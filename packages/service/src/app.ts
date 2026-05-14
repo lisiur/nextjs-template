@@ -1,0 +1,35 @@
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { Scalar } from "@scalar/hono-api-reference";
+import { cors } from "hono/cors";
+import { logger } from "hono/logger";
+import { routes } from "./routes";
+
+const openAPIApp = new OpenAPIHono().basePath("/api");
+
+openAPIApp.use("*", logger());
+openAPIApp.use("*", cors());
+
+const app = openAPIApp
+  .route("/", routes)
+  .get("/", (c) => c.json({ message: "Hello world!" }))
+  .get(
+    "/docs",
+    Scalar({
+      sources: [
+        { url: "/api/openapi.json", title: "Main" },
+        { url: "/api/auth/open-api/generate-schema", title: "Authentication" },
+      ],
+    }),
+  );
+
+openAPIApp.doc("/openapi.json", {
+  openapi: "3.0.0",
+  info: {
+    title: "Next101 API",
+    version: "1.0.0",
+    description: "Hono REST API with OpenAPI support",
+  },
+  servers: [{ url: "/api" }],
+});
+
+export { app };
