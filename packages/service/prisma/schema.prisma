@@ -122,3 +122,21 @@ model Invitation {
   @@index([email])
   @@map("invitation")
 }
+
+model SystemConfig {
+  id          String   @id @default(cuid())
+  group       String
+  key         String
+  value       String
+  type        String   @default("string")
+  label       String
+  description String?
+  isSecret    Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([group, key])
+  @@index([group])
+  @@map("system_config")
+}

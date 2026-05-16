@@ -32,11 +32,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full">
         <NextIntlClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-          >
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Loader />
             <Toaster
               richColors

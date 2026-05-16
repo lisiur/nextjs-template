@@ -84,5 +84,51 @@
   },
   "Header": {
     "brand": "Next101"
+  },
+  "Users": {
+    "title": "User Management",
+    "description": "Manage system users",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "createdAt": "Created At",
+    "actions": "Actions",
+    "active": "Active",
+    "banned": "Banned",
+    "noUsers": "No users found",
+    "addUser": "Add User",
+    "addUserDescription": "Create a new user account",
+    "editUser": "Edit User",
+    "editUserDescription": "Update user information",
+    "deleteUser": "Delete User",
+    "confirmDelete": "Are you sure you want to delete",
+    "cancel": "Cancel",
+    "password": "Password",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "updateSuccess": "User updated successfully",
+    "createSuccess": "User created successfully",
+    "deleteSuccess": "User deleted successfully",
+    "fetchFailed": "Failed to fetch users",
+    "showing": "Showing",
+    "of": "of",
+    "previous": "Previous",
+    "next": "Next",
+    "roles": {
+      "admin": "Admin",
+      "member": "Member"
+    }
+  },
+  "Settings": {
+    "title": "System Settings",
+    "description": "Manage your application configuration",
+    "save": "Save Changes",
+    "saving": "Saving...",
+    "saveSuccess": "Settings saved successfully",
+    "saveFailed": "Failed to save settings",
+    "loadFailed": "Failed to load settings"
   }
 }
