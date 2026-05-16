@@ -53,7 +53,7 @@ export function ConfigField({ item, control }: ConfigFieldProps) {
             return (
               <Textarea
                 id={item.key}
-                value={field.value}
+                value={field.value ?? ""}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
                 name={field.name}
@@ -74,7 +74,7 @@ export function ConfigField({ item, control }: ConfigFieldProps) {
                     ? "number"
                     : "text"
               }
-              value={field.value}
+              value={field.value ?? ""}
               onChange={field.onChange}
               onBlur={field.onBlur}
               name={field.name}

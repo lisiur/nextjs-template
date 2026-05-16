@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { appClient } from "@/lib/api";
+import { useSystemConfigStore } from "@/stores/system-config-store";
 import { ConfigField } from "./config-field";
 
 interface ConfigItem {
@@ -28,12 +30,17 @@ export function ConfigGroup({ group }: ConfigGroupProps) {
   const [items, setItems] = useState<ConfigItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const updateConfig = useSystemConfigStore((s) => s.updateConfig);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/system-config/${group}`);
+        const res = await appClient.api["system-config"][":group"].$get({
+          param: {
+            group,
+          },
+        });
         if (!res.ok) throw new Error("Failed to load");
         const data = await res.json();
         setItems(data);
@@ -62,18 +69,21 @@ export function ConfigGroup({ group }: ConfigGroupProps) {
         group: item.group,
         key: item.key,
         value: form.getValues(item.key),
-        type: item.type,
+        type: item.type as "string" | "number" | "boolean" | "json",
         label: item.label,
         description: item.description ?? undefined,
         isSecret: item.isSecret,
         sortOrder: item.sortOrder,
       }));
-      const res = await fetch("/api/system-config/batch", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: payload }),
+      const res = await appClient.api["system-config"].batch.$put({
+        json: {
+          items: payload,
+        },
       });
       if (!res.ok) throw new Error("Failed to save");
+      for (const item of payload) {
+        updateConfig(item.group, item.key, item.value);
+      }
       toast.success("Settings saved");
     } catch {
       toast.error("Failed to save settings");

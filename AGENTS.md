@@ -23,6 +23,7 @@ pnpm db:migrate       # Run Prisma migrations
 - The API layer (`@repo/service`) is wired into Next.js at `apps/admin/src/app/api/[[...route]]/route.ts` using `hono/vercel`. The service can also run independently (`pnpm --filter @repo/service dev`).
 - Hono RPC client is used for type-safe API calls: `hc<AppType>("/api")` in `apps/admin/src/lib/api/index.ts`.
 - Prisma client is a global singleton (dev hot-reload safe). Import from `@repo/service`, not directly.
+- **每次修改 `schema.prisma` 后，必须重新运行 `pnpm db:generate` 并重启 dev server**，否则运行时 `prisma.<model>` 会是 `undefined`（500 错误）。
 - Linter is **Biome** (`biome.json`), not ESLint. Uses spaces (indent width 2). Generated code in `**/prisma/generated` is excluded.
 - No tests, no CI workflows configured yet.
 
@@ -166,3 +167,50 @@ const routes = new OpenAPIHono()
 
 export { routes };
 ```
+
+## Calling API from Frontend (Hono RPC Client)
+
+Use the typed `appClient` from `@/lib/api` for all API calls. Never use raw `fetch`.
+
+### Client setup
+
+```ts
+// apps/admin/src/lib/api/app-client.ts
+import { hc } from "hono/client";
+import type { AppType } from "@/app/api/[[...route]]/route";
+
+export const appClient = hc<AppType>("/api");
+```
+
+### GET requests
+
+```ts
+import { appClient } from "@/lib/api";
+
+// Path params use bracket notation: [":param"]
+const res = await appClient.api["system-config"][":group"].$get({
+  param: { group: "general" },
+});
+
+if (!res.ok) throw new Error("Failed to load");
+const data = await res.json();
+```
+
+### PUT/POST requests with JSON body
+
+```ts
+const res = await appClient.api["system-config"].batch.$put({
+  json: {
+    items: payload,
+  },
+});
+
+if (!res.ok) throw new Error("Failed to save");
+```
+
+### Rules
+- Always import `appClient` from `@/lib/api`
+- Path params: use bracket notation `[":param"]` for dynamic segments
+- Nested routes: use dot notation `.batch.$put()` for static segments
+- Request body: use `json` key (not `body`)
+- Always check `res.ok` before calling `res.json()`

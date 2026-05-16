@@ -3,6 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client";
 
 const adapter = new PrismaPg({
+  // biome-ignore lint/style/noNonNullAssertion: seed script, DATABASE_URL is required
   connectionString: process.env.DATABASE_URL!,
 });
 const prisma = new PrismaClient({ adapter });

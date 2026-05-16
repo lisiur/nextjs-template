@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter './apps/*' dev",
+    "dev": "NODE_OPTIONS='--max-old-space-size=8192' pnpm --filter './apps/*' dev",
     "build": "pnpm --filter './apps/*' build",
     "lint": "biome check .",
     "lint:fix": "biome check --write --unsafe .",
