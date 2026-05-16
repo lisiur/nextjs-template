@@ -1,9 +1,9 @@
 # Monorepo Workspace
 
-pnpm monorepo. See `apps/web/AGENTS.md` for Next.js-specific rules.
+pnpm monorepo. See `apps/admin/AGENTS.md` for Next.js-specific rules.
 
 ## Structure
-- `apps/web` — Next.js 16 app (React 19, Tailwind 4, shadcn/ui)
+- `apps/admin` — Next.js 16 app (React 19, Tailwind 4, shadcn/ui)
 - `packages/service` — Hono API server (OpenAPI/Zod, Scalar docs) with Prisma 7 + PostgreSQL. Can run standalone on port 3001 or be consumed as a Next.js API route via `hono/vercel`
 - `packages/shared` — Shared utilities (currently empty)
 
@@ -20,8 +20,8 @@ pnpm db:migrate       # Run Prisma migrations
 ```
 
 ## Architecture Notes
-- The API layer (`@repo/service`) is wired into Next.js at `apps/web/src/app/api/[[...route]]/route.ts` using `hono/vercel`. The service can also run independently (`pnpm --filter @repo/service dev`).
-- Hono RPC client is used for type-safe API calls: `hc<AppType>("/api")` in `apps/web/src/lib/api/index.ts`.
+- The API layer (`@repo/service`) is wired into Next.js at `apps/admin/src/app/api/[[...route]]/route.ts` using `hono/vercel`. The service can also run independently (`pnpm --filter @repo/service dev`).
+- Hono RPC client is used for type-safe API calls: `hc<AppType>("/api")` in `apps/admin/src/lib/api/index.ts`.
 - Prisma client is a global singleton (dev hot-reload safe). Import from `@repo/service`, not directly.
 - Linter is **Biome** (`biome.json`), not ESLint. Uses spaces (indent width 2). Generated code in `**/prisma/generated` is excluded.
 - No tests, no CI workflows configured yet.
