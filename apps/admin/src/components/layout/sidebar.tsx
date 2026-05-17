@@ -1,6 +1,6 @@
 "use client";
 
-import { HomeIcon, SettingsIcon, UsersIcon } from "lucide-react";
+import { Building2Icon, HomeIcon, SettingsIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -23,6 +23,11 @@ const menuItems = [
     url: "/users",
     icon: UsersIcon,
   },
+  {
+    title: "Organizations",
+    url: "/organizations",
+    icon: Building2Icon,
+  },
 ];
 
 const bottomMenuItems = [
@@ -37,7 +42,7 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar collapsible="none">
+    <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarMenu>
           {menuItems.map((item) => (
