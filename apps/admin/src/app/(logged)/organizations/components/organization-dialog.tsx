@@ -1,8 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ImagePlus, X } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -25,7 +27,7 @@ const orgSchema = z.object({
     .string()
     .min(1)
     .regex(/^[a-z0-9-]+$/),
-  logo: z.string().url().optional().or(z.literal("")),
+  logo: z.string().optional().or(z.literal("")),
   metadata: z.string().optional(),
 });
 
@@ -59,6 +61,10 @@ export function OrganizationDialog({
 }: OrganizationDialogProps) {
   const t = useTranslations("Organizations");
   const isEdit = !!organization;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [logoPreview, setLogoPreview] = useState<string>(
+    organization?.logo ?? "",
+  );
 
   const {
     register,
@@ -78,6 +84,26 @@ export function OrganizationDialog({
   });
 
   const watchName = watch("name");
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setLogoPreview(dataUrl);
+      setValue("logo", dataUrl, { shouldValidate: true });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleRemoveLogo() {
+    setLogoPreview("");
+    setValue("logo", "", { shouldValidate: true });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
 
   useEffect(() => {
     if (!isEdit && watchName) {
@@ -117,6 +143,7 @@ export function OrganizationDialog({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       reset();
+      setLogoPreview(organization?.logo ?? "");
     }
     onOpenChange(nextOpen);
   }
@@ -146,8 +173,44 @@ export function OrganizationDialog({
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="logo">{t("logo")}</Label>
-            <Input id="logo" {...register("logo")} placeholder="https://" />
+            <Label>{t("logo")}</Label>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            {logoPreview ? (
+              <div className="relative inline-block">
+                <Image
+                  src={logoPreview}
+                  alt="Logo preview"
+                  width={80}
+                  height={80}
+                  className="rounded-lg border object-cover"
+                  unoptimized
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute -top-2 -right-2 h-6 w-6"
+                  onClick={handleRemoveLogo}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ImagePlus className="mr-2 h-4 w-4" />
+                {t("uploadLogo")}
+              </Button>
+            )}
             {errors.logo && (
               <p className="text-sm text-destructive">{errors.logo.message}</p>
             )}

@@ -137,6 +137,7 @@
     "name": "名称",
     "slug": "标识",
     "logo": "Logo",
+    "uploadLogo": "上传 Logo",
     "metadata": "元数据",
     "createdAt": "创建时间",
     "actions": "操作",

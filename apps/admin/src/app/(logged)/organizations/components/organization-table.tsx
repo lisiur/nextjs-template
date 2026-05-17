@@ -92,9 +92,24 @@ export function OrganizationTable() {
 
   if (organizations.length === 0) {
     return (
-      <div className="py-8 text-center text-muted-foreground">
-        {t("noOrgs")}
-      </div>
+      <>
+        <div className="mb-4 flex justify-end">
+          <Button onClick={() => setShowCreate(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t("addOrg")}
+          </Button>
+        </div>
+        <div className="py-8 text-center text-muted-foreground">
+          {t("noOrgs")}
+        </div>
+        {showCreate && (
+          <OrganizationDialog
+            open={showCreate}
+            onOpenChange={(open) => !open && setShowCreate(false)}
+            onSuccess={handleCreateSuccess}
+          />
+        )}
+      </>
     );
   }
 

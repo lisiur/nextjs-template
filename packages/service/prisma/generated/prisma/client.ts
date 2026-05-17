@@ -81,3 +81,8 @@ export type Invitation = Prisma.InvitationModel
  * 
  */
 export type SystemConfig = Prisma.SystemConfigModel
+/**
+ * Model Upload
+ * 
+ */
+export type Upload = Prisma.UploadModel

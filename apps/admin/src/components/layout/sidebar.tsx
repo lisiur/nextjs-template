@@ -1,6 +1,12 @@
 "use client";
 
-import { Building2Icon, HomeIcon, SettingsIcon, UsersIcon } from "lucide-react";
+import {
+  Building2Icon,
+  HomeIcon,
+  SettingsIcon,
+  UserIcon,
+  UsersIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -31,6 +37,11 @@ const menuItems = [
 ];
 
 const bottomMenuItems = [
+  {
+    title: "Profile",
+    url: "/profile",
+    icon: UserIcon,
+  },
   {
     title: "Settings",
     url: "/settings",

@@ -137,6 +137,7 @@
     "name": "Name",
     "slug": "Slug",
     "logo": "Logo",
+    "uploadLogo": "Upload Logo",
     "metadata": "Metadata",
     "createdAt": "Created At",
     "actions": "Actions",

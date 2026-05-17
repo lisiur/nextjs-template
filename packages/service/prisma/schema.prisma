@@ -23,6 +23,7 @@ model User {
   accounts      Account[]
   members       Member[]
   invitations   Invitation[]
+  uploads       Upload[]
 
   @@unique([email])
   @@map("user")
@@ -139,4 +140,18 @@ model SystemConfig {
   @@unique([group, key])
   @@index([group])
   @@map("system_config")
+}
+
+model Upload {
+  id         String   @id @default(cuid())
+  path       String
+  mimeType   String
+  size       Int
+  visibility String   @default("private")
+  uploaderId String
+  uploader   User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([uploaderId])
+  @@map("upload")
 }
