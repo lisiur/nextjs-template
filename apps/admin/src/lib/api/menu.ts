@@ -71,3 +71,16 @@ export async function deleteMenu(id: string): Promise<void> {
   const res = await appClient.api.menu[':id'].$delete({ param: { id } });
   if (!res.ok) throw new Error('Failed to delete menu');
 }
+
+export interface ReorderItem {
+  id: string;
+  parentId: string | null;
+  sortOrder: number;
+}
+
+export async function reorderMenus(items: ReorderItem[]): Promise<Menu[]> {
+  const res = await appClient.api.menu.reorder.$post({ json: { items } });
+  if (!res.ok) throw new Error('Failed to reorder menus');
+  const data = await res.json();
+  return data.menus;
+}
