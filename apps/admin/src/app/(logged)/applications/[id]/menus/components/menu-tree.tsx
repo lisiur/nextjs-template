@@ -23,11 +23,25 @@ import {
   FolderOpen,
   GripVertical,
   icons,
+  Loader2,
   type LucideIcon,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { appClient } from "@/lib/api";
 import { cn } from "@/utils/cn";
@@ -84,7 +98,6 @@ function buildTree(menus: Menu[]): SortableMenuItem[] {
     }
   }
 
-  // Sort children by sortOrder
   function sortChildren(nodes: SortableMenuItem[]) {
     nodes.sort((a, b) => a.sortOrder - b.sortOrder);
     for (const node of nodes) {
@@ -113,6 +126,8 @@ interface SortableNodeProps {
   onSelect?: (menu: Menu) => void;
   expandedIds: Set<string>;
   onToggle: (id: string) => void;
+  onAddChild: (menu: Menu) => void;
+  onDelete: (menu: Menu) => void;
 }
 
 function SortableNode({
@@ -122,6 +137,8 @@ function SortableNode({
   onSelect,
   expandedIds,
   onToggle,
+  onAddChild,
+  onDelete,
 }: SortableNodeProps) {
   const {
     attributes,
@@ -143,20 +160,13 @@ function SortableNode({
 
   return (
     <div ref={setNodeRef} style={style}>
-      <button
-        type="button"
+      <div
         className={cn(
-          "flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+          "group flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
           isSelected && "bg-accent font-medium text-accent-foreground",
           isDragging && "opacity-50",
         )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
-        onClick={() => {
-          if (hasChildren) {
-            onToggle(node.id);
-          }
-          onSelect?.(node.menu);
-        }}
       >
         <span
           className="shrink-0 cursor-grab touch-none text-muted-foreground hover:text-foreground"
@@ -166,33 +176,67 @@ function SortableNode({
         >
           <GripVertical className="h-4 w-4" />
         </span>
-        {hasChildren ? (
-          <span
-            className="shrink-0"
+        <button
+          type="button"
+          className="flex shrink-0 items-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (hasChildren) onToggle(node.id);
+            onSelect?.(node.menu);
+          }}
+        >
+          {hasChildren ? (
+            <>
+              <FolderOpen
+                className={cn(
+                  "h-4 w-4 text-muted-foreground transition-transform",
+                  !isExpanded && "hidden",
+                )}
+              />
+              <Folder
+                className={cn(
+                  "h-4 w-4 text-muted-foreground transition-transform",
+                  isExpanded && "hidden",
+                )}
+              />
+            </>
+          ) : (
+            <span className="h-4 w-4" />
+          )}
+        </button>
+        {node.icon && <span className="shrink-0">{node.icon}</span>}
+        <button
+          type="button"
+          className="min-w-0 flex-1 truncate text-left"
+          onClick={() => onSelect?.(node.menu)}
+        >
+          {node.name}
+        </button>
+        <div className="flex shrink-0 gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5"
             onClick={(e) => {
               e.stopPropagation();
-              onToggle(node.id);
+              onAddChild(node.menu);
             }}
           >
-            <FolderOpen
-              className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform",
-                !isExpanded && "hidden",
-              )}
-            />
-            <Folder
-              className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform",
-                isExpanded && "hidden",
-              )}
-            />
-          </span>
-        ) : (
-          <span className="h-4 w-4 shrink-0" />
-        )}
-        {node.icon && <span className="shrink-0">{node.icon}</span>}
-        <span className="truncate">{node.name}</span>
-      </button>
+            <Plus className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-5 w-5 text-destructive hover:text-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(node.menu);
+            }}
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
       {hasChildren && isExpanded && (
         <SortableContext
           items={node.children.map((c) => c.id)}
@@ -207,6 +251,8 @@ function SortableNode({
               onSelect={onSelect}
               expandedIds={expandedIds}
               onToggle={onToggle}
+              onAddChild={onAddChild}
+              onDelete={onDelete}
             />
           ))}
         </SortableContext>
@@ -219,18 +265,30 @@ interface MenuTreeProps {
   appId: string;
   selectedMenuId?: string | null;
   onSelectMenu?: (menu: Menu) => void;
+  onMenuAdded?: () => void;
+  onMenuDeleted?: () => void;
 }
 
 export function MenuTree({
   appId,
   selectedMenuId,
   onSelectMenu,
+  onMenuAdded,
+  onMenuDeleted,
 }: MenuTreeProps) {
   const t = useTranslations("Menus");
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  const [addChildTarget, setAddChildTarget] = useState<Menu | null>(null);
+  const [childName, setChildName] = useState("");
+  const [childCode, setChildCode] = useState("");
+  const [addingChild, setAddingChild] = useState(false);
+
+  const [deleteTarget, setDeleteTarget] = useState<Menu | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -245,7 +303,6 @@ export function MenuTree({
       if (res.ok) {
         const data = await res.json();
         setMenus(data.menus);
-        // Auto-expand root nodes
         setExpandedIds(
           new Set(
             data.menus.filter((m: Menu) => !m.parentId).map((m: Menu) => m.id),
@@ -284,6 +341,59 @@ export function MenuTree({
     });
   }, []);
 
+  const handleAddChild = useCallback((menu: Menu) => {
+    setAddChildTarget(menu);
+    setChildName("");
+    setChildCode("");
+  }, []);
+
+  const handleDelete = useCallback((menu: Menu) => {
+    setDeleteTarget(menu);
+  }, []);
+
+  const handleAddChildSubmit = useCallback(async () => {
+    if (!addChildTarget || !childName.trim() || !childCode.trim()) return;
+    setAddingChild(true);
+    try {
+      await appClient.api.menu.$post({
+        json: {
+          name: childName.trim(),
+          code: childCode.trim(),
+          appId,
+          parentId: addChildTarget.id,
+        },
+      });
+      toast.success(t("addChildSuccess"));
+      setAddChildTarget(false as unknown as Menu);
+      setChildName("");
+      setChildCode("");
+      fetchMenus();
+      onMenuAdded?.();
+    } catch {
+      // Error handled by client
+    } finally {
+      setAddingChild(false);
+    }
+  }, [addChildTarget, childName, childCode, appId, t, fetchMenus, onMenuAdded]);
+
+  const handleDeleteSubmit = useCallback(async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await appClient.api.menu[":id"].$delete({
+        param: { id: deleteTarget.id },
+      });
+      toast.success(t("deleteSuccess"));
+      setDeleteTarget(null);
+      fetchMenus();
+      onMenuDeleted?.();
+    } catch {
+      // Error handled by client
+    } finally {
+      setDeleting(false);
+    }
+  }, [deleteTarget, t, fetchMenus, onMenuDeleted]);
+
   const findParentId = useCallback(
     (
       nodeId: string,
@@ -314,11 +424,9 @@ export function MenuTree({
 
       if (activeId === overId) return;
 
-      // Check if we're dragging onto a different parent
       const activeParentId = findParentId(activeId, treeData);
       const overParentId = findParentId(overId, treeData);
 
-      // If dragging to a different parent level, move the node
       if (activeParentId !== overParentId) {
         setMenus((prev) => {
           const updated = [...prev];
@@ -343,32 +451,26 @@ export function MenuTree({
       const draggedId = String(active.id);
       const overId = String(over.id);
 
-      // Use functional form to get the latest menus state (handleDragOver may have updated it)
       let latestMenus: Menu[] = [];
       setMenus((prev) => {
         latestMenus = prev;
-        return prev; // Don't modify yet
+        return prev;
       });
 
-      // Find the parent of the over item from latest state
       const overParentId =
         latestMenus.find((m) => m.id === overId)?.parentId ?? null;
 
-      // Get all siblings under the same parent
       const siblings = latestMenus.filter(
         (m) => (m.parentId ?? null) === overParentId,
       );
 
-      // Find current and target indices
       const activeIndex = siblings.findIndex((m) => m.id === draggedId);
       const overIndex = siblings.findIndex((m) => m.id === overId);
 
       if (activeIndex === -1 || overIndex === -1) return;
 
-      // Reorder locally
       const reordered = arrayMove(siblings, activeIndex, overIndex);
 
-      // Update menus state with new sort orders
       setMenus((prev) => {
         const updated = [...prev];
         for (let i = 0; i < reordered.length; i++) {
@@ -380,7 +482,6 @@ export function MenuTree({
         return updated;
       });
 
-      // Build reorder payload with all items that changed
       const changed = reordered
         .map((item, idx) => {
           const original = latestMenus.find((m) => m.id === item.id);
@@ -405,7 +506,6 @@ export function MenuTree({
         sortOrder: number;
       }[];
 
-      // Also include items that changed parentId but weren't in the reorder group
       for (const item of latestMenus) {
         if (item.id === draggedId) continue;
         const inChanged = changed.some((c) => c.id === item.id);
@@ -453,78 +553,157 @@ export function MenuTree({
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="rounded-md border p-1">
-        <div className="flex gap-1 px-1 pb-1">
-          <button
-            type="button"
-            className="text-xs text-muted-foreground hover:text-foreground"
-            onClick={() => {
-              const allIds = new Set<string>();
-              function collect(nodes: SortableMenuItem[]) {
-                for (const node of nodes) {
-                  if (node.children.length > 0) {
-                    allIds.add(node.id);
-                    collect(node.children);
+    <>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="rounded-md border p-1">
+          <div className="flex gap-1 px-1 pb-1">
+            <button
+              type="button"
+              className="text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                const allIds = new Set<string>();
+                function collect(nodes: SortableMenuItem[]) {
+                  for (const node of nodes) {
+                    if (node.children.length > 0) {
+                      allIds.add(node.id);
+                      collect(node.children);
+                    }
                   }
                 }
-              }
-              collect(treeData);
-              setExpandedIds(allIds);
-            }}
-          >
-            {t("expandAll")}
-          </button>
-          <span className="text-muted-foreground">/</span>
-          <button
-            type="button"
-            className="text-xs text-muted-foreground hover:text-foreground"
-            onClick={() => setExpandedIds(new Set())}
-          >
-            {t("collapseAll")}
-          </button>
+                collect(treeData);
+                setExpandedIds(allIds);
+              }}
+            >
+              {t("expandAll")}
+            </button>
+            <span className="text-muted-foreground">/</span>
+            <button
+              type="button"
+              className="text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => setExpandedIds(new Set())}
+            >
+              {t("collapseAll")}
+            </button>
+          </div>
+          {treeData.length === 0 ? (
+            <div className="py-4 text-center text-sm text-muted-foreground">
+              {t("noData")}
+            </div>
+          ) : (
+            <SortableContext
+              items={treeData.map((n) => n.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {treeData.map((node) => (
+                <SortableNode
+                  key={node.id}
+                  node={node}
+                  level={0}
+                  selectedId={selectedMenuId}
+                  onSelect={handleSelect}
+                  expandedIds={expandedIds}
+                  onToggle={handleToggle}
+                  onAddChild={handleAddChild}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </SortableContext>
+          )}
         </div>
-        {treeData.length === 0 ? (
-          <div className="py-4 text-center text-sm text-muted-foreground">
-            {t("noData")}
+        <DragOverlay>
+          {activeMenu ? (
+            <div className="flex items-center gap-1.5 rounded-md bg-background px-2 py-1.5 text-sm shadow-md opacity-90">
+              {activeMenu.icon && (
+                <span className="shrink-0">
+                  {getIcon(activeMenu.icon ?? null)}
+                </span>
+              )}
+              <span className="truncate">{activeMenu.name}</span>
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+
+      {/* Add Child Dialog */}
+      <Dialog
+        open={!!addChildTarget}
+        onOpenChange={(open) => !open && setAddChildTarget(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("addChildTitle")}</DialogTitle>
+            <DialogDescription>{t("addChildDescription")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Field orientation="vertical">
+              <FieldLabel htmlFor="child-name">{t("name")} *</FieldLabel>
+              <FieldContent>
+                <Input
+                  id="child-name"
+                  value={childName}
+                  onChange={(e) => setChildName(e.target.value)}
+                />
+              </FieldContent>
+            </Field>
+            <Field orientation="vertical">
+              <FieldLabel htmlFor="child-code">{t("code")} *</FieldLabel>
+              <FieldContent>
+                <Input
+                  id="child-code"
+                  value={childCode}
+                  onChange={(e) => setChildCode(e.target.value)}
+                />
+              </FieldContent>
+            </Field>
           </div>
-        ) : (
-          <SortableContext
-            items={treeData.map((n) => n.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            {treeData.map((node) => (
-              <SortableNode
-                key={node.id}
-                node={node}
-                level={0}
-                selectedId={selectedMenuId}
-                onSelect={handleSelect}
-                expandedIds={expandedIds}
-                onToggle={handleToggle}
-              />
-            ))}
-          </SortableContext>
-        )}
-      </div>
-      <DragOverlay>
-        {activeMenu ? (
-          <div className="flex items-center gap-1.5 rounded-md bg-background px-2 py-1.5 text-sm shadow-md opacity-90">
-            {activeMenu.icon && (
-              <span className="shrink-0">
-                {getIcon(activeMenu.icon ?? null)}
-              </span>
-            )}
-            <span className="truncate">{activeMenu.name}</span>
-          </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddChildTarget(null)}>
+              {t("cancel")}
+            </Button>
+            <Button
+              onClick={handleAddChildSubmit}
+              disabled={addingChild || !childName.trim() || !childCode.trim()}
+            >
+              {addingChild && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("add")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("deleteConfirmTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("deleteConfirmDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteSubmit}
+              disabled={deleting}
+            >
+              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {t("delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

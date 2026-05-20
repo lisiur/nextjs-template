@@ -1,8 +1,7 @@
 "use client";
 
-import { use } from "react";
 import { useTranslations } from "next-intl";
-import { useCallback, useState } from "react";
+import { use, useCallback, useState } from "react";
 import { MenuForm } from "./components/menu-form";
 import { MenuTree } from "./components/menu-tree";
 
@@ -49,17 +48,17 @@ export default function MenusPage({ params }: MenusPageProps) {
       <div className="flex gap-6" style={{ height: "calc(100vh - 200px)" }}>
         {/* Left panel — Tree navigation */}
         <div className="w-80 shrink-0 overflow-auto rounded-md border">
-          <MenuTree appId={id} selectedMenuId={selectedMenu?.id} onSelectMenu={handleSelectMenu} />
+          <MenuTree
+            appId={id}
+            selectedMenuId={selectedMenu?.id}
+            onSelectMenu={handleSelectMenu}
+            onMenuDeleted={handleMenuDeleted}
+          />
         </div>
         {/* Right panel — Edit form */}
         <div className="flex-1 overflow-auto">
           {selectedMenu ? (
-            <MenuForm
-              menu={selectedMenu}
-              appId={id}
-              onSaved={handleMenuSaved}
-              onDeleted={handleMenuDeleted}
-            />
+            <MenuForm menu={selectedMenu} onSaved={handleMenuSaved} />
           ) : (
             <div className="flex h-full items-center justify-center text-muted-foreground">
               {t("selectMenuToEdit")}
