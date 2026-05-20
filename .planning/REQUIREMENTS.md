@@ -62,26 +62,26 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| APP-01 | — | Pending |
-| APP-02 | — | Pending |
-| APP-03 | — | Pending |
-| APP-04 | — | Pending |
-| APP-05 | — | Pending |
-| MENU-01 | — | Pending |
-| MENU-02 | — | Pending |
-| MENU-03 | — | Pending |
-| MENU-04 | — | Pending |
-| MENU-05 | — | Pending |
-| MENU-06 | — | Pending |
-| RBAC-01 | — | Pending |
-| RBAC-02 | — | Pending |
-| MIGR-01 | — | Pending |
+| APP-01 | Phase 1: Foundation | Pending |
+| APP-02 | Phase 1: Foundation | Pending |
+| APP-03 | Phase 1: Foundation | Pending |
+| APP-04 | Phase 1: Foundation | Pending |
+| APP-05 | Phase 1: Foundation | Pending |
+| MENU-01 | Phase 2: Menu Tree Management | Pending |
+| MENU-02 | Phase 2: Menu Tree Management | Pending |
+| MENU-03 | Phase 2: Menu Tree Management | Pending |
+| MENU-04 | Phase 2: Menu Tree Management | Pending |
+| MENU-05 | Phase 2: Menu Tree Management | Pending |
+| MENU-06 | Phase 2: Menu Tree Management | Pending |
+| RBAC-01 | Phase 3: RBAC & Menu Visibility | Pending |
+| RBAC-02 | Phase 3: RBAC & Menu Visibility | Pending |
+| MIGR-01 | Phase 4: Migration | Pending |
 
 **Coverage:**
 - v1 requirements: 14 total
-- Mapped to phases: 0
-- Unmapped: 14 ⚠️
+- Mapped to phases: 14 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-20*
-*Last updated: 2026-05-20 after initial definition*
+*Last updated: 2026-05-20 after roadmap creation — traceability mapped*
