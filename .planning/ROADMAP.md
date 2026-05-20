@@ -83,12 +83,10 @@ Plans:
   1. All existing hardcoded admin navigation items are represented in the database
   2. The admin sidebar loads menus from the database instead of hardcoded data
   3. Existing navigation functionality is preserved (no broken links or missing items)
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 04-01: Seed script to populate database with current hardcoded menu items
-- [ ] 04-02: Switch sidebar from hardcoded to dynamic rendering
-- [ ] 04-03: Remove hardcoded menu data and verify full functionality
+- [ ] 04-01-PLAN.md — Seed Application, Menu, and MenuRole data for admin navigation
 
 ## Progress
 
@@ -100,4 +98,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Foundation | 3/3 | Complete   | 2026-05-20 |
 | 2. Menu Tree Management | 5/5 | Complete | 2026-05-20 |
 | 3. RBAC & Menu Visibility | 0/3 | Planning complete | - |
-| 4. Migration | 0/3 | Not started | - |
+| 4. Migration | 0/1 | Planning complete | - |
