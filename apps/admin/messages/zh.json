@@ -146,7 +146,10 @@
     "organizations": "组织",
     "applications": "应用",
     "profile": "个人资料",
-    "settings": "设置"
+    "settings": "设置",
+    "loading": "加载菜单中...",
+    "noMenus": "暂无可用菜单",
+    "fetchError": "加载菜单失败"
   },
   "Organizations": {
     "title": "组织管理",
