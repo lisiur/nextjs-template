@@ -295,5 +295,9 @@
         "fromEmail": "用作发件人的邮箱地址"
       }
     }
+  },
+  "Menus": {
+    "fetchFailed": "获取菜单失败",
+    "reorderFailed": "菜单排序失败"
   }
 }

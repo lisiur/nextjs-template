@@ -295,5 +295,9 @@
         "fromEmail": "Email address used as sender"
       }
     }
+  },
+  "Menus": {
+    "fetchFailed": "Failed to fetch menus",
+    "reorderFailed": "Failed to reorder menus"
   }
 }
