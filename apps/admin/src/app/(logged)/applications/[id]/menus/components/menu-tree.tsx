@@ -29,7 +29,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -290,6 +290,8 @@ export function MenuTree({
   const [deleteTarget, setDeleteTarget] = useState<Menu | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const parentChangesRef = useRef<Map<string, string | null>>(new Map());
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
@@ -412,6 +414,7 @@ export function MenuTree({
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(String(event.active.id));
+    parentChangesRef.current.clear();
   }, []);
 
   const handleDragOver = useCallback(
@@ -428,6 +431,7 @@ export function MenuTree({
       const overParentId = findParentId(overId, treeData);
 
       if (activeParentId !== overParentId) {
+        parentChangesRef.current.set(activeId, overParentId);
         setMenus((prev) => {
           const updated = [...prev];
           const activeMenu = updated.find((m) => m.id === activeId);
@@ -446,7 +450,10 @@ export function MenuTree({
       const { active, over } = event;
       setActiveId(null);
 
-      if (!over || active.id === over.id) return;
+      if (!over || active.id === over.id) {
+        parentChangesRef.current.clear();
+        return;
+      }
 
       const draggedId = String(active.id);
       const overId = String(over.id);
@@ -467,7 +474,10 @@ export function MenuTree({
       const activeIndex = siblings.findIndex((m) => m.id === draggedId);
       const overIndex = siblings.findIndex((m) => m.id === overId);
 
-      if (activeIndex === -1 || overIndex === -1) return;
+      if (activeIndex === -1 || overIndex === -1) {
+        parentChangesRef.current.clear();
+        return;
+      }
 
       const reordered = arrayMove(siblings, activeIndex, overIndex);
 
@@ -482,44 +492,46 @@ export function MenuTree({
         return updated;
       });
 
-      const changed = reordered
-        .map((item, idx) => {
-          const original = latestMenus.find((m) => m.id === item.id);
-          if (!original) return null;
-          const newParentId = original.parentId ?? null;
-          const newSortOrder = idx;
-          if (
-            original.parentId !== newParentId ||
-            original.sortOrder !== newSortOrder
-          ) {
-            return {
-              id: item.id,
-              parentId: newParentId,
-              sortOrder: newSortOrder,
-            };
-          }
-          return null;
-        })
-        .filter(Boolean) as {
-        id: string;
-        parentId: string | null;
-        sortOrder: number;
-      }[];
+      // Build changed items using ref for parent changes + local sort order changes
+      const changed: { id: string; parentId: string | null; sortOrder: number }[] = [];
 
-      for (const item of latestMenus) {
-        if (item.id === draggedId) continue;
-        const inChanged = changed.some((c) => c.id === item.id);
-        if (!inChanged) {
-          const original = latestMenus.find((m) => m.id === item.id);
-          if (original && original.parentId !== item.parentId) {
-            changed.push({
-              id: item.id,
-              parentId: item.parentId ?? null,
-              sortOrder: item.sortOrder,
-            });
-          }
+      for (let i = 0; i < reordered.length; i++) {
+        const item = reordered[i];
+        const original = latestMenus.find((m) => m.id === item.id);
+        if (!original) continue;
+
+        const newParentId = parentChangesRef.current.has(item.id)
+          ? parentChangesRef.current.get(item.id)!
+          : (original.parentId ?? null);
+        const newSortOrder = i;
+
+        if (
+          original.parentId !== newParentId ||
+          original.sortOrder !== newSortOrder
+        ) {
+          changed.push({
+            id: item.id,
+            parentId: newParentId,
+            sortOrder: newSortOrder,
+          });
         }
       }
+
+      // Also detect items whose parent changed but weren't in the reorder group
+      for (const [itemId, newParentId] of parentChangesRef.current) {
+        if (itemId === draggedId) continue;
+        if (changed.some((c) => c.id === itemId)) continue;
+        const original = latestMenus.find((m) => m.id === itemId);
+        if (original && original.parentId !== newParentId) {
+          changed.push({
+            id: itemId,
+            parentId: newParentId,
+            sortOrder: original.sortOrder,
+          });
+        }
+      }
+
+      parentChangesRef.current.clear();
 
       if (changed.length === 0) return;
 
