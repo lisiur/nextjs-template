@@ -25,8 +25,6 @@ const menuSchema = z.object({
   name: z.string().min(1, "Name is required"),
   code: z.string().min(1, "Code is required"),
   icon: z.string().optional().or(z.literal("")),
-  url: z.string().optional().or(z.literal("")),
-  sortOrder: z.number().int().min(0),
   isExternal: z.boolean(),
   isVisible: z.boolean(),
 });
@@ -67,8 +65,6 @@ export function MenuForm({ menu, onSaved }: MenuFormProps) {
       name: menu.name,
       code: menu.code,
       icon: menu.icon ?? "",
-      url: menu.url ?? "",
-      sortOrder: menu.sortOrder,
       isExternal: menu.isExternal,
       isVisible: menu.isVisible,
     },
@@ -79,8 +75,6 @@ export function MenuForm({ menu, onSaved }: MenuFormProps) {
       name: menu.name,
       code: menu.code,
       icon: menu.icon ?? "",
-      url: menu.url ?? "",
-      sortOrder: menu.sortOrder,
       isExternal: menu.isExternal,
       isVisible: menu.isVisible,
     });
@@ -98,8 +92,6 @@ export function MenuForm({ menu, onSaved }: MenuFormProps) {
           name: data.name,
           code: data.code,
           icon: data.icon || null,
-          url: data.url || null,
-          sortOrder: data.sortOrder,
           isExternal: data.isExternal,
           isVisible: data.isVisible,
         },
@@ -135,40 +127,14 @@ export function MenuForm({ menu, onSaved }: MenuFormProps) {
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Field orientation="vertical">
-            <FieldLabel>{t("icon")}</FieldLabel>
-            <FieldContent>
-              <IconPicker
-                value={iconValue || undefined}
-                onChange={(val) => setValue("icon", val || "")}
-              />
-              <FieldDescription>{t("iconDescription")}</FieldDescription>
-            </FieldContent>
-          </Field>
-
-          <Field orientation="vertical">
-            <FieldLabel htmlFor="menu-url">{t("url")}</FieldLabel>
-            <FieldContent>
-              <Input
-                id="menu-url"
-                {...register("url")}
-                placeholder={t("urlPlaceholder")}
-              />
-            </FieldContent>
-          </Field>
-        </div>
-
         <Field orientation="vertical">
-          <FieldLabel htmlFor="menu-sort">{t("sortOrder")}</FieldLabel>
+          <FieldLabel>{t("icon")}</FieldLabel>
           <FieldContent>
-            <Input
-              id="menu-sort"
-              type="number"
-              min={0}
-              {...register("sortOrder", { valueAsNumber: true })}
-              className="w-32"
+            <IconPicker
+              value={iconValue || undefined}
+              onChange={(val) => setValue("icon", val || "")}
             />
+            <FieldDescription>{t("iconDescription")}</FieldDescription>
           </FieldContent>
         </Field>
 
