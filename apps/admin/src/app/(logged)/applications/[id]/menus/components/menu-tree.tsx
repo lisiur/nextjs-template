@@ -1,31 +1,36 @@
-'use client';
+"use client";
 
 import {
+  closestCenter,
   DndContext,
-  DragOverlay,
   type DragEndEvent,
   type DragOverEvent,
-  DragStartEvent,
+  DragOverlay,
+  type DragStartEvent,
   PointerSensor,
-  closestCenter,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
-  SortableContext,
   arrayMove,
+  SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { icons, type LucideIcon } from 'lucide-react';
-import { Folder, FolderOpen, GripVertical } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
-import { Spinner } from '@/components/ui/spinner';
-import { appClient } from '@/lib/api';
-import { cn } from '@/utils/cn';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  Folder,
+  FolderOpen,
+  GripVertical,
+  icons,
+  type LucideIcon,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import { appClient } from "@/lib/api";
+import { cn } from "@/utils/cn";
 
 interface Menu {
   id: string;
@@ -141,9 +146,9 @@ function SortableNode({
       <button
         type="button"
         className={cn(
-          'flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground',
-          isSelected && 'bg-accent font-medium text-accent-foreground',
-          isDragging && 'opacity-50',
+          "flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+          isSelected && "bg-accent font-medium text-accent-foreground",
+          isDragging && "opacity-50",
         )}
         style={{ paddingLeft: `${level * 16 + 8}px` }}
         onClick={() => {
@@ -171,14 +176,14 @@ function SortableNode({
           >
             <FolderOpen
               className={cn(
-                'h-4 w-4 text-muted-foreground transition-transform',
-                !isExpanded && 'hidden',
+                "h-4 w-4 text-muted-foreground transition-transform",
+                !isExpanded && "hidden",
               )}
             />
             <Folder
               className={cn(
-                'h-4 w-4 text-muted-foreground transition-transform',
-                isExpanded && 'hidden',
+                "h-4 w-4 text-muted-foreground transition-transform",
+                isExpanded && "hidden",
               )}
             />
           </span>
@@ -216,8 +221,12 @@ interface MenuTreeProps {
   onSelectMenu?: (menu: Menu) => void;
 }
 
-export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps) {
-  const t = useTranslations('Menus');
+export function MenuTree({
+  appId,
+  selectedMenuId,
+  onSelectMenu,
+}: MenuTreeProps) {
+  const t = useTranslations("Menus");
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -238,11 +247,13 @@ export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps)
         setMenus(data.menus);
         // Auto-expand root nodes
         setExpandedIds(
-          new Set(data.menus.filter((m: Menu) => !m.parentId).map((m: Menu) => m.id)),
+          new Set(
+            data.menus.filter((m: Menu) => !m.parentId).map((m: Menu) => m.id),
+          ),
         );
       }
     } catch {
-      toast.error(t('fetchFailed'));
+      toast.error(t("fetchFailed"));
     } finally {
       setLoading(false);
     }
@@ -274,7 +285,11 @@ export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps)
   }, []);
 
   const findParentId = useCallback(
-    (nodeId: string, nodes: SortableMenuItem[], parentId: string | null = null): string | null => {
+    (
+      nodeId: string,
+      nodes: SortableMenuItem[],
+      parentId: string | null = null,
+    ): string | null => {
       for (const node of nodes) {
         if (node.id === nodeId) return parentId;
         const found = findParentId(nodeId, node.children, node.id);
@@ -336,7 +351,8 @@ export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps)
       });
 
       // Find the parent of the over item from latest state
-      const overParentId = latestMenus.find((m) => m.id === overId)?.parentId ?? null;
+      const overParentId =
+        latestMenus.find((m) => m.id === overId)?.parentId ?? null;
 
       // Get all siblings under the same parent
       const siblings = latestMenus.filter(
@@ -371,12 +387,23 @@ export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps)
           if (!original) return null;
           const newParentId = original.parentId ?? null;
           const newSortOrder = idx;
-          if (original.parentId !== newParentId || original.sortOrder !== newSortOrder) {
-            return { id: item.id, parentId: newParentId, sortOrder: newSortOrder };
+          if (
+            original.parentId !== newParentId ||
+            original.sortOrder !== newSortOrder
+          ) {
+            return {
+              id: item.id,
+              parentId: newParentId,
+              sortOrder: newSortOrder,
+            };
           }
           return null;
         })
-        .filter(Boolean) as { id: string; parentId: string | null; sortOrder: number }[];
+        .filter(Boolean) as {
+        id: string;
+        parentId: string | null;
+        sortOrder: number;
+      }[];
 
       // Also include items that changed parentId but weren't in the reorder group
       for (const item of latestMenus) {
@@ -404,11 +431,11 @@ export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps)
           const data = await res.json();
           setMenus(data.menus);
         } else {
-          toast.error(t('reorderFailed'));
+          toast.error(t("reorderFailed"));
           fetchMenus();
         }
       } catch {
-        toast.error(t('reorderFailed'));
+        toast.error(t("reorderFailed"));
         fetchMenus();
       }
     },
@@ -452,7 +479,7 @@ export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps)
               setExpandedIds(allIds);
             }}
           >
-            展开全部
+            {t("expandAll")}
           </button>
           <span className="text-muted-foreground">/</span>
           <button
@@ -460,12 +487,12 @@ export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps)
             className="text-xs text-muted-foreground hover:text-foreground"
             onClick={() => setExpandedIds(new Set())}
           >
-            收起全部
+            {t("collapseAll")}
           </button>
         </div>
         {treeData.length === 0 ? (
           <div className="py-4 text-center text-sm text-muted-foreground">
-            暂无数据
+            {t("noData")}
           </div>
         ) : (
           <SortableContext
@@ -489,7 +516,11 @@ export function MenuTree({ appId, selectedMenuId, onSelectMenu }: MenuTreeProps)
       <DragOverlay>
         {activeMenu ? (
           <div className="flex items-center gap-1.5 rounded-md bg-background px-2 py-1.5 text-sm shadow-md opacity-90">
-            {activeMenu.icon && <span className="shrink-0">{getIcon(activeMenu.icon ?? null)}</span>}
+            {activeMenu.icon && (
+              <span className="shrink-0">
+                {getIcon(activeMenu.icon ?? null)}
+              </span>
+            )}
             <span className="truncate">{activeMenu.name}</span>
           </div>
         ) : null}
