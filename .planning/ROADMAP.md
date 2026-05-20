@@ -67,12 +67,12 @@ Plans:
   1. Admin can assign menu visibility to specific roles via an assignment UI
   2. Users see only the menus they are authorized to access based on their role
   3. The sidebar dynamically renders the correct menus for each logged-in user
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 03-01: Role-menu assignment API endpoints
-- [ ] 03-02: Server-side menu filtering by role (API + better-auth integration)
-- [ ] 03-03: Dynamic sidebar rendering (replace hardcoded menuItems)
+- [ ] 03-01-PLAN.md — MenuRole API endpoints (batch assign, get role menus, get mine)
+- [ ] 03-02-PLAN.md — Role-menu assignment UI (checkbox tree with auto-include children)
+- [ ] 03-03-PLAN.md — Dynamic sidebar (Zustand store + replace hardcoded menuItems)
 
 ### Phase 4: Migration
 **Goal**: Current hardcoded admin navigation is replaced with database-driven dynamic menus without breaking existing navigation
@@ -99,5 +99,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-05-20 |
 | 2. Menu Tree Management | 5/5 | Complete | 2026-05-20 |
-| 3. RBAC & Menu Visibility | 0/3 | Not started | - |
+| 3. RBAC & Menu Visibility | 0/3 | Planning complete | - |
 | 4. Migration | 0/3 | Not started | - |
