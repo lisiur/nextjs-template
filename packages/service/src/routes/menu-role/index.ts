@@ -23,6 +23,6 @@ const adminPart = adminRoutes.openapiRoutes(
 
 const publicPart = publicRoutes.openapiRoutes([getMine] as const);
 
-const routes = adminPart.route("/", publicPart);
+const routes = publicPart.route("/", adminPart);
 
 export { routes as menuRoleRoutes };
