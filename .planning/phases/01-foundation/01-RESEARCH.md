@@ -582,22 +582,13 @@ model MenuRole {
 
 **If this table is empty:** N/A — assumptions exist.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should Menu/MenuRole models be created in Phase 1 or Phase 2?**
-   - What we know: ROADMAP says Phase 1 plan 01-01 includes "Application, Menu, MenuRole models"
-   - What's unclear: Whether to create empty Menu/MenuRole schemas now or wait
-   - Recommendation: Create them in Phase 1 schema (Plan 01-01) — avoids a second migration in Phase 2, and the models are simple enough to design now
+1. **Should Menu/MenuRole models be created in Phase 1 or Phase 2?** — RESOLVED: Create them in Phase 1 schema (Plan 01-01). Avoids a second migration in Phase 2, and the models are simple enough to design now.
 
-2. **Should we use `deletedAt` (timestamp) or `isDeleted` (boolean) for soft delete?**
-   - What we know: D-04 says "soft delete" but doesn't specify the field type
-   - What's unclear: Which approach the agent prefers
-   - Recommendation: Use `deletedAt` DateTime — timestamps enable "deleted X ago" display and are a common pattern
+2. **Should we use `deletedAt` (timestamp) or `isDeleted` (boolean) for soft delete?** — RESOLVED: Use `deletedAt` DateTime. Timestamps enable "deleted X ago" display and are a common pattern.
 
-3. **How to handle code uniqueness for soft-deleted apps?**
-   - What we know: D-01 says code is free-form, only uniqueness enforced
-   - What's unclear: Should "deleted" app codes be available for reuse?
-   - Recommendation: Use `deletedAt` filtering so deleted codes CAN be reused — admin might delete "CRM" and create a new "CRM" later
+3. **How to handle code uniqueness for soft-deleted apps?** — RESOLVED: Use `deletedAt` filtering so deleted codes CAN be reused — admin might delete "CRM" and create a new "CRM" later.
 
 ## Validation Architecture
 
