@@ -12,7 +12,7 @@
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Prisma schema + App CRUD (name, code, description, logo, search, status)
+- [x] **Phase 1: Foundation** - Prisma schema + App CRUD (name, code, description, logo, search, status) (completed 2026-05-20)
 - [ ] **Phase 2: Menu Tree Management** - Menu CRUD + left-right split UI + drag-and-drop sorting + icon picker
 - [ ] **Phase 3: RBAC & Menu Visibility** - Role-menu assignment + server-side filtering + dynamic sidebar
 - [ ] **Phase 4: Migration** - Migrate hardcoded admin navigation to database-driven dynamic menus
@@ -30,12 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Admin can delete an application after confirming in a dialog
   4. Admin can search and filter applications in the list view
   5. Admin can upload and change application logo
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 
 Plans:
-- [ ] 01-01-PLAN.md — Prisma schema (Application, Menu, MenuRole models with cascade deletes)
-- [ ] 01-02-PLAN.md — App CRUD API endpoints (Hono routes with OpenAPI, search, soft delete)
-- [ ] 01-03-PLAN.md — App management UI (list, create/edit dialog, search, logo upload)
+- [x] 01-01-PLAN.md — Prisma schema (Application, Menu, MenuRole models with cascade deletes)
+- [x] 01-02-PLAN.md — App CRUD API endpoints (Hono routes with OpenAPI, search, soft delete)
+- [x] 01-03-PLAN.md — App management UI (list, create/edit dialog, search, logo upload)
 
 ### Phase 2: Menu Tree Management
 **Goal**: Admin can manage multi-level menu trees per application with drag-and-drop sorting and icon selection
@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 3/3 | Complete   | 2026-05-20 |
 | 2. Menu Tree Management | 0/5 | Not started | - |
 | 3. RBAC & Menu Visibility | 0/3 | Not started | - |
 | 4. Migration | 0/3 | Not started | - |
