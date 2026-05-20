@@ -16,9 +16,9 @@
 ### 菜单管理 (MENU)
 
 - [ ] **MENU-01**: 管理员可以创建多级嵌套菜单树
-- [ ] **MENU-02**: 管理员可以编辑菜单属性（名称、图标、排序、码值）
+- [x] **MENU-02**: 管理员可以编辑菜单属性（名称、图标、排序、码值）
 - [ ] **MENU-03**: 管理员可以删除菜单项（级联处理子菜单）
-- [ ] **MENU-04**: 管理员通过左右分栏界面管理菜单（左侧树形导航，右侧编辑表单）
+- [x] **MENU-04**: 管理员通过左右分栏界面管理菜单（左侧树形导航，右侧编辑表单）
 - [ ] **MENU-05**: 管理员可以拖拽调整菜单排序（同级和跨级）
 - [ ] **MENU-06**: 管理员可以通过图标选择器为菜单选择图标（支持搜索过滤）
 
@@ -68,9 +68,9 @@
 | APP-04 | Phase 1: Foundation | Pending |
 | APP-05 | Phase 1: Foundation | Pending |
 | MENU-01 | Phase 2: Menu Tree Management | Pending |
-| MENU-02 | Phase 2: Menu Tree Management | Pending |
+| MENU-02 | Phase 2: Menu Tree Management | Complete |
 | MENU-03 | Phase 2: Menu Tree Management | Pending |
-| MENU-04 | Phase 2: Menu Tree Management | Pending |
+| MENU-04 | Phase 2: Menu Tree Management | Complete |
 | MENU-05 | Phase 2: Menu Tree Management | Pending |
 | MENU-06 | Phase 2: Menu Tree Management | Pending |
 | RBAC-01 | Phase 3: RBAC & Menu Visibility | Pending |
