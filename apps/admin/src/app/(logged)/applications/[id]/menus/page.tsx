@@ -26,17 +26,19 @@ export default function MenusPage({ params }: MenusPageProps) {
   const t = useTranslations("Menus");
   const { id } = use(params);
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleSelectMenu = useCallback((menu: Menu) => {
     setSelectedMenu(menu);
   }, []);
 
   const handleMenuSaved = useCallback(() => {
-    // Refresh tree after save — MenuTree handles its own refresh
+    setRefreshKey((k) => k + 1);
   }, []);
 
   const handleMenuDeleted = useCallback(() => {
     setSelectedMenu(null);
+    setRefreshKey((k) => k + 1);
   }, []);
 
   return (
@@ -53,6 +55,7 @@ export default function MenusPage({ params }: MenusPageProps) {
             selectedMenuId={selectedMenu?.id}
             onSelectMenu={handleSelectMenu}
             onMenuDeleted={handleMenuDeleted}
+            refreshKey={refreshKey}
           />
         </div>
         {/* Right panel — Edit form */}

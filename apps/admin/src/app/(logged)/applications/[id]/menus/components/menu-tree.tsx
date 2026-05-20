@@ -267,6 +267,7 @@ interface MenuTreeProps {
   onSelectMenu?: (menu: Menu) => void;
   onMenuAdded?: () => void;
   onMenuDeleted?: () => void;
+  refreshKey?: number;
 }
 
 export function MenuTree({
@@ -275,6 +276,7 @@ export function MenuTree({
   onSelectMenu,
   onMenuAdded,
   onMenuDeleted,
+  refreshKey,
 }: MenuTreeProps) {
   const t = useTranslations("Menus");
   const [menus, setMenus] = useState<Menu[]>([]);
@@ -323,6 +325,10 @@ export function MenuTree({
   useEffect(() => {
     fetchMenus();
   }, [fetchMenus]);
+
+  useEffect(() => {
+    if (refreshKey) fetchMenus();
+  }, [refreshKey, fetchMenus]);
 
   useEffect(() => {
     menusRef.current = menus;
