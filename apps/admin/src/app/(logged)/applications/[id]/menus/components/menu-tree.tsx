@@ -18,7 +18,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Folder, FolderOpen, GripVertical, LayoutDashboard, Settings, Shield, Users } from 'lucide-react';
+import { icons, type LucideIcon } from 'lucide-react';
+import { Folder, FolderOpen, GripVertical } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -39,18 +40,13 @@ interface Menu {
   isVisible: boolean;
 }
 
-const ICON_MAP: Record<string, React.ReactNode> = {
-  dashboard: <LayoutDashboard className="h-4 w-4" />,
-  settings: <Settings className="h-4 w-4" />,
-  users: <Users className="h-4 w-4" />,
-  shield: <Shield className="h-4 w-4" />,
-  folder: <Folder className="h-4 w-4" />,
-  'folder-open': <FolderOpen className="h-4 w-4" />,
-};
+const iconsRecord = icons as Record<string, LucideIcon>;
 
 function getIcon(icon: string | null): React.ReactNode | undefined {
   if (!icon) return undefined;
-  return ICON_MAP[icon] || <Folder className="h-4 w-4" />;
+  const IconComponent = iconsRecord[icon];
+  if (IconComponent) return <IconComponent className="h-4 w-4" />;
+  return <Folder className="h-4 w-4" />;
 }
 
 function buildTree(menus: Menu[]): SortableMenuItem[] {
