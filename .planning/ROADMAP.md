@@ -30,12 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Admin can delete an application after confirming in a dialog
   4. Admin can search and filter applications in the list view
   5. Admin can upload and change application logo
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: Prisma schema (Application, Menu, MenuRole models with cascade deletes)
-- [ ] 01-02: App CRUD API endpoints (Hono routes with OpenAPI)
-- [ ] 01-03: App management UI (list, create/edit dialog, search, logo upload)
+- [ ] 01-01-PLAN.md — Prisma schema (Application, Menu, MenuRole models with cascade deletes)
+- [ ] 01-02-PLAN.md — App CRUD API endpoints (Hono routes with OpenAPI, search, soft delete)
+- [ ] 01-03-PLAN.md — App management UI (list, create/edit dialog, search, logo upload)
 
 ### Phase 2: Menu Tree Management
 **Goal**: Admin can manage multi-level menu trees per application with drag-and-drop sorting and icon selection

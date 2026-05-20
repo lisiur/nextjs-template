@@ -1,0 +1,4 @@
+CodeDiff
+lazygit
+opencode
+stylua
