@@ -1,10 +1,13 @@
 "use client";
 
-import { icons, type LucideIcon } from "lucide-react";
-import { Search } from "lucide-react";
+import { icons, type LucideIcon, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/utils/cn";
 
 interface IconPickerProps {
@@ -74,13 +77,17 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
           {value || "Select icon..."}
         </span>
         {value && (
-          <button
-            type="button"
+          <span
+            role="button"
+            tabIndex={0}
             onClick={handleClear}
-            className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-foreground"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") handleClear(e as unknown as React.MouseEvent);
+            }}
+            className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-foreground cursor-pointer"
           >
             ×
-          </button>
+          </span>
         )}
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" side="bottom" sideOffset={4}>
@@ -101,7 +108,9 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
           </div>
           <div
             className="grid gap-0.5"
-            style={{ gridTemplateColumns: `repeat(${GRID_COLUMNS}, minmax(0, 1fr))` }}
+            style={{
+              gridTemplateColumns: `repeat(${GRID_COLUMNS}, minmax(0, 1fr))`,
+            }}
           >
             {filtered.map((item) => {
               const Icon = iconsRecord[item.name];
@@ -115,7 +124,8 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
                   onClick={() => handleSelect(item.name)}
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-accent",
-                    isSelected && "bg-accent text-accent-foreground ring-1 ring-ring",
+                    isSelected &&
+                      "bg-accent text-accent-foreground ring-1 ring-ring",
                   )}
                 >
                   <Icon className="h-4 w-4" />
