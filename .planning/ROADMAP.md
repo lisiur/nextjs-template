@@ -13,7 +13,7 @@
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Prisma schema + App CRUD (name, code, description, logo, search, status) (completed 2026-05-20)
-- [ ] **Phase 2: Menu Tree Management** - Menu CRUD + left-right split UI + drag-and-drop sorting + icon picker
+- [x] **Phase 2: Menu Tree Management** - Menu CRUD + left-right split UI + drag-and-drop sorting + icon picker (completed 2026-05-20)
 - [ ] **Phase 3: RBAC & Menu Visibility** - Role-menu assignment + server-side filtering + dynamic sidebar
 - [ ] **Phase 4: Migration** - Migrate hardcoded admin navigation to database-driven dynamic menus
 
@@ -49,14 +49,14 @@ Plans:
   4. Admin uses a left-right split interface: tree navigation on left, edit form on right
   5. Admin can drag and drop menu items to reorder within the same level or move across levels
   6. Admin can pick icons for menus via a searchable icon picker
-**Plans**: TBD
+**Plans:** 5/5 plans complete
 
 Plans:
-- [ ] 02-01: Menu CRUD API endpoints (tree structure, parentId, sort order)
-- [ ] 02-02: Menu tree component integration (shadcn-tree-view)
-- [ ] 02-03: Left-right split UI with tree on left, edit form on right
-- [ ] 02-04: Drag-and-drop sorting (re-index siblings after reorder)
-- [ ] 02-05: Icon picker component (searchable, over lucide-react)
+- [x] 02-01-PLAN.md — Menu CRUD API endpoints (tree structure, parentId, sort order)
+- [x] 02-02-PLAN.md — Menu tree component (custom TreeView with expand/collapse)
+- [x] 02-03-PLAN.md — Left-right split UI with tree on left, edit form on right
+- [x] 02-04-PLAN.md — Drag-and-drop sorting (re-index siblings after reorder)
+- [x] 02-05-PLAN.md — Icon picker component (searchable, over lucide-react)
 
 ### Phase 3: RBAC & Menu Visibility
 **Goal**: Different user roles see different menus, with server-side filtering and dynamic sidebar rendering
@@ -98,6 +98,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete   | 2026-05-20 |
-| 2. Menu Tree Management | 0/5 | Not started | - |
+| 2. Menu Tree Management | 5/5 | Complete | 2026-05-20 |
 | 3. RBAC & Menu Visibility | 0/3 | Not started | - |
 | 4. Migration | 0/3 | Not started | - |
