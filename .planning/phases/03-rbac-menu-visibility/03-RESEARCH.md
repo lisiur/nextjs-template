@@ -422,22 +422,16 @@ function collectDescendantIds(
 | A3 | The `collectDescendantIds` helper handles circular references gracefully (Prisma schema has `onDelete: Cascade` preventing cycles) | Code Examples | Infinite recursion if cycles exist — Prisma schema prevents this |
 | A4 | `bottomMenuItems` (profile, settings) should remain hardcoded and not be managed via MenuRole | Architecture | These items might need role-based visibility — currently assumed system-level |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does `session.user.role` return the exact string "admin"/"manager"/"user"?**
-   - What we know: `permissions.ts` defines roles as `admin`, `manager`, `user` (lowercase). `auth.ts` passes these to better-auth admin plugin.
-   - What's unclear: The actual string stored in `user.role` column and returned in session
-   - Recommendation: Verify by checking a real session response or better-auth docs. The schema shows `role String?` on User model — the value comes from better-auth admin plugin.
+   - **RESOLVED: YES.** The better-auth admin plugin is configured with role keys `admin`, `manager`, `user` (lowercase) in `auth.ts` lines 27-31. These are the role names stored in the database `User.role` field and returned in the session. The `permissions.ts` file defines these same lowercase role names. `session.user.role` will return exactly `"admin"`, `"manager"`, or `"user"`.
 
 2. **Should `GET /menus/mine` return a flat list or tree structure?**
-   - What we know: Existing `listMenus` returns flat list; sidebar needs tree for rendering
-   - What's unclear: Whether to return flat and build tree client-side, or return pre-built tree
-   - Recommendation: Return flat list (consistent with existing pattern), build tree in Zustand store or component. The `buildTree()` helper from `menu-tree.tsx` can be extracted to a shared utility.
+   - **RESOLVED: Flat list.** Return flat list (consistent with existing `listMenus` pattern), build tree client-side in Zustand store. Plan 03-01 confirms `getMenusForRole` returns flat `Menu[]`; Plan 03-03 builds tree in `useMenuStore.fetchMenus()`.
 
 3. **Should the role-menu assignment page live under `/roles/[roleId]/menus` or `/roles?tab=menus`?**
-   - What we know: D-02 says "separate page for role-menu assignment"
-   - What's unclear: Exact URL structure
-   - Recommendation: `/roles/[roleId]/menus` — follows existing pattern of nested routes (see `/applications/[id]/menus`)
+   - **RESOLVED: `/roles/menus` with role selector.** Use a flat route `/roles/menus` with a Select dropdown for role selection (not nested route). Plan 03-02 confirms this approach — matches D-02 ("separate page") while keeping URL simple.
 
 ## Environment Availability
 
