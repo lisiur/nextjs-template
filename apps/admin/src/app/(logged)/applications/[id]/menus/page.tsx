@@ -1,0 +1,72 @@
+"use client";
+
+import { use } from "react";
+import { useTranslations } from "next-intl";
+import { useCallback, useState } from "react";
+import { MenuForm } from "./components/menu-form";
+import { MenuTree } from "./components/menu-tree";
+
+interface Menu {
+  id: string;
+  appId: string;
+  parentId?: string | null;
+  name: string;
+  code: string;
+  icon?: string | null;
+  url?: string | null;
+  sortOrder: number;
+  isExternal: boolean;
+  isVisible: boolean;
+}
+
+interface MenusPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default function MenusPage({ params }: MenusPageProps) {
+  const t = useTranslations("Menus");
+  const { id } = use(params);
+  const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
+
+  const handleSelectMenu = useCallback((menu: Menu) => {
+    setSelectedMenu(menu);
+  }, []);
+
+  const handleMenuSaved = useCallback(() => {
+    // Refresh tree after save — MenuTree handles its own refresh
+  }, []);
+
+  const handleMenuDeleted = useCallback(() => {
+    setSelectedMenu(null);
+  }, []);
+
+  return (
+    <div className="container mx-auto py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("description")}</p>
+      </div>
+      <div className="flex gap-6" style={{ height: "calc(100vh - 200px)" }}>
+        {/* Left panel — Tree navigation */}
+        <div className="w-80 shrink-0 overflow-auto rounded-md border">
+          <MenuTree appId={id} selectedMenuId={selectedMenu?.id} onSelectMenu={handleSelectMenu} />
+        </div>
+        {/* Right panel — Edit form */}
+        <div className="flex-1 overflow-auto">
+          {selectedMenu ? (
+            <MenuForm
+              menu={selectedMenu}
+              appId={id}
+              onSaved={handleMenuSaved}
+              onDeleted={handleMenuDeleted}
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-muted-foreground">
+              {t("selectMenuToEdit")}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
