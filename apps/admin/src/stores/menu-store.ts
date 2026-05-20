@@ -77,7 +77,7 @@ export const useMenuStore = create<MenuState>((set, get) => ({
 
     set({ loading: true });
     try {
-      const res = await appClient.api.menu.mine.$get();
+      const res = await appClient.api["menu-role"].mine.$get();
       if (res.ok) {
         const data = await res.json();
         const menus = data.menus;
