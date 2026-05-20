@@ -173,6 +173,7 @@ export function AppTable() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      nativeButton={false}
                       render={<Link href={`/applications/${app.id}/menus`} />}
                     >
                       <TreePine className="h-4 w-4" />
