@@ -116,6 +116,75 @@ const defaultConfigs = [
   },
 ];
 
+async function seedAdminApplication() {
+  console.log("Seeding admin application...");
+  const app = await prisma.application.upsert({
+    where: { code: "admin" },
+    update: {
+      name: "Admin Panel",
+      description: "Administrative dashboard application",
+    },
+    create: {
+      id: "app-admin",
+      name: "Admin Panel",
+      code: "admin",
+      description: "Administrative dashboard application",
+    },
+  });
+  console.log(`Admin application ready: ${app.id}`);
+  return app;
+}
+
+async function seedMenus(appId: string) {
+  console.log("Seeding admin menus...");
+
+  const menuDefinitions = [
+    { id: "menu-dashboard", name: "Dashboard", code: "dashboard", icon: "LayoutDashboard", url: "/dashboard", sortOrder: 0 },
+    { id: "menu-applications", name: "Applications", code: "applications", icon: "Layers", url: "/applications", sortOrder: 1 },
+    { id: "menu-organizations", name: "Organizations", code: "organizations", icon: "Building2", url: "/organizations", sortOrder: 2 },
+    { id: "menu-users", name: "Users", code: "users", icon: "Users", url: "/users", sortOrder: 3 },
+    { id: "menu-roles", name: "Roles", code: "roles", icon: "Shield", url: "/roles", sortOrder: 4 },
+    { id: "menu-settings", name: "Settings", code: "settings", icon: "Settings", url: "/settings", sortOrder: 5 },
+    { id: "menu-profile", name: "Profile", code: "profile", icon: "User", url: "/profile", sortOrder: 6 },
+  ];
+
+  const menuIds: string[] = [];
+
+  for (const menu of menuDefinitions) {
+    await prisma.menu.upsert({
+      where: { id: menu.id },
+      update: { name: menu.name, icon: menu.icon, url: menu.url, sortOrder: menu.sortOrder },
+      create: {
+        id: menu.id,
+        appId,
+        name: menu.name,
+        code: menu.code,
+        icon: menu.icon,
+        url: menu.url,
+        sortOrder: menu.sortOrder,
+      },
+    });
+    menuIds.push(menu.id);
+  }
+
+  console.log(`Seeded ${menuIds.length} menus.`);
+  return menuIds;
+}
+
+async function seedMenuRoles(menuIds: string[], roleId: string) {
+  console.log(`Assigning menus to role "${roleId}"...`);
+
+  for (const menuId of menuIds) {
+    await prisma.menuRole.upsert({
+      where: { menuId_roleId: { menuId, roleId } },
+      update: {},
+      create: { menuId, roleId },
+    });
+  }
+
+  console.log(`Assigned ${menuIds.length} menus to role "${roleId}".`);
+}
+
 async function seed() {
   console.log("Seeding system configs...");
 
@@ -133,6 +202,11 @@ async function seed() {
   }
 
   console.log(`Seeded ${defaultConfigs.length} default configurations.`);
+
+  // Seed application, menus, and menu roles
+  const adminApp = await seedAdminApplication();
+  const menuIds = await seedMenus(adminApp.id);
+  await seedMenuRoles(menuIds, "admin");
 }
 
 seed()
