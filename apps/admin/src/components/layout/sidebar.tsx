@@ -1,8 +1,13 @@
 "use client";
 
 import { useStore } from "better-auth/react";
-import { ChevronRight, Folder, FolderOpen } from "lucide-react";
-import { icons, type LucideIcon } from "lucide-react";
+import {
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  icons,
+  type LucideIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -27,17 +32,9 @@ const bottomMenuItems = [
     url: "/profile",
     icon: UserIcon,
   },
-  {
-    key: "settings",
-    url: "/settings",
-    icon: SettingsIcon,
-  },
 ];
 
-import {
-  SettingsIcon,
-  UserIcon,
-} from "lucide-react";
+import { UserIcon } from "lucide-react";
 
 const iconsRecord = icons as Record<string, LucideIcon>;
 
