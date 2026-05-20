@@ -1,6 +1,7 @@
 "use client";
 
-import { Eye, Shield, ShieldCheck, User } from "lucide-react";
+import { Eye, Shield, ShieldCheck, TreePine, User } from "lucide-react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -114,6 +115,14 @@ export function RoleTable() {
                 </div>
               </TableCell>
               <TableCell className="text-right">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  nativeButton={false}
+                  render={<Link href="/roles/menus" />}
+                >
+                  <TreePine className="h-4 w-4" />
+                </Button>
                 <Button
                   variant="ghost"
                   size="icon"
