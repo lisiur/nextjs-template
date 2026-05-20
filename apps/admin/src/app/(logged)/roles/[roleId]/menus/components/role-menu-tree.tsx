@@ -1,7 +1,12 @@
 "use client";
 
-import { ChevronRight, Folder, FolderOpen } from "lucide-react";
-import { icons, type LucideIcon } from "lucide-react";
+import {
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  icons,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -169,7 +174,7 @@ export function RoleMenuTree({
             setExpandedIds(allIds);
           }}
         >
-          展开全部
+            {t("expandAll")}
         </button>
         <span className="text-muted-foreground">/</span>
         <button
@@ -177,7 +182,7 @@ export function RoleMenuTree({
           className="text-xs text-muted-foreground hover:text-foreground"
           onClick={() => setExpandedIds(new Set())}
         >
-          收起全部
+            {t("collapseAll")}
         </button>
       </div>
       {treeData.map((node) => (

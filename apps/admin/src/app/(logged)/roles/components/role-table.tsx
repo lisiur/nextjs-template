@@ -119,7 +119,7 @@ export function RoleTable() {
                   variant="ghost"
                   size="icon"
                   nativeButton={false}
-                  render={<Link href="/roles/menus" />}
+                  render={<Link href={`/roles/${role.id}/menus`} />}
                 >
                   <TreePine className="h-4 w-4" />
                 </Button>
