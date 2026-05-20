@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, Shield, ShieldCheck, TreePine, User } from "lucide-react";
+import { Eye, ListChecks, Shield, ShieldCheck, User } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -121,7 +121,7 @@ export function RoleTable() {
                   nativeButton={false}
                   render={<Link href={`/roles/${role.id}/menus`} />}
                 >
-                  <TreePine className="h-4 w-4" />
+                  <ListChecks className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"

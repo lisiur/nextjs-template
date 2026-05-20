@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Plus, Search, Trash2, TreePine } from "lucide-react";
+import { Menu, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -176,7 +176,7 @@ export function AppTable() {
                       nativeButton={false}
                       render={<Link href={`/applications/${app.id}/menus`} />}
                     >
-                      <TreePine className="h-4 w-4" />
+                      <Menu className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
