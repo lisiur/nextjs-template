@@ -139,13 +139,54 @@ async function seedMenus(appId: string) {
   console.log("Seeding admin menus...");
 
   const menuDefinitions = [
-    { id: "menu-dashboard", name: "Dashboard", code: "dashboard", icon: "LayoutDashboard", url: "/dashboard", sortOrder: 0 },
-    { id: "menu-applications", name: "Applications", code: "applications", icon: "Layers", url: "/applications", sortOrder: 1 },
-    { id: "menu-organizations", name: "Organizations", code: "organizations", icon: "Building2", url: "/organizations", sortOrder: 2 },
-    { id: "menu-users", name: "Users", code: "users", icon: "Users", url: "/users", sortOrder: 3 },
-    { id: "menu-roles", name: "Roles", code: "roles", icon: "Shield", url: "/roles", sortOrder: 4 },
-    { id: "menu-settings", name: "Settings", code: "settings", icon: "Settings", url: "/settings", sortOrder: 5 },
-    { id: "menu-profile", name: "Profile", code: "profile", icon: "User", url: "/profile", sortOrder: 6 },
+    {
+      id: "menu-dashboard",
+      name: "Dashboard",
+      code: "dashboard",
+      icon: "LayoutDashboard",
+      url: "/dashboard",
+      sortOrder: 0,
+    },
+    {
+      id: "menu-applications",
+      name: "Applications",
+      code: "applications",
+      icon: "Layers",
+      url: "/applications",
+      sortOrder: 1,
+    },
+    {
+      id: "menu-organizations",
+      name: "Organizations",
+      code: "organizations",
+      icon: "Building2",
+      url: "/organizations",
+      sortOrder: 2,
+    },
+    {
+      id: "menu-users",
+      name: "Users",
+      code: "users",
+      icon: "Users",
+      url: "/users",
+      sortOrder: 3,
+    },
+    {
+      id: "menu-roles",
+      name: "Roles",
+      code: "roles",
+      icon: "Shield",
+      url: "/roles",
+      sortOrder: 4,
+    },
+    {
+      id: "menu-settings",
+      name: "Settings",
+      code: "settings",
+      icon: "Settings",
+      url: "/settings",
+      sortOrder: 5,
+    },
   ];
 
   const menuIds: string[] = [];
@@ -153,7 +194,12 @@ async function seedMenus(appId: string) {
   for (const menu of menuDefinitions) {
     await prisma.menu.upsert({
       where: { id: menu.id },
-      update: { name: menu.name, icon: menu.icon, url: menu.url, sortOrder: menu.sortOrder },
+      update: {
+        name: menu.name,
+        icon: menu.icon,
+        url: menu.url,
+        sortOrder: menu.sortOrder,
+      },
       create: {
         id: menu.id,
         appId,
