@@ -299,5 +299,18 @@
   "Menus": {
     "fetchFailed": "获取菜单失败",
     "reorderFailed": "菜单排序失败"
+  },
+  "RoleMenus": {
+    "title": "角色菜单分配",
+    "description": "选择角色管理其菜单可见性",
+    "selectRole": "选择角色",
+    "selectRolePlaceholder": "选择一个角色...",
+    "save": "保存分配",
+    "saving": "保存中...",
+    "saved": "菜单分配已保存",
+    "loadError": "加载菜单失败，请重试",
+    "saveError": "保存失败，请重试",
+    "noRoleSelected": "从下拉菜单中选择一个角色来管理其菜单分配",
+    "noMenus": "暂无菜单，请先在菜单管理页面创建菜单"
   }
 }

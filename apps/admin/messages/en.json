@@ -299,5 +299,18 @@
   "Menus": {
     "fetchFailed": "Failed to fetch menus",
     "reorderFailed": "Failed to reorder menus"
+  },
+  "RoleMenus": {
+    "title": "Role Menu Assignment",
+    "description": "Select a role to manage its menu visibility",
+    "selectRole": "Select Role",
+    "selectRolePlaceholder": "Choose a role...",
+    "save": "Save Assignment",
+    "saving": "Saving...",
+    "saved": "Menu assignments saved successfully",
+    "loadError": "Failed to load menus. Please retry.",
+    "saveError": "Failed to save assignment. Please retry.",
+    "noRoleSelected": "Select a role from the dropdown to manage its menu assignments",
+    "noMenus": "No menus available. Create menus in the menu management page first"
   }
 }
