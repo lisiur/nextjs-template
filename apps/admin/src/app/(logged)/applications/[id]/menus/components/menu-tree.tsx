@@ -551,7 +551,7 @@ export function MenuTree({
         fetchMenus();
       }
     },
-    [t, fetchMenus],
+    [menus, t, fetchMenus],
   );
 
   const activeMenu = activeId ? menus.find((m) => m.id === activeId) : null;
