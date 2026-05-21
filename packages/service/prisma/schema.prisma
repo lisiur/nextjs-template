@@ -24,6 +24,7 @@ model User {
   members       Member[]
   invitations   Invitation[]
   uploads       Upload[]
+  userRoles     UserRole[]
 
   @@unique([email])
   @@map("user")
@@ -167,6 +168,7 @@ model Application {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   menus       Menu[]
+  roles       Role[]
 
   @@unique([code])
   @@index([deletedAt])
@@ -201,10 +203,41 @@ model MenuRole {
   menuId    String
   menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
   roleId    String
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@unique([menuId, roleId])
   @@index([menuId])
   @@index([roleId])
   @@map("menu_role")
+}
+
+model Role {
+  id        String   @id @default(cuid())
+  appId     String
+  app       Application @relation(fields: [appId], references: [id], onDelete: Cascade)
+  name      String
+  code      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  menuRoles MenuRole[]
+  userRoles UserRole[]
+
+  @@unique([appId, code])
+  @@index([appId])
+  @@map("role")
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_role")
 }
