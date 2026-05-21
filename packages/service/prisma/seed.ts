@@ -231,6 +231,30 @@ async function seedMenuRoles(menuIds: string[], roleId: string) {
   console.log(`Assigned ${menuIds.length} menus to role "${roleId}".`);
 }
 
+async function seedRoles(appId: string) {
+  console.log("Seeding roles...");
+
+  const roleDefinitions = [
+    { name: "Administrator", code: "admin" },
+    { name: "Manager", code: "manager" },
+    { name: "User", code: "user" },
+  ];
+
+  const roleIds: Record<string, string> = {};
+
+  for (const def of roleDefinitions) {
+    const role = await prisma.role.upsert({
+      where: { appId_code: { appId, code: def.code } },
+      update: { name: def.name },
+      create: { appId, name: def.name, code: def.code },
+    });
+    roleIds[def.code] = role.id;
+  }
+
+  console.log(`Seeded ${Object.keys(roleIds).length} roles.`);
+  return roleIds;
+}
+
 async function seed() {
   console.log("Seeding system configs...");
 
@@ -249,10 +273,11 @@ async function seed() {
 
   console.log(`Seeded ${defaultConfigs.length} default configurations.`);
 
-  // Seed application, menus, and menu roles
+  // Seed application, menus, roles, and menu roles
   const adminApp = await seedAdminApplication();
   const menuIds = await seedMenus(adminApp.id);
-  await seedMenuRoles(menuIds, "admin");
+  const roleIds = await seedRoles(adminApp.id);
+  await seedMenuRoles(menuIds, roleIds.admin);
 }
 
 seed()
