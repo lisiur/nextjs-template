@@ -473,10 +473,21 @@ export function MenuTree({
       const draggedId = String(active.id);
       const overId = String(over.id);
 
-      const latestMenus = menusRef.current;
+      let latestMenus: Menu[] = [];
+      setMenus((prev) => {
+        latestMenus = prev;
+        return prev;
+      });
 
-      const overParentId =
-        latestMenus.find((m) => m.id === overId)?.parentId ?? null;
+      const overMenu = latestMenus.find((m) => m.id === overId);
+      if (!overMenu) {
+        parentChangesRef.current.clear();
+        return;
+      }
+
+      const overParentId = parentChangesRef.current.has(overId)
+        ? parentChangesRef.current.get(overId)!
+        : (overMenu.parentId ?? null);
 
       const siblings = latestMenus.filter(
         (m) => (m.parentId ?? null) === overParentId,
