@@ -310,6 +310,7 @@ export function MenuTree({
       if (res.ok) {
         const data = await res.json();
         setMenus(data.menus);
+        menusRef.current = data.menus;
         setExpandedIds(
           new Set(
             data.menus.filter((m: Menu) => !m.parentId).map((m: Menu) => m.id),
@@ -330,10 +331,6 @@ export function MenuTree({
   useEffect(() => {
     if (refreshKey) fetchMenus();
   }, [refreshKey, fetchMenus]);
-
-  useEffect(() => {
-    menusRef.current = menus;
-  }, [menus]);
 
   const treeData = useMemo(() => buildTree(menus), [menus]);
 
@@ -453,6 +450,7 @@ export function MenuTree({
           if (activeMenu) {
             activeMenu.parentId = overParentId;
           }
+          menusRef.current = updated;
           return updated;
         });
       }
@@ -473,11 +471,7 @@ export function MenuTree({
       const draggedId = String(active.id);
       const overId = String(over.id);
 
-      let latestMenus: Menu[] = [];
-      setMenus((prev) => {
-        latestMenus = prev;
-        return prev;
-      });
+      const latestMenus = menusRef.current;
 
       const overMenu = latestMenus.find((m) => m.id === overId);
       if (!overMenu) {
@@ -511,6 +505,7 @@ export function MenuTree({
             menu.sortOrder = i;
           }
         }
+        menusRef.current = updated;
         return updated;
       });
 
@@ -564,6 +559,7 @@ export function MenuTree({
         if (res.ok) {
           const data = await res.json();
           setMenus(data.menus);
+          menusRef.current = data.menus;
         } else {
           toast.error(t("reorderFailed"));
           fetchMenus();
