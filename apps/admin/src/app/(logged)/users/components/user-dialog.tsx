@@ -2,8 +2,10 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { authClient } from "@/lib/api";
+import { appClient, authClient } from "@/lib/api";
 
 const userSchema = z.object({
   name: z.string().min(1),
@@ -45,6 +47,32 @@ interface UserDialogProps {
   onSuccess: () => void;
 }
 
+interface Application {
+  id: string;
+  name: string;
+  code: string;
+}
+
+interface Role {
+  id: string;
+  appId: string;
+  name: string;
+  code: string;
+}
+
+interface UserRole {
+  id: string;
+  userId: string;
+  roleId: string;
+  role: {
+    id: string;
+    appId: string;
+    name: string;
+    code: string;
+  };
+  createdAt: string;
+}
+
 export function UserDialog({
   user,
   open,
@@ -53,6 +81,11 @@ export function UserDialog({
 }: UserDialogProps) {
   const t = useTranslations("Users");
   const isEdit = !!user;
+
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [appRoles, setAppRoles] = useState<Role[]>([]);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
+  const [selectedAppId, setSelectedAppId] = useState<string>("");
 
   const {
     register,
@@ -107,6 +140,65 @@ export function UserDialog({
     onOpenChange(nextOpen);
   }
 
+  useEffect(() => {
+    if (open) {
+      appClient.api.applications
+        .$get()
+        .then((res) => {
+          if (res.ok)
+            res.json().then((d) => setApplications(d.applications ?? []));
+        });
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (selectedAppId) {
+      appClient.api.roles
+        .$get({ query: { appId: selectedAppId } })
+        .then((res) => {
+          if (res.ok) res.json().then((d) => setAppRoles(d));
+        });
+    }
+  }, [selectedAppId]);
+
+  useEffect(() => {
+    if (user?.id && open) {
+      appClient.api["user-roles"]
+        .$get({ query: { userId: user.id } })
+        .then((res) => {
+          if (res.ok) res.json().then((d) => setUserRoles(d));
+        });
+    }
+  }, [user?.id, open]);
+
+  async function handleAssignRole(roleId: string) {
+    if (!user?.id) return;
+    await appClient.api["user-roles"].$post({
+      json: { userId: user.id, roleId },
+    });
+    const res = await appClient.api["user-roles"].$get({
+      query: { userId: user.id },
+    });
+    if (res.ok) {
+      const d = await res.json();
+      setUserRoles(d);
+    }
+  }
+
+  async function handleRemoveRole(roleId: string) {
+    if (!user?.id) return;
+    await appClient.api["user-roles"][":userId"][":roleId"].$delete({
+      param: { userId: user.id, roleId },
+    });
+    const res = await appClient.api["user-roles"].$get({
+      query: { userId: user.id },
+    });
+    if (res.ok) {
+      const d = await res.json();
+      setUserRoles(d);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
@@ -157,6 +249,63 @@ export function UserDialog({
                 <SelectItem value="user">{t("roles.user")}</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>{t("appRoles")}</Label>
+            <div className="rounded-md border p-3 space-y-2">
+              {userRoles.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {userRoles.map((ur) => (
+                    <Badge key={ur.id} variant="secondary" className="gap-1">
+                      {ur.role.name} (
+                      {applications.find((a) => a.id === ur.role.appId)?.name ??
+                        "?"}
+                      )
+                      <button
+                        type="button"
+                        className="ml-1 text-muted-foreground hover:text-foreground"
+                        onClick={() => handleRemoveRole(ur.roleId)}
+                      >
+                        ×
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              <div className="flex gap-2">
+                <Select value={selectedAppId} onValueChange={setSelectedAppId}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder={t("selectApp")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {applications.map((app) => (
+                      <SelectItem key={app.id} value={app.id}>
+                        {app.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedAppId && (
+                  <Select
+                    onValueChange={(roleId) => {
+                      handleAssignRole(roleId);
+                      setSelectedAppId("");
+                    }}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder={t("selectRole")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {appRoles.map((role) => (
+                        <SelectItem key={role.id} value={role.id}>
+                          {role.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button
