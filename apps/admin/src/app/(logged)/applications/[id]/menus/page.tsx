@@ -56,7 +56,7 @@ export default function MenusPage({ params }: MenusPageProps) {
         <h1 className="text-2xl font-bold">{t("title")}</h1>
         <p className="text-muted-foreground">{t("description")}</p>
       </div>
-      <div className="flex gap-6" style={{ height: "calc(100vh - 200px)" }}>
+      <div className="flex gap-6">
         {/* Left panel — Tree navigation */}
         <div className="w-80 shrink-0 overflow-auto rounded-md border">
           <MenuTree
@@ -68,7 +68,7 @@ export default function MenusPage({ params }: MenusPageProps) {
           />
         </div>
         {/* Right panel — Edit form */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1">
           {selectedMenu ? (
             <MenuForm menu={selectedMenu} onSaved={handleMenuSaved} />
           ) : (
