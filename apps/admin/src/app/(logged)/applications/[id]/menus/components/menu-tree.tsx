@@ -1,8 +1,8 @@
 "use client";
 
-import {
-  type DraggableAttributes,
-  type DraggableSyntheticListeners,
+import type {
+  DraggableAttributes,
+  DraggableSyntheticListeners,
 } from "@dnd-kit/core";
 import {
   Folder,
@@ -26,8 +26,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  type DraggableTreeNode,
   DraggableTree,
+  type DraggableTreeNode,
   type ReorderChange,
 } from "@/components/ui/draggable-tree";
 import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
@@ -225,7 +225,11 @@ export function MenuTree({
         const updated = prev.map((m) => {
           const change = changed.find((c) => c.id === m.id);
           if (change) {
-            return { ...m, parentId: change.parentId, sortOrder: change.sortOrder };
+            return {
+              ...m,
+              parentId: change.parentId,
+              sortOrder: change.sortOrder,
+            };
           }
           return m;
         });

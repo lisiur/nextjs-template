@@ -62,7 +62,9 @@ export const ModelName = {
   Upload: 'Upload',
   Application: 'Application',
   Menu: 'Menu',
-  MenuRole: 'MenuRole'
+  MenuRole: 'MenuRole',
+  Role: 'Role',
+  UserRole: 'UserRole'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -253,6 +255,28 @@ export const MenuRoleScalarFieldEnum = {
 } as const
 
 export type MenuRoleScalarFieldEnum = (typeof MenuRoleScalarFieldEnum)[keyof typeof MenuRoleScalarFieldEnum]
+
+
+export const RoleScalarFieldEnum = {
+  id: 'id',
+  appId: 'appId',
+  name: 'name',
+  code: 'code',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const UserRoleScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roleId: 'roleId',
+  createdAt: 'createdAt'
+} as const
+
+export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
 export const SortOrder = {

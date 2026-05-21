@@ -82,7 +82,8 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
             tabIndex={0}
             onClick={handleClear}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") handleClear(e as unknown as React.MouseEvent);
+              if (e.key === "Enter" || e.key === " ")
+                handleClear(e as unknown as React.MouseEvent);
             }}
             className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-foreground cursor-pointer"
           >

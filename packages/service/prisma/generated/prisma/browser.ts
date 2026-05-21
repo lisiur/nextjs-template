@@ -77,3 +77,13 @@ export type Menu = Prisma.MenuModel
  * 
  */
 export type MenuRole = Prisma.MenuRoleModel
+/**
+ * Model Role
+ * 
+ */
+export type Role = Prisma.RoleModel
+/**
+ * Model UserRole
+ * 
+ */
+export type UserRole = Prisma.UserRoleModel

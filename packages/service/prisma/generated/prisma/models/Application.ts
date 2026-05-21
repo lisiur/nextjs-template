@@ -249,6 +249,7 @@ export type ApplicationWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   menus?: Prisma.MenuListRelationFilter
+  roles?: Prisma.RoleListRelationFilter
 }
 
 export type ApplicationOrderByWithRelationInput = {
@@ -262,6 +263,7 @@ export type ApplicationOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   menus?: Prisma.MenuOrderByRelationAggregateInput
+  roles?: Prisma.RoleOrderByRelationAggregateInput
 }
 
 export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
@@ -278,6 +280,7 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   menus?: Prisma.MenuListRelationFilter
+  roles?: Prisma.RoleListRelationFilter
 }, "id" | "code">
 
 export type ApplicationOrderByWithAggregationInput = {
@@ -323,6 +326,7 @@ export type ApplicationCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
+  roles?: Prisma.RoleCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUncheckedCreateInput = {
@@ -336,6 +340,7 @@ export type ApplicationUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUpdateInput = {
@@ -349,6 +354,7 @@ export type ApplicationUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationUncheckedUpdateInput = {
@@ -362,6 +368,7 @@ export type ApplicationUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationCreateManyInput = {
@@ -463,6 +470,20 @@ export type ApplicationUpdateOneRequiredWithoutMenusNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutMenusInput, Prisma.ApplicationUpdateWithoutMenusInput>, Prisma.ApplicationUncheckedUpdateWithoutMenusInput>
 }
 
+export type ApplicationCreateNestedOneWithoutRolesInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutRolesInput, Prisma.ApplicationUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutRolesInput
+  connect?: Prisma.ApplicationWhereUniqueInput
+}
+
+export type ApplicationUpdateOneRequiredWithoutRolesNestedInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutRolesInput, Prisma.ApplicationUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutRolesInput
+  upsert?: Prisma.ApplicationUpsertWithoutRolesInput
+  connect?: Prisma.ApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutRolesInput, Prisma.ApplicationUpdateWithoutRolesInput>, Prisma.ApplicationUncheckedUpdateWithoutRolesInput>
+}
+
 export type ApplicationCreateWithoutMenusInput = {
   id?: string
   name: string
@@ -473,6 +494,7 @@ export type ApplicationCreateWithoutMenusInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  roles?: Prisma.RoleCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUncheckedCreateWithoutMenusInput = {
@@ -485,6 +507,7 @@ export type ApplicationUncheckedCreateWithoutMenusInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationCreateOrConnectWithoutMenusInput = {
@@ -513,6 +536,7 @@ export type ApplicationUpdateWithoutMenusInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutMenusInput = {
@@ -525,6 +549,75 @@ export type ApplicationUncheckedUpdateWithoutMenusInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutAppNestedInput
+}
+
+export type ApplicationCreateWithoutRolesInput = {
+  id?: string
+  name: string
+  code: string
+  description?: string | null
+  logo?: string | null
+  sortOrder?: number
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  menus?: Prisma.MenuCreateNestedManyWithoutAppInput
+}
+
+export type ApplicationUncheckedCreateWithoutRolesInput = {
+  id?: string
+  name: string
+  code: string
+  description?: string | null
+  logo?: string | null
+  sortOrder?: number
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
+}
+
+export type ApplicationCreateOrConnectWithoutRolesInput = {
+  where: Prisma.ApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutRolesInput, Prisma.ApplicationUncheckedCreateWithoutRolesInput>
+}
+
+export type ApplicationUpsertWithoutRolesInput = {
+  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutRolesInput, Prisma.ApplicationUncheckedUpdateWithoutRolesInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutRolesInput, Prisma.ApplicationUncheckedCreateWithoutRolesInput>
+  where?: Prisma.ApplicationWhereInput
+}
+
+export type ApplicationUpdateToOneWithWhereWithoutRolesInput = {
+  where?: Prisma.ApplicationWhereInput
+  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutRolesInput, Prisma.ApplicationUncheckedUpdateWithoutRolesInput>
+}
+
+export type ApplicationUpdateWithoutRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
+}
+
+export type ApplicationUncheckedUpdateWithoutRolesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
 }
 
 
@@ -534,10 +627,12 @@ export type ApplicationUncheckedUpdateWithoutMenusInput = {
 
 export type ApplicationCountOutputType = {
   menus: number
+  roles: number
 }
 
 export type ApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menus?: boolean | ApplicationCountOutputTypeCountMenusArgs
+  roles?: boolean | ApplicationCountOutputTypeCountRolesArgs
 }
 
 /**
@@ -557,6 +652,13 @@ export type ApplicationCountOutputTypeCountMenusArgs<ExtArgs extends runtime.Typ
   where?: Prisma.MenuWhereInput
 }
 
+/**
+ * ApplicationCountOutputType without action
+ */
+export type ApplicationCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RoleWhereInput
+}
+
 
 export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -569,6 +671,7 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdAt?: boolean
   updatedAt?: boolean
   menus?: boolean | Prisma.Application$menusArgs<ExtArgs>
+  roles?: boolean | Prisma.Application$rolesArgs<ExtArgs>
   _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
@@ -611,6 +714,7 @@ export type ApplicationSelectScalar = {
 export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "description" | "logo" | "sortOrder" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menus?: boolean | Prisma.Application$menusArgs<ExtArgs>
+  roles?: boolean | Prisma.Application$rolesArgs<ExtArgs>
   _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -620,6 +724,7 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
   name: "Application"
   objects: {
     menus: Prisma.$MenuPayload<ExtArgs>[]
+    roles: Prisma.$RolePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1026,6 +1131,7 @@ readonly fields: ApplicationFieldRefs;
 export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   menus<T extends Prisma.Application$menusArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$menusArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  roles<T extends Prisma.Application$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1478,6 +1584,30 @@ export type Application$menusArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.MenuScalarFieldEnum | Prisma.MenuScalarFieldEnum[]
+}
+
+/**
+ * Application.roles
+ */
+export type Application$rolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Role
+   */
+  select?: Prisma.RoleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Role
+   */
+  omit?: Prisma.RoleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RoleInclude<ExtArgs> | null
+  where?: Prisma.RoleWhereInput
+  orderBy?: Prisma.RoleOrderByWithRelationInput | Prisma.RoleOrderByWithRelationInput[]
+  cursor?: Prisma.RoleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RoleScalarFieldEnum | Prisma.RoleScalarFieldEnum[]
 }
 
 /**

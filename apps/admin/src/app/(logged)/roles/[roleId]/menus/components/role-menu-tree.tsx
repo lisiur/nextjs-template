@@ -174,7 +174,7 @@ export function RoleMenuTree({
             setExpandedIds(allIds);
           }}
         >
-            {t("expandAll")}
+          {t("expandAll")}
         </button>
         <span className="text-muted-foreground">/</span>
         <button
@@ -182,7 +182,7 @@ export function RoleMenuTree({
           className="text-xs text-muted-foreground hover:text-foreground"
           onClick={() => setExpandedIds(new Set())}
         >
-            {t("collapseAll")}
+          {t("collapseAll")}
         </button>
       </div>
       {treeData.map((node) => (
