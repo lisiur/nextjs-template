@@ -6,6 +6,7 @@ import { menuRoleRoutes } from "./menu-role";
 import { organizationRoutes } from "./organization";
 import { systemConfigRoutes } from "./system-config";
 import { uploadRoutes } from "./upload";
+import { userRoleRoutes } from "./user-role";
 
 const routes = new OpenAPIHono()
   .route("/auth", authRoutes)
@@ -14,6 +15,7 @@ const routes = new OpenAPIHono()
   .route("/applications", applicationRoutes)
   .route("/menu", menuRoutes)
   .route("/menu-role", menuRoleRoutes)
-  .route("/upload", uploadRoutes);
+  .route("/upload", uploadRoutes)
+  .route("/user-role", userRoleRoutes);
 
 export { routes };
