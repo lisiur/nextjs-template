@@ -18,12 +18,6 @@ interface Application {
   code: string;
 }
 
-const roleNames: Record<string, string> = {
-  admin: "Administrator",
-  manager: "Manager",
-  user: "User",
-};
-
 interface RoleMenusPageProps {
   params: Promise<{ roleId: string }>;
 }
@@ -130,7 +124,7 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
           {t("backToRoles")}
         </Link>
         <h1 className="text-2xl font-bold">
-          {t("title")} — {roleNames[roleId] ?? roleId}
+          {t("title")} — {roleId}
         </h1>
         <p className="mt-1 text-muted-foreground">{t("description")}</p>
       </div>
