@@ -29,13 +29,44 @@ export const userRoleRepository = {
     });
   },
 
-  getMenusForUser(userId: string) {
-    return prisma.menu.findMany({
+  async getMenusForUser(userId: string) {
+    // First try app-scoped roles via UserRole
+    const scopedMenus = await prisma.menu.findMany({
       where: {
         menuRoles: {
           some: {
             role: {
               userRoles: { some: { userId } },
+            },
+          },
+        },
+        isVisible: true,
+      },
+      orderBy: { sortOrder: "asc" },
+    });
+
+    if (scopedMenus.length > 0) {
+      return scopedMenus;
+    }
+
+    // Fallback: check global User.role (for users without UserRole records)
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+
+    if (!user?.role) {
+      return [];
+    }
+
+    // For global admin role, return all visible menus
+    // For other global roles, find roles with matching code across all apps
+    return prisma.menu.findMany({
+      where: {
+        menuRoles: {
+          some: {
+            role: {
+              code: user.role,
             },
           },
         },
