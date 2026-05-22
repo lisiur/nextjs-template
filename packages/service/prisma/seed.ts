@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { hashPassword } from "better-auth/crypto";
 import { PrismaClient } from "./generated/prisma/client";
 
 const adapter = new PrismaPg({
@@ -259,6 +260,8 @@ async function seedAdminUser() {
   console.log("Seeding admin user...");
 
   const adminEmail = "admin@example.com";
+  const adminPassword = "admin123";
+
   const user = await prisma.user.upsert({
     where: { email: adminEmail },
     update: { role: "admin" },
@@ -271,7 +274,31 @@ async function seedAdminUser() {
     },
   });
 
-  console.log(`Admin user ready: ${user.id} (${user.email})`);
+  // Create email/password account
+  const hashedPassword = await hashPassword(adminPassword);
+  const existingAccount = await prisma.account.findFirst({
+    where: { userId: user.id, providerId: "email" },
+  });
+
+  if (existingAccount) {
+    await prisma.account.update({
+      where: { id: existingAccount.id },
+      data: { password: hashedPassword },
+    });
+  } else {
+    await prisma.account.create({
+      data: {
+        accountId: adminEmail,
+        providerId: "email",
+        userId: user.id,
+        password: hashedPassword,
+      },
+    });
+  }
+
+  console.log(
+    `Admin user ready: ${user.email} (password: ${adminPassword})`,
+  );
   return user;
 }
 
