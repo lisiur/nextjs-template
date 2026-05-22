@@ -273,11 +273,10 @@ export function MenuTree({
     ) => {
       return (
         <div
-          className={`group flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
-            props.isSelected
+          className={`group flex w-full items-center gap-1.5 rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${props.isSelected
               ? "bg-accent font-medium text-accent-foreground"
               : ""
-          } ${props.isDragging ? "opacity-50" : ""}`}
+            } ${props.isDragging ? "opacity-50" : ""}`}
           style={{ paddingLeft: `${props.level * 16 + 8}px` }}
         >
           <button
@@ -291,8 +290,8 @@ export function MenuTree({
           </button>
           <button
             type="button"
-            className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-left"
-            onClick={() => {handleSelect(node)}}
+            className="flex min-w-0 flex-1 items-center gap-1.5 px-2 py-1.5 truncate text-left"
+            onClick={() => { handleSelect(node) }}
           >
             {node.icon && <span className="shrink-0">{node.icon}</span>}
             <span className="truncate">{node.name}</span>
@@ -338,9 +337,9 @@ export function MenuTree({
   return (
     <>
       <DraggableTree
+        className="flex flex-col gap-2"
         data={treeData}
         selectedId={selectedMenuId}
-
         onReorder={handleReorder}
         defaultExpandedIds={defaultExpandedIds}
         expandAllLabel={t("expandAll")}

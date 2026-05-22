@@ -201,7 +201,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        <SidebarMenu>
+        <SidebarMenu className="flex flex-col gap-1 py-2">
           {loading && !fetched ? (
             <div className="space-y-2 px-2">
               {Array.from({ length: 4 }).map((_, i) => (
