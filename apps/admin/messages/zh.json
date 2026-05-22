@@ -121,7 +121,10 @@
       "admin": "管理员",
       "manager": "经理",
       "user": "普通用户"
-    }
+    },
+    "appRoles": "应用角色",
+    "selectApp": "选择应用",
+    "selectRole": "选择角色"
   },
   "Settings": {
     "title": "系统设置",
@@ -254,12 +257,19 @@
   "Roles": {
     "title": "角色管理",
     "description": "管理系统角色和权限",
+    "applications": "应用",
     "name": "角色名称",
+    "code": "编码",
     "description_label": "描述",
     "permissions": "权限",
     "userCount": "用户数",
     "actions": "操作",
     "viewDetails": "查看详情",
+    "selectApp": "选择一个应用查看角色",
+    "noRoles": "暂无角色",
+    "loadError": "加载失败",
+    "deleteSuccess": "删除成功",
+    "deleteError": "删除失败",
     "admin": "管理员",
     "admin_desc": "拥有系统所有权限",
     "manager": "经理",

@@ -121,7 +121,10 @@
       "admin": "Admin",
       "manager": "Manager",
       "user": "User"
-    }
+    },
+    "appRoles": "App Roles",
+    "selectApp": "Select App",
+    "selectRole": "Select Role"
   },
   "Settings": {
     "title": "System Settings",
@@ -254,12 +257,19 @@
   "Roles": {
     "title": "Role Management",
     "description": "Manage system roles and permissions",
+    "applications": "Applications",
     "name": "Role Name",
+    "code": "Code",
     "description_label": "Description",
     "permissions": "Permissions",
     "userCount": "Users",
     "actions": "Actions",
     "viewDetails": "View Details",
+    "selectApp": "Select an application to view roles",
+    "noRoles": "No roles",
+    "loadError": "Failed to load",
+    "deleteSuccess": "Deleted successfully",
+    "deleteError": "Failed to delete",
     "admin": "Administrator",
     "admin_desc": "Full system access with all permissions",
     "manager": "Manager",
@@ -269,7 +279,7 @@
     "resource": "Resource",
     "action": "Action",
     "granted": "Granted",
-    "denied": "Denited"
+    "denied": "Denied"
   },
   "Remote": {
     "settings": {
