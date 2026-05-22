@@ -1,8 +1,6 @@
-import { ac, admin as adminRole, user } from "@repo/shared";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin, openAPI, organization } from "better-auth/plugins";
-import type { AccessControl } from "better-auth/plugins/access";
 import { prisma } from "./db";
 
 export const auth = betterAuth({
@@ -23,13 +21,7 @@ export const auth = betterAuth({
   },
   plugins: [
     openAPI(),
-    admin({
-      ac: ac as AccessControl,
-      roles: {
-        admin: adminRole,
-        user,
-      },
-    }),
+    admin(),
     organization(),
   ],
 });
