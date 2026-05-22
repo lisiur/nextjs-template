@@ -269,7 +269,7 @@ async function seedUser(params: {
 
   const hashedPassword = await hashPassword(params.password);
   const existingAccount = await prisma.account.findFirst({
-    where: { userId: user.id, providerId: "email" },
+    where: { userId: user.id, providerId: "credential" },
   });
 
   if (existingAccount) {
@@ -280,8 +280,8 @@ async function seedUser(params: {
   } else {
     await prisma.account.create({
       data: {
-        accountId: params.email,
-        providerId: "email",
+        accountId: user.id,
+        providerId: "credential",
         userId: user.id,
         password: hashedPassword,
       },
