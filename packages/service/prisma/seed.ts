@@ -255,6 +255,47 @@ async function seedRoles(appId: string) {
   return roleIds;
 }
 
+async function seedAdminUser() {
+  console.log("Seeding admin user...");
+
+  const adminEmail = "admin@example.com";
+  const user = await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: { role: "admin" },
+    create: {
+      id: "user-admin",
+      name: "Admin",
+      email: adminEmail,
+      emailVerified: true,
+      role: "admin",
+    },
+  });
+
+  console.log(`Admin user ready: ${user.id} (${user.email})`);
+  return user;
+}
+
+async function seedUserRoles(userId: string, roleIds: Record<string, string>) {
+  console.log("Seeding user-role assignments...");
+
+  // Assign all roles to admin user for the admin app
+  const assignments = [
+    { roleId: roleIds.admin },
+    { roleId: roleIds.manager },
+    { roleId: roleIds.user },
+  ];
+
+  for (const { roleId } of assignments) {
+    await prisma.userRole.upsert({
+      where: { userId_roleId: { userId, roleId } },
+      update: {},
+      create: { userId, roleId },
+    });
+  }
+
+  console.log(`Assigned ${assignments.length} roles to admin user.`);
+}
+
 async function seed() {
   console.log("Seeding system configs...");
 
@@ -278,6 +319,10 @@ async function seed() {
   const menuIds = await seedMenus(adminApp.id);
   const roleIds = await seedRoles(adminApp.id);
   await seedMenuRoles(menuIds, roleIds.admin);
+
+  // Seed admin user and assign roles
+  const adminUser = await seedAdminUser();
+  await seedUserRoles(adminUser.id, roleIds);
 }
 
 seed()
