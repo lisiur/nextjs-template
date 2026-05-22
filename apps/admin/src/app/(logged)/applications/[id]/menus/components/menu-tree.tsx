@@ -289,13 +289,13 @@ export function MenuTree({
           >
             <GripVertical className="h-4 w-4" />
           </button>
-          {node.icon && <span className="shrink-0">{node.icon}</span>}
           <button
             type="button"
-            className="min-w-0 flex-1 truncate text-left"
-            onClick={() => handleSelect(node)}
+            className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-left"
+            onClick={() => {handleSelect(node)}}
           >
-            {node.name}
+            {node.icon && <span className="shrink-0">{node.icon}</span>}
+            <span className="truncate">{node.name}</span>
           </button>
           <div className="flex shrink-0 gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button
@@ -340,7 +340,7 @@ export function MenuTree({
       <DraggableTree
         data={treeData}
         selectedId={selectedMenuId}
-        onSelect={handleSelect}
+
         onReorder={handleReorder}
         defaultExpandedIds={defaultExpandedIds}
         expandAllLabel={t("expandAll")}

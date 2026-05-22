@@ -6,11 +6,13 @@ import {
   Folder,
   FolderOpen,
   icons,
+  LogOut,
   type LucideIcon,
+  UserIcon,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -32,9 +34,11 @@ const bottomMenuItems = [
     url: "/profile",
     icon: UserIcon,
   },
+  {
+    key: "signOut",
+    icon: LogOut,
+  },
 ];
-
-import { UserIcon } from "lucide-react";
 
 const iconsRecord = icons as Record<string, LucideIcon>;
 
@@ -137,14 +141,21 @@ function SidebarMenuNode({
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const session = useStore(authClient.useSession);
   const user = session?.data?.user;
   const t = useTranslations("Sidebar");
   const { treeMenus, loading, fetched, fetchMenus } = useMenuStore();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
   const skeletonIds = useRef(
     Array.from({ length: 4 }, () => crypto.randomUUID()),
   );
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    router.push("/sign-in");
+  };
 
   useEffect(() => {
     fetchMenus();
@@ -194,7 +205,7 @@ export function AppSidebar() {
           {loading && !fetched ? (
             <div className="space-y-2 px-2">
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-full" />
+                <Skeleton key={skeletonIds.current[i]} className="h-8 w-full" />
               ))}
             </div>
           ) : fetched && treeMenus.length === 0 ? (
@@ -220,12 +231,14 @@ export function AppSidebar() {
           {bottomMenuItems.map((item) => (
             <SidebarMenuItem key={item.key}>
               <SidebarMenuButton
-                isActive={pathname === item.url}
-                render={<Link href={item.url} />}
+                isActive={"url" in item ? pathname === item.url : false}
+                {...("url" in item
+                  ? { render: <Link href={item.url} /> }
+                  : { onClick: handleSignOut })}
               >
                 <item.icon />
                 <span>{t(item.key)}</span>
-                {item.url === "/profile" && user && (
+                {"url" in item && item.url === "/profile" && user && (
                   <div className="ml-auto relative h-6 w-6 shrink-0 overflow-hidden rounded-sm bg-muted">
                     {user.image ? (
                       <Image

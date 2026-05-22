@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Menu, Pencil, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/table";
 import { appClient } from "@/lib/api";
 import { AppDialog } from "./app-dialog";
-import { DeleteConfirmDialog } from "./delete-confirm-dialog";
 
 interface Application {
   id: string;
@@ -37,9 +36,7 @@ export function AppTable() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [showCreate, setShowCreate] = useState(false);
   const [editApp, setEditApp] = useState<Application | null>(null);
-  const [deleteApp, setDeleteApp] = useState<Application | null>(null);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -89,18 +86,6 @@ export function AppTable() {
     toast.success(t("updateSuccess"));
   }
 
-  function handleCreateSuccess() {
-    setShowCreate(false);
-    fetchApplications();
-    toast.success(t("createSuccess"));
-  }
-
-  function handleDeleteSuccess() {
-    setDeleteApp(null);
-    fetchApplications();
-    toast.success(t("deleteSuccess"));
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -121,10 +106,6 @@ export function AppTable() {
             className="pl-9"
           />
         </div>
-        <Button onClick={() => setShowCreate(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t("addApp")}
-        </Button>
       </div>
 
       {applications.length === 0 ? (
@@ -185,13 +166,6 @@ export function AppTable() {
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeleteApp(app)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -227,29 +201,12 @@ export function AppTable() {
         </>
       )}
 
-      {showCreate && (
-        <AppDialog
-          open={showCreate}
-          onOpenChange={(open) => !open && setShowCreate(false)}
-          onSuccess={handleCreateSuccess}
-        />
-      )}
-
       {editApp && (
         <AppDialog
           app={editApp}
           open={!!editApp}
           onOpenChange={(open) => !open && setEditApp(null)}
           onSuccess={handleEditSuccess}
-        />
-      )}
-
-      {deleteApp && (
-        <DeleteConfirmDialog
-          app={deleteApp}
-          open={!!deleteApp}
-          onOpenChange={(open) => !open && setDeleteApp(null)}
-          onSuccess={handleDeleteSuccess}
         />
       )}
     </>

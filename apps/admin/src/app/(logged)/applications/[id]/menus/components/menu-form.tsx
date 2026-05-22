@@ -57,7 +57,6 @@ export function MenuForm({ menu, onSaved }: MenuFormProps) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    reset,
     watch,
     setValue,
   } = useForm<MenuInput>({
@@ -71,17 +70,6 @@ export function MenuForm({ menu, onSaved }: MenuFormProps) {
       isVisible: menu.isVisible,
     },
   });
-
-  useEffect(() => {
-    reset({
-      name: menu.name,
-      code: menu.code,
-      icon: menu.icon ?? "",
-      url: menu.url ?? "",
-      isExternal: menu.isExternal,
-      isVisible: menu.isVisible,
-    });
-  }, [menu, reset]);
 
   const isExternal = watch("isExternal");
   const isVisible = watch("isVisible");

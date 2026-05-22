@@ -3,7 +3,7 @@
 import { ArrowLeft, Layers } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { use, useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,6 +33,9 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
   );
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const skeletonIds = useRef(
+    Array.from({ length: 5 }, () => crypto.randomUUID()),
+  );
 
   const fetchApplications = useCallback(async () => {
     try {
@@ -141,7 +144,10 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
             {applications.length === 0 ? (
               <div className="space-y-1">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-9 w-full" />
+                  <Skeleton
+                    key={skeletonIds.current[i]}
+                    className="h-9 w-full"
+                  />
                 ))}
               </div>
             ) : (
@@ -177,7 +183,7 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
           ) : loading ? (
             <div className="space-y-2">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-full" />
+                <Skeleton key={skeletonIds.current[i]} className="h-8 w-full" />
               ))}
             </div>
           ) : (

@@ -1,7 +1,8 @@
 "use client";
 
+import { useStore } from "better-auth/react";
 import { useEffect, useState } from "react";
-import { appClient } from "@/lib/api";
+import { appClient, authClient } from "@/lib/api";
 
 interface Application {
   id: string;
@@ -17,8 +18,18 @@ interface Application {
 export function useCurrentApp() {
   const [app, setApp] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
+  const session = useStore(authClient.useSession);
 
   useEffect(() => {
+    if (session.isPending) return;
+
+    if (!session.data) {
+      setApp(null);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     appClient.api.applications.current
       .$get()
       .then(async (res: Response) => {
@@ -29,7 +40,7 @@ export function useCurrentApp() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [session.isPending, session.data]);
 
   return { app, loading };
 }

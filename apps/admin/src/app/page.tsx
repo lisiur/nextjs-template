@@ -1,9 +1,40 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Home",
-};
+import { useStore } from "better-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { appClient, authClient } from "@/lib/api";
+import { getFirstMenuUrl } from "@/lib/menu-utils";
 
 export default function HomePage() {
-  return <div />;
+  const router = useRouter();
+  const session = useStore(authClient.useSession);
+
+  useEffect(() => {
+    if (session.isPending) return;
+
+    if (!session.data) {
+      router.replace("/sign-in");
+      return;
+    }
+
+    appClient.api["menu-role"].mine
+      .$get()
+      .then(async (res) => {
+        if (res.ok) {
+          const data = await res.json();
+          const firstUrl = getFirstMenuUrl(data.menus);
+          if (firstUrl) {
+            router.replace(firstUrl);
+            return;
+          }
+        }
+        router.replace("/");
+      })
+      .catch(() => {
+        router.replace("/");
+      });
+  }, [session, router]);
+
+  return null;
 }

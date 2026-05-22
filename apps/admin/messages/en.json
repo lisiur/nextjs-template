@@ -151,7 +151,8 @@
     "settings": "Settings",
     "loading": "Loading menus...",
     "noMenus": "No menus available",
-    "fetchError": "Failed to load menus"
+    "fetchError": "Failed to load menus",
+    "signOut": "Sign Out"
   },
   "Organizations": {
     "title": "Organization Management",

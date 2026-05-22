@@ -25,7 +25,7 @@ export default function RegisterPage() {
         <CardContent>
           <RegisterForm
             onSuccess={() => router.push("/")}
-            onSwitchToLogin={() => router.push("/login")}
+            onSwitchToLogin={() => router.push("/sign-in")}
           />
         </CardContent>
       </Card>
