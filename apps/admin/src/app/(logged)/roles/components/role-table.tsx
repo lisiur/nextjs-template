@@ -1,6 +1,6 @@
 "use client";
 
-import { ListChecks, Pencil, Plus, Trash2 } from "lucide-react";
+import { ListChecks, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
@@ -42,7 +42,9 @@ export function RoleTable() {
 
   const fetchApplications = useCallback(async () => {
     try {
-      const res = await appClient.api.applications.$get();
+      const res = await appClient.api.applications.$get({
+        query: { limit: 100, offset: 0 },
+      });
       if (res.ok) {
         const data = await res.json();
         setApplications(data.applications ?? []);
@@ -135,17 +137,13 @@ export function RoleTable() {
                   <TableRow>
                     <TableHead>{t("name")}</TableHead>
                     <TableHead>{t("code")}</TableHead>
-                    <TableHead className="text-right">
-                      {t("actions")}
-                    </TableHead>
+                    <TableHead className="text-right">{t("actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {roles.map((role) => (
                     <TableRow key={role.id}>
-                      <TableCell className="font-medium">
-                        {role.name}
-                      </TableCell>
+                      <TableCell className="font-medium">{role.name}</TableCell>
                       <TableCell>
                         <Badge variant="secondary">{role.code}</Badge>
                       </TableCell>

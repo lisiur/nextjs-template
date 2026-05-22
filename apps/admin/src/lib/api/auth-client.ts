@@ -8,14 +8,15 @@ import { toast } from "sonner";
 export const authClient = createAuthClient({
   basePath: "/api/auth",
   plugins: [
+    // biome-ignore lint/suspicious/noExplicitAny: better-auth type compatibility issue
     adminClient({
-      ac,
+      ac: ac as any,
       roles: {
         admin,
         manager,
         user,
       },
-    }),
+    } as any),
   ],
   fetchOptions: {
     onError: async (ctx) => {

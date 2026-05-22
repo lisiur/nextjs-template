@@ -1,10 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { userRoleRepository } from "../../repositories/user-role.repository";
-import {
-  errorSchema,
-  listUserRolesQuerySchema,
-  userRoleSchema,
-} from "./schema";
+import { listUserRolesQuerySchema, userRoleSchema } from "./schema";
 
 export const listUserRoles = defineOpenAPIRoute({
   route: createRoute({

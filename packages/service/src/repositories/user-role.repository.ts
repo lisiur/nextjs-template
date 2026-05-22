@@ -19,6 +19,7 @@ export const userRoleRepository = {
       where: { userId_roleId: { userId, roleId } },
       update: {},
       create: { userId, roleId },
+      include: { role: true },
     });
   },
 

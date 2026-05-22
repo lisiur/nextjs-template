@@ -115,7 +115,8 @@ export function UserDialog({
           data: {
             name: data.name,
             email: data.email,
-            role: data.role,
+          // biome-ignore lint/suspicious/noExplicitAny: better-auth role types don't include custom roles
+          role: data.role as any,
           },
         });
       } else {
@@ -123,7 +124,8 @@ export function UserDialog({
           name: data.name,
           email: data.email,
           password: data.password,
-          role: data.role as "admin" | "manager" | "user",
+          // biome-ignore lint/suspicious/noExplicitAny: better-auth role types don't include custom roles
+          role: data.role as any,
         });
       }
       reset();
@@ -142,12 +144,10 @@ export function UserDialog({
 
   useEffect(() => {
     if (open) {
-      appClient.api.applications
-        .$get()
-        .then((res) => {
-          if (res.ok)
-            res.json().then((d) => setApplications(d.applications ?? []));
-        });
+      appClient.api.applications.$get({ query: { limit: 100, offset: 0 } }).then((res) => {
+        if (res.ok)
+          res.json().then((d) => setApplications(d.applications ?? []));
+      });
     }
   }, [open]);
 
@@ -163,7 +163,7 @@ export function UserDialog({
 
   useEffect(() => {
     if (user?.id && open) {
-      appClient.api["user-roles"]
+      appClient.api["user-role"]
         .$get({ query: { userId: user.id } })
         .then((res) => {
           if (res.ok) res.json().then((d) => setUserRoles(d));
@@ -173,10 +173,10 @@ export function UserDialog({
 
   async function handleAssignRole(roleId: string) {
     if (!user?.id) return;
-    await appClient.api["user-roles"].$post({
+    await appClient.api["user-role"].$post({
       json: { userId: user.id, roleId },
     });
-    const res = await appClient.api["user-roles"].$get({
+    const res = await appClient.api["user-role"].$get({
       query: { userId: user.id },
     });
     if (res.ok) {
@@ -187,10 +187,10 @@ export function UserDialog({
 
   async function handleRemoveRole(roleId: string) {
     if (!user?.id) return;
-    await appClient.api["user-roles"][":userId"][":roleId"].$delete({
-      param: { userId: user.id, roleId },
+    await appClient.api["user-role"].remove.$post({
+      json: { userId: user.id, roleId },
     });
-    const res = await appClient.api["user-roles"].$get({
+    const res = await appClient.api["user-role"].$get({
       query: { userId: user.id },
     });
     if (res.ok) {
@@ -273,7 +273,7 @@ export function UserDialog({
                 </div>
               )}
               <div className="flex gap-2">
-                <Select value={selectedAppId} onValueChange={setSelectedAppId}>
+                <Select value={selectedAppId} onValueChange={(v) => setSelectedAppId(v ?? "")}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder={t("selectApp")} />
                   </SelectTrigger>
@@ -287,9 +287,11 @@ export function UserDialog({
                 </Select>
                 {selectedAppId && (
                   <Select
-                    onValueChange={(roleId) => {
-                      handleAssignRole(roleId);
-                      setSelectedAppId("");
+                    onValueChange={(value) => {
+                      if (typeof value === "string") {
+                        handleAssignRole(value);
+                        setSelectedAppId("");
+                      }
                     }}
                   >
                     <SelectTrigger className="w-[180px]">

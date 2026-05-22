@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { menuSchema } from "../menu/schema";
 
 export const userRoleSchema = z
   .object({
@@ -35,3 +36,9 @@ export const errorSchema = z
     message: z.string().openapi({ example: "Bad Request" }),
   })
   .openapi("Error");
+
+export const mineMenusResponseSchema = z
+  .object({
+    menus: menuSchema.array(),
+  })
+  .openapi("MineMenusResponse");

@@ -22,14 +22,15 @@ export const auth = betterAuth({
   },
   plugins: [
     openAPI(),
+    // biome-ignore lint/suspicious/noExplicitAny: better-auth type compatibility issue
     admin({
-      ac,
+      ac: ac as any,
       roles: {
         admin: adminRole,
         manager,
         user,
       },
-    }),
+    } as any),
     organization(),
   ],
 });

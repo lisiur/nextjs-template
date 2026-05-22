@@ -36,7 +36,9 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
 
   const fetchApplications = useCallback(async () => {
     try {
-      const res = await appClient.api.applications.$get();
+      const res = await appClient.api.applications.$get({
+        query: { limit: 100, offset: 0 },
+      });
       if (res.ok) {
         const data = await res.json();
         setApplications(data.applications ?? []);

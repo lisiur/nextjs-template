@@ -2,8 +2,7 @@ import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "../../lib/auth";
 import { userRoleRepository } from "../../repositories/user-role.repository";
-import { menuSchema } from "../menu/schema";
-import { errorSchema } from "./schema";
+import { errorSchema, mineMenusResponseSchema } from "./schema";
 
 export const getUserAppRoles = defineOpenAPIRoute({
   route: createRoute({
@@ -14,12 +13,7 @@ export const getUserAppRoles = defineOpenAPIRoute({
     responses: {
       200: {
         content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: { menus: menuSchema.array() },
-            },
-          },
+          "application/json": { schema: mineMenusResponseSchema },
         },
         description: "User's authorized menus across all applications",
       },

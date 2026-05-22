@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { prisma } from "../../lib/db";
 import { roleRepository } from "../../repositories/role.repository";
-import { errorSchema, roleIdParamSchema } from "./schema";
+import { errorSchema, roleIdParamSchema, successSchema } from "./schema";
 
 export const deleteRole = defineOpenAPIRoute({
   route: createRoute({
@@ -15,12 +15,7 @@ export const deleteRole = defineOpenAPIRoute({
     responses: {
       200: {
         content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: { success: { type: "boolean" } },
-            },
-          },
+          "application/json": { schema: successSchema },
         },
         description: "Deleted",
       },

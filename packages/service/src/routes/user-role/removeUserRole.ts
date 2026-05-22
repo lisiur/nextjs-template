@@ -1,32 +1,41 @@
+import { z } from "@hono/zod-openapi";
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { userRoleRepository } from "../../repositories/user-role.repository";
-import { errorSchema, removeUserRoleParamSchema } from "./schema";
+
+const removeBodySchema = z.object({
+  userId: z.string().min(1),
+  roleId: z.string().min(1),
+});
+
+const successSchema = z.object({
+  success: z.boolean(),
+});
 
 export const removeUserRole = defineOpenAPIRoute({
   route: createRoute({
-    method: "delete",
-    path: "/{userId}/{roleId}",
+    method: "post",
+    path: "/remove",
     tags: ["UserRole"],
     summary: "Remove a role from a user",
     request: {
-      params: removeUserRoleParamSchema,
+      body: {
+        content: {
+          "application/json": { schema: removeBodySchema },
+        },
+        required: true,
+      },
     },
     responses: {
       200: {
         content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: { success: { type: "boolean" } },
-            },
-          },
+          "application/json": { schema: successSchema },
         },
         description: "Removed",
       },
     },
   }),
   handler: async (c) => {
-    const { userId, roleId } = c.req.valid("param");
+    const { userId, roleId } = c.req.valid("json");
     await userRoleRepository.remove(userId, roleId);
     return c.json({ success: true }, 200);
   },

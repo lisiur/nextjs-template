@@ -36,3 +36,9 @@ export const errorSchema = z
     message: z.string().openapi({ example: "Bad Request" }),
   })
   .openapi("Error");
+
+export const successSchema = z
+  .object({
+    success: z.boolean(),
+  })
+  .openapi("Success");
