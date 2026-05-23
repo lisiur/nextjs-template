@@ -72,7 +72,11 @@ export default function MenusPage({ params }: MenusPageProps) {
         {/* Right panel — Edit form */}
         <div className="flex-1 pb-8">
           {selectedMenu ? (
-            <MenuForm key={selectedMenu.id} menu={selectedMenu} onSaved={handleMenuSaved} />
+            <MenuForm
+              key={selectedMenu.id}
+              menu={selectedMenu}
+              onSaved={handleMenuSaved}
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-muted-foreground">
               {t("selectMenuToEdit")}

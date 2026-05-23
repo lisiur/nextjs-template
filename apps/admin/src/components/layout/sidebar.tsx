@@ -3,6 +3,7 @@
 import { useStore } from "better-auth/react";
 import {
   ChevronRight,
+  ChevronsUpDown,
   Folder,
   FolderOpen,
   icons,
@@ -16,6 +17,15 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -27,18 +37,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { authClient } from "@/lib/api/auth-client";
 import { useMenuStore } from "@/stores/menu-store";
 import { cn } from "@/utils/cn";
-
-const bottomMenuItems = [
-  {
-    key: "profile",
-    url: "/profile",
-    icon: UserIcon,
-  },
-  {
-    key: "signOut",
-    icon: LogOut,
-  },
-];
 
 const iconsRecord = icons as Record<string, LucideIcon>;
 
@@ -228,36 +226,68 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          {bottomMenuItems.map((item) => (
-            <SidebarMenuItem key={item.key}>
-              <SidebarMenuButton
-                isActive={"url" in item ? pathname === item.url : false}
-                {...("url" in item
-                  ? { render: <Link href={item.url} /> }
-                  : { onClick: handleSignOut })}
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <SidebarMenuButton
+                    size="lg"
+                    className="w-full data-[popup-open]:bg-sidebar-accent data-[popup-open]:text-sidebar-accent-foreground"
+                  />
+                }
               >
-                <item.icon />
-                <span>{t(item.key)}</span>
-                {"url" in item && item.url === "/profile" && user && (
-                  <div className="ml-auto relative h-6 w-6 shrink-0 overflow-hidden rounded-sm bg-muted">
-                    {user.image ? (
-                      <Image
-                        src={user.image}
-                        alt={user.name}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-[10px] font-medium text-muted-foreground">
-                        {initials}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+                <div className="relative flex aspect-square h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  {user?.image ? (
+                    <Image
+                      src={user.image}
+                      alt={user.name ?? ""}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <span className="text-xs font-semibold">{initials}</span>
+                  )}
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">{user?.name}</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {user?.email}
+                  </span>
+                </div>
+                <ChevronsUpDown className="ml-auto h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-[--radix-dropdown-menu-trigger-width] min-w-56"
+                side="top"
+                align="start"
+                sideOffset={4}
+              >
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user?.name}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem render={<Link href="/profile" />}>
+                  <UserIcon />
+                  {t("profile")}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+                  <LogOut />
+                  {t("signOut")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
