@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -39,14 +40,12 @@ export function OrganizationTable() {
   const [deleteOrg, setDeleteOrg] = useState<Organization | null>(null);
 
   const pageSize = 10;
-  const offset = (page - 1) * pageSize;
-  const totalPages = Math.ceil(total / pageSize);
 
   const fetchOrganizations = useCallback(async () => {
     setLoading(true);
     try {
       const res = await appClient.api.organizations.$get({
-        query: { limit: pageSize, offset },
+        query: { limit: pageSize, offset: (page - 1) * pageSize },
       });
       if (res.ok) {
         const data = await res.json();
@@ -58,7 +57,7 @@ export function OrganizationTable() {
     } finally {
       setLoading(false);
     }
-  }, [offset, t]);
+  }, [t, page]);
 
   useEffect(() => {
     fetchOrganizations();
@@ -174,31 +173,13 @@ export function OrganizationTable() {
         </TableBody>
       </Table>
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between py-4">
-          <p className="text-sm text-muted-foreground">
-            {t("showing")} {offset + 1}-{Math.min(offset + pageSize, total)}{" "}
-            {t("of")} {total}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-            >
-              {t("previous")}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
-            >
-              {t("next")}
-            </Button>
-          </div>
-        </div>
+      {total > pageSize && (
+        <DataTablePagination
+          page={page}
+          total={total}
+          pageSize={pageSize}
+          onPageChange={setPage}
+        />
       )}
 
       {showCreate && (

@@ -64,7 +64,8 @@ export const ModelName = {
   Menu: 'Menu',
   MenuRole: 'MenuRole',
   Role: 'Role',
-  UserRole: 'UserRole'
+  UserRole: 'UserRole',
+  OperationLog: 'OperationLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -277,6 +278,23 @@ export const UserRoleScalarFieldEnum = {
 } as const
 
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
+
+
+export const OperationLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  userName: 'userName',
+  action: 'action',
+  module: 'module',
+  targetId: 'targetId',
+  targetName: 'targetName',
+  detail: 'detail',
+  ip: 'ip',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt'
+} as const
+
+export type OperationLogScalarFieldEnum = (typeof OperationLogScalarFieldEnum)[keyof typeof OperationLogScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { userRoleRepository } from "#repositories/user-role.repository";
 import {
@@ -36,6 +37,15 @@ export const assignUserRole = defineOpenAPIRoute({
   handler: async (c) => {
     const { userId, roleId } = c.req.valid("json");
     const userRole = await userRoleRepository.assign(userId, roleId);
+
+    logOperation({
+      action: "assign",
+      module: "user-role",
+      targetId: userRole.id,
+      detail: JSON.stringify({ userId, roleId }),
+      c,
+    });
+
     return c.json(userRole, 200);
   },
 });

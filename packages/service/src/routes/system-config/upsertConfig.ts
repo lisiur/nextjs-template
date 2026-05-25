@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { systemConfigRepository } from "#repositories/system-config.repository";
 import {
@@ -59,6 +60,14 @@ export const upsertConfig = defineOpenAPIRoute({
     const body = c.req.valid("json");
 
     const config = await systemConfigRepository.upsert(group, key, body);
+
+    logOperation({
+      action: "update",
+      module: "system-config",
+      targetName: `${group}.${key}`,
+      c,
+    });
+
     return c.json(config, 200);
   },
 });

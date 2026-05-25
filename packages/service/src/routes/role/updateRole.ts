@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { roleRepository } from "#repositories/role.repository";
 import {
@@ -43,6 +44,15 @@ export const updateRole = defineOpenAPIRoute({
       return c.json({ code: 404, message: "Role not found" }, 404);
     }
     const updated = await roleRepository.update(id, data);
+
+    logOperation({
+      action: "update",
+      module: "role",
+      targetId: id,
+      targetName: updated.name,
+      c,
+    });
+
     return c.json(updated, 200);
   },
 });

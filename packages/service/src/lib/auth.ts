@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin, openAPI, organization } from "better-auth/plugins";
 import { prisma } from "./db";
+import { logOperation } from "./logger";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -20,6 +21,34 @@ export const auth = betterAuth({
     },
   },
   plugins: [openAPI(), admin(), organization()],
+  databaseHooks: {
+    session: {
+      create: {
+        after(session) {
+          logOperation({
+            userId: session.userId,
+            action: "login",
+            module: "auth",
+            targetId: session.id,
+            detail: JSON.stringify({
+              ipAddress: session.ipAddress,
+              userAgent: session.userAgent,
+            }),
+          });
+        },
+      },
+      delete: {
+        after(session) {
+          logOperation({
+            userId: session.userId,
+            action: "logout",
+            module: "auth",
+            targetId: session.id,
+          });
+        },
+      },
+    },
+  },
 });
 
 export type AuthType = {

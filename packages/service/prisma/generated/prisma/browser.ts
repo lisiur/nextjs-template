@@ -87,3 +87,8 @@ export type Role = Prisma.RoleModel
  * 
  */
 export type UserRole = Prisma.UserRoleModel
+/**
+ * Model OperationLog
+ * 
+ */
+export type OperationLog = Prisma.OperationLogModel

@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute, z } from "@hono/zod-openapi";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { userRoleRepository } from "#repositories/user-role.repository";
 
@@ -38,6 +39,14 @@ export const removeUserRole = defineOpenAPIRoute({
   handler: async (c) => {
     const { userId, roleId } = c.req.valid("json");
     await userRoleRepository.remove(userId, roleId);
+
+    logOperation({
+      action: "remove",
+      module: "user-role",
+      detail: JSON.stringify({ userId, roleId }),
+      c,
+    });
+
     return c.json({ success: true }, 200);
   },
 });

@@ -69,26 +69,38 @@ function DateRangePicker({
   onChange?: (range: DateRange | undefined) => void;
   className?: string;
 }) {
+  const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<DateRange | undefined>(
     startDate && endDate ? { from: startDate, to: endDate } : undefined,
   );
 
-  const handleSelect: OnSelectHandler<DateRange> = (nextRange, selectedDay) => {
+  const handleSelect: OnSelectHandler<DateRange | undefined> = (
+    nextRange,
+    selectedDay,
+  ) => {
+    let result: DateRange | undefined;
     setDate((range) => {
-      const next = range?.from && range?.to ? { from: selectedDay } : nextRange;
-      return next;
+      if (range?.from && !nextRange) {
+        result = { from: selectedDay, to: selectedDay };
+      } else if (range?.from && range?.to) {
+        result = { from: selectedDay };
+      } else {
+        result = nextRange;
+      }
+      return result;
     });
   };
 
-  const onChangeRef = React.useRef(onChange);
-  onChangeRef.current = onChange;
-
-  React.useEffect(() => {
-    onChangeRef.current?.(date);
-  }, [date]);
-
   return (
-    <Popover>
+    <Popover
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) {
+          onChange?.(date);
+        }
+      }}
+    >
       <PopoverTrigger
         render={
           <Button
@@ -117,11 +129,12 @@ function DateRangePicker({
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="range"
-          required
+          required={false}
           defaultMonth={date?.from}
           selected={date}
           onSelect={handleSelect}
           numberOfMonths={2}
+          min={1}
         />
       </PopoverContent>
     </Popover>

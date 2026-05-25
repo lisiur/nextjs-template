@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { menuRoleRepository } from "#repositories/menu-role.repository";
 import {
@@ -63,6 +64,14 @@ export const batchAssignMenus = defineOpenAPIRoute({
     }
 
     await menuRoleRepository.batchAssign(roleId, Array.from(allDescendantIds));
+
+    logOperation({
+      action: "assign",
+      module: "menu-role",
+      targetId: roleId,
+      detail: JSON.stringify({ menuIds: Array.from(allDescendantIds) }),
+      c,
+    });
 
     const menus = await menuRoleRepository.getMenusForRole(roleId);
     return c.json({ menus }, 200);

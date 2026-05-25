@@ -1,6 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { createMenuBodySchema, errorSchema, menuSchema } from "./schema";
 
@@ -78,6 +79,14 @@ export const createMenu = defineOpenAPIRoute({
         isExternal: body.isExternal,
         isVisible: body.isVisible,
       },
+    });
+
+    logOperation({
+      action: "create",
+      module: "menu",
+      targetId: menu.id,
+      targetName: menu.name,
+      c,
     });
 
     return c.json(menu, 201);

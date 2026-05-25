@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -42,8 +43,6 @@ export function AppTable() {
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const pageSize = 10;
-  const offset = (page - 1) * pageSize;
-  const totalPages = Math.ceil(total / pageSize);
 
   function handleSearchChange(value: string) {
     setSearch(value);
@@ -60,7 +59,7 @@ export function AppTable() {
       const res = await appClient.api.applications.$get({
         query: {
           limit: pageSize,
-          offset,
+          offset: (page - 1) * pageSize,
           search: debouncedSearch || undefined,
         },
       });
@@ -74,7 +73,7 @@ export function AppTable() {
     } finally {
       setLoading(false);
     }
-  }, [offset, debouncedSearch, t]);
+  }, [debouncedSearch, t, page]);
 
   useEffect(() => {
     fetchApplications();
@@ -172,31 +171,13 @@ export function AppTable() {
             </TableBody>
           </Table>
 
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between py-4">
-              <p className="text-sm text-muted-foreground">
-                {t("showing")} {offset + 1}-{Math.min(offset + pageSize, total)}{" "}
-                {t("of")} {total}
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                >
-                  {t("previous")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
-                >
-                  {t("next")}
-                </Button>
-              </div>
-            </div>
+          {total > pageSize && (
+            <DataTablePagination
+              page={page}
+              total={total}
+              pageSize={pageSize}
+              onPageChange={setPage}
+            />
           )}
         </>
       )}

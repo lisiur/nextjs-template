@@ -241,3 +241,23 @@ model UserRole {
   @@index([roleId])
   @@map("user_role")
 }
+
+model OperationLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  userName    String?
+  action      String
+  module      String
+  targetId    String?
+  targetName  String?
+  detail      String?
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([module])
+  @@index([createdAt])
+  @@map("operation_log")
+}

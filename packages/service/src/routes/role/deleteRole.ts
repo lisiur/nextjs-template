@@ -1,5 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { prisma } from "#lib/db";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { roleRepository } from "#repositories/role.repository";
 import { errorSchema, roleIdParamSchema, successSchema } from "./schema";
@@ -38,6 +39,15 @@ export const deleteRole = defineOpenAPIRoute({
       prisma.userRole.deleteMany({ where: { roleId: id } }),
       prisma.role.delete({ where: { id } }),
     ]);
+
+    logOperation({
+      action: "delete",
+      module: "role",
+      targetId: id,
+      targetName: role.name,
+      c,
+    });
+
     return c.json({ success: true }, 200);
   },
 });

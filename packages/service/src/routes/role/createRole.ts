@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { roleRepository } from "#repositories/role.repository";
 import { createRoleBodySchema, errorSchema, roleSchema } from "./schema";
@@ -42,6 +43,15 @@ export const createRole = defineOpenAPIRoute({
       );
     }
     const role = await roleRepository.create(data);
+
+    logOperation({
+      action: "create",
+      module: "role",
+      targetId: role.id,
+      targetName: role.name,
+      c,
+    });
+
     return c.json(role, 201);
   },
 });

@@ -79,8 +79,8 @@ export default function FormDemoPage() {
       preference: "email",
       interests: [],
       birthDate: new Date(),
-      dateRangeStart: new Date(),
-      dateRangeEnd: new Date(),
+      dateRangeStart: undefined,
+      dateRangeEnd: undefined,
       terms: false,
     },
   });

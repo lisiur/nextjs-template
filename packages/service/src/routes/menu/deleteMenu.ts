@@ -1,6 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { deleteSuccessSchema, errorSchema, menuIdParamSchema } from "./schema";
 
@@ -46,6 +47,14 @@ export const deleteMenu = defineOpenAPIRoute({
     }
 
     await prisma.menu.delete({ where: { id } });
+
+    logOperation({
+      action: "delete",
+      module: "menu",
+      targetId: id,
+      targetName: existing.name,
+      c,
+    });
 
     return c.json({ success: true as const }, 200);
   },

@@ -1,6 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
+import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import {
   errorSchema,
@@ -76,6 +77,14 @@ export const updateOrganization = defineOpenAPIRoute({
     const org = await prisma.organization.update({
       where: { id },
       data: body,
+    });
+
+    logOperation({
+      action: "update",
+      module: "organization",
+      targetId: org.id,
+      targetName: org.name,
+      c,
     });
 
     return c.json(org, 200);

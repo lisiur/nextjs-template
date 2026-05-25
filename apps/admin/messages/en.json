@@ -6,7 +6,11 @@
     "email": "Email",
     "password": "Password",
     "name": "Name",
-    "locale": "Locale"
+    "locale": "Locale",
+    "showing": "Showing",
+    "of": "of",
+    "previous": "Previous",
+    "next": "Next"
   },
   "Auth": {
     "welcomeBack": "Welcome back",
@@ -113,10 +117,6 @@
     "createSuccess": "User created successfully",
     "deleteSuccess": "User deleted successfully",
     "fetchFailed": "Failed to fetch users",
-    "showing": "Showing",
-    "of": "of",
-    "previous": "Previous",
-    "next": "Next",
     "roles": {
       "admin": "Admin",
       "user": "User"
@@ -152,7 +152,8 @@
     "loading": "Loading menus...",
     "noMenus": "No menus available",
     "fetchError": "Failed to load menus",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "logs": "Logs"
   },
   "Organizations": {
     "title": "Organization Management",
@@ -179,11 +180,7 @@
     "updateSuccess": "Organization updated successfully",
     "createSuccess": "Organization created successfully",
     "deleteSuccess": "Organization deleted successfully",
-    "fetchFailed": "Failed to fetch organizations",
-    "showing": "Showing",
-    "of": "of",
-    "previous": "Previous",
-    "next": "Next"
+    "fetchFailed": "Failed to fetch organizations"
   },
   "Applications": {
     "title": "Application Management",
@@ -213,11 +210,7 @@
     "createSuccess": "Application created successfully",
     "deleteSuccess": "Application deleted successfully",
     "fetchFailed": "Failed to fetch applications",
-    "logoTooLarge": "Logo file size must be less than 2MB",
-    "showing": "Showing",
-    "of": "of",
-    "previous": "Previous",
-    "next": "Next"
+    "logoTooLarge": "Logo file size must be less than 2MB"
   },
   "Profile": {
     "title": "Profile",
@@ -364,5 +357,57 @@
     "expandAll": "Expand All",
     "collapseAll": "Collapse All",
     "backToRoles": "Back to Roles"
+  },
+  "Logs": {
+    "title": "Log Management",
+    "description": "View system operation logs and login logs",
+    "fetchFailed": "Failed to fetch logs",
+    "deleteFailed": "Failed to delete logs",
+    "deleteSuccess": "Logs deleted successfully",
+    "viewDetail": "View",
+    "detailTitle": "Log Detail",
+    "noLogs": "No logs found",
+    "confirmDelete": "Are you sure you want to delete the selected logs?",
+    "delete": "Delete",
+    "batchDelete": "Batch Delete",
+    "cancel": "Cancel",
+    "clearFilters": "Clear Filters",
+    "columns": {
+      "createdAt": "Time",
+      "userName": "User",
+      "module": "Module",
+      "action": "Action",
+      "targetName": "Target",
+      "ip": "IP",
+      "detail": "Detail"
+    },
+    "actions": {
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "login": "Login",
+      "logout": "Logout",
+      "assign": "Assign",
+      "remove": "Remove",
+      "batchUpsert": "Batch Upsert"
+    },
+    "modules": {
+      "user": "User",
+      "organization": "Organization",
+      "application": "Application",
+      "menu": "Menu",
+      "role": "Role",
+      "system-config": "System Config",
+      "user-role": "User Role",
+      "menu-role": "Menu Role",
+      "auth": "Auth"
+    },
+    "filters": {
+      "action": "Action",
+      "module": "Module",
+      "dateRange": "Date Range",
+      "allActions": "All Actions",
+      "allModules": "All Modules"
+    }
   }
 }

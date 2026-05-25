@@ -173,12 +173,20 @@ async function seedMenus(appId: string) {
       sortOrder: 3,
     },
     {
+      id: "menu-logs",
+      name: "Logs",
+      code: "logs",
+      icon: "FileText",
+      url: "/logs",
+      sortOrder: 4,
+    },
+    {
       id: "menu-settings",
       name: "Settings",
       code: "settings",
       icon: "Settings",
       url: "/settings",
-      sortOrder: 4,
+      sortOrder: 5,
     },
   ];
 
