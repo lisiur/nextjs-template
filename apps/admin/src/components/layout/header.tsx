@@ -1,6 +1,7 @@
 "use client";
 
 import { PanelLeftIcon } from "lucide-react";
+import Image from "next/image";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { useCurrentApp } from "@/hooks/use-current-app";
@@ -21,6 +22,16 @@ export function Header({ className }: { className?: string }) {
           <PanelLeftIcon />
           <span className="sr-only">Toggle Sidebar</span>
         </button>
+        {app?.logo ? (
+          <Image
+            src={app.logo}
+            alt={app.name}
+            width={24}
+            height={24}
+            className="shrink-0 rounded"
+            unoptimized
+          />
+        ) : null}
         <span className="text-lg font-semibold">{app?.name ?? ""}</span>
       </div>
       <div className="ml-auto flex items-center gap-2">
