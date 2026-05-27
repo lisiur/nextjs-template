@@ -4,6 +4,20 @@ import type * as React from "react";
 
 import { cn } from "@/utils/cn";
 
+type CellAlign = "left" | "center" | "right";
+type StickySide = "right";
+
+type TableCellOptions = {
+  align?: CellAlign;
+  sticky?: StickySide;
+};
+
+const cellAlignClassName: Record<CellAlign, string> = {
+  left: "text-left",
+  center: "text-center",
+  right: "text-right",
+};
+
 function Table({
   className,
   containerClassName,
@@ -61,7 +75,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b transition-colors duration-150 ease-in-out [&>td]:transition-colors [&>td]:duration-150 [&>td]:ease-in-out hover:bg-muted/50 hover:[&>td]:bg-muted has-aria-expanded:bg-muted/50 has-aria-expanded:[&>td]:bg-muted data-[state=selected]:bg-muted data-[state=selected]:[&>td]:bg-muted",
         className,
       )}
       {...props}
@@ -69,12 +83,19 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   );
 }
 
-function TableHead({ className, ...props }: React.ComponentProps<"th">) {
+function TableHead({
+  className,
+  align,
+  sticky,
+  ...props
+}: React.ComponentProps<"th"> & TableCellOptions) {
   return (
     <th
       data-slot="table-head"
       className={cn(
         "h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
+        align && cellAlignClassName[align],
+        sticky === "right" && "sticky right-0 z-30",
         className,
       )}
       {...props}
@@ -82,12 +103,19 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   );
 }
 
-function TableCell({ className, ...props }: React.ComponentProps<"td">) {
+function TableCell({
+  className,
+  align,
+  sticky,
+  ...props
+}: React.ComponentProps<"td"> & TableCellOptions) {
   return (
     <td
       data-slot="table-cell"
       className={cn(
-        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+        "bg-background p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+        align && cellAlignClassName[align],
+        sticky === "right" && "sticky right-0 z-10",
         className,
       )}
       {...props}

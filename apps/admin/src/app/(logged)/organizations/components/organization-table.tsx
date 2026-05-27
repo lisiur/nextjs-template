@@ -129,7 +129,7 @@ export function OrganizationTable() {
               <TableHead>{t("slug")}</TableHead>
               <TableHead>{t("logo")}</TableHead>
               <TableHead>{t("createdAt")}</TableHead>
-              <TableHead className="sticky right-0 z-30 bg-background text-right shadow-[-1px_0_0_0_var(--border)]">
+              <TableHead sticky="right" align="right">
                 {t("actions")}
               </TableHead>
             </TableRow>
@@ -153,7 +153,7 @@ export function OrganizationTable() {
                   )}
                 </TableCell>
                 <TableCell>{formatDate(org.createdAt)}</TableCell>
-                <TableCell className="sticky right-0 z-10 bg-background text-right shadow-[-1px_0_0_0_var(--border)]">
+                <TableCell sticky="right" align="right">
                   <Button
                     variant="ghost"
                     size="icon"

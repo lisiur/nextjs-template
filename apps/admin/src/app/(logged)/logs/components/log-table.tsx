@@ -165,7 +165,7 @@ export function LogTable() {
           {t("noLogs")}
         </div>
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex min-h-0 flex-col">
           <Table containerClassName="min-h-0 flex-1 overflow-auto rounded-md border">
             <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-20 [&_th]:bg-background">
               <TableRow>

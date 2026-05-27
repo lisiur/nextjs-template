@@ -2,7 +2,7 @@
 
 import { Pencil, Search, Settings } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -34,6 +34,7 @@ interface Application {
 }
 
 export function AppTable() {
+  const router = useRouter();
   const t = useTranslations("Applications");
   const [applications, setApplications] = useState<Application[]>([]);
   const [total, setTotal] = useState(0);
@@ -112,7 +113,7 @@ export function AppTable() {
           {t("noApps")}
         </div>
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex min-h-0 flex-col">
           <Table containerClassName="min-h-0 flex-1 overflow-auto rounded-md border">
             <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-20 [&_th]:bg-background">
               <TableRow>
@@ -121,7 +122,7 @@ export function AppTable() {
                 <TableHead>{t("description_label")}</TableHead>
                 <TableHead>{t("logo")}</TableHead>
                 <TableHead>{t("createdAt")}</TableHead>
-                <TableHead className="sticky right-0 z-30 bg-background text-right shadow-[-1px_0_0_0_var(--border)]">
+                <TableHead sticky="right" align="right">
                   {t("actions")}
                 </TableHead>
               </TableRow>
@@ -149,12 +150,11 @@ export function AppTable() {
                     )}
                   </TableCell>
                   <TableCell>{formatDate(app.createdAt)}</TableCell>
-                  <TableCell className="sticky right-0 z-10 bg-background text-right shadow-[-1px_0_0_0_var(--border)]">
+                  <TableCell sticky="right" align="right">
                     <Button
                       variant="ghost"
                       size="icon"
-                      nativeButton={false}
-                      render={<Link href={`/applications/${app.id}`} />}
+                      onClick={() => router.push(`/applications/${app.id}`)}
                     >
                       <Settings className="h-4 w-4" />
                     </Button>

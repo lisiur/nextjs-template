@@ -89,7 +89,7 @@ export function ApplicationRoleManagement({
           <TableRow>
             <TableHead>{t("name")}</TableHead>
             <TableHead>{t("code")}</TableHead>
-            <TableHead className="sticky right-0 z-30 bg-background text-right shadow-[-1px_0_0_0_var(--border)]">
+            <TableHead sticky="right" align="right">
               {t("actions")}
             </TableHead>
           </TableRow>
@@ -101,7 +101,7 @@ export function ApplicationRoleManagement({
               <TableCell>
                 <Badge variant="secondary">{role.code}</Badge>
               </TableCell>
-              <TableCell className="sticky right-0 z-10 bg-background text-right shadow-[-1px_0_0_0_var(--border)]">
+              <TableCell sticky="right" align="right">
                 <Button
                   variant="ghost"
                   size="icon"

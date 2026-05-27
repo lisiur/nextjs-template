@@ -106,7 +106,7 @@ export function UserTable() {
         </Button>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-col">
         <Table containerClassName="min-h-0 flex-1 overflow-auto rounded-md border">
           <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-20 [&_th]:bg-background">
             <TableRow>
@@ -115,7 +115,7 @@ export function UserTable() {
               <TableHead>{t("role")}</TableHead>
               <TableHead>{t("status")}</TableHead>
               <TableHead>{t("createdAt")}</TableHead>
-              <TableHead className="sticky right-0 z-30 bg-background text-right shadow-[-1px_0_0_0_var(--border)]">
+              <TableHead sticky="right" align="right">
                 {t("actions")}
               </TableHead>
             </TableRow>
@@ -155,7 +155,7 @@ export function UserTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>{formatDate(user.createdAt)}</TableCell>
-                  <TableCell className="sticky right-0 z-10 bg-background text-right shadow-[-1px_0_0_0_var(--border)]">
+                  <TableCell sticky="right" align="right">
                     <Button
                       variant="ghost"
                       size="icon"

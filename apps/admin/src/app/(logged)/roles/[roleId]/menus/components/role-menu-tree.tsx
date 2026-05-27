@@ -3,8 +3,8 @@
 import {
   ChevronRight,
   Folder,
-  FolderOpen,
   icons,
+  Link,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -224,41 +224,50 @@ function TreeNodeComponent({
   return (
     <div>
       <div
-        className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
         style={{ paddingLeft: `${level * 16 + 8}px` }}
       >
         <Checkbox
           checked={isChecked}
           onCheckedChange={(checked) => onCheckedChange(node, !!checked)}
         />
-        {hasChildren ? (
-          <button
-            type="button"
-            className="shrink-0"
-            onClick={() => onToggle(node.id)}
-          >
+        <button
+          type="button"
+          className="flex min-w-0 flex-1 items-center gap-2 border-0 bg-transparent p-0 text-left text-sm text-inherit disabled:cursor-default"
+          onClick={() => {
+            if (hasChildren) onToggle(node.id);
+          }}
+          aria-expanded={hasChildren ? isExpanded : undefined}
+          aria-label={
+            hasChildren
+              ? `${isExpanded ? "Collapse" : "Expand"} ${node.name}`
+              : node.name
+          }
+          disabled={!hasChildren}
+        >
+          {node.icon ? (
+            <span className="shrink-0">{getIcon(node.icon)}</span>
+          ) : (
+            <span>
+              {hasChildren ? (
+                <Link className="h-4 w-4" />
+              ) : (
+                <Folder className="h-4 w-4" />
+              )}
+            </span>
+          )}
+          <span className="truncate">{node.name}</span>
+          {hasChildren ? (
             <ChevronRight
               className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform",
+                "ml-auto h-4 w-4 shrink-0 text-muted-foreground transition-transform",
                 isExpanded && "rotate-90",
               )}
             />
-          </button>
-        ) : (
-          <span className="h-4 w-4 shrink-0" />
-        )}
-        {node.icon ? (
-          <span className="shrink-0">{getIcon(node.icon)}</span>
-        ) : hasChildren ? (
-          <span className="shrink-0 text-muted-foreground">
-            {isExpanded ? (
-              <FolderOpen className="h-4 w-4" />
-            ) : (
-              <Folder className="h-4 w-4" />
-            )}
-          </span>
-        ) : null}
-        <span className="truncate">{node.name}</span>
+          ) : (
+            <span className="ml-auto h-4 w-4 shrink-0" />
+          )}
+        </button>
       </div>
       {hasChildren && isExpanded && (
         <div>
