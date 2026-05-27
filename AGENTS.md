@@ -172,6 +172,17 @@ export { routes };
 
 Use the typed `appClient` from `@/lib/api` for all API calls. Never use raw `fetch`.
 
+## Frontend Overlay Patterns
+
+Use overlay components by task scope, not by trying to force every admin action into one pattern.
+
+- Use `Dialog` for focused, blocking tasks: create, edit, delete, confirm, and short forms with clear submit/cancel actions.
+- Use `Sheet` for contextual management tasks tied to a selected record: assignment, relationship management, inspection, or workflows that benefit from keeping the parent page visible.
+- Use a full page for primary management surfaces, dense tables, multi-section workflows, or views users may need to bookmark/share.
+- Do not convert `Sheet` to `Dialog` or vice versa just for visual consistency; consistency comes from matching the interaction pattern to the task scope.
+
+Current examples: app/menu create and edit flows use `Dialog`; role-menu assignment uses a right-side `Sheet` because it is a larger contextual configuration workflow.
+
 ### Client setup
 
 ```ts
