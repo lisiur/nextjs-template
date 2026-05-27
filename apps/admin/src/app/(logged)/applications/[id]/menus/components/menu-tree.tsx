@@ -163,11 +163,6 @@ export function MenuTree({
 
   const treeData = useMemo(() => buildTree(menus), [menus]);
 
-  const defaultExpandedIds = useMemo(
-    () => menus.filter((m) => !m.parentId).map((m) => m.id),
-    [menus],
-  );
-
   const handleSelect = useCallback(
     (node: MenuTreeNode) => {
       onSelectMenu?.(node.menu);
@@ -383,7 +378,7 @@ export function MenuTree({
         selectedId={selectedMenuId}
         onReorder={handleReorder}
         isExpandable={(node) => node.menu.linkType === "GROUP"}
-        defaultExpandedIds={defaultExpandedIds}
+        defaultExpandedIds={[]}
         expandAllLabel={t("expandAll")}
         collapseAllLabel={t("collapseAll")}
         emptyLabel={t("noData")}
