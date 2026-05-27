@@ -363,6 +363,8 @@
   "RoleMenus": {
     "title": "角色菜单分配",
     "description": "管理此角色可见的菜单",
+    "assignForRole": "为「{name}」分配菜单",
+    "selectRole": "选择一个角色来分配菜单",
     "selectApp": "应用",
     "noAppSelected": "选择一个应用来管理此角色的菜单可见性",
     "save": "保存分配",

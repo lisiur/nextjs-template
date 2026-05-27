@@ -363,6 +363,8 @@
   "RoleMenus": {
     "title": "Role Menu Assignment",
     "description": "Manage which menus this role can see",
+    "assignForRole": "Assign menus for \"{name}\"",
+    "selectRole": "Select a role to assign menus",
     "selectApp": "Applications",
     "noAppSelected": "Select an application to manage its menu visibility for this role",
     "save": "Save Assignment",

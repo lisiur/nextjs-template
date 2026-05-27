@@ -2,6 +2,7 @@ import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logOperation } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { menuRoleRepository } from "#repositories/menu-role.repository";
+import { roleRepository } from "#repositories/role.repository";
 import {
   batchAssignBodySchema,
   errorSchema,
@@ -48,15 +49,43 @@ export const batchAssignMenus = defineOpenAPIRoute({
         },
         description: "Unauthorized",
       },
+      400: {
+        content: {
+          "application/json": { schema: errorSchema },
+        },
+        description: "Bad Request",
+      },
+      404: {
+        content: {
+          "application/json": { schema: errorSchema },
+        },
+        description: "Role not found",
+      },
     },
   }),
   handler: async (c) => {
     const { roleId, menuIds } = c.req.valid("json");
+    const role = await roleRepository.findById(roleId);
 
-    const allMenus = await menuRoleRepository.findAllMenus();
+    if (!role) {
+      return c.json({ code: 404, message: "Role not found" }, 404);
+    }
+
+    const allMenus = await menuRoleRepository.findMenusByAppId(role.appId);
+    const validMenuIds = new Set(allMenus.map((menu) => menu.id));
 
     const allDescendantIds = new Set<string>();
     for (const menuId of menuIds) {
+      if (!validMenuIds.has(menuId)) {
+        return c.json(
+          {
+            code: 400,
+            message: "Menu does not belong to the role application",
+          },
+          400,
+        );
+      }
+
       const ids = collectDescendantIds(menuId, allMenus);
       for (const id of ids) {
         allDescendantIds.add(id);

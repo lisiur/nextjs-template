@@ -26,6 +26,13 @@ export const menuRoleRepository = {
     });
   },
 
+  findMenusByAppId(appId: string) {
+    return prisma.menu.findMany({
+      where: { appId },
+      orderBy: { sortOrder: "asc" },
+    });
+  },
+
   findAllMenus() {
     return prisma.menu.findMany({
       orderBy: { sortOrder: "asc" },
