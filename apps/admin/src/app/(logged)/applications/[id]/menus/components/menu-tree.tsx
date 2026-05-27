@@ -367,7 +367,7 @@ export function MenuTree({
     [handleSelect, handleAddChild, handleDelete, t],
   );
 
-  if (loading) {
+  if (loading && menus.length === 0) {
     return (
       <div className="flex items-center justify-center py-8">
         <Spinner />
