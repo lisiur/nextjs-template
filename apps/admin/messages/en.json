@@ -213,6 +213,14 @@
     "createSuccess": "Application created successfully",
     "deleteSuccess": "Application deleted successfully",
     "fetchFailed": "Failed to fetch applications",
+    "settingsTitle": "Application Settings",
+    "settingsDescription": "Manage roles and menus for this application",
+    "backToApps": "Back to Applications",
+    "notFound": "Application not found",
+    "tabs": {
+      "roles": "Role Management",
+      "menus": "Menus Management"
+    },
     "logoTooLarge": "Logo file size must be less than 2MB"
   },
   "Profile": {
@@ -349,7 +357,8 @@
     "createSubGroup": "Create Sub Group",
     "updateSuccess": "Menu updated successfully",
     "deleteSuccess": "Menu deleted successfully",
-    "backToApps": "Back to Applications"
+    "backToApps": "Back to Applications",
+    "backToSettings": "Back to Application Settings"
   },
   "RoleMenus": {
     "title": "Role Menu Assignment",

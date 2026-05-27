@@ -82,7 +82,7 @@ export function LogFilter({ filters, onFiltersChange }: LogFilterProps) {
         onValueChange={(value) =>
           onFiltersChange({
             ...filters,
-            module: value === "all" ? undefined : value,
+            module: !value || value === "all" ? undefined : value,
           })
         }
       >
@@ -106,7 +106,7 @@ export function LogFilter({ filters, onFiltersChange }: LogFilterProps) {
         onValueChange={(value) =>
           onFiltersChange({
             ...filters,
-            action: value === "all" ? undefined : value,
+            action: !value || value === "all" ? undefined : value,
           })
         }
       >

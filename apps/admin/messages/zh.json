@@ -213,6 +213,14 @@
     "createSuccess": "应用创建成功",
     "deleteSuccess": "应用删除成功",
     "fetchFailed": "获取应用列表失败",
+    "settingsTitle": "应用设置",
+    "settingsDescription": "管理此应用的角色和菜单",
+    "backToApps": "返回应用列表",
+    "notFound": "应用不存在",
+    "tabs": {
+      "roles": "角色管理",
+      "menus": "菜单管理"
+    },
     "logoTooLarge": "Logo 文件大小不能超过 2MB"
   },
   "Profile": {
@@ -349,7 +357,8 @@
     "createSubGroup": "创建子分组",
     "updateSuccess": "菜单更新成功",
     "deleteSuccess": "菜单删除成功",
-    "backToApps": "返回应用列表"
+    "backToApps": "返回应用列表",
+    "backToSettings": "返回应用设置"
   },
   "RoleMenus": {
     "title": "角色菜单分配",

@@ -79,7 +79,7 @@ function ResourceCard({
         <ProgressPrimitive.Root value={percent} className="flex flex-col gap-1">
           <div className="flex items-center">
             <ProgressLabel>{title}</ProgressLabel>
-            <ProgressValue>{percent.toFixed(1)}%</ProgressValue>
+            <ProgressValue>{() => `${percent.toFixed(1)}%`}</ProgressValue>
           </div>
           <ProgressTrack>
             <ProgressIndicator
@@ -177,7 +177,9 @@ export default function DashboardPage() {
             >
               <div className="flex items-center justify-between text-sm">
                 <ProgressLabel>CPU</ProgressLabel>
-                <ProgressValue>{info.process.cpu.toFixed(1)}%</ProgressValue>
+                <ProgressValue>
+                  {() => `${info.process.cpu.toFixed(1)}%`}
+                </ProgressValue>
               </div>
               <ProgressTrack>
                 <ProgressIndicator

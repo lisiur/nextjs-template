@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -280,9 +281,11 @@ export function MenuTree({
         isSelected: boolean;
         isExpanded: boolean;
         hasChildren: boolean;
+        canExpand: boolean;
         level: number;
         attributes: DraggableAttributes;
-        listeners: DraggableSyntheticListeners;
+        listeners: DraggableSyntheticListeners | undefined;
+        expandToggle: ReactNode;
       },
     ) => {
       return (

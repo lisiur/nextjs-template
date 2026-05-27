@@ -135,7 +135,7 @@ function SidebarMenuNode({
           render={
             // biome-ignore lint/a11y/useAnchorContent: SidebarMenuButton renders children inside the anchor
             <a
-              href={href}
+              href={href ?? "#"}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}

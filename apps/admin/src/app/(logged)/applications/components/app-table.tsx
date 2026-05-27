@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Pencil, Search } from "lucide-react";
+import { Pencil, Search, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -154,9 +154,9 @@ export function AppTable() {
                       variant="ghost"
                       size="icon"
                       nativeButton={false}
-                      render={<Link href={`/applications/${app.id}/menus`} />}
+                      render={<Link href={`/applications/${app.id}`} />}
                     >
-                      <Menu className="h-4 w-4" />
+                      <Settings className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
