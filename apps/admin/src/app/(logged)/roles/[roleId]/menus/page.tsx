@@ -22,6 +22,28 @@ interface Menu {
   sortOrder: number;
 }
 
+function getLocalSelectedMenuIds(menus: Menu[], persistedIds: Set<string>) {
+  const childCountByParentId = new Map<string, number>();
+
+  for (const menu of menus) {
+    if (!menu.parentId) continue;
+    childCountByParentId.set(
+      menu.parentId,
+      (childCountByParentId.get(menu.parentId) ?? 0) + 1,
+    );
+  }
+
+  return new Set(
+    menus
+      .filter((menu) => persistedIds.has(menu.id))
+      .filter((menu) => {
+        const hasChildren = (childCountByParentId.get(menu.id) ?? 0) > 0;
+        return menu.linkType !== "GROUP" || !hasChildren;
+      })
+      .map((menu) => menu.id),
+  );
+}
+
 import { cn } from "@/utils/cn";
 import { RoleMenuTree } from "./components/role-menu-tree";
 
@@ -41,7 +63,10 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [appMenus, setAppMenus] = useState<Menu[]>([]);
-  const [assignedMenuIds, setAssignedMenuIds] = useState<Set<string>>(
+  const [persistedMenuIds, setPersistedMenuIds] = useState<Set<string>>(
+    new Set(),
+  );
+  const [selectedMenuIds, setSelectedMenuIds] = useState<Set<string>>(
     new Set(),
   );
   const [loading, setLoading] = useState(false);
@@ -88,7 +113,7 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
         param: { roleId },
       });
       const data = await res.json();
-      setAssignedMenuIds(new Set(data.menus.map((m: Menu) => m.id)));
+      setPersistedMenuIds(new Set(data.menus.map((m: Menu) => m.id)));
     } catch {
       toast.error(t("loadError"));
     }
@@ -105,6 +130,10 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
     }
   }, [selectedApp, fetchAppMenus]);
 
+  useEffect(() => {
+    setSelectedMenuIds(getLocalSelectedMenuIds(appMenus, persistedMenuIds));
+  }, [appMenus, persistedMenuIds]);
+
   const handleSave = useCallback(async () => {
     if (!selectedApp) return;
     setSaving(true);
@@ -113,17 +142,18 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
         {
           json: {
             roleId,
-            menuIds: Array.from(assignedMenuIds),
+            menuIds: Array.from(selectedMenuIds),
           },
         },
       );
       toast.success(t("saved"));
+      setPersistedMenuIds(new Set(selectedMenuIds));
     } catch {
       toast.error(t("saveError"));
     } finally {
       setSaving(false);
     }
-  }, [roleId, selectedApp, assignedMenuIds, t]);
+  }, [roleId, selectedApp, selectedMenuIds, t]);
 
   return (
     <div className="container mx-auto py-8">
@@ -197,8 +227,8 @@ export default function RoleMenusPage({ params }: RoleMenusPageProps) {
             <div className="space-y-4">
               <RoleMenuTree
                 menus={appMenus}
-                checkedIds={assignedMenuIds}
-                onCheckedChange={setAssignedMenuIds}
+                selectedIds={selectedMenuIds}
+                onSelectedChange={setSelectedMenuIds}
               />
               <div className="flex justify-end">
                 <Button onClick={handleSave} disabled={saving}>

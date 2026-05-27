@@ -28,6 +28,8 @@ interface TreeNode {
   id: string;
   name: string;
   icon?: string | null;
+  linkType: "GROUP" | "INTERNAL" | "EXTERNAL";
+  sortOrder: number;
   children: TreeNode[];
 }
 
@@ -49,6 +51,8 @@ function buildTree(menus: Menu[]): TreeNode[] {
       id: menu.id,
       name: menu.name,
       icon: menu.icon,
+      linkType: menu.linkType,
+      sortOrder: menu.sortOrder,
       children: [],
     });
   }
@@ -69,7 +73,9 @@ function buildTree(menus: Menu[]): TreeNode[] {
   }
 
   function sortChildren(nodes: TreeNode[]) {
-    nodes.sort((a, b) => a.name.localeCompare(b.name));
+    nodes.sort(
+      (a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name),
+    );
     for (const node of nodes) {
       sortChildren(node.children);
     }
@@ -79,25 +85,61 @@ function buildTree(menus: Menu[]): TreeNode[] {
   return roots;
 }
 
-function collectAllDescendantIds(node: TreeNode): string[] {
+function isSelectableNode(node: TreeNode) {
+  return node.linkType !== "GROUP" || node.children.length === 0;
+}
+
+function collectSelectableIds(node: TreeNode): string[] {
   const ids: string[] = [];
-  for (const child of node.children) {
-    ids.push(child.id);
-    ids.push(...collectAllDescendantIds(child));
+
+  if (isSelectableNode(node)) {
+    ids.push(node.id);
   }
+
+  for (const child of node.children) {
+    ids.push(...collectSelectableIds(child));
+  }
+
   return ids;
+}
+
+interface CheckState {
+  checked: boolean;
+  indeterminate: boolean;
+}
+
+function getCheckState(node: TreeNode, selectedIds: Set<string>): CheckState {
+  if (node.children.length === 0) {
+    return {
+      checked: selectedIds.has(node.id),
+      indeterminate: false,
+    };
+  }
+
+  const childStates = node.children.map((child) =>
+    getCheckState(child, selectedIds),
+  );
+  const allChildrenChecked = childStates.every((state) => state.checked);
+  const hasCheckedChild = childStates.some(
+    (state) => state.checked || state.indeterminate,
+  );
+
+  return {
+    checked: allChildrenChecked,
+    indeterminate: !allChildrenChecked && hasCheckedChild,
+  };
 }
 
 interface RoleMenuTreeProps {
   menus: Menu[];
-  checkedIds: Set<string>;
-  onCheckedChange: (checkedIds: Set<string>) => void;
+  selectedIds: Set<string>;
+  onSelectedChange: (selectedIds: Set<string>) => void;
 }
 
 export function RoleMenuTree({
   menus,
-  checkedIds,
-  onCheckedChange,
+  selectedIds,
+  onSelectedChange,
 }: RoleMenuTreeProps) {
   const t = useTranslations("RoleMenus");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
@@ -126,24 +168,22 @@ export function RoleMenuTree({
 
   const handleCheckedChange = useCallback(
     (node: TreeNode, checked: boolean) => {
-      const newChecked = new Set(checkedIds);
-      const descendantIds = collectAllDescendantIds(node);
+      const newSelected = new Set(selectedIds);
+      const selectableIds = collectSelectableIds(node);
 
       if (checked) {
-        newChecked.add(node.id);
-        for (const id of descendantIds) {
-          newChecked.add(id);
+        for (const id of selectableIds) {
+          newSelected.add(id);
         }
       } else {
-        newChecked.delete(node.id);
-        for (const id of descendantIds) {
-          newChecked.delete(id);
+        for (const id of selectableIds) {
+          newSelected.delete(id);
         }
       }
 
-      onCheckedChange(newChecked);
+      onSelectedChange(newSelected);
     },
-    [checkedIds, onCheckedChange],
+    [selectedIds, onSelectedChange],
   );
 
   if (menus.length === 0) {
@@ -190,7 +230,7 @@ export function RoleMenuTree({
           key={node.id}
           node={node}
           level={0}
-          checkedIds={checkedIds}
+          selectedIds={selectedIds}
           expandedIds={expandedIds}
           onToggle={handleToggle}
           onCheckedChange={handleCheckedChange}
@@ -203,7 +243,7 @@ export function RoleMenuTree({
 interface TreeNodeComponentProps {
   node: TreeNode;
   level: number;
-  checkedIds: Set<string>;
+  selectedIds: Set<string>;
   expandedIds: Set<string>;
   onToggle: (id: string) => void;
   onCheckedChange: (node: TreeNode, checked: boolean) => void;
@@ -212,14 +252,17 @@ interface TreeNodeComponentProps {
 function TreeNodeComponent({
   node,
   level,
-  checkedIds,
+  selectedIds,
   expandedIds,
   onToggle,
   onCheckedChange,
 }: TreeNodeComponentProps) {
   const hasChildren = node.children.length > 0;
   const isExpanded = expandedIds.has(node.id);
-  const isChecked = checkedIds.has(node.id);
+  const { checked: isChecked, indeterminate: isIndeterminate } = getCheckState(
+    node,
+    selectedIds,
+  );
 
   return (
     <div>
@@ -229,6 +272,7 @@ function TreeNodeComponent({
       >
         <Checkbox
           checked={isChecked}
+          indeterminate={isIndeterminate}
           onCheckedChange={(checked) => onCheckedChange(node, !!checked)}
         />
         <button
@@ -276,7 +320,7 @@ function TreeNodeComponent({
               key={child.id}
               node={child}
               level={level + 1}
-              checkedIds={checkedIds}
+              selectedIds={selectedIds}
               expandedIds={expandedIds}
               onToggle={onToggle}
               onCheckedChange={onCheckedChange}

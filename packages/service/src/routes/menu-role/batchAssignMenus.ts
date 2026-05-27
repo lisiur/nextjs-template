@@ -21,6 +21,27 @@ function collectDescendantIds(
   return ids;
 }
 
+function collectAncestorGroupIds(
+  menuId: string,
+  allMenus: { id: string; parentId: string | null; linkType: string }[],
+): string[] {
+  const ids: string[] = [];
+  let current = allMenus.find((menu) => menu.id === menuId);
+
+  while (current?.parentId) {
+    const parent = allMenus.find((menu) => menu.id === current?.parentId);
+    if (!parent) break;
+
+    if (parent.linkType === "GROUP") {
+      ids.push(parent.id);
+    }
+
+    current = parent;
+  }
+
+  return ids;
+}
+
 export const batchAssignMenus = defineOpenAPIRoute({
   route: createRoute({
     method: "put",
@@ -74,7 +95,7 @@ export const batchAssignMenus = defineOpenAPIRoute({
     const allMenus = await menuRoleRepository.findMenusByAppId(role.appId);
     const validMenuIds = new Set(allMenus.map((menu) => menu.id));
 
-    const allDescendantIds = new Set<string>();
+    const assignedMenuIds = new Set<string>();
     for (const menuId of menuIds) {
       if (!validMenuIds.has(menuId)) {
         return c.json(
@@ -86,19 +107,22 @@ export const batchAssignMenus = defineOpenAPIRoute({
         );
       }
 
-      const ids = collectDescendantIds(menuId, allMenus);
-      for (const id of ids) {
-        allDescendantIds.add(id);
+      for (const id of collectAncestorGroupIds(menuId, allMenus)) {
+        assignedMenuIds.add(id);
+      }
+
+      for (const id of collectDescendantIds(menuId, allMenus)) {
+        assignedMenuIds.add(id);
       }
     }
 
-    await menuRoleRepository.batchAssign(roleId, Array.from(allDescendantIds));
+    await menuRoleRepository.batchAssign(roleId, Array.from(assignedMenuIds));
 
     logOperation({
       action: "assign",
       module: "menu-role",
       targetId: roleId,
-      detail: JSON.stringify({ menuIds: Array.from(allDescendantIds) }),
+      detail: JSON.stringify({ menuIds: Array.from(assignedMenuIds) }),
       c,
     });
 

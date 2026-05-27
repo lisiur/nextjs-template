@@ -30,6 +30,28 @@ interface Menu {
   sortOrder: number;
 }
 
+function getLocalSelectedMenuIds(menus: Menu[], persistedIds: Set<string>) {
+  const childCountByParentId = new Map<string, number>();
+
+  for (const menu of menus) {
+    if (!menu.parentId) continue;
+    childCountByParentId.set(
+      menu.parentId,
+      (childCountByParentId.get(menu.parentId) ?? 0) + 1,
+    );
+  }
+
+  return new Set(
+    menus
+      .filter((menu) => persistedIds.has(menu.id))
+      .filter((menu) => {
+        const hasChildren = (childCountByParentId.get(menu.id) ?? 0) > 0;
+        return menu.linkType !== "GROUP" || !hasChildren;
+      })
+      .map((menu) => menu.id),
+  );
+}
+
 interface RoleMenuAssignmentProps {
   appId: string;
   role: Role | null;
@@ -38,7 +60,7 @@ interface RoleMenuAssignmentProps {
 export function RoleMenuAssignment({ appId, role }: RoleMenuAssignmentProps) {
   const t = useTranslations("RoleMenus");
   const [appMenus, setAppMenus] = useState<Menu[]>([]);
-  const [assignedMenuIds, setAssignedMenuIds] = useState<Set<string>>(
+  const [selectedMenuIds, setSelectedMenuIds] = useState<Set<string>>(
     new Set(),
   );
   const [loading, setLoading] = useState(false);
@@ -64,14 +86,15 @@ export function RoleMenuAssignment({ appId, role }: RoleMenuAssignmentProps) {
       const menusData = await menusRes.json();
       const roleMenusData = await roleMenusRes.json();
       const menuIds = new Set(menusData.menus.map((menu: Menu) => menu.id));
+      const persistedIds = new Set(
+        roleMenusData.menus
+          .filter((menu: Menu) => menuIds.has(menu.id))
+          .map((menu: Menu) => menu.id),
+      );
 
       setAppMenus(menusData.menus);
-      setAssignedMenuIds(
-        new Set(
-          roleMenusData.menus
-            .filter((menu: Menu) => menuIds.has(menu.id))
-            .map((menu: Menu) => menu.id),
-        ),
+      setSelectedMenuIds(
+        getLocalSelectedMenuIds(menusData.menus, persistedIds),
       );
     } catch {
       toast.error(t("loadError"));
@@ -92,7 +115,7 @@ export function RoleMenuAssignment({ appId, role }: RoleMenuAssignmentProps) {
       await apiWithFeedback(appClient.api["menu-role"].batch.$put)({
         json: {
           roleId: role.id,
-          menuIds: Array.from(assignedMenuIds),
+          menuIds: Array.from(selectedMenuIds),
         },
       });
       toast.success(t("saved"));
@@ -101,7 +124,7 @@ export function RoleMenuAssignment({ appId, role }: RoleMenuAssignmentProps) {
     } finally {
       setSaving(false);
     }
-  }, [role, assignedMenuIds, t]);
+  }, [role, selectedMenuIds, t]);
 
   if (!role) {
     return (
@@ -123,8 +146,8 @@ export function RoleMenuAssignment({ appId, role }: RoleMenuAssignmentProps) {
         ) : (
           <RoleMenuTree
             menus={appMenus}
-            checkedIds={assignedMenuIds}
-            onCheckedChange={setAssignedMenuIds}
+            selectedIds={selectedMenuIds}
+            onSelectedChange={setSelectedMenuIds}
           />
         )}
       </div>
