@@ -8,6 +8,7 @@ import {
   Folder,
   GripVertical,
   icons,
+  Link,
   Loader2,
   type LucideIcon,
   Plus,
@@ -205,7 +206,7 @@ export function MenuTree({
           parentId: addChildTarget?.id,
           icon: data.icon,
           linkType: data.linkType,
-          url: data.url || null,
+          url: data.url,
         },
       });
       toast.success(addChildTarget ? t("addChildSuccess") : t("createSuccess"));
@@ -286,7 +287,7 @@ export function MenuTree({
     ) => {
       return (
         <div
-          className={`group flex w-full items-center gap-1.5 rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
+          className={`group flex w-full items-center gap-1.5 pr-2 rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
             props.isSelected
               ? "bg-accent font-medium text-accent-foreground"
               : ""
@@ -329,6 +330,7 @@ export function MenuTree({
                       handleAddChild(node.menu, "INTERNAL");
                     }}
                   >
+                    <Link className="h-4 w-4" />
                     {t("createSubMenu")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -337,6 +339,7 @@ export function MenuTree({
                       handleAddChild(node.menu, "GROUP");
                     }}
                   >
+                    <Folder className="h-4 w-4" />
                     {t("createSubGroup")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -354,6 +357,7 @@ export function MenuTree({
               <Trash2 className="h-3 w-3" />
             </Button>
           </div>
+          {props.expandToggle}
         </div>
       );
     },
@@ -375,6 +379,7 @@ export function MenuTree({
         data={treeData}
         selectedId={selectedMenuId}
         onReorder={handleReorder}
+        isExpandable={(node) => node.menu.linkType === "GROUP"}
         defaultExpandedIds={defaultExpandedIds}
         expandAllLabel={t("expandAll")}
         collapseAllLabel={t("collapseAll")}
@@ -386,22 +391,24 @@ export function MenuTree({
               render={
                 <Button
                   variant="ghost"
-                  size="sm"
-                  className="ml-auto h-6 text-xs"
+                  size="icon"
+                  className="ml-auto h-6 w-6"
+                  aria-label={t("createMenu")}
                 />
               }
             >
-              <Plus className="mr-1 h-3 w-3" />
-              {t("createMenu")}
+              <Plus className="h-3 w-3" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="min-w-fit">
               <DropdownMenuItem
                 onClick={() => handleAddChild(null, "INTERNAL")}
               >
-                {t("createSubMenu")}
+                <Link className="h-4 w-4" />
+                {t("createMenu")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleAddChild(null, "GROUP")}>
-                {t("createSubGroup")}
+                <Folder className="h-4 w-4" />
+                {t("createGroup")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -310,6 +310,7 @@
     "reorderFailed": "Failed to reorder menus",
     "selectMenuToEdit": "Select a menu to edit",
     "createMenu": "Create Menu",
+    "createGroup": "Create Group",
     "createMenuDescription": "Create a new top-level menu",
     "editMenu": "Edit Menu",
     "deleteMenu": "Delete Menu",

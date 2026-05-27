@@ -20,7 +20,13 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ChevronDown, ChevronRight, GripVertical } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  GripVertical,
+  ListChevronsDownUp,
+  ListChevronsUpDown,
+} from "lucide-react";
 import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { cn } from "@/utils/cn";
 
@@ -73,12 +79,22 @@ function collectDescendantIds(nodes: DraggableTreeNode[]): Set<string> {
   return ids;
 }
 
-function collectAllIds(nodes: DraggableTreeNode[]): Set<string> {
+function isNodeExpandable<T extends DraggableTreeNode>(
+  node: T,
+  isExpandable?: (node: T) => boolean,
+): boolean {
+  return isExpandable ? isExpandable(node) : node.children.length > 0;
+}
+
+function collectAllIds<T extends DraggableTreeNode>(
+  nodes: T[],
+  isExpandable?: (node: T) => boolean,
+): Set<string> {
   const ids = new Set<string>();
   for (const node of nodes) {
-    if (node.children.length > 0) {
+    if (isNodeExpandable(node, isExpandable)) {
       ids.add(node.id);
-      for (const id of collectAllIds(node.children)) {
+      for (const id of collectAllIds(node.children as T[], isExpandable)) {
         ids.add(id);
       }
     }
@@ -89,17 +105,18 @@ function collectAllIds(nodes: DraggableTreeNode[]): Set<string> {
 function collectVisibleDescendants<T extends DraggableTreeNode>(
   node: T,
   expandedIds: Set<string>,
+  isExpandable?: (node: T) => boolean,
 ): T[] {
   const result: T[] = [];
   function walk(items: T[]) {
     for (const child of items) {
       result.push(child);
-      if (child.children.length > 0 && expandedIds.has(child.id)) {
+      if (isNodeExpandable(child, isExpandable) && expandedIds.has(child.id)) {
         walk(child.children as T[]);
       }
     }
   }
-  if (expandedIds.has(node.id)) {
+  if (isNodeExpandable(node, isExpandable) && expandedIds.has(node.id)) {
     walk(node.children as T[]);
   }
   return result;
@@ -126,6 +143,7 @@ interface SortableNodeProps<T extends DraggableTreeNode> {
   onSelect?: (node: T) => void;
   expandedIds: Set<string>;
   onToggle: (id: string) => void;
+  isExpandable?: (node: T) => boolean;
   isChildOfDragging?: boolean;
   renderNode?: (
     node: T,
@@ -134,9 +152,11 @@ interface SortableNodeProps<T extends DraggableTreeNode> {
       isSelected: boolean;
       isExpanded: boolean;
       hasChildren: boolean;
+      canExpand: boolean;
       level: number;
       attributes: DraggableAttributes;
       listeners: DraggableSyntheticListeners | undefined;
+      expandToggle: ReactNode;
     },
   ) => ReactNode;
 }
@@ -148,6 +168,7 @@ function SortableNode<T extends DraggableTreeNode>({
   onSelect,
   expandedIds,
   onToggle,
+  isExpandable,
   isChildOfDragging,
   renderNode,
   children,
@@ -167,8 +188,41 @@ function SortableNode<T extends DraggableTreeNode>({
   };
 
   const hasChildren = node.children.length > 0;
+  const canExpand = isNodeExpandable(node, isExpandable);
   const isExpanded = expandedIds.has(node.id);
   const isSelected = selectedId === node.id;
+
+  const renderExpandToggle = ({
+    placeholder = false,
+    selectOnToggle = false,
+  }: {
+    placeholder?: boolean;
+    selectOnToggle?: boolean;
+  } = {}) => {
+    if (!canExpand) {
+      return placeholder ? (
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center" />
+      ) : null;
+    }
+
+    return (
+      <button
+        type="button"
+        className="flex h-5 w-5 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground"
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle(node.id);
+          if (selectOnToggle) onSelect?.(node);
+        }}
+      >
+        {isExpanded ? (
+          <ChevronDown className="h-4 w-4 transition-transform" />
+        ) : (
+          <ChevronRight className="h-4 w-4 transition-transform" />
+        )}
+      </button>
+    );
+  };
 
   return (
     <div ref={setNodeRef} style={style}>
@@ -179,9 +233,11 @@ function SortableNode<T extends DraggableTreeNode>({
             isSelected,
             isExpanded,
             hasChildren,
+            canExpand,
             level,
             attributes,
             listeners,
+            expandToggle: renderExpandToggle({ placeholder: true }),
           })}
         </div>
       ) : (
@@ -212,34 +268,7 @@ function SortableNode<T extends DraggableTreeNode>({
           >
             {node.name}
           </button>
-          <button
-            type="button"
-            className="flex shrink-0 items-center"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (hasChildren) onToggle(node.id);
-              onSelect?.(node);
-            }}
-          >
-            {hasChildren ? (
-              <>
-                <ChevronDown
-                  className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform",
-                    !isExpanded && "hidden",
-                  )}
-                />
-                <ChevronRight
-                  className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform",
-                    isExpanded && "hidden",
-                  )}
-                />
-              </>
-            ) : (
-              <span className="h-4 w-4" />
-            )}
-          </button>
+          {renderExpandToggle({ placeholder: true, selectOnToggle: true })}
         </div>
       )}
       {children}
@@ -256,6 +285,7 @@ interface TreeLevelProps<T extends DraggableTreeNode> {
   onSelect?: (node: T) => void;
   expandedIds: Set<string>;
   onToggle: (id: string) => void;
+  isExpandable?: (node: T) => boolean;
   activeDescendantIds: Set<string>;
   renderNode?: (
     node: T,
@@ -264,9 +294,11 @@ interface TreeLevelProps<T extends DraggableTreeNode> {
       isSelected: boolean;
       isExpanded: boolean;
       hasChildren: boolean;
+      canExpand: boolean;
       level: number;
       attributes: DraggableAttributes;
       listeners: DraggableSyntheticListeners | undefined;
+      expandToggle: ReactNode;
     },
   ) => ReactNode;
 }
@@ -278,6 +310,7 @@ function TreeLevel<T extends DraggableTreeNode>({
   onSelect,
   expandedIds,
   onToggle,
+  isExpandable,
   activeDescendantIds,
   renderNode,
 }: TreeLevelProps<T>) {
@@ -294,21 +327,25 @@ function TreeLevel<T extends DraggableTreeNode>({
           onSelect={onSelect}
           expandedIds={expandedIds}
           onToggle={onToggle}
+          isExpandable={isExpandable}
           isChildOfDragging={activeDescendantIds.has(node.id)}
           renderNode={renderNode}
         >
-          {expandedIds.has(node.id) && node.children.length > 0 && (
-            <TreeLevel
-              nodes={node.children as T[]}
-              level={level + 1}
-              selectedId={selectedId}
-              onSelect={onSelect}
-              expandedIds={expandedIds}
-              onToggle={onToggle}
-              activeDescendantIds={activeDescendantIds}
-              renderNode={renderNode}
-            />
-          )}
+          {isNodeExpandable(node as T, isExpandable) &&
+            node.children.length > 0 &&
+            expandedIds.has(node.id) && (
+              <TreeLevel
+                nodes={node.children as T[]}
+                level={level + 1}
+                selectedId={selectedId}
+                onSelect={onSelect}
+                expandedIds={expandedIds}
+                onToggle={onToggle}
+                isExpandable={isExpandable}
+                activeDescendantIds={activeDescendantIds}
+                renderNode={renderNode}
+              />
+            )}
         </SortableNode>
       ))}
     </SortableContext>
@@ -330,12 +367,15 @@ export interface DraggableTreeProps<T extends DraggableTreeNode> {
       isSelected: boolean;
       isExpanded: boolean;
       hasChildren: boolean;
+      canExpand: boolean;
       level: number;
       attributes: DraggableAttributes;
       listeners: DraggableSyntheticListeners | undefined;
+      expandToggle: ReactNode;
     },
   ) => ReactNode;
   renderOverlay?: (node: T) => ReactNode;
+  isExpandable?: (node: T) => boolean;
   defaultExpandedIds?: string[];
   expandAllLabel?: string;
   collapseAllLabel?: string;
@@ -351,6 +391,7 @@ export function DraggableTree<T extends DraggableTreeNode>({
   className,
   renderNode,
   renderOverlay,
+  isExpandable,
   defaultExpandedIds = [],
   expandAllLabel = "Expand All",
   collapseAllLabel = "Collapse All",
@@ -422,8 +463,8 @@ export function DraggableTree<T extends DraggableTreeNode>({
   }, []);
 
   const expandAll = useCallback(() => {
-    setExpandedIds(collectAllIds(treeData));
-  }, [treeData]);
+    setExpandedIds(collectAllIds(treeData, isExpandable));
+  }, [treeData, isExpandable]);
 
   const collapseAll = useCallback(() => {
     setExpandedIds(new Set());
@@ -487,27 +528,30 @@ export function DraggableTree<T extends DraggableTreeNode>({
   const activeDescendantIds = useMemo(() => {
     if (!activeNode) return new Set<string>();
     return new Set(
-      collectVisibleDescendants(activeNode, expandedIds).map((n) => n.id),
+      collectVisibleDescendants(activeNode, expandedIds, isExpandable).map(
+        (n) => n.id,
+      ),
     );
-  }, [activeNode, expandedIds]);
+  }, [activeNode, expandedIds, isExpandable]);
 
   return (
     <div className={cn(className)}>
       <div className="flex items-center gap-1 px-1 pb-1">
         <button
           type="button"
-          className="text-xs text-muted-foreground hover:text-foreground"
+          className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground"
           onClick={expandAll}
+          aria-label={expandAllLabel}
         >
-          {expandAllLabel}
+          <ListChevronsUpDown className="h-3.5 w-3.5" />
         </button>
-        <span className="text-muted-foreground">/</span>
         <button
           type="button"
-          className="text-xs text-muted-foreground hover:text-foreground"
+          className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground"
           onClick={collapseAll}
+          aria-label={collapseAllLabel}
         >
-          {collapseAllLabel}
+          <ListChevronsDownUp className="h-3.5 w-3.5" />
         </button>
         {toolbar}
       </div>
@@ -529,6 +573,7 @@ export function DraggableTree<T extends DraggableTreeNode>({
             onSelect={onSelect}
             expandedIds={expandedIds}
             onToggle={handleToggle}
+            isExpandable={isExpandable}
             activeDescendantIds={activeDescendantIds}
             renderNode={renderNode}
           />
