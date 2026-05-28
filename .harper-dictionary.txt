@@ -1,7 +1,16 @@
 CodeDiff
+Codegen
+GSD
 Hono
+OpenAPI
+Prisma
+Vitest
+Zod
+bookmarkable
+js
 lazygit
 noExplicitAny
 noNonNullAssertion
 opencode
+pnpm
 stylua
