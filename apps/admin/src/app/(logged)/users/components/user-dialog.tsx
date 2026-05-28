@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { isBuiltinUser } from "@repo/shared";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -27,14 +27,12 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { appClient } from "@/lib/api";
 
-const userSchema = z.object({
-  name: z.string().min(1),
-  email: z.email(),
-  password: z.string().optional(),
-  roleIds: z.array(z.string()),
-});
-
-type UserInput = z.infer<typeof userSchema>;
+type UserInput = {
+  name: string;
+  email: string;
+  password?: string;
+  roleIds: string[];
+};
 
 interface Role {
   id: string;
@@ -72,6 +70,17 @@ export function UserDialog({
   const t = useTranslations("Users");
   const isEdit = !!user;
   const builtinUser = isBuiltinUser(user?.flags);
+  const createUserSchema = z.object({
+    name: z.string().min(1),
+    email: z.email(),
+    password: z.string().min(1, t("passwordRequired")),
+    roleIds: z.array(z.string()),
+  });
+  const editUserSchema = z.object({
+    name: z.string().min(1),
+    email: z.email(),
+    roleIds: z.array(z.string()),
+  });
 
   const [roles, setRoles] = useState<Role[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
@@ -107,7 +116,9 @@ export function UserDialog({
     watch,
     reset,
   } = useForm<UserInput>({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(
+      isEdit ? editUserSchema : createUserSchema,
+    ) as Resolver<UserInput>,
     defaultValues: {
       name: user?.name ?? "",
       email: user?.email ?? "",
@@ -129,9 +140,6 @@ export function UserDialog({
   }, [open, user, reset]);
 
   async function onSubmit(data: UserInput) {
-    if (!isEdit && (!data.password || data.password.length === 0)) {
-      return;
-    }
     try {
       if (isEdit) {
         const res = await appClient.api["admin-users"][":id"].$put({
@@ -153,7 +161,7 @@ export function UserDialog({
           json: {
             name: data.name,
             email: data.email,
-            password: data.password || "",
+            password: data.password ?? "",
             roleIds: data.roleIds,
           },
         });
@@ -208,22 +216,32 @@ export function UserDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <FieldGroup>
-            <Field>
+            <Field data-invalid={!!errors.name}>
               <FieldLabel htmlFor="name">{t("name")}</FieldLabel>
-              <Input id="name" {...register("name")} />
+              <Input
+                id="name"
+                aria-invalid={!!errors.name}
+                {...register("name")}
+              />
               <FieldError errors={errors.name ? [errors.name] : undefined} />
             </Field>
-            <Field>
+            <Field data-invalid={!!errors.email}>
               <FieldLabel htmlFor="email">{t("email")}</FieldLabel>
-              <Input id="email" type="email" {...register("email")} />
+              <Input
+                id="email"
+                type="email"
+                aria-invalid={!!errors.email}
+                {...register("email")}
+              />
               <FieldError errors={errors.email ? [errors.email] : undefined} />
             </Field>
             {!isEdit && (
-              <Field>
+              <Field data-invalid={!!errors.password}>
                 <FieldLabel htmlFor="password">{t("password")}</FieldLabel>
                 <Input
                   id="password"
                   type="password"
+                  aria-invalid={!!errors.password}
                   {...register("password")}
                 />
                 <FieldError

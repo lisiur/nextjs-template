@@ -113,14 +113,6 @@ export function UserTable() {
     );
   }
 
-  if (users.length === 0) {
-    return (
-      <div className="flex min-h-0 flex-1 items-center justify-center py-8 text-center text-muted-foreground">
-        {t("noUsers")}
-      </div>
-    );
-  }
-
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="mb-4 flex shrink-0 justify-end">
@@ -130,100 +122,106 @@ export function UserTable() {
         </Button>
       </div>
 
-      <div className="flex min-h-0 flex-col">
-        <Table containerClassName="min-h-0 flex-1 overflow-auto rounded-md border">
-          <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-20 [&_th]:bg-background">
-            <TableRow>
-              <TableHead>{t("name")}</TableHead>
-              <TableHead>{t("email")}</TableHead>
-              <TableHead>{t("roles")}</TableHead>
-              <TableHead>{t("status")}</TableHead>
-              <TableHead>{t("createdAt")}</TableHead>
-              <TableHead sticky="right" align="right">
-                {t("actions")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => {
-              const builtinUser = isBuiltinUser(user.flags);
+      {users.length === 0 ? (
+        <div className="flex min-h-0 flex-1 items-center justify-center py-8 text-center text-muted-foreground">
+          {t("noUsers")}
+        </div>
+      ) : (
+        <div className="flex min-h-0 flex-col">
+          <Table containerClassName="min-h-0 flex-1 overflow-auto rounded-md border">
+            <TableHeader className="[&_th]:sticky [&_th]:top-0 [&_th]:z-20 [&_th]:bg-background">
+              <TableRow>
+                <TableHead>{t("name")}</TableHead>
+                <TableHead>{t("email")}</TableHead>
+                <TableHead>{t("roles")}</TableHead>
+                <TableHead>{t("status")}</TableHead>
+                <TableHead>{t("createdAt")}</TableHead>
+                <TableHead sticky="right" align="right">
+                  {t("actions")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => {
+                const builtinUser = isBuiltinUser(user.flags);
 
-              return (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span>{user.name}</span>
-                      {builtinUser && (
-                        <Badge
-                          variant="secondary"
-                          className="px-1.5"
-                          title={t("protected")}
-                          aria-label={t("protected")}
-                        >
-                          <ShieldCheck className="h-3 w-3" />
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {user.userRoles && user.userRoles.length > 0 ? (
-                        user.userRoles.map((ur) => (
-                          <Badge key={ur.id} variant="secondary">
-                            {ur.role.name}
+                return (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span>{user.name}</span>
+                        {builtinUser && (
+                          <Badge
+                            variant="secondary"
+                            className="px-1.5"
+                            title={t("protected")}
+                            aria-label={t("protected")}
+                          >
+                            <ShieldCheck className="h-3 w-3" />
                           </Badge>
-                        ))
-                      ) : (
-                        <Badge variant="outline">{t("noRoles")}</Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={user.banned ? "destructive" : "outline"}>
-                      {user.banned ? t("banned") : t("active")}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatDate(user.createdAt)}</TableCell>
-                  <TableCell sticky="right" align="right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title={
-                        builtinUser ? t("protectedActionDisabled") : undefined
-                      }
-                      onClick={() => setEditUser(user)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title={
-                        builtinUser ? t("protectedActionDisabled") : undefined
-                      }
-                      disabled={builtinUser}
-                      onClick={() => setDeleteUser(user)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {user.userRoles && user.userRoles.length > 0 ? (
+                          user.userRoles.map((ur) => (
+                            <Badge key={ur.id} variant="secondary">
+                              {ur.role.name}
+                            </Badge>
+                          ))
+                        ) : (
+                          <Badge variant="outline">{t("noRoles")}</Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={user.banned ? "destructive" : "outline"}>
+                        {user.banned ? t("banned") : t("active")}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formatDate(user.createdAt)}</TableCell>
+                    <TableCell sticky="right" align="right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title={
+                          builtinUser ? t("protectedActionDisabled") : undefined
+                        }
+                        onClick={() => setEditUser(user)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title={
+                          builtinUser ? t("protectedActionDisabled") : undefined
+                        }
+                        disabled={builtinUser}
+                        onClick={() => setDeleteUser(user)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
 
-        {total > pageSize && (
-          <DataTablePagination
-            className="shrink-0"
-            page={page}
-            total={total}
-            pageSize={pageSize}
-            onPageChange={setPage}
-          />
-        )}
-      </div>
+          {total > pageSize && (
+            <DataTablePagination
+              className="shrink-0"
+              page={page}
+              total={total}
+              pageSize={pageSize}
+              onPageChange={setPage}
+            />
+          )}
+        </div>
+      )}
 
       {showCreate && (
         <UserDialog

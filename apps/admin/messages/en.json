@@ -112,6 +112,7 @@
     "confirmDelete": "Are you sure you want to delete",
     "cancel": "Cancel",
     "password": "Password",
+    "passwordRequired": "Password is required",
     "newPassword": "New Password",
     "passwordOptional": "Leave empty to keep current password",
     "save": "Save",
