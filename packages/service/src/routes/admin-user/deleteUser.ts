@@ -1,7 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { prisma } from "#lib/db";
-import { assertUserIsNotBuiltin } from "#lib/protected-user";
 import { requireAdmin } from "#middleware/require-admin";
+import { deleteUser as deleteUserSvc } from "../../services/admin-user.service";
 import { errorSchema, successSchema, userIdParamSchema } from "./schema";
 
 export const deleteUser = defineOpenAPIRoute({
@@ -31,19 +30,7 @@ export const deleteUser = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const { id } = c.req.valid("param");
-
-    await assertUserIsNotBuiltin(id);
-
-    // Check if user exists
-    const user = await prisma.user.findUnique({ where: { id } });
-
-    if (!user) {
-      return c.json({ code: 404, message: "User not found" }, 404);
-    }
-
-    // Delete user directly via Prisma (cascading deletes handle related records)
-    await prisma.user.delete({ where: { id } });
-
-    return c.json({ success: true }, 200);
+    const result = await deleteUserSvc(id);
+    return c.json(result, 200);
   },
 });

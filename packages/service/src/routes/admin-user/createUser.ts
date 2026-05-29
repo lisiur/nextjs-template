@@ -1,10 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { auth } from "#lib/auth";
-import { prisma } from "#lib/db";
 import { requireAdmin } from "#middleware/require-admin";
+import { createUser as createUserSvc } from "../../services/admin-user.service";
 import { adminUserSchema, createUserBodySchema, errorSchema } from "./schema";
-
-const ADMIN_APP_ID = "admin";
 
 export const createUser = defineOpenAPIRoute({
   route: createRoute({
@@ -38,112 +35,7 @@ export const createUser = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const { name, email, password, roleIds } = c.req.valid("json");
-
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      return c.json({ code: 400, message: "User already exists" }, 400);
-    }
-
-    // Create user via better-auth
-    const result = await auth.api
-      .createUser({
-        body: {
-          name,
-          email,
-          password,
-          role: "user", // Default role, will be derived from custom roles
-        },
-      })
-      .catch(async () => {
-        const conflictingUser = await prisma.user.findUnique({
-          where: { email },
-        });
-        if (conflictingUser) {
-          return null;
-        }
-
-        throw new Error("Failed to create user");
-      });
-
-    if (!result) {
-      return c.json({ code: 400, message: "User already exists" }, 400);
-    }
-
-    if (!result.user) {
-      return c.json({ code: 500, message: "Failed to create user" }, 500);
-    }
-
-    const userId = result.user.id;
-
-    try {
-      await prisma.$transaction(async (tx) => {
-        // Assign custom roles
-        if (roleIds.length > 0) {
-          for (const roleId of roleIds) {
-            await tx.userRole.upsert({
-              where: { userId_roleId: { userId, roleId } },
-              update: {},
-              create: { userId, roleId },
-            });
-          }
-        }
-
-        // Derive better-auth role from custom roles (only from admin app)
-        const hasAdminRole = await tx.userRole.findFirst({
-          where: {
-            userId,
-            role: {
-              appId: ADMIN_APP_ID,
-              authRole: "admin",
-            },
-          },
-        });
-
-        const derivedRole = hasAdminRole ? "admin" : "user";
-
-        // Update user's better-auth role if needed
-        if (derivedRole !== "user") {
-          await tx.user.update({
-            where: { id: userId },
-            data: { role: derivedRole },
-          });
-        }
-      });
-    } catch {
-      await prisma.user.delete({ where: { id: userId } }).catch(() => null);
-      return c.json({ code: 500, message: "Failed to assign user roles" }, 500);
-    }
-
-    // Return user with roles
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        userRoles: {
-          include: {
-            role: {
-              select: {
-                id: true,
-                appId: true,
-                name: true,
-                code: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!user) {
-      return c.json(
-        { code: 500, message: "Failed to fetch created user" },
-        500,
-      );
-    }
-
+    const user = await createUserSvc({ name, email, password, roleIds });
     return c.json(user, 200);
   },
 });
