@@ -1,5 +1,4 @@
 import { HTTPException } from "hono/http-exception";
-import type { Prisma } from "#generated/prisma";
 import { prisma } from "#lib/db";
 
 export async function getOrganizationById(id: string) {
@@ -14,7 +13,7 @@ export async function createOrganization(data: {
   name: string;
   slug: string;
   logo?: string;
-  metadata?: Prisma.InputJsonValue;
+  metadata?: string;
 }) {
   const existing = await prisma.organization.findUnique({
     where: { slug: data.slug },
@@ -36,7 +35,7 @@ export async function updateOrganization(
     name?: string;
     slug?: string;
     logo?: string | null;
-    metadata?: Prisma.InputJsonValue | null;
+    metadata?: string | null;
   },
 ) {
   const existing = await prisma.organization.findUnique({ where: { id } });
@@ -61,8 +60,8 @@ export async function deleteOrganization(id: string) {
   if (!existing) {
     throw new HTTPException(404, { message: "Organization not found" });
   }
-  await prisma.organization.delete({ where: { id } });
-  return { name: existing.name };
+  const deleted = await prisma.organization.delete({ where: { id } });
+  return { ...deleted, name: existing.name };
 }
 
 export async function listOrganizations(params: {
