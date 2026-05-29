@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "#lib/auth";
-import { userRoleRepository } from "#repositories/user-role.repository";
+import { getUserAppMenus } from "../../services/user-role.service";
 import { errorSchema, mineMenusResponseSchema } from "./schema";
 
 export const getUserAppRoles = defineOpenAPIRoute({
@@ -32,7 +32,7 @@ export const getUserAppRoles = defineOpenAPIRoute({
       throw new HTTPException(401, { message: "Unauthorized" });
     }
 
-    const menus = await userRoleRepository.getMenusForUser(session.user.id);
+    const menus = await getUserAppMenus(session.user.id);
     return c.json({ menus }, 200);
   },
 });
