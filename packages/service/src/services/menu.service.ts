@@ -1,5 +1,6 @@
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
+import type { LinkType } from "../../prisma/generated/prisma/enums";
 
 export async function getMenuById(id: string) {
   const menu = await prisma.menu.findUnique({ where: { id } });
@@ -15,9 +16,16 @@ export async function createMenu(data: {
   code: string;
   parentId?: string | null;
   icon?: string | null;
-  linkType: string;
+  linkType: LinkType;
   url?: string | null;
 }) {
+  const app = await prisma.application.findFirst({
+    where: { id: data.appId, deletedAt: null },
+  });
+  if (!app) {
+    throw new HTTPException(400, { message: "Application not found" });
+  }
+
   if (data.parentId) {
     const parent = await prisma.menu.findFirst({
       where: { id: data.parentId, appId: data.appId },
@@ -61,7 +69,7 @@ export async function updateMenu(
     name?: string;
     code?: string;
     icon?: string | null;
-    linkType?: string;
+    linkType?: LinkType;
     url?: string | null;
     sortOrder?: number;
   },

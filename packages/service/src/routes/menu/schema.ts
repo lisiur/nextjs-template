@@ -78,6 +78,25 @@ export const listMenusResponseSchema = z
   })
   .openapi("ListMenusResponse");
 
+export const reorderMenusBodySchema = z.object({
+  items: z
+    .array(
+      z.object({
+        id: z.string().min(1).openapi({ example: "clx1234567890" }),
+        parentId: z.string().nullable().openapi({ example: null }),
+        sortOrder: z.number().int().min(0).openapi({ example: 0 }),
+      }),
+    )
+    .min(1)
+    .openapi({ description: "Array of menu items with updated positions" }),
+});
+
+export const reorderMenusResponseSchema = z
+  .object({
+    menus: menuSchema.array(),
+  })
+  .openapi("ReorderMenusResponse");
+
 export type Menu = z.infer<typeof menuSchema>;
 export type CreateMenuBody = z.infer<typeof createMenuBodySchema>;
 export type UpdateMenuBody = z.infer<typeof updateMenuBodySchema>;
