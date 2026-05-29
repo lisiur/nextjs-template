@@ -1,0 +1,60 @@
+import { HTTPException } from "hono/http-exception";
+import { prisma } from "#lib/db";
+import { roleRepository } from "#repositories/role.repository";
+
+export async function getRoleById(id: string) {
+  const role = await roleRepository.findById(id);
+  if (!role) {
+    throw new HTTPException(404, { message: "Role not found" });
+  }
+  return role;
+}
+
+export async function createRole(data: {
+  appId: string;
+  name: string;
+  code: string;
+  authRole?: string;
+  flags?: string[];
+}) {
+  const existing = await roleRepository.findByAppAndCode(data.appId, data.code);
+  if (existing) {
+    throw new HTTPException(400, {
+      message: "Role code already exists in this application",
+    });
+  }
+  return roleRepository.create(data);
+}
+
+export async function updateRole(
+  id: string,
+  data: {
+    name?: string;
+    code?: string;
+    authRole?: string | null;
+    flags?: string[];
+  },
+) {
+  const role = await roleRepository.findById(id);
+  if (!role) {
+    throw new HTTPException(404, { message: "Role not found" });
+  }
+  return roleRepository.update(id, data);
+}
+
+export async function deleteRole(id: string) {
+  const role = await roleRepository.findById(id);
+  if (!role) {
+    throw new HTTPException(404, { message: "Role not found" });
+  }
+  await prisma.$transaction([
+    prisma.menuRole.deleteMany({ where: { roleId: id } }),
+    prisma.userRole.deleteMany({ where: { roleId: id } }),
+    prisma.role.delete({ where: { id } }),
+  ]);
+  return { name: role.name };
+}
+
+export async function listRoles(appId: string) {
+  return roleRepository.findByAppId(appId);
+}

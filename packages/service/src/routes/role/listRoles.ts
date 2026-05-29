@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requireAdmin } from "#middleware/require-admin";
-import { roleRepository } from "#repositories/role.repository";
+import { listRoles as listRolesService } from "../../services/role.service";
 import { errorSchema, listRolesQuerySchema, roleSchema } from "./schema";
 
 export const listRoles = defineOpenAPIRoute({
@@ -28,7 +28,7 @@ export const listRoles = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const { appId } = c.req.valid("query");
-    const roles = await roleRepository.findByAppId(appId);
+    const roles = await listRolesService(appId);
     return c.json(roles, 200);
   },
 });

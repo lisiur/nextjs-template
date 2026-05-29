@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
-import { roleRepository } from "#repositories/role.repository";
+import { createRole as createRoleService } from "../../services/role.service";
 import { createRoleBodySchema, errorSchema, roleSchema } from "./schema";
 
 export const createRole = defineOpenAPIRoute({
@@ -32,17 +32,7 @@ export const createRole = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const data = c.req.valid("json");
-    const existing = await roleRepository.findByAppAndCode(
-      data.appId,
-      data.code,
-    );
-    if (existing) {
-      return c.json(
-        { code: 400, message: "Role code already exists in this application" },
-        400,
-      );
-    }
-    const role = await roleRepository.create(data);
+    const role = await createRoleService(data);
 
     logAudit({
       event: "role.created",

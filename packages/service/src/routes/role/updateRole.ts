@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
-import { roleRepository } from "#repositories/role.repository";
+import { updateRole as updateRoleService } from "../../services/role.service";
 import {
   errorSchema,
   roleIdParamSchema,
@@ -39,11 +39,7 @@ export const updateRole = defineOpenAPIRoute({
   handler: async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");
-    const role = await roleRepository.findById(id);
-    if (!role) {
-      return c.json({ code: 404, message: "Role not found" }, 404);
-    }
-    const updated = await roleRepository.update(id, data);
+    const updated = await updateRoleService(id, data);
 
     logAudit({
       event: "role.updated",
