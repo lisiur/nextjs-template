@@ -19,7 +19,7 @@ export async function createRole(data: {
 }) {
   const existing = await roleRepository.findByAppAndCode(data.appId, data.code);
   if (existing) {
-    throw new HTTPException(400, {
+    throw new HTTPException(409, {
       message: "Role code already exists in this application",
     });
   }
@@ -38,6 +38,17 @@ export async function updateRole(
   const role = await roleRepository.findById(id);
   if (!role) {
     throw new HTTPException(404, { message: "Role not found" });
+  }
+  if (data.code && data.code !== role.code) {
+    const codeTaken = await roleRepository.findByAppAndCode(
+      role.appId,
+      data.code,
+    );
+    if (codeTaken) {
+      throw new HTTPException(409, {
+        message: "Role code already exists in this application",
+      });
+    }
   }
   return roleRepository.update(id, data);
 }
