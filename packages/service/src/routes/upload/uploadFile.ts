@@ -1,29 +1,8 @@
-import { createHash } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "#lib/auth";
-import { prisma } from "#lib/db";
+import { uploadFile as uploadFileToStorage } from "../../services/upload.service";
 import { errorSchema, uploadResponseSchema } from "./schema";
-
-const ALLOWED_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-  "application/pdf",
-];
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-const UPLOADS_ROOT = join(process.cwd(), "uploads");
-
-function computeHash(buffer: Buffer): string {
-  return createHash("sha256").update(buffer).digest("hex");
-}
-
-function shardPath(hash: string, ext: string): string {
-  return `${hash[0]}/${hash[1]}/${hash}${ext}`;
-}
 
 export const uploadFile = defineOpenAPIRoute({
   route: createRoute({
@@ -83,48 +62,12 @@ export const uploadFile = defineOpenAPIRoute({
       throw new HTTPException(400, { message: "No file provided" });
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      throw new HTTPException(400, {
-        message: `Invalid file type. Allowed: ${ALLOWED_TYPES.join(", ")}`,
-      });
-    }
-
-    if (file.size > MAX_SIZE) {
-      throw new HTTPException(400, {
-        message: `File too large. Maximum size: ${MAX_SIZE / 1024 / 1024}MB`,
-      });
-    }
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const hash = computeHash(buffer);
-    const ext = extname(file.name) || ".bin";
-    const relPath = shardPath(hash, ext);
-    const dir = visibility === "public" ? "public" : "private";
-    const fullPath = join(UPLOADS_ROOT, dir, relPath);
-
-    await mkdir(join(UPLOADS_ROOT, dir, hash[0], hash[1]), {
-      recursive: true,
-    });
-    await writeFile(fullPath, buffer);
-
-    const dbPath = `${dir}/${relPath}`;
-
-    const upload = await prisma.upload.create({
-      data: {
-        path: dbPath,
-        mimeType: file.type,
-        size: file.size,
-        visibility,
-        uploaderId: session.user.id,
-      },
+    const result = await uploadFileToStorage({
+      file,
+      visibility,
+      uploaderId: session.user.id,
     });
 
-    return c.json(
-      {
-        id: upload.id,
-        url: `/api/upload/${upload.id}`,
-      },
-      200,
-    );
+    return c.json(result, 200);
   },
 });

@@ -1,19 +1,12 @@
-import { createHmac } from "node:crypto";
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { auth } from "#lib/auth";
-import { prisma } from "#lib/db";
+import { signFile as generateSignedUrl } from "../../services/upload.service";
 import {
   errorSchema,
   signedUrlResponseSchema,
   signFileParamSchema,
 } from "./schema";
-
-const SIGN_SECRET =
-  process.env.UPLOAD_SIGN_SECRET ||
-  process.env.BETTER_AUTH_SECRET ||
-  "upload-sign-default";
-const EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
 export const signFile = defineOpenAPIRoute({
   route: createRoute({
@@ -70,24 +63,12 @@ export const signFile = defineOpenAPIRoute({
 
     const { id } = c.req.valid("param");
 
-    const upload = await prisma.upload.findUnique({ where: { id } });
-    if (!upload) {
-      throw new HTTPException(404, { message: "File not found" });
-    }
+    const result = await generateSignedUrl({
+      id,
+      userId: session.user.id,
+      userRole: session.user.role,
+    });
 
-    const isAdmin = session.user.role === "admin";
-    const isOwner = upload.uploaderId === session.user.id;
-    if (!isAdmin && !isOwner) {
-      throw new HTTPException(403, { message: "Not file owner" });
-    }
-
-    const expiresAt = Date.now() + EXPIRY_MS;
-    const token = createHmac("sha256", SIGN_SECRET)
-      .update(`${id}:${expiresAt}`)
-      .digest("hex");
-
-    const url = `/api/upload/${id}?token=${token}&expires=${expiresAt}`;
-
-    return c.json({ url, expiresAt: new Date(expiresAt) }, 200);
+    return c.json(result, 200);
   },
 });
