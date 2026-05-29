@@ -1,7 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { HTTPException } from "hono/http-exception";
-import { prisma } from "#lib/db";
 import { requireAdmin } from "#middleware/require-admin";
+import { getOrganizationById } from "../../services/organization.service";
 import {
   errorSchema,
   organizationIdParamSchema,
@@ -42,12 +41,7 @@ export const getOrganization = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const { id } = c.req.valid("param");
-
-    const org = await prisma.organization.findUnique({ where: { id } });
-    if (!org) {
-      throw new HTTPException(404, { message: "Organization not found" });
-    }
-
+    const org = await getOrganizationById(id);
     return c.json(org, 200);
   },
 });

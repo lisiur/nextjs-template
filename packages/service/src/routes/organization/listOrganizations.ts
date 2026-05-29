@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { prisma } from "#lib/db";
 import { requireAdmin } from "#middleware/require-admin";
+import { listOrganizations as listOrganizationsService } from "../../services/organization.service";
 import {
   errorSchema,
   listOrganizationsQuerySchema,
@@ -37,16 +37,7 @@ export const listOrganizations = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const { limit, offset } = c.req.valid("query");
-
-    const [organizations, total] = await Promise.all([
-      prisma.organization.findMany({
-        orderBy: { createdAt: "desc" },
-        take: limit,
-        skip: offset,
-      }),
-      prisma.organization.count(),
-    ]);
-
-    return c.json({ organizations, total }, 200);
+    const result = await listOrganizationsService({ limit, offset });
+    return c.json(result, 200);
   },
 });

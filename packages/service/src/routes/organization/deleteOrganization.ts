@@ -1,8 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { HTTPException } from "hono/http-exception";
-import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
+import { deleteOrganization as deleteOrganizationService } from "../../services/organization.service";
 import {
   deleteSuccessSchema,
   errorSchema,
@@ -44,19 +43,13 @@ export const deleteOrganization = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const { id } = c.req.valid("param");
-
-    const existing = await prisma.organization.findUnique({ where: { id } });
-    if (!existing) {
-      throw new HTTPException(404, { message: "Organization not found" });
-    }
-
-    await prisma.organization.delete({ where: { id } });
+    const { name } = await deleteOrganizationService(id);
 
     logAudit({
       event: "organization.deleted",
       category: "organization",
       targetId: id,
-      targetName: existing.name,
+      targetName: name,
       c,
     });
 

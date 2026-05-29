@@ -1,8 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { HTTPException } from "hono/http-exception";
-import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
+import { updateOrganization as updateOrganizationService } from "../../services/organization.service";
 import {
   errorSchema,
   organizationIdParamSchema,
@@ -59,25 +58,7 @@ export const updateOrganization = defineOpenAPIRoute({
   handler: async (c) => {
     const { id } = c.req.valid("param");
     const body = c.req.valid("json");
-
-    const existing = await prisma.organization.findUnique({ where: { id } });
-    if (!existing) {
-      throw new HTTPException(404, { message: "Organization not found" });
-    }
-
-    if (body.slug && body.slug !== existing.slug) {
-      const slugTaken = await prisma.organization.findUnique({
-        where: { slug: body.slug },
-      });
-      if (slugTaken) {
-        throw new HTTPException(409, { message: "Slug already taken" });
-      }
-    }
-
-    const org = await prisma.organization.update({
-      where: { id },
-      data: body,
-    });
+    const org = await updateOrganizationService(id, body);
 
     logAudit({
       event: "organization.updated",
