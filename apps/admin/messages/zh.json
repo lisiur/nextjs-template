@@ -390,54 +390,68 @@
   },
   "Logs": {
     "title": "日志管理",
-    "description": "查看系统操作日志和登录日志",
+    "description": "排查技术运行日志并审计安全合规事件",
     "fetchFailed": "获取日志失败",
     "deleteFailed": "删除日志失败",
     "deleteSuccess": "日志删除成功",
     "viewDetail": "查看",
-    "detailTitle": "日志详情",
-    "noLogs": "暂无日志",
+    "copy": "复制",
+    "traceCopied": "Trace ID 已复制",
+    "filterByTrace": "按 Trace 筛选",
     "confirmDelete": "确定要删除选中的日志吗？",
     "delete": "删除",
     "batchDelete": "批量删除",
     "cancel": "取消",
     "clearFilters": "清除筛选",
+    "tabs": {
+      "operation": "运行日志",
+      "audit": "审计日志"
+    },
+    "operation": {
+      "title": "运行日志",
+      "description": "用于故障排查的技术请求和系统行为日志。",
+      "detailTitle": "运行日志详情",
+      "noLogs": "暂无运行日志"
+    },
+    "audit": {
+      "title": "审计日志",
+      "description": "用于用户问责、安全调查和合规追踪的事件。审计日志不能在此删除。",
+      "detailTitle": "审计日志详情",
+      "noLogs": "暂无审计日志"
+    },
     "columns": {
       "createdAt": "时间",
       "userName": "操作人",
+      "level": "级别",
+      "event": "事件",
       "module": "模块",
-      "action": "操作",
-      "targetName": "目标",
+      "request": "请求",
+      "statusCode": "状态",
+      "durationMs": "耗时",
+      "traceId": "Trace ID",
+      "sessionId": "Session ID",
+      "message": "消息",
+      "category": "分类",
+      "outcome": "结果",
+      "severity": "严重性",
+      "target": "目标",
       "ip": "IP",
       "detail": "详情"
     },
-    "actions": {
-      "create": "创建",
-      "update": "更新",
-      "delete": "删除",
-      "login": "登录",
-      "logout": "登出",
-      "assign": "分配",
-      "remove": "移除",
-      "batchUpsert": "批量更新"
-    },
-    "modules": {
-      "user": "用户",
-      "organization": "组织",
-      "application": "应用",
-      "menu": "菜单",
-      "role": "角色",
-      "system-config": "系统配置",
-      "user-role": "用户角色",
-      "menu-role": "菜单角色",
-      "auth": "认证"
-    },
     "filters": {
-      "action": "操作类型",
+      "traceId": "Trace ID",
+      "sessionId": "Session ID",
+      "level": "级别",
       "module": "模块",
-      "dateRange": "时间范围",
-      "allActions": "全部操作",
-      "allModules": "全部模块"
+      "event": "事件",
+      "path": "路径",
+      "statusCode": "状态码",
+      "userName": "操作人",
+      "category": "分类",
+      "targetType": "目标类型",
+      "allLevels": "全部级别",
+      "allSeverities": "全部严重性",
+      "allOutcomes": "全部结果"
     }
   }
 }

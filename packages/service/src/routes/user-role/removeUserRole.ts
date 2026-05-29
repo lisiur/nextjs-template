@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute, z } from "@hono/zod-openapi";
-import { logOperation } from "#lib/logger";
+import { logAudit } from "#lib/logger";
 import { assertUserIsNotBuiltin } from "#lib/protected-user";
 import { requireAdmin } from "#middleware/require-admin";
 import { userRoleRepository } from "#repositories/user-role.repository";
@@ -42,10 +42,10 @@ export const removeUserRole = defineOpenAPIRoute({
     await assertUserIsNotBuiltin(userId);
     await userRoleRepository.remove(userId, roleId);
 
-    logOperation({
-      action: "remove",
-      module: "user-role",
-      detail: JSON.stringify({ userId, roleId }),
+    logAudit({
+      event: "user_role.removed",
+      category: "user_role",
+      metadata: { userId, roleId },
       c,
     });
 

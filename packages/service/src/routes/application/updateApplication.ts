@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
-import { logOperation } from "#lib/logger";
+import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import {
   applicationIdParamSchema,
@@ -83,9 +83,9 @@ export const updateApplication = defineOpenAPIRoute({
       data: body,
     });
 
-    logOperation({
-      action: "update",
-      module: "application",
+    logAudit({
+      event: "application.updated",
+      category: "application",
       targetId: app.id,
       targetName: app.name,
       c,

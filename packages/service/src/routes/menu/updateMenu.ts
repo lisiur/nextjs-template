@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
-import { logOperation } from "#lib/logger";
+import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import {
   errorSchema,
@@ -93,9 +93,9 @@ export const updateMenu = defineOpenAPIRoute({
       },
     });
 
-    logOperation({
-      action: "update",
-      module: "menu",
+    logAudit({
+      event: "menu.updated",
+      category: "menu",
       targetId: menu.id,
       targetName: menu.name,
       c,

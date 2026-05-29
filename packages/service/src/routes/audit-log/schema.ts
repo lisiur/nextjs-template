@@ -1,0 +1,59 @@
+import { z } from "@hono/zod-openapi";
+
+export const auditLogSchema = z
+  .object({
+    id: z.string().openapi({ example: "clx1234567890" }),
+    traceId: z.string().openapi({ example: "018fc9c2-7a7e-4b7b" }),
+    sessionId: z.string().nullable().optional(),
+    userId: z.string().nullable().optional(),
+    userName: z.string().nullable().optional(),
+    event: z.string().openapi({ example: "role.updated" }),
+    category: z.string().openapi({ example: "access_control" }),
+    severity: z.string().openapi({ example: "warning" }),
+    outcome: z.string().openapi({ example: "success" }),
+    targetType: z.string().nullable().optional(),
+    targetId: z.string().nullable().optional(),
+    targetName: z.string().nullable().optional(),
+    before: z.unknown().nullable().optional(),
+    after: z.unknown().nullable().optional(),
+    metadata: z.unknown().nullable().optional(),
+    ip: z.string().nullable().optional(),
+    userAgent: z.string().nullable().optional(),
+    createdAt: z.date(),
+  })
+  .openapi("AuditLog");
+
+export const listAuditLogsQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+  offset: z.coerce.number().int().min(0).default(0),
+  traceId: z.string().optional(),
+  sessionId: z.string().optional(),
+  userId: z.string().optional(),
+  userName: z.string().optional(),
+  event: z.string().optional(),
+  category: z.string().optional(),
+  severity: z.string().optional(),
+  outcome: z.string().optional(),
+  targetType: z.string().optional(),
+  targetId: z.string().optional(),
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
+});
+
+export const auditLogIdParamSchema = z.object({
+  id: z.string().min(1).openapi({ example: "clx1234567890" }),
+});
+
+export const errorSchema = z
+  .object({
+    code: z.number().openapi({ example: 400 }),
+    message: z.string().openapi({ example: "Bad Request" }),
+  })
+  .openapi("AuditLogError");
+
+export const listAuditLogsResponseSchema = z
+  .object({
+    logs: auditLogSchema.array(),
+    total: z.number(),
+  })
+  .openapi("ListAuditLogsResponse");

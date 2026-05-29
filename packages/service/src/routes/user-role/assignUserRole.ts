@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { logOperation } from "#lib/logger";
+import { logAudit } from "#lib/logger";
 import { assertUserIsNotBuiltin } from "#lib/protected-user";
 import { requireAdmin } from "#middleware/require-admin";
 import { userRoleRepository } from "#repositories/user-role.repository";
@@ -40,11 +40,11 @@ export const assignUserRole = defineOpenAPIRoute({
     await assertUserIsNotBuiltin(userId);
     const userRole = await userRoleRepository.assign(userId, roleId);
 
-    logOperation({
-      action: "assign",
-      module: "user-role",
+    logAudit({
+      event: "user_role.assigned",
+      category: "user_role",
       targetId: userRole.id,
-      detail: JSON.stringify({ userId, roleId }),
+      metadata: { userId, roleId },
       c,
     });
 

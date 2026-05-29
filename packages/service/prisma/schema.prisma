@@ -252,21 +252,61 @@ model UserRole {
 }
 
 model OperationLog {
-  id          String   @id @default(cuid())
-  userId      String?
-  userName    String?
-  action      String
-  module      String
-  targetId    String?
-  targetName  String?
-  detail      String?
-  ip          String?
-  userAgent   String?
-  createdAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  traceId      String
+  sessionId    String?
+  level        String   @default("info")
+  source       String?
+  module       String?
+  event        String
+  message      String?
+  method       String?
+  path         String?
+  statusCode   Int?
+  durationMs   Int?
+  errorName    String?
+  errorMessage String?
+  stack        String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
 
-  @@index([userId])
-  @@index([action])
+  @@index([traceId])
+  @@index([sessionId])
+  @@index([level])
   @@index([module])
+  @@index([event])
+  @@index([statusCode])
   @@index([createdAt])
   @@map("operation_log")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  traceId    String
+  sessionId  String?
+  userId     String?
+  userName   String?
+  event      String
+  category   String
+  severity   String   @default("info")
+  outcome    String   @default("success")
+  targetType String?
+  targetId   String?
+  targetName String?
+  before     Json?
+  after      Json?
+  metadata   Json?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([traceId])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([event])
+  @@index([category])
+  @@index([severity])
+  @@index([outcome])
+  @@index([createdAt])
+  @@map("audit_log")
 }

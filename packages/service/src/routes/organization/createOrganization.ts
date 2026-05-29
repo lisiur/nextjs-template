@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
-import { logOperation } from "#lib/logger";
+import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import {
   createOrganizationBodySchema,
@@ -68,9 +68,9 @@ export const createOrganization = defineOpenAPIRoute({
       },
     });
 
-    logOperation({
-      action: "create",
-      module: "organization",
+    logAudit({
+      event: "organization.created",
+      category: "organization",
       targetId: org.id,
       targetName: org.name,
       c,

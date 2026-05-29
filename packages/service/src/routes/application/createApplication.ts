@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
-import { logOperation } from "#lib/logger";
+import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import {
   applicationSchema,
@@ -70,9 +70,9 @@ export const createApplication = defineOpenAPIRoute({
       },
     });
 
-    logOperation({
-      action: "create",
-      module: "application",
+    logAudit({
+      event: "application.created",
+      category: "application",
       targetId: app.id,
       targetName: app.name,
       c,

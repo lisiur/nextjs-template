@@ -20,93 +20,147 @@ export type OperationLogModel = runtime.Types.Result.DefaultSelection<Prisma.$Op
 
 export type AggregateOperationLog = {
   _count: OperationLogCountAggregateOutputType | null
+  _avg: OperationLogAvgAggregateOutputType | null
+  _sum: OperationLogSumAggregateOutputType | null
   _min: OperationLogMinAggregateOutputType | null
   _max: OperationLogMaxAggregateOutputType | null
 }
 
+export type OperationLogAvgAggregateOutputType = {
+  statusCode: number | null
+  durationMs: number | null
+}
+
+export type OperationLogSumAggregateOutputType = {
+  statusCode: number | null
+  durationMs: number | null
+}
+
 export type OperationLogMinAggregateOutputType = {
   id: string | null
-  userId: string | null
-  userName: string | null
-  action: string | null
+  traceId: string | null
+  sessionId: string | null
+  level: string | null
+  source: string | null
   module: string | null
-  targetId: string | null
-  targetName: string | null
-  detail: string | null
-  ip: string | null
-  userAgent: string | null
+  event: string | null
+  message: string | null
+  method: string | null
+  path: string | null
+  statusCode: number | null
+  durationMs: number | null
+  errorName: string | null
+  errorMessage: string | null
+  stack: string | null
   createdAt: Date | null
 }
 
 export type OperationLogMaxAggregateOutputType = {
   id: string | null
-  userId: string | null
-  userName: string | null
-  action: string | null
+  traceId: string | null
+  sessionId: string | null
+  level: string | null
+  source: string | null
   module: string | null
-  targetId: string | null
-  targetName: string | null
-  detail: string | null
-  ip: string | null
-  userAgent: string | null
+  event: string | null
+  message: string | null
+  method: string | null
+  path: string | null
+  statusCode: number | null
+  durationMs: number | null
+  errorName: string | null
+  errorMessage: string | null
+  stack: string | null
   createdAt: Date | null
 }
 
 export type OperationLogCountAggregateOutputType = {
   id: number
-  userId: number
-  userName: number
-  action: number
+  traceId: number
+  sessionId: number
+  level: number
+  source: number
   module: number
-  targetId: number
-  targetName: number
-  detail: number
-  ip: number
-  userAgent: number
+  event: number
+  message: number
+  method: number
+  path: number
+  statusCode: number
+  durationMs: number
+  errorName: number
+  errorMessage: number
+  stack: number
+  metadata: number
   createdAt: number
   _all: number
 }
 
 
+export type OperationLogAvgAggregateInputType = {
+  statusCode?: true
+  durationMs?: true
+}
+
+export type OperationLogSumAggregateInputType = {
+  statusCode?: true
+  durationMs?: true
+}
+
 export type OperationLogMinAggregateInputType = {
   id?: true
-  userId?: true
-  userName?: true
-  action?: true
+  traceId?: true
+  sessionId?: true
+  level?: true
+  source?: true
   module?: true
-  targetId?: true
-  targetName?: true
-  detail?: true
-  ip?: true
-  userAgent?: true
+  event?: true
+  message?: true
+  method?: true
+  path?: true
+  statusCode?: true
+  durationMs?: true
+  errorName?: true
+  errorMessage?: true
+  stack?: true
   createdAt?: true
 }
 
 export type OperationLogMaxAggregateInputType = {
   id?: true
-  userId?: true
-  userName?: true
-  action?: true
+  traceId?: true
+  sessionId?: true
+  level?: true
+  source?: true
   module?: true
-  targetId?: true
-  targetName?: true
-  detail?: true
-  ip?: true
-  userAgent?: true
+  event?: true
+  message?: true
+  method?: true
+  path?: true
+  statusCode?: true
+  durationMs?: true
+  errorName?: true
+  errorMessage?: true
+  stack?: true
   createdAt?: true
 }
 
 export type OperationLogCountAggregateInputType = {
   id?: true
-  userId?: true
-  userName?: true
-  action?: true
+  traceId?: true
+  sessionId?: true
+  level?: true
+  source?: true
   module?: true
-  targetId?: true
-  targetName?: true
-  detail?: true
-  ip?: true
-  userAgent?: true
+  event?: true
+  message?: true
+  method?: true
+  path?: true
+  statusCode?: true
+  durationMs?: true
+  errorName?: true
+  errorMessage?: true
+  stack?: true
+  metadata?: true
   createdAt?: true
   _all?: true
 }
@@ -149,6 +203,18 @@ export type OperationLogAggregateArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: OperationLogAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: OperationLogSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: OperationLogMinAggregateInputType
@@ -179,23 +245,33 @@ export type OperationLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   _count?: OperationLogCountAggregateInputType | true
+  _avg?: OperationLogAvgAggregateInputType
+  _sum?: OperationLogSumAggregateInputType
   _min?: OperationLogMinAggregateInputType
   _max?: OperationLogMaxAggregateInputType
 }
 
 export type OperationLogGroupByOutputType = {
   id: string
-  userId: string | null
-  userName: string | null
-  action: string
-  module: string
-  targetId: string | null
-  targetName: string | null
-  detail: string | null
-  ip: string | null
-  userAgent: string | null
+  traceId: string
+  sessionId: string | null
+  level: string
+  source: string | null
+  module: string | null
+  event: string
+  message: string | null
+  method: string | null
+  path: string | null
+  statusCode: number | null
+  durationMs: number | null
+  errorName: string | null
+  errorMessage: string | null
+  stack: string | null
+  metadata: runtime.JsonValue | null
   createdAt: Date
   _count: OperationLogCountAggregateOutputType | null
+  _avg: OperationLogAvgAggregateOutputType | null
+  _sum: OperationLogSumAggregateOutputType | null
   _min: OperationLogMinAggregateOutputType | null
   _max: OperationLogMaxAggregateOutputType | null
 }
@@ -220,29 +296,41 @@ export type OperationLogWhereInput = {
   OR?: Prisma.OperationLogWhereInput[]
   NOT?: Prisma.OperationLogWhereInput | Prisma.OperationLogWhereInput[]
   id?: Prisma.StringFilter<"OperationLog"> | string
-  userId?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  userName?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  action?: Prisma.StringFilter<"OperationLog"> | string
-  module?: Prisma.StringFilter<"OperationLog"> | string
-  targetId?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  targetName?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  detail?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  ip?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  userAgent?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  traceId?: Prisma.StringFilter<"OperationLog"> | string
+  sessionId?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  level?: Prisma.StringFilter<"OperationLog"> | string
+  source?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  module?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  event?: Prisma.StringFilter<"OperationLog"> | string
+  message?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  method?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  path?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  statusCode?: Prisma.IntNullableFilter<"OperationLog"> | number | null
+  durationMs?: Prisma.IntNullableFilter<"OperationLog"> | number | null
+  errorName?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  errorMessage?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  stack?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  metadata?: Prisma.JsonNullableFilter<"OperationLog">
   createdAt?: Prisma.DateTimeFilter<"OperationLog"> | Date | string
 }
 
 export type OperationLogOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrderInput | Prisma.SortOrder
-  userName?: Prisma.SortOrderInput | Prisma.SortOrder
-  action?: Prisma.SortOrder
-  module?: Prisma.SortOrder
-  targetId?: Prisma.SortOrderInput | Prisma.SortOrder
-  targetName?: Prisma.SortOrderInput | Prisma.SortOrder
-  detail?: Prisma.SortOrderInput | Prisma.SortOrder
-  ip?: Prisma.SortOrderInput | Prisma.SortOrder
-  userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
+  traceId?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  level?: Prisma.SortOrder
+  source?: Prisma.SortOrderInput | Prisma.SortOrder
+  module?: Prisma.SortOrderInput | Prisma.SortOrder
+  event?: Prisma.SortOrder
+  message?: Prisma.SortOrderInput | Prisma.SortOrder
+  method?: Prisma.SortOrderInput | Prisma.SortOrder
+  path?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  durationMs?: Prisma.SortOrderInput | Prisma.SortOrder
+  errorName?: Prisma.SortOrderInput | Prisma.SortOrder
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  stack?: Prisma.SortOrderInput | Prisma.SortOrder
+  metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -251,33 +339,47 @@ export type OperationLogWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.OperationLogWhereInput | Prisma.OperationLogWhereInput[]
   OR?: Prisma.OperationLogWhereInput[]
   NOT?: Prisma.OperationLogWhereInput | Prisma.OperationLogWhereInput[]
-  userId?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  userName?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  action?: Prisma.StringFilter<"OperationLog"> | string
-  module?: Prisma.StringFilter<"OperationLog"> | string
-  targetId?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  targetName?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  detail?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  ip?: Prisma.StringNullableFilter<"OperationLog"> | string | null
-  userAgent?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  traceId?: Prisma.StringFilter<"OperationLog"> | string
+  sessionId?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  level?: Prisma.StringFilter<"OperationLog"> | string
+  source?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  module?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  event?: Prisma.StringFilter<"OperationLog"> | string
+  message?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  method?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  path?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  statusCode?: Prisma.IntNullableFilter<"OperationLog"> | number | null
+  durationMs?: Prisma.IntNullableFilter<"OperationLog"> | number | null
+  errorName?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  errorMessage?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  stack?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  metadata?: Prisma.JsonNullableFilter<"OperationLog">
   createdAt?: Prisma.DateTimeFilter<"OperationLog"> | Date | string
 }, "id">
 
 export type OperationLogOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrderInput | Prisma.SortOrder
-  userName?: Prisma.SortOrderInput | Prisma.SortOrder
-  action?: Prisma.SortOrder
-  module?: Prisma.SortOrder
-  targetId?: Prisma.SortOrderInput | Prisma.SortOrder
-  targetName?: Prisma.SortOrderInput | Prisma.SortOrder
-  detail?: Prisma.SortOrderInput | Prisma.SortOrder
-  ip?: Prisma.SortOrderInput | Prisma.SortOrder
-  userAgent?: Prisma.SortOrderInput | Prisma.SortOrder
+  traceId?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrderInput | Prisma.SortOrder
+  level?: Prisma.SortOrder
+  source?: Prisma.SortOrderInput | Prisma.SortOrder
+  module?: Prisma.SortOrderInput | Prisma.SortOrder
+  event?: Prisma.SortOrder
+  message?: Prisma.SortOrderInput | Prisma.SortOrder
+  method?: Prisma.SortOrderInput | Prisma.SortOrder
+  path?: Prisma.SortOrderInput | Prisma.SortOrder
+  statusCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  durationMs?: Prisma.SortOrderInput | Prisma.SortOrder
+  errorName?: Prisma.SortOrderInput | Prisma.SortOrder
+  errorMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  stack?: Prisma.SortOrderInput | Prisma.SortOrder
+  metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.OperationLogCountOrderByAggregateInput
+  _avg?: Prisma.OperationLogAvgOrderByAggregateInput
   _max?: Prisma.OperationLogMaxOrderByAggregateInput
   _min?: Prisma.OperationLogMinOrderByAggregateInput
+  _sum?: Prisma.OperationLogSumOrderByAggregateInput
 }
 
 export type OperationLogScalarWhereWithAggregatesInput = {
@@ -285,232 +387,344 @@ export type OperationLogScalarWhereWithAggregatesInput = {
   OR?: Prisma.OperationLogScalarWhereWithAggregatesInput[]
   NOT?: Prisma.OperationLogScalarWhereWithAggregatesInput | Prisma.OperationLogScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"OperationLog"> | string
-  userId?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
-  userName?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
-  action?: Prisma.StringWithAggregatesFilter<"OperationLog"> | string
-  module?: Prisma.StringWithAggregatesFilter<"OperationLog"> | string
-  targetId?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
-  targetName?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
-  detail?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
-  ip?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
-  userAgent?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  traceId?: Prisma.StringWithAggregatesFilter<"OperationLog"> | string
+  sessionId?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  level?: Prisma.StringWithAggregatesFilter<"OperationLog"> | string
+  source?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  module?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  event?: Prisma.StringWithAggregatesFilter<"OperationLog"> | string
+  message?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  method?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  path?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  statusCode?: Prisma.IntNullableWithAggregatesFilter<"OperationLog"> | number | null
+  durationMs?: Prisma.IntNullableWithAggregatesFilter<"OperationLog"> | number | null
+  errorName?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  errorMessage?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  stack?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  metadata?: Prisma.JsonNullableWithAggregatesFilter<"OperationLog">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"OperationLog"> | Date | string
 }
 
 export type OperationLogCreateInput = {
   id?: string
-  userId?: string | null
-  userName?: string | null
-  action: string
-  module: string
-  targetId?: string | null
-  targetName?: string | null
-  detail?: string | null
-  ip?: string | null
-  userAgent?: string | null
+  traceId: string
+  sessionId?: string | null
+  level?: string
+  source?: string | null
+  module?: string | null
+  event: string
+  message?: string | null
+  method?: string | null
+  path?: string | null
+  statusCode?: number | null
+  durationMs?: number | null
+  errorName?: string | null
+  errorMessage?: string | null
+  stack?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
 export type OperationLogUncheckedCreateInput = {
   id?: string
-  userId?: string | null
-  userName?: string | null
-  action: string
-  module: string
-  targetId?: string | null
-  targetName?: string | null
-  detail?: string | null
-  ip?: string | null
-  userAgent?: string | null
+  traceId: string
+  sessionId?: string | null
+  level?: string
+  source?: string | null
+  module?: string | null
+  event: string
+  message?: string | null
+  method?: string | null
+  path?: string | null
+  statusCode?: number | null
+  durationMs?: number | null
+  errorName?: string | null
+  errorMessage?: string | null
+  stack?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
 export type OperationLogUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  action?: Prisma.StringFieldUpdateOperationsInput | string
-  module?: Prisma.StringFieldUpdateOperationsInput | string
-  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  targetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  detail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  traceId?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  module?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  path?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stack?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type OperationLogUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  action?: Prisma.StringFieldUpdateOperationsInput | string
-  module?: Prisma.StringFieldUpdateOperationsInput | string
-  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  targetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  detail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  traceId?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  module?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  path?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stack?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type OperationLogCreateManyInput = {
   id?: string
-  userId?: string | null
-  userName?: string | null
-  action: string
-  module: string
-  targetId?: string | null
-  targetName?: string | null
-  detail?: string | null
-  ip?: string | null
-  userAgent?: string | null
+  traceId: string
+  sessionId?: string | null
+  level?: string
+  source?: string | null
+  module?: string | null
+  event: string
+  message?: string | null
+  method?: string | null
+  path?: string | null
+  statusCode?: number | null
+  durationMs?: number | null
+  errorName?: string | null
+  errorMessage?: string | null
+  stack?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
 
 export type OperationLogUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  action?: Prisma.StringFieldUpdateOperationsInput | string
-  module?: Prisma.StringFieldUpdateOperationsInput | string
-  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  targetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  detail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  traceId?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  module?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  path?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stack?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type OperationLogUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  action?: Prisma.StringFieldUpdateOperationsInput | string
-  module?: Prisma.StringFieldUpdateOperationsInput | string
-  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  targetName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  detail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userAgent?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  traceId?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.StringFieldUpdateOperationsInput | string
+  source?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  module?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  event?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  method?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  path?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  statusCode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  durationMs?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  errorName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  errorMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stack?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type OperationLogCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  userName?: Prisma.SortOrder
-  action?: Prisma.SortOrder
+  traceId?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrder
+  level?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   module?: Prisma.SortOrder
-  targetId?: Prisma.SortOrder
-  targetName?: Prisma.SortOrder
-  detail?: Prisma.SortOrder
-  ip?: Prisma.SortOrder
-  userAgent?: Prisma.SortOrder
+  event?: Prisma.SortOrder
+  message?: Prisma.SortOrder
+  method?: Prisma.SortOrder
+  path?: Prisma.SortOrder
+  statusCode?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+  errorName?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
+  stack?: Prisma.SortOrder
+  metadata?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type OperationLogAvgOrderByAggregateInput = {
+  statusCode?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
 }
 
 export type OperationLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  userName?: Prisma.SortOrder
-  action?: Prisma.SortOrder
+  traceId?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrder
+  level?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   module?: Prisma.SortOrder
-  targetId?: Prisma.SortOrder
-  targetName?: Prisma.SortOrder
-  detail?: Prisma.SortOrder
-  ip?: Prisma.SortOrder
-  userAgent?: Prisma.SortOrder
+  event?: Prisma.SortOrder
+  message?: Prisma.SortOrder
+  method?: Prisma.SortOrder
+  path?: Prisma.SortOrder
+  statusCode?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+  errorName?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
+  stack?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type OperationLogMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
-  userName?: Prisma.SortOrder
-  action?: Prisma.SortOrder
+  traceId?: Prisma.SortOrder
+  sessionId?: Prisma.SortOrder
+  level?: Prisma.SortOrder
+  source?: Prisma.SortOrder
   module?: Prisma.SortOrder
-  targetId?: Prisma.SortOrder
-  targetName?: Prisma.SortOrder
-  detail?: Prisma.SortOrder
-  ip?: Prisma.SortOrder
-  userAgent?: Prisma.SortOrder
+  event?: Prisma.SortOrder
+  message?: Prisma.SortOrder
+  method?: Prisma.SortOrder
+  path?: Prisma.SortOrder
+  statusCode?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+  errorName?: Prisma.SortOrder
+  errorMessage?: Prisma.SortOrder
+  stack?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type OperationLogSumOrderByAggregateInput = {
+  statusCode?: Prisma.SortOrder
+  durationMs?: Prisma.SortOrder
+}
+
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 
 
 export type OperationLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
-  userName?: boolean
-  action?: boolean
+  traceId?: boolean
+  sessionId?: boolean
+  level?: boolean
+  source?: boolean
   module?: boolean
-  targetId?: boolean
-  targetName?: boolean
-  detail?: boolean
-  ip?: boolean
-  userAgent?: boolean
+  event?: boolean
+  message?: boolean
+  method?: boolean
+  path?: boolean
+  statusCode?: boolean
+  durationMs?: boolean
+  errorName?: boolean
+  errorMessage?: boolean
+  stack?: boolean
+  metadata?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["operationLog"]>
 
 export type OperationLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
-  userName?: boolean
-  action?: boolean
+  traceId?: boolean
+  sessionId?: boolean
+  level?: boolean
+  source?: boolean
   module?: boolean
-  targetId?: boolean
-  targetName?: boolean
-  detail?: boolean
-  ip?: boolean
-  userAgent?: boolean
+  event?: boolean
+  message?: boolean
+  method?: boolean
+  path?: boolean
+  statusCode?: boolean
+  durationMs?: boolean
+  errorName?: boolean
+  errorMessage?: boolean
+  stack?: boolean
+  metadata?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["operationLog"]>
 
 export type OperationLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
-  userName?: boolean
-  action?: boolean
+  traceId?: boolean
+  sessionId?: boolean
+  level?: boolean
+  source?: boolean
   module?: boolean
-  targetId?: boolean
-  targetName?: boolean
-  detail?: boolean
-  ip?: boolean
-  userAgent?: boolean
+  event?: boolean
+  message?: boolean
+  method?: boolean
+  path?: boolean
+  statusCode?: boolean
+  durationMs?: boolean
+  errorName?: boolean
+  errorMessage?: boolean
+  stack?: boolean
+  metadata?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["operationLog"]>
 
 export type OperationLogSelectScalar = {
   id?: boolean
-  userId?: boolean
-  userName?: boolean
-  action?: boolean
+  traceId?: boolean
+  sessionId?: boolean
+  level?: boolean
+  source?: boolean
   module?: boolean
-  targetId?: boolean
-  targetName?: boolean
-  detail?: boolean
-  ip?: boolean
-  userAgent?: boolean
+  event?: boolean
+  message?: boolean
+  method?: boolean
+  path?: boolean
+  statusCode?: boolean
+  durationMs?: boolean
+  errorName?: boolean
+  errorMessage?: boolean
+  stack?: boolean
+  metadata?: boolean
   createdAt?: boolean
 }
 
-export type OperationLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "userName" | "action" | "module" | "targetId" | "targetName" | "detail" | "ip" | "userAgent" | "createdAt", ExtArgs["result"]["operationLog"]>
+export type OperationLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "traceId" | "sessionId" | "level" | "source" | "module" | "event" | "message" | "method" | "path" | "statusCode" | "durationMs" | "errorName" | "errorMessage" | "stack" | "metadata" | "createdAt", ExtArgs["result"]["operationLog"]>
 
 export type $OperationLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "OperationLog"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    userId: string | null
-    userName: string | null
-    action: string
-    module: string
-    targetId: string | null
-    targetName: string | null
-    detail: string | null
-    ip: string | null
-    userAgent: string | null
+    traceId: string
+    sessionId: string | null
+    level: string
+    source: string | null
+    module: string | null
+    event: string
+    message: string | null
+    method: string | null
+    path: string | null
+    statusCode: number | null
+    durationMs: number | null
+    errorName: string | null
+    errorMessage: string | null
+    stack: string | null
+    metadata: runtime.JsonValue | null
     createdAt: Date
   }, ExtArgs["result"]["operationLog"]>
   composites: {}
@@ -936,15 +1150,21 @@ export interface Prisma__OperationLogClient<T, Null = never, ExtArgs extends run
  */
 export interface OperationLogFieldRefs {
   readonly id: Prisma.FieldRef<"OperationLog", 'String'>
-  readonly userId: Prisma.FieldRef<"OperationLog", 'String'>
-  readonly userName: Prisma.FieldRef<"OperationLog", 'String'>
-  readonly action: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly traceId: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly sessionId: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly level: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly source: Prisma.FieldRef<"OperationLog", 'String'>
   readonly module: Prisma.FieldRef<"OperationLog", 'String'>
-  readonly targetId: Prisma.FieldRef<"OperationLog", 'String'>
-  readonly targetName: Prisma.FieldRef<"OperationLog", 'String'>
-  readonly detail: Prisma.FieldRef<"OperationLog", 'String'>
-  readonly ip: Prisma.FieldRef<"OperationLog", 'String'>
-  readonly userAgent: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly event: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly message: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly method: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly path: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly statusCode: Prisma.FieldRef<"OperationLog", 'Int'>
+  readonly durationMs: Prisma.FieldRef<"OperationLog", 'Int'>
+  readonly errorName: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly errorMessage: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly stack: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly metadata: Prisma.FieldRef<"OperationLog", 'Json'>
   readonly createdAt: Prisma.FieldRef<"OperationLog", 'DateTime'>
 }
     

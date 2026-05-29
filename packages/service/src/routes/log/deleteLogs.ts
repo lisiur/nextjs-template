@@ -1,5 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { prisma } from "#lib/db";
+import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import {
   deleteLogsBodySchema,
@@ -45,6 +46,15 @@ export const deleteLogs = defineOpenAPIRoute({
 
     await prisma.operationLog.deleteMany({
       where: { id: { in: ids } },
+    });
+
+    await logAudit({
+      event: "operation_log.deleted",
+      category: "log_management",
+      severity: "warning",
+      targetType: "operation_log",
+      metadata: { ids },
+      c,
     });
 
     return c.json({ success: true as const }, 200);

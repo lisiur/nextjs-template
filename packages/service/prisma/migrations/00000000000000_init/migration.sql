@@ -1,0 +1,416 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
+-- CreateEnum
+CREATE TYPE "LinkType" AS ENUM ('GROUP', 'INTERNAL', 'EXTERNAL');
+
+-- CreateTable
+CREATE TABLE "user" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "image" TEXT,
+    "role" TEXT,
+    "banned" BOOLEAN DEFAULT false,
+    "banReason" TEXT,
+    "banExpires" TIMESTAMP(3),
+    "flags" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "session" (
+    "id" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "token" TEXT NOT NULL,
+    "ipAddress" TEXT,
+    "userAgent" TEXT,
+    "userId" TEXT NOT NULL,
+    "impersonatedBy" TEXT,
+    "activeOrganizationId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "session_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "account" (
+    "id" TEXT NOT NULL,
+    "accountId" TEXT NOT NULL,
+    "providerId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "accessToken" TEXT,
+    "refreshToken" TEXT,
+    "idToken" TEXT,
+    "accessTokenExpiresAt" TIMESTAMP(3),
+    "refreshTokenExpiresAt" TIMESTAMP(3),
+    "scope" TEXT,
+    "password" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "account_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "verification" (
+    "id" TEXT NOT NULL,
+    "identifier" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "verification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "organization" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "logo" TEXT,
+    "metadata" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "organization_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "member" (
+    "id" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'member',
+    "createdAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "member_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "invitation" (
+    "id" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "role" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "inviterId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "invitation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "system_config" (
+    "id" TEXT NOT NULL,
+    "group" TEXT NOT NULL,
+    "key" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'string',
+    "label" TEXT NOT NULL,
+    "description" TEXT,
+    "isSecret" BOOLEAN NOT NULL DEFAULT false,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "system_config_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "upload" (
+    "id" TEXT NOT NULL,
+    "path" TEXT NOT NULL,
+    "mimeType" TEXT NOT NULL,
+    "size" INTEGER NOT NULL,
+    "visibility" TEXT NOT NULL DEFAULT 'private',
+    "uploaderId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "upload_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "application" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "description" TEXT,
+    "logo" TEXT,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "deletedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "application_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "menu" (
+    "id" TEXT NOT NULL,
+    "appId" TEXT NOT NULL,
+    "parentId" TEXT,
+    "name" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "icon" TEXT,
+    "linkType" "LinkType" NOT NULL DEFAULT 'GROUP',
+    "url" TEXT,
+    "sortOrder" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "menu_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "menu_role" (
+    "id" TEXT NOT NULL,
+    "menuId" TEXT NOT NULL,
+    "roleId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "menu_role_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "role" (
+    "id" TEXT NOT NULL,
+    "appId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "code" TEXT NOT NULL,
+    "authRole" TEXT,
+    "flags" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "role_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_role" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "roleId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "user_role_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "operation_log" (
+    "id" TEXT NOT NULL,
+    "traceId" TEXT NOT NULL,
+    "sessionId" TEXT,
+    "level" TEXT NOT NULL DEFAULT 'info',
+    "source" TEXT,
+    "module" TEXT,
+    "event" TEXT NOT NULL,
+    "message" TEXT,
+    "method" TEXT,
+    "path" TEXT,
+    "statusCode" INTEGER,
+    "durationMs" INTEGER,
+    "errorName" TEXT,
+    "errorMessage" TEXT,
+    "stack" TEXT,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "operation_log_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "audit_log" (
+    "id" TEXT NOT NULL,
+    "traceId" TEXT NOT NULL,
+    "sessionId" TEXT,
+    "userId" TEXT,
+    "userName" TEXT,
+    "event" TEXT NOT NULL,
+    "category" TEXT NOT NULL,
+    "severity" TEXT NOT NULL DEFAULT 'info',
+    "outcome" TEXT NOT NULL DEFAULT 'success',
+    "targetType" TEXT,
+    "targetId" TEXT,
+    "targetName" TEXT,
+    "before" JSONB,
+    "after" JSONB,
+    "metadata" JSONB,
+    "ip" TEXT,
+    "userAgent" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "audit_log_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
+
+-- CreateIndex
+CREATE INDEX "session_userId_idx" ON "session"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "session_token_key" ON "session"("token");
+
+-- CreateIndex
+CREATE INDEX "account_userId_idx" ON "account"("userId");
+
+-- CreateIndex
+CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "organization_slug_key" ON "organization"("slug");
+
+-- CreateIndex
+CREATE INDEX "member_organizationId_idx" ON "member"("organizationId");
+
+-- CreateIndex
+CREATE INDEX "member_userId_idx" ON "member"("userId");
+
+-- CreateIndex
+CREATE INDEX "invitation_organizationId_idx" ON "invitation"("organizationId");
+
+-- CreateIndex
+CREATE INDEX "invitation_email_idx" ON "invitation"("email");
+
+-- CreateIndex
+CREATE INDEX "system_config_group_idx" ON "system_config"("group");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "system_config_group_key_key" ON "system_config"("group", "key");
+
+-- CreateIndex
+CREATE INDEX "upload_uploaderId_idx" ON "upload"("uploaderId");
+
+-- CreateIndex
+CREATE INDEX "application_deletedAt_idx" ON "application"("deletedAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "application_code_key" ON "application"("code");
+
+-- CreateIndex
+CREATE INDEX "menu_appId_idx" ON "menu"("appId");
+
+-- CreateIndex
+CREATE INDEX "menu_parentId_idx" ON "menu"("parentId");
+
+-- CreateIndex
+CREATE INDEX "menu_role_menuId_idx" ON "menu_role"("menuId");
+
+-- CreateIndex
+CREATE INDEX "menu_role_roleId_idx" ON "menu_role"("roleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "menu_role_menuId_roleId_key" ON "menu_role"("menuId", "roleId");
+
+-- CreateIndex
+CREATE INDEX "role_appId_idx" ON "role"("appId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "role_appId_code_key" ON "role"("appId", "code");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "role_appId_authRole_key" ON "role"("appId", "authRole");
+
+-- CreateIndex
+CREATE INDEX "user_role_userId_idx" ON "user_role"("userId");
+
+-- CreateIndex
+CREATE INDEX "user_role_roleId_idx" ON "user_role"("roleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_role_userId_roleId_key" ON "user_role"("userId", "roleId");
+
+-- CreateIndex
+CREATE INDEX "operation_log_traceId_idx" ON "operation_log"("traceId");
+
+-- CreateIndex
+CREATE INDEX "operation_log_sessionId_idx" ON "operation_log"("sessionId");
+
+-- CreateIndex
+CREATE INDEX "operation_log_level_idx" ON "operation_log"("level");
+
+-- CreateIndex
+CREATE INDEX "operation_log_module_idx" ON "operation_log"("module");
+
+-- CreateIndex
+CREATE INDEX "operation_log_event_idx" ON "operation_log"("event");
+
+-- CreateIndex
+CREATE INDEX "operation_log_statusCode_idx" ON "operation_log"("statusCode");
+
+-- CreateIndex
+CREATE INDEX "operation_log_createdAt_idx" ON "operation_log"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "audit_log_traceId_idx" ON "audit_log"("traceId");
+
+-- CreateIndex
+CREATE INDEX "audit_log_sessionId_idx" ON "audit_log"("sessionId");
+
+-- CreateIndex
+CREATE INDEX "audit_log_userId_idx" ON "audit_log"("userId");
+
+-- CreateIndex
+CREATE INDEX "audit_log_event_idx" ON "audit_log"("event");
+
+-- CreateIndex
+CREATE INDEX "audit_log_category_idx" ON "audit_log"("category");
+
+-- CreateIndex
+CREATE INDEX "audit_log_severity_idx" ON "audit_log"("severity");
+
+-- CreateIndex
+CREATE INDEX "audit_log_outcome_idx" ON "audit_log"("outcome");
+
+-- CreateIndex
+CREATE INDEX "audit_log_createdAt_idx" ON "audit_log"("createdAt");
+
+-- AddForeignKey
+ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "member" ADD CONSTRAINT "member_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "member" ADD CONSTRAINT "member_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviterId_fkey" FOREIGN KEY ("inviterId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "upload" ADD CONSTRAINT "upload_uploaderId_fkey" FOREIGN KEY ("uploaderId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "menu" ADD CONSTRAINT "menu_appId_fkey" FOREIGN KEY ("appId") REFERENCES "application"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "menu" ADD CONSTRAINT "menu_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "menu"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "menu_role" ADD CONSTRAINT "menu_role_menuId_fkey" FOREIGN KEY ("menuId") REFERENCES "menu"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "menu_role" ADD CONSTRAINT "menu_role_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "role"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "role" ADD CONSTRAINT "role_appId_fkey" FOREIGN KEY ("appId") REFERENCES "application"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_role" ADD CONSTRAINT "user_role_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "role"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_role" ADD CONSTRAINT "user_role_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "db:reset": "prisma migrate reset",
+    "db:reset:danger": "node scripts/reset-danger.mjs",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",

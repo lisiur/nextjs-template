@@ -116,3 +116,8 @@ export type UserRole = Prisma.UserRoleModel
  * 
  */
 export type OperationLog = Prisma.OperationLogModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel

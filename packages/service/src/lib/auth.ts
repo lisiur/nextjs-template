@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin, openAPI, organization } from "better-auth/plugins";
 import { prisma } from "./db";
-import { logOperation } from "./logger";
+import { logAudit } from "./logger";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -35,24 +35,28 @@ export const auth = betterAuth({
     session: {
       create: {
         async after(session) {
-          await logOperation({
+          await logAudit({
             userId: session.userId,
-            action: "login",
-            module: "auth",
+            sessionId: session.id,
+            event: "auth.login",
+            category: "authentication",
+            targetType: "session",
             targetId: session.id,
-            detail: JSON.stringify({
+            metadata: {
               ipAddress: session.ipAddress,
               userAgent: session.userAgent,
-            }),
+            },
           });
         },
       },
       delete: {
         async after(session) {
-          await logOperation({
+          await logAudit({
             userId: session.userId,
-            action: "logout",
-            module: "auth",
+            sessionId: session.id,
+            event: "auth.logout",
+            category: "authentication",
+            targetType: "session",
             targetId: session.id,
           });
         },

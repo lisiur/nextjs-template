@@ -37,13 +37,32 @@ export const listLogs = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const { limit, offset, action, module, userId, startDate, endDate } =
-      c.req.valid("query");
+    const {
+      limit,
+      offset,
+      traceId,
+      sessionId,
+      level,
+      source,
+      module,
+      event,
+      method,
+      path,
+      statusCode,
+      startDate,
+      endDate,
+    } = c.req.valid("query");
 
     const where: Record<string, unknown> = {};
-    if (action) where.action = action;
+    if (traceId) where.traceId = traceId;
+    if (sessionId) where.sessionId = sessionId;
+    if (level) where.level = level;
+    if (source) where.source = source;
     if (module) where.module = module;
-    if (userId) where.userId = userId;
+    if (event) where.event = event;
+    if (method) where.method = method;
+    if (path) where.path = { contains: path, mode: "insensitive" };
+    if (statusCode) where.statusCode = statusCode;
     if (startDate || endDate) {
       const createdAt: Record<string, Date> = {};
       if (startDate) createdAt.gte = startDate;

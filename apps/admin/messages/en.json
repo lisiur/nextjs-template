@@ -390,54 +390,68 @@
   },
   "Logs": {
     "title": "Log Management",
-    "description": "View system operation logs and login logs",
+    "description": "Investigate technical operation logs and security audit logs",
     "fetchFailed": "Failed to fetch logs",
     "deleteFailed": "Failed to delete logs",
     "deleteSuccess": "Logs deleted successfully",
     "viewDetail": "View",
-    "detailTitle": "Log Detail",
-    "noLogs": "No logs found",
+    "copy": "Copy",
+    "traceCopied": "Trace ID copied",
+    "filterByTrace": "Filter by trace",
     "confirmDelete": "Are you sure you want to delete the selected logs?",
     "delete": "Delete",
     "batchDelete": "Batch Delete",
     "cancel": "Cancel",
     "clearFilters": "Clear Filters",
+    "tabs": {
+      "operation": "Operation Logs",
+      "audit": "Audit Logs"
+    },
+    "operation": {
+      "title": "Operation Logs",
+      "description": "Technical request and system behavior logs for troubleshooting.",
+      "detailTitle": "Operation Log Detail",
+      "noLogs": "No operation logs found"
+    },
+    "audit": {
+      "title": "Audit Logs",
+      "description": "User accountability, security, and compliance events. Audit logs cannot be deleted here.",
+      "detailTitle": "Audit Log Detail",
+      "noLogs": "No audit logs found"
+    },
     "columns": {
       "createdAt": "Time",
       "userName": "User",
+      "level": "Level",
+      "event": "Event",
       "module": "Module",
-      "action": "Action",
-      "targetName": "Target",
+      "request": "Request",
+      "statusCode": "Status",
+      "durationMs": "Duration",
+      "traceId": "Trace ID",
+      "sessionId": "Session ID",
+      "message": "Message",
+      "category": "Category",
+      "outcome": "Outcome",
+      "severity": "Severity",
+      "target": "Target",
       "ip": "IP",
       "detail": "Detail"
     },
-    "actions": {
-      "create": "Create",
-      "update": "Update",
-      "delete": "Delete",
-      "login": "Login",
-      "logout": "Logout",
-      "assign": "Assign",
-      "remove": "Remove",
-      "batchUpsert": "Batch Upsert"
-    },
-    "modules": {
-      "user": "User",
-      "organization": "Organization",
-      "application": "Application",
-      "menu": "Menu",
-      "role": "Role",
-      "system-config": "System Config",
-      "user-role": "User Role",
-      "menu-role": "Menu Role",
-      "auth": "Auth"
-    },
     "filters": {
-      "action": "Action",
+      "traceId": "Trace ID",
+      "sessionId": "Session ID",
+      "level": "Level",
       "module": "Module",
-      "dateRange": "Date Range",
-      "allActions": "All Actions",
-      "allModules": "All Modules"
+      "event": "Event",
+      "path": "Path",
+      "statusCode": "Status",
+      "userName": "User",
+      "category": "Category",
+      "targetType": "Target Type",
+      "allLevels": "All Levels",
+      "allSeverities": "All Severities",
+      "allOutcomes": "All Outcomes"
     }
   }
 }
