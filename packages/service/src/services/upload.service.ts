@@ -14,7 +14,10 @@ const ALLOWED_TYPES = [
 ];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const UPLOADS_ROOT = join(process.cwd(), "uploads");
-const SIGN_SECRET = process.env.UPLOAD_SIGN_SECRET || "upload-sign-default";
+const SIGN_SECRET = process.env.UPLOAD_SIGN_SECRET;
+if (!SIGN_SECRET) {
+  throw new Error("UPLOAD_SIGN_SECRET environment variable is required");
+}
 const SIGN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 
 function computeHash(buffer: Buffer): string {

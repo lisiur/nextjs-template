@@ -56,7 +56,12 @@ export const uploadFile = defineOpenAPIRoute({
 
     const body = await c.req.parseBody();
     const file = body.file;
-    const visibility = (body.visibility as string) || "private";
+    const rawVisibility = (body.visibility as string) || "private";
+    if (rawVisibility !== "public" && rawVisibility !== "private") {
+      throw new HTTPException(400, {
+        message: "visibility must be 'public' or 'private'",
+      });
+    }
 
     if (!(file instanceof File)) {
       throw new HTTPException(400, { message: "No file provided" });
@@ -64,7 +69,7 @@ export const uploadFile = defineOpenAPIRoute({
 
     const result = await uploadFileToStorage({
       file,
-      visibility,
+      visibility: rawVisibility,
       uploaderId: session.user.id,
     });
 

@@ -12,7 +12,7 @@ export const signFile = defineOpenAPIRoute({
   route: createRoute({
     method: "post",
     path: "/{id}/sign",
-    tags: ["Files"],
+    tags: ["Upload"],
     summary: "Generate signed URL for a private file",
     description: "Create a time-limited signed URL to access a private file.",
     request: {
