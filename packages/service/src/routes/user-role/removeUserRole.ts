@@ -1,16 +1,8 @@
-import { createRoute, defineOpenAPIRoute, z } from "@hono/zod-openapi";
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
 import { requireAdmin } from "#middleware/require-admin";
 import { removeUserRole as removeUserRoleSvc } from "../../services/user-role.service";
-
-const removeBodySchema = z.object({
-  userId: z.string().min(1),
-  roleId: z.string().min(1),
-});
-
-const successSchema = z.object({
-  success: z.boolean(),
-});
+import { removeUserRoleParamSchema, successResponseSchema } from "./schema";
 
 export const removeUserRole = defineOpenAPIRoute({
   route: createRoute({
@@ -22,7 +14,7 @@ export const removeUserRole = defineOpenAPIRoute({
     request: {
       body: {
         content: {
-          "application/json": { schema: removeBodySchema },
+          "application/json": { schema: removeUserRoleParamSchema },
         },
         required: true,
       },
@@ -30,7 +22,7 @@ export const removeUserRole = defineOpenAPIRoute({
     responses: {
       200: {
         content: {
-          "application/json": { schema: successSchema },
+          "application/json": { schema: successResponseSchema },
         },
         description: "Removed",
       },

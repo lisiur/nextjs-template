@@ -37,6 +37,10 @@ export const errorSchema = z
   })
   .openapi("Error");
 
+export const successResponseSchema = z.object({
+  success: z.boolean(),
+});
+
 export const mineMenusResponseSchema = z
   .object({
     menus: menuSchema.array(),
