@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { auth } from "#lib/auth";
+import { getSession } from "#services/auth.service";
 import { getUserAppMenus } from "#services/user-role.service";
 import { errorSchema, mineMenusResponseSchema } from "./schema";
 
@@ -24,9 +24,7 @@ export const getUserAppRoles = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await auth.api.getSession({
-      headers: c.req.raw.headers,
-    });
+    const session = await getSession(c.req.raw.headers);
 
     if (!session?.user) {
       throw new HTTPException(401, { message: "Unauthorized" });

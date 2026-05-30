@@ -1,9 +1,9 @@
 import { isBuiltinUser } from "@repo/shared";
 import { HTTPException } from "hono/http-exception";
-import { auth } from "#lib/auth";
 import { prisma } from "#lib/db";
 import { hashPassword } from "#lib/password";
 import { assertUserIsNotBuiltin } from "#lib/protected-user";
+import { createUser as createAuthUser } from "#services/auth.service";
 
 const ADMIN_APP_ID = "admin";
 
@@ -52,25 +52,21 @@ export async function createUser(data: {
     throw new HTTPException(400, { message: "User already exists" });
   }
 
-  const result = await auth.api
-    .createUser({
-      body: {
-        name,
-        email,
-        password,
-        role: "user",
-      },
-    })
-    .catch(async () => {
-      const conflictingUser = await prisma.user.findUnique({
-        where: { email },
-      });
-      if (conflictingUser) {
-        return null;
-      }
-
-      throw new Error("Failed to create user");
+  const result = await createAuthUser({
+    name,
+    email,
+    password,
+    role: "user",
+  }).catch(async () => {
+    const conflictingUser = await prisma.user.findUnique({
+      where: { email },
     });
+    if (conflictingUser) {
+      return null;
+    }
+
+    throw new Error("Failed to create user");
+  });
 
   if (!result) {
     throw new HTTPException(400, { message: "User already exists" });

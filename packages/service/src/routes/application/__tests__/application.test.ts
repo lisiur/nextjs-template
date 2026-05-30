@@ -15,19 +15,15 @@ vi.mock("../../../lib/db", () => ({
 }));
 
 // Mock auth
-vi.mock("../../../lib/auth", () => ({
-  auth: {
-    api: {
-      getSession: vi.fn(),
-    },
-  },
+vi.mock("../../../services/auth.service", () => ({
+  getSession: vi.fn(),
 }));
 
-import { auth } from "../../../lib/auth";
 import { prisma } from "../../../lib/db";
+import { getSession } from "../../../services/auth.service";
 
 const mockPrisma = vi.mocked(prisma);
-const mockAuth = vi.mocked(auth);
+const mockGetSession = vi.mocked(getSession);
 
 // Helper to create a mock Hono app for a route
 async function testRoute(
@@ -60,9 +56,7 @@ async function testRoute(
   // Admin middleware (same as application/index.ts)
   if (withAuth) {
     app.use("*", async (c, next) => {
-      const session = await mockAuth.api.getSession({
-        headers: c.req.raw.headers,
-      });
+      const session = await mockGetSession(c.req.raw.headers);
       if (!session?.user || session.user.role !== "admin") {
         throw new HTTPException(401, { message: "Admin access required" });
       }
@@ -94,7 +88,7 @@ async function testRoute(
 describe("POST / - Create Application", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mockAuth.api.getSession.mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       user: { id: "u1", role: "admin" },
       session: { id: "s1" },
     } as any);
@@ -151,7 +145,7 @@ describe("POST / - Create Application", () => {
   });
 
   it("returns 401 without admin session", async () => {
-    mockAuth.api.getSession.mockResolvedValue(null);
+    mockGetSession.mockResolvedValue(null);
 
     const { createApplication } = await import("../createApplication");
     const res = await testRoute(createApplication, {
@@ -170,7 +164,7 @@ describe("POST / - Create Application", () => {
 describe("GET / - List Applications", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mockAuth.api.getSession.mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       user: { id: "u1", role: "admin" },
       session: { id: "s1" },
     } as any);
@@ -224,7 +218,7 @@ describe("GET / - List Applications", () => {
   });
 
   it("returns 401 without admin session", async () => {
-    mockAuth.api.getSession.mockResolvedValue(null);
+    mockGetSession.mockResolvedValue(null);
 
     const { listApplications } = await import("../listApplications");
     const res = await testRoute(listApplications, {
@@ -242,7 +236,7 @@ describe("GET / - List Applications", () => {
 describe("GET /{id} - Get Application", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mockAuth.api.getSession.mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       user: { id: "u1", role: "admin" },
       session: { id: "s1" },
     } as any);
@@ -287,7 +281,7 @@ describe("GET /{id} - Get Application", () => {
   });
 
   it("returns 401 without admin session", async () => {
-    mockAuth.api.getSession.mockResolvedValue(null);
+    mockGetSession.mockResolvedValue(null);
 
     const { getApplication } = await import("../getApplication");
     const res = await testRoute(getApplication, {
@@ -306,7 +300,7 @@ describe("GET /{id} - Get Application", () => {
 describe("PUT /{id} - Update Application", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mockAuth.api.getSession.mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       user: { id: "u1", role: "admin" },
       session: { id: "s1" },
     } as any);
@@ -384,7 +378,7 @@ describe("PUT /{id} - Update Application", () => {
   });
 
   it("returns 401 without admin session", async () => {
-    mockAuth.api.getSession.mockResolvedValue(null);
+    mockGetSession.mockResolvedValue(null);
 
     const { updateApplication } = await import("../updateApplication");
     const res = await testRoute(updateApplication, {
@@ -404,7 +398,7 @@ describe("PUT /{id} - Update Application", () => {
 describe("DELETE /{id} - Delete Application (soft delete)", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    mockAuth.api.getSession.mockResolvedValue({
+    mockGetSession.mockResolvedValue({
       user: { id: "u1", role: "admin" },
       session: { id: "s1" },
     } as any);
@@ -453,7 +447,7 @@ describe("DELETE /{id} - Delete Application (soft delete)", () => {
   });
 
   it("returns 401 without admin session", async () => {
-    mockAuth.api.getSession.mockResolvedValue(null);
+    mockGetSession.mockResolvedValue(null);
 
     const { deleteApplication } = await import("../deleteApplication");
     const res = await testRoute(deleteApplication, {

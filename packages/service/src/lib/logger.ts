@@ -1,7 +1,7 @@
 import type { Context } from "hono";
-import { auth } from "#lib/auth";
 import { prisma } from "#lib/db";
 import { getRequestTraceId } from "#lib/request-context";
+import { getSession } from "#services/auth.service";
 
 type OperationLogLevel = "debug" | "info" | "warn" | "error";
 type AuditSeverity = "info" | "warning" | "critical";
@@ -78,9 +78,7 @@ export async function logAudit(params: LogAuditParams) {
     let sessionId = params.sessionId;
 
     if ((!userId || !sessionId) && params.c) {
-      const session = await auth.api.getSession({
-        headers: params.c.req.raw.headers,
-      });
+      const session = await getSession(params.c.req.raw.headers);
       userId = session?.user?.id;
       userName = session?.user?.name;
       sessionId = session?.session?.id;
@@ -121,9 +119,7 @@ function resolveTraceId(c?: Context, traceId?: string): string {
 
 async function resolveSessionId(c?: Context, sessionId?: string) {
   if (sessionId || !c) return sessionId;
-  const session = await auth.api.getSession({
-    headers: c.req.raw.headers,
-  });
+  const session = await getSession(c.req.raw.headers);
   return session?.session?.id;
 }
 
