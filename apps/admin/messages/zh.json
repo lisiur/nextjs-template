@@ -397,7 +397,7 @@
     "viewDetail": "查看",
     "copy": "复制",
     "traceCopied": "Trace ID 已复制",
-    "filterByTrace": "按 Trace 筛选",
+    "trace": "追踪",
     "confirmDelete": "确定要删除选中的日志吗？",
     "delete": "删除",
     "batchDelete": "批量删除",

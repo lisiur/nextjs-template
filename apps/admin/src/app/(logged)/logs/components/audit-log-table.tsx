@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye } from "lucide-react";
+import { Eye, GitBranch } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -19,9 +19,10 @@ import {
 import { appClient } from "@/lib/api";
 import { apiWithFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
-import type { TraceFilterRequest } from "../page";
 import { AuditLogFilter, type AuditLogFilters } from "./audit-log-filter";
 import { LogDetailDialog } from "./log-detail-dialog";
+
+export type { AuditLogFilters };
 
 interface AuditLogEntry {
   id: string;
@@ -63,12 +64,18 @@ const OUTCOME_VARIANT: Record<
 };
 
 interface AuditLogTableProps {
-  traceRequest?: TraceFilterRequest;
+  filters: AuditLogFilters;
+  onFiltersChange: (
+    newFiltersOrFn:
+      | AuditLogFilters
+      | ((prev: AuditLogFilters) => AuditLogFilters),
+  ) => void;
   onTraceChange?: (traceId: string) => void;
 }
 
 export function AuditLogTable({
-  traceRequest,
+  filters,
+  onFiltersChange,
   onTraceChange,
 }: AuditLogTableProps) {
   const t = useTranslations("Logs");
@@ -76,9 +83,6 @@ export function AuditLogTable({
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<AuditLogFilters>(
-    traceRequest ? { traceId: traceRequest.traceId } : {},
-  );
   const [detailLog, setDetailLog] = useState<AuditLogEntry | null>(null);
   const lastEffectFetchKeyRef = useRef<string>(undefined);
 
@@ -129,11 +133,9 @@ export function AuditLogTable({
       | AuditLogFilters
       | ((prev: AuditLogFilters) => AuditLogFilters),
   ) {
-    setFilters(newFiltersOrFn);
+    onFiltersChange(newFiltersOrFn);
     setPage(1);
   }
-
-
 
   return (
     <div className="flex min-h-0 w-full flex-col">
@@ -234,14 +236,26 @@ export function AuditLogTable({
                     sticky="right"
                     className="bg-background text-right"
                   >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDetailLog(log)}
-                    >
-                      <Eye className="mr-1 h-3 w-3" />
-                      {t("viewDetail")}
-                    </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      {onTraceChange && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onTraceChange(log.traceId)}
+                        >
+                          <GitBranch className="mr-1 h-3 w-3" />
+                          {t("trace")}
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDetailLog(log)}
+                      >
+                        <Eye className="mr-1 h-3 w-3" />
+                        {t("viewDetail")}
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -263,7 +277,6 @@ export function AuditLogTable({
         traceId={detailLog?.traceId}
         data={detailLog}
         onOpenChange={(open) => !open && setDetailLog(null)}
-        onTraceClick={(value) => onTraceChange?.(value)}
       />
     </div>
   );

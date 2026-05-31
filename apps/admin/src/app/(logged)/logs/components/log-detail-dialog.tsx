@@ -17,7 +17,6 @@ interface LogDetailDialogProps {
   traceId?: string | null;
   data: unknown;
   onOpenChange: (open: boolean) => void;
-  onTraceClick?: (traceId: string) => void;
 }
 
 export function LogDetailDialog({
@@ -27,7 +26,6 @@ export function LogDetailDialog({
   traceId,
   data,
   onOpenChange,
-  onTraceClick,
 }: LogDetailDialogProps) {
   const t = useTranslations("Logs");
 
@@ -56,15 +54,6 @@ export function LogDetailDialog({
               <Copy className="mr-1 h-3 w-3" />
               {t("copy")}
             </Button>
-            {onTraceClick && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onTraceClick(traceId)}
-              >
-                {t("filterByTrace")}
-              </Button>
-            )}
           </div>
         )}
         <pre className="max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-md bg-muted p-4 text-sm">

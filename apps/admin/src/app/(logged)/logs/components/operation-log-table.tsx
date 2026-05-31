@@ -20,12 +20,13 @@ import {
 import { appClient } from "@/lib/api";
 import { apiWithFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
-import type { TraceFilterRequest } from "../page";
 import { LogDetailDialog } from "./log-detail-dialog";
 import {
   OperationLogFilter,
   type OperationLogFilters,
 } from "./operation-log-filter";
+
+export type { OperationLogFilters };
 
 interface OperationLogEntry {
   id: string;
@@ -58,22 +59,23 @@ const LEVEL_VARIANT: Record<
 };
 
 interface OperationLogTableProps {
-  traceRequest?: TraceFilterRequest;
-  onTraceChange?: (traceId: string) => void;
+  filters: OperationLogFilters;
+  onFiltersChange: (
+    newFiltersOrFn:
+      | OperationLogFilters
+      | ((prev: OperationLogFilters) => OperationLogFilters),
+  ) => void;
 }
 
 export function OperationLogTable({
-  traceRequest,
-  onTraceChange,
+  filters,
+  onFiltersChange,
 }: OperationLogTableProps) {
   const t = useTranslations("Logs");
   const [logs, setLogs] = useState<OperationLogEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<OperationLogFilters>(
-    traceRequest ? { traceId: traceRequest.traceId } : {},
-  );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [detailLog, setDetailLog] = useState<OperationLogEntry | null>(null);
   const lastEffectFetchKeyRef = useRef<string>(undefined);
@@ -121,7 +123,7 @@ export function OperationLogTable({
       | OperationLogFilters
       | ((prev: OperationLogFilters) => OperationLogFilters),
   ) {
-    setFilters(newFiltersOrFn);
+    onFiltersChange(newFiltersOrFn);
     setPage(1);
   }
 
@@ -154,8 +156,6 @@ export function OperationLogTable({
       return next;
     });
   }
-
-
 
   return (
     <div className="flex min-h-0 w-full flex-col">
@@ -290,7 +290,6 @@ export function OperationLogTable({
         traceId={detailLog?.traceId}
         data={detailLog}
         onOpenChange={(open) => !open && setDetailLog(null)}
-        onTraceClick={(value) => onTraceChange?.(value)}
       />
     </div>
   );

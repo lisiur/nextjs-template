@@ -3,29 +3,25 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AuditLogTable } from "./components/audit-log-table";
-import { OperationLogTable } from "./components/operation-log-table";
-
-export interface TraceFilterRequest {
-  traceId: string;
-  nonce: number;
-}
+import {
+  type AuditLogFilters,
+  AuditLogTable,
+} from "./components/audit-log-table";
+import {
+  type OperationLogFilters,
+  OperationLogTable,
+} from "./components/operation-log-table";
 
 export default function LogsPage() {
   const t = useTranslations("Logs");
   const [activeTab, setActiveTab] = useState("operation");
-  const [operationTraceRequest, setOperationTraceRequest] =
-    useState<TraceFilterRequest>();
-  const [auditTraceRequest, setAuditTraceRequest] =
-    useState<TraceFilterRequest>();
+  const [operationFilters, setOperationFilters] = useState<OperationLogFilters>(
+    {},
+  );
+  const [auditFilters, setAuditFilters] = useState<AuditLogFilters>({});
 
-  function handleOperationTrace(trace: string) {
-    setAuditTraceRequest({ traceId: trace, nonce: Date.now() });
-    setActiveTab("audit");
-  }
-
-  function handleAuditTrace(trace: string) {
-    setOperationTraceRequest({ traceId: trace, nonce: Date.now() });
+  function handleAuditTrace(traceId: string) {
+    setOperationFilters((prev) => ({ ...prev, traceId }));
     setActiveTab("operation");
   }
 
@@ -46,15 +42,14 @@ export default function LogsPage() {
         </TabsList>
         <TabsContent value="operation" className="flex min-h-0 overflow-hidden">
           <OperationLogTable
-            key={operationTraceRequest?.nonce ?? "operation"}
-            traceRequest={operationTraceRequest}
-            onTraceChange={handleOperationTrace}
+            filters={operationFilters}
+            onFiltersChange={setOperationFilters}
           />
         </TabsContent>
         <TabsContent value="audit" className="flex min-h-0 overflow-hidden">
           <AuditLogTable
-            key={auditTraceRequest?.nonce ?? "audit"}
-            traceRequest={auditTraceRequest}
+            filters={auditFilters}
+            onFiltersChange={setAuditFilters}
             onTraceChange={handleAuditTrace}
           />
         </TabsContent>

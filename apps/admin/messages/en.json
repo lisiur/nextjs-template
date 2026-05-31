@@ -397,7 +397,7 @@
     "viewDetail": "View",
     "copy": "Copy",
     "traceCopied": "Trace ID copied",
-    "filterByTrace": "Filter by trace",
+    "trace": "Trace",
     "confirmDelete": "Are you sure you want to delete the selected logs?",
     "delete": "Delete",
     "batchDelete": "Batch Delete",
