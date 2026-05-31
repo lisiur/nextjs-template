@@ -26,7 +26,7 @@ interface Menu {
   code: string;
   icon?: string | null;
   linkType: "GROUP" | "INTERNAL" | "EXTERNAL";
-  url?: string | null;
+  url: string | null;
   sortOrder: number;
 }
 

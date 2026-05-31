@@ -24,13 +24,23 @@ import {
 
 type LinkType = "GROUP" | "INTERNAL" | "EXTERNAL";
 
-const menuSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  code: z.string().min(1, "Code is required"),
-  icon: z.string().optional().or(z.literal("")),
-  linkType: z.enum(["GROUP", "INTERNAL", "EXTERNAL"]),
-  url: z.string().optional().or(z.literal("")),
-});
+const menuSchema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    code: z.string().min(1, "Code is required"),
+    icon: z.string().optional().or(z.literal("")),
+    linkType: z.enum(["GROUP", "INTERNAL", "EXTERNAL"]),
+    url: z.string().optional().or(z.literal("")),
+  })
+  .superRefine((data, ctx) => {
+    if (data.linkType !== "GROUP" && !data.url) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "URL is required",
+        path: ["url"],
+      });
+    }
+  });
 
 export type MenuInput = z.infer<typeof menuSchema>;
 
@@ -135,15 +145,18 @@ export const MenuForm = forwardRef<MenuFormRef, MenuFormProps>(
           </Field>
         )}
 
-        {linkType === "EXTERNAL" && (
+        {linkType !== "GROUP" && (
           <Field orientation="vertical">
             <FieldLabel htmlFor="menu-url">{t("url")} *</FieldLabel>
             <FieldContent>
               <Input
                 id="menu-url"
                 {...register("url")}
-                placeholder="https://example.com"
+                placeholder={
+                  linkType === "EXTERNAL" ? "https://example.com" : "/path"
+                }
               />
+              <FieldError errors={errors.url ? [errors.url] : undefined} />
             </FieldContent>
           </Field>
         )}

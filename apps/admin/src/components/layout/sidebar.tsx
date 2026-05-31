@@ -52,7 +52,7 @@ interface SidebarTreeNode {
   code: string;
   icon?: string | null;
   linkType: "GROUP" | "INTERNAL" | "EXTERNAL";
-  url?: string | null;
+  url: string | null;
   children: SidebarTreeNode[];
 }
 
@@ -72,12 +72,7 @@ function SidebarMenuNode({
   const t = useTranslations("Sidebar");
   const hasChildren = node.children.length > 0;
   const isExpanded = expandedIds.has(node.id);
-  const href =
-    node.linkType === "INTERNAL"
-      ? `/${node.code}`
-      : node.linkType === "EXTERNAL"
-        ? node.url
-        : undefined;
+  const href = node.linkType === "GROUP" ? undefined : node.url;
   const isActive = href ? pathname === href : false;
 
   const label = t.has(node.code) ? t(node.code) : node.name;

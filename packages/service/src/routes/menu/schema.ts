@@ -11,7 +11,7 @@ export const menuSchema = z
     code: z.string().openapi({ example: "dashboard" }),
     icon: z.string().nullable().optional(),
     linkType: linkTypeSchema.openapi({ example: "INTERNAL" }),
-    url: z.string().nullable().optional(),
+    url: z.string().nullable(),
     sortOrder: z.number().openapi({ example: 0 }),
     createdAt: z.date(),
     updatedAt: z.date(),
@@ -37,8 +37,8 @@ export const createMenuBodySchema = z
     url: z.string().optional(),
   })
   .refine(
-    (data) => !(data.linkType === "EXTERNAL" && !data.url),
-    "URL is required when linkType is EXTERNAL",
+    (data) => data.linkType === "GROUP" || (!!data.url && data.url.length > 0),
+    "URL is required when linkType is INTERNAL or EXTERNAL",
   );
 
 export const updateMenuBodySchema = z
@@ -53,10 +53,10 @@ export const updateMenuBodySchema = z
   .refine(
     (data) =>
       !(
-        data.linkType === "EXTERNAL" &&
-        (data.url === null || data.url === undefined)
+        (data.linkType === "EXTERNAL" || data.linkType === "INTERNAL") &&
+        (data.url === null || data.url === undefined || data.url === "")
       ),
-    "URL is required when linkType is EXTERNAL",
+    "URL is required when linkType is INTERNAL or EXTERNAL",
   );
 
 export const errorSchema = z

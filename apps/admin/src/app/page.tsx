@@ -26,10 +26,10 @@ export default function HomePage() {
           router.replace(firstUrl);
           return;
         }
-        router.replace("/");
+        router.replace("/sign-in");
       })
       .catch(() => {
-        router.replace("/");
+        router.replace("/sign-in");
       });
   }, [session.isPending, session.data, router]);
 

@@ -95,9 +95,9 @@ export async function updateMenu(
     });
   }
 
-  if (effectiveLinkType === "EXTERNAL" && !data.url && !existing.url) {
+  if (effectiveLinkType !== "GROUP" && !data.url && !existing.url) {
     throw new HTTPException(400, {
-      message: "URL is required when linkType is EXTERNAL",
+      message: "URL is required when linkType is INTERNAL or EXTERNAL",
     });
   }
 
