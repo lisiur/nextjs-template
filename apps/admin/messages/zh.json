@@ -156,7 +156,7 @@
     "jsonPlaceholder": "输入 JSON"
   },
   "Sidebar": {
-    "dashboard": "仪表盘",
+    "monitor": "监控",
     "users": "用户",
     "roles": "角色",
     "organizations": "组织",

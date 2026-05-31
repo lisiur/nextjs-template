@@ -5,6 +5,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "imports": {
+    "#generated/*": "./prisma/generated/*",
     "#lib/*": "./src/lib/*.ts",
     "#middleware/*": "./src/middleware/*.ts",
     "#repositories/*": "./src/repositories/*.ts",

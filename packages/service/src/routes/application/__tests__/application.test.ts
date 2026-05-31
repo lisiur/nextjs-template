@@ -22,7 +22,15 @@ vi.mock("../../../services/auth.service", () => ({
 import { prisma } from "../../../lib/db";
 import { getSession } from "../../../services/auth.service";
 
-const mockPrisma = vi.mocked(prisma);
+const mockPrisma = prisma as unknown as {
+  application: {
+    findFirst: ReturnType<typeof vi.fn>;
+    findMany: ReturnType<typeof vi.fn>;
+    count: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+  };
+};
 const mockGetSession = vi.mocked(getSession);
 
 // Helper to create a mock Hono app for a route

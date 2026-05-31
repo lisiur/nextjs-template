@@ -142,22 +142,13 @@ async function seedMenus(appId: string) {
 
   const menuDefinitions = [
     {
-      id: "dashboard",
-      name: "Dashboard",
-      code: "dashboard",
-      icon: "LayoutDashboard",
-      linkType: "INTERNAL" as const,
-      url: "/dashboard",
-      sortOrder: 0,
-    },
-    {
       id: "applications",
       name: "Applications",
       code: "applications",
       icon: "Layers",
       linkType: "INTERNAL" as const,
       url: "/applications",
-      sortOrder: 1,
+      sortOrder: 0,
     },
     {
       id: "organizations",
@@ -166,7 +157,7 @@ async function seedMenus(appId: string) {
       icon: "Building2",
       linkType: "INTERNAL" as const,
       url: "/organizations",
-      sortOrder: 2,
+      sortOrder: 1,
     },
     {
       id: "users",
@@ -175,7 +166,7 @@ async function seedMenus(appId: string) {
       icon: "Users",
       linkType: "INTERNAL" as const,
       url: "/users",
-      sortOrder: 3,
+      sortOrder: 2,
     },
     {
       id: "logs",
@@ -184,6 +175,15 @@ async function seedMenus(appId: string) {
       icon: "FileText",
       linkType: "INTERNAL" as const,
       url: "/logs",
+      sortOrder: 3,
+    },
+    {
+      id: "monitor",
+      name: "Monitor",
+      code: "monitor",
+      icon: "LayoutDashboard",
+      linkType: "INTERNAL" as const,
+      url: "/monitor",
       sortOrder: 4,
     },
     {

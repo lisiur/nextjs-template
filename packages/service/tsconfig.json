@@ -17,9 +17,10 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "#generated/*": ["./prisma/generated/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "prisma/generated/**/*"],
   "exclude": ["node_modules"]
 }

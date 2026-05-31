@@ -8,7 +8,7 @@ export const menuSchema = z
     appId: z.string().openapi({ example: "clx1234567890" }),
     parentId: z.string().nullable().optional(),
     name: z.string().openapi({ example: "Dashboard" }),
-    code: z.string().openapi({ example: "dashboard" }),
+    code: z.string().openapi({ example: "monitor" }),
     icon: z.string().nullable().optional(),
     linkType: linkTypeSchema.openapi({ example: "INTERNAL" }),
     url: z.string().nullable(),
@@ -29,7 +29,7 @@ export const menuIdParamSchema = z.object({
 export const createMenuBodySchema = z
   .object({
     name: z.string().min(1).openapi({ example: "Dashboard" }),
-    code: z.string().min(1).openapi({ example: "dashboard" }),
+    code: z.string().min(1).openapi({ example: "monitor" }),
     appId: z.string().min(1).openapi({ example: "clx1234567890" }),
     parentId: z.string().optional(),
     icon: z.string().optional(),

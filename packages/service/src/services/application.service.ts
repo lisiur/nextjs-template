@@ -1,5 +1,5 @@
 import { HTTPException } from "hono/http-exception";
-import type { Prisma } from "#generated/prisma";
+import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 
 export async function getApplicationById(id: string) {

@@ -156,7 +156,7 @@
     "jsonPlaceholder": "Enter JSON"
   },
   "Sidebar": {
-    "dashboard": "Dashboard",
+    "monitor": "Monitor",
     "users": "Users",
     "roles": "Roles",
     "organizations": "Organizations",
