@@ -32,6 +32,7 @@ CREATE TABLE "session" (
     "userId" TEXT NOT NULL,
     "impersonatedBy" TEXT,
     "activeOrganizationId" TEXT,
+    "revokedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

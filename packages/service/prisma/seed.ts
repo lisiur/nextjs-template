@@ -116,6 +116,28 @@ const defaultConfigs = [
     isSecret: false,
     sortOrder: 4,
   },
+
+  // WeChat settings
+  {
+    group: "wechat",
+    key: "appid",
+    value: "",
+    type: "string",
+    label: "settings.fields.wechatAppid",
+    description: "settings.fieldsDesc.wechatAppid",
+    isSecret: false,
+    sortOrder: 0,
+  },
+  {
+    group: "wechat",
+    key: "secret",
+    value: "",
+    type: "string",
+    label: "settings.fields.wechatSecret",
+    description: "settings.fieldsDesc.wechatSecret",
+    isSecret: true,
+    sortOrder: 1,
+  },
 ];
 
 async function seedAdminApplication() {

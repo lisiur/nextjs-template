@@ -66,6 +66,10 @@ export const changePasswordBodySchema = z.object({
   newPassword: z.string().min(6),
 });
 
+export const signInWechatBodySchema = z.object({
+  code: z.string().min(1),
+});
+
 export const authMutationResponseSchema = z
   .object({
     data: z.unknown().optional(),

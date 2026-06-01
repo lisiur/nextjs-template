@@ -7,6 +7,8 @@ import {
   getSessionByToken,
   getSessionTokenFromHeaders,
 } from "#lib/session";
+import { code2Session } from "#lib/wechat";
+import { systemConfigRepository } from "#repositories/system-config.repository";
 
 export type AuthSessionUser = {
   id: string;
@@ -190,4 +192,79 @@ export async function updateUser(params: {
   });
 
   return { user };
+}
+
+export async function signInWithWechat(params: {
+  code: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+}) {
+  const appidConfig = await systemConfigRepository.findByGroupAndKey(
+    "wechat",
+    "appid",
+  );
+  const secretConfig = await systemConfigRepository.findByGroupAndKey(
+    "wechat",
+    "secret",
+  );
+
+  if (!appidConfig?.value || !secretConfig?.value) {
+    throw new HTTPException(500, {
+      message: "WeChat configuration is incomplete",
+    });
+  }
+
+  const wechatResult = await code2Session({
+    appid: appidConfig.value,
+    secret: secretConfig.value,
+    js_code: params.code,
+  });
+
+  const existingAccount = await prisma.account.findFirst({
+    where: {
+      providerId: "wechat",
+      accountId: wechatResult.openid,
+    },
+    include: { user: true },
+  });
+
+  if (existingAccount) {
+    await prisma.account.update({
+      where: { id: existingAccount.id },
+      data: { accessToken: wechatResult.session_key },
+    });
+
+    const session = await createSession({
+      userId: existingAccount.userId,
+      ipAddress: params.ipAddress,
+      userAgent: params.userAgent,
+    });
+
+    return { user: existingAccount.user, session };
+  }
+
+  const user = await prisma.user.create({
+    data: {
+      name: `wx_${wechatResult.openid.slice(0, 8)}`,
+      email: `${wechatResult.openid}@wechat.placeholder`,
+      emailVerified: false,
+      role: "user",
+      flags: [],
+      accounts: {
+        create: {
+          accountId: wechatResult.openid,
+          providerId: "wechat",
+          accessToken: wechatResult.session_key,
+        },
+      },
+    },
+  });
+
+  const session = await createSession({
+    userId: user.id,
+    ipAddress: params.ipAddress,
+    userAgent: params.userAgent,
+  });
+
+  return { user, session };
 }
