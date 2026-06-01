@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/api";
+import { useSessionStore } from "@/stores/session-store";
 
 interface AvatarUploadProps {
   currentImage?: string | null;
@@ -72,7 +73,7 @@ export function AvatarUpload({
       setPreview(null);
       toast.success(t("avatarUpdated"));
 
-      await authClient.getSession();
+      await useSessionStore.getState().refetchSession();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("uploadFailed"));
     } finally {

@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type AuthUser = {
@@ -69,6 +68,15 @@ export const authClient = {
         },
       );
     },
+    wechat(code: string) {
+      return request<{ user: AuthUser; session: AuthSession }>(
+        "/sign-in/wechat",
+        {
+          method: "POST",
+          body: JSON.stringify({ code }),
+        },
+      );
+    },
   },
   signUp: {
     email(input: { name: string; email: string; password: string }) {
@@ -100,25 +108,3 @@ export const authClient = {
     });
   },
 };
-
-export function useSession() {
-  const [data, setData] = useState<SessionData>(null);
-  const [isPending, setIsPending] = useState(true);
-
-  const refetch = useCallback(async () => {
-    setIsPending(true);
-    try {
-      const result = await authClient.getSession();
-      setData(result.data ?? null);
-      return result;
-    } finally {
-      setIsPending(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void refetch();
-  }, [refetch]);
-
-  return { data, isPending, refetch };
-}

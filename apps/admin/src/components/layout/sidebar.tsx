@@ -33,7 +33,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { authClient, useSession } from "@/lib/api/auth-client";
+import { authClient } from "@/lib/api/auth-client";
+import { useSession } from "@/lib/api/use-session";
 import { useMenuStore } from "@/stores/menu-store";
 import { cn } from "@/utils/cn";
 

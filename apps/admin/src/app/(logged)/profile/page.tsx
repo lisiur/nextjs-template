@@ -4,41 +4,33 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { authClient } from "@/lib/api";
+import { useSession } from "@/lib/api/use-session";
 import { AvatarUpload } from "./components/avatar-upload";
 import { PasswordForm } from "./components/password-form";
 import { ProfileForm } from "./components/profile-form";
 
 export default function ProfilePage() {
   const t = useTranslations("Profile");
+  const session = useSession();
   const [user, setUser] = useState<{
     id: string;
     name: string;
     email: string;
     image?: string | null;
   } | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const { data } = await authClient.getSession();
-        if (data?.user) {
-          setUser({
-            id: data.user.id,
-            name: data.user.name,
-            email: data.user.email,
-            image: data.user.image,
-          });
-        }
-      } finally {
-        setLoading(false);
-      }
+    if (session.data?.user) {
+      setUser({
+        id: session.data.user.id,
+        name: session.data.user.name,
+        email: session.data.user.email,
+        image: session.data.user.image,
+      });
     }
-    load();
-  }, []);
+  }, [session.data]);
 
-  if (loading) {
+  if (session.isPending) {
     return (
       <div className="container mx-auto py-8">
         <div className="flex items-center justify-center py-16">
