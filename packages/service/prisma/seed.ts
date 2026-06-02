@@ -572,6 +572,15 @@ async function seed() {
     flags: [BUILTIN_USER_FLAG],
   });
   await seedUserRole(adminUser.id, roleIds.admin);
+
+  const regularUser = await seedUser({
+    id: "user",
+    name: "User",
+    email: "user@system.local",
+    password: "admin123",
+    flags: [BUILTIN_USER_FLAG],
+  });
+  await seedUserRole(regularUser.id, roleIds.user);
 }
 
 seed()
