@@ -47,23 +47,11 @@ export function AvatarUpload({
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("visibility", "public");
-
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
+      const res = await withApiFeedback(appClient.api.upload.$post)({
+        form: { file, visibility: "public" },
       });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => null);
-        throw new Error(err?.message ?? t("uploadFailed"));
-      }
-
       const data = await res.json();
-      const imageUrl = `/api/upload/${data.id}`;
+      const imageUrl = data.url;
 
       await withApiFeedback(appClient.api.auth["update-user"].$post)({
         json: { image: imageUrl },

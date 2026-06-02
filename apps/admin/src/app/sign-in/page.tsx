@@ -28,9 +28,9 @@ export default function LoginPage() {
         return;
       }
     } catch {
-      // Fallback to dashboard
+      // Fallback to profile
     }
-    router.push("/");
+    router.push("/profile");
   };
 
   return (

@@ -26,7 +26,7 @@ export default function HomePage() {
           router.replace(firstUrl);
           return;
         }
-        router.replace("/sign-in");
+        router.replace("/profile");
       })
       .catch(() => {
         router.replace("/sign-in");

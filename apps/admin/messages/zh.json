@@ -28,7 +28,10 @@
     "registrationFailed": "注册失败",
     "sessionExpired": "会话已过期",
     "sessionExpiredDescription": "您的会话已过期，请重新登录。",
-    "goToLogin": "前往登录"
+    "goToLogin": "前往登录",
+    "unauthorizedTitle": "该角色未授权菜单",
+    "unauthorizedDescription": "当前角色没有可用的菜单权限，请联系管理员。",
+    "backToLogin": "返回登录"
   },
   "FormDemo": {
     "title": "表单演示",

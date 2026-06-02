@@ -13,6 +13,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSession } from "@/lib/api";
+import { useMenuStore } from "@/stores/menu-store";
+import { useSessionStore } from "@/stores/session-store";
 
 export function SessionGuard({ children }: { children: React.ReactNode }) {
   const { data, isPending, fetched, refetch } = useSession();
@@ -26,6 +28,14 @@ export function SessionGuard({ children }: { children: React.ReactNode }) {
       void refetch();
     }
   }, [fetched, data, refetch]);
+
+  // Register beforeSignOut handler to reset menu state
+  useEffect(() => {
+    const unregister = useSessionStore.getState().registerBeforeSignOut(() => {
+      useMenuStore.getState().resetMenus();
+    });
+    return unregister;
+  }, []);
 
   if (isPending) {
     return (

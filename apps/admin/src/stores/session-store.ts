@@ -24,12 +24,19 @@ type SessionData = {
   session: AuthSession;
 } | null;
 
+type SignOutHandler = () => void | Promise<void>;
+
 interface SessionState {
   data: SessionData;
   isPending: boolean;
   fetched: boolean;
+  beforeSignOutHandlers: Set<SignOutHandler>;
+  afterSignOutHandlers: Set<SignOutHandler>;
   fetchSession: () => Promise<void>;
   refetchSession: () => Promise<void>;
+  registerBeforeSignOut: (handler: SignOutHandler) => () => void;
+  registerAfterSignOut: (handler: SignOutHandler) => () => void;
+  signOut: () => Promise<void>;
 }
 
 let inflight: Promise<SessionData> | null = null;
@@ -54,6 +61,8 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   data: null,
   isPending: true,
   fetched: false,
+  beforeSignOutHandlers: new Set(),
+  afterSignOutHandlers: new Set(),
 
   fetchSession: async () => {
     if (get().fetched) return;
@@ -72,5 +81,47 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   refetchSession: async () => {
     set({ fetched: false });
     await get().fetchSession();
+  },
+
+  registerBeforeSignOut: (handler) => {
+    const { beforeSignOutHandlers } = get();
+    beforeSignOutHandlers.add(handler);
+    return () => {
+      beforeSignOutHandlers.delete(handler);
+    };
+  },
+
+  registerAfterSignOut: (handler) => {
+    const { afterSignOutHandlers } = get();
+    afterSignOutHandlers.add(handler);
+    return () => {
+      afterSignOutHandlers.delete(handler);
+    };
+  },
+
+  signOut: async () => {
+    const { beforeSignOutHandlers, afterSignOutHandlers } = get();
+
+    // Execute before signOut handlers
+    for (const handler of beforeSignOutHandlers) {
+      await handler();
+    }
+
+    // Call sign-out API
+    await appClient.api.auth["sign-out"].$post();
+
+    // Reset session state
+    set({
+      data: null,
+      isPending: false,
+      fetched: false,
+      beforeSignOutHandlers: new Set(),
+      afterSignOutHandlers: new Set(),
+    });
+
+    // Execute after signOut handlers
+    for (const handler of afterSignOutHandlers) {
+      await handler();
+    }
   },
 }));

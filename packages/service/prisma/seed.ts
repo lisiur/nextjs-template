@@ -4,9 +4,11 @@ import { BUILTIN_ROLE_FLAG, BUILTIN_USER_FLAG } from "@repo/shared";
 import { hashPassword } from "../src/lib/password";
 import { PrismaClient } from "./generated/prisma/client";
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
-});
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL environment variable is not set");
+}
+const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 const menuPermissionCode = (code: string) => `menu-item:${code}::view`;
@@ -546,6 +548,21 @@ async function seed() {
   }
 
   await seedRolePermissions(roleIds.admin, permIds);
+
+  // Assign basic permissions to user role
+  const userPermCodes = [
+    "application::view",
+    "menu::list",
+    "menu::view",
+    "upload::sign",
+  ];
+  const userPermIds: Record<string, string> = {};
+  for (const code of userPermCodes) {
+    if (permIds[code]) {
+      userPermIds[code] = permIds[code];
+    }
+  }
+  await seedRolePermissions(roleIds.user, userPermIds);
 
   const adminUser = await seedUser({
     id: "admin",

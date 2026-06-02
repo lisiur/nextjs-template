@@ -35,6 +35,7 @@ interface MenuState {
   fetched: boolean;
   fetchMenus: () => Promise<void>;
   refetchMenus: () => Promise<void>;
+  resetMenus: () => void;
 }
 
 export function getFirstMenuUrl(menus: Menu[]): string | null {
@@ -133,5 +134,9 @@ export const useMenuStore = create<MenuState>((set, get) => ({
   refetchMenus: async () => {
     set({ fetched: false });
     await get().fetchMenus();
+  },
+
+  resetMenus: () => {
+    set({ menus: [], treeMenus: [], fetched: false, loading: false });
   },
 }));

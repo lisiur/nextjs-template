@@ -1,4 +1,7 @@
-export function prepend<T>(list: T | T[] | undefined, item: T | undefined): T[] {
+export function prepend<T>(
+  list: T | T[] | undefined,
+  item: T | undefined,
+): T[] {
   if (item === undefined) {
     if (list === undefined) return [];
     if (Array.isArray(list)) return [...list];

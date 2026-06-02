@@ -29,8 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
-import { appClient, useSession } from "@/lib/api";
-import { withApiFeedback } from "@/lib/api/utils";
+import { useSession } from "@/lib/api";
 
 type UserMenuItem = "profile" | "theme" | "locale" | "signOut";
 
@@ -71,7 +70,7 @@ export function UserMenu({ full, items, avatarRadius }: UserMenuProps) {
   );
 
   const handleSignOut = async () => {
-    await withApiFeedback(appClient.api.auth["sign-out"].$post)();
+    await session.signOut();
     router.push("/sign-in");
   };
 

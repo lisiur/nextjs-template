@@ -28,7 +28,10 @@
     "registrationFailed": "Registration failed",
     "sessionExpired": "Session Expired",
     "sessionExpiredDescription": "Your session has expired. Please sign in again.",
-    "goToLogin": "Go to Login"
+    "goToLogin": "Go to Login",
+    "unauthorizedTitle": "Role Not Authorized",
+    "unauthorizedDescription": "Your current role has no menu permissions. Please contact the administrator.",
+    "backToLogin": "Back to Login"
   },
   "FormDemo": {
     "title": "Form Demo",

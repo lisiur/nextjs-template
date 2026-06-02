@@ -1,6 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { cors } from "hono/cors";
+import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { appContext } from "#middleware/app-context";
 import { operationLogger } from "#middleware/operation-logger";
@@ -9,10 +10,22 @@ import { routes } from "./routes";
 
 const openAPIApp = new OpenAPIHono().basePath("/api");
 
+openAPIApp.onError((err, c) => {
+  if (err instanceof HTTPException) {
+    return c.json({ code: err.status, message: err.message }, err.status);
+  }
+  return c.json({ code: 500, message: "Internal Server Error" }, 500);
+});
+
 openAPIApp.use("*", logger());
 openAPIApp.use("*", cors());
 openAPIApp.use("*", traceContext);
-openAPIApp.use("*", appContext);
+openAPIApp.use("*", async (c, next) => {
+  if (c.req.path.startsWith("/api/upload")) {
+    return next();
+  }
+  return appContext(c, next);
+});
 openAPIApp.use("*", operationLogger);
 
 const app = openAPIApp
