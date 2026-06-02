@@ -1,3 +1,4 @@
+import { SessionGuard } from "@/components/auth/session-guard";
 import { AppSidebar } from "@/components/layout/sidebar";
 import { SidebarBorderTrigger } from "@/components/layout/sidebar-border-trigger";
 import { SidebarToggleListener } from "@/components/layout/sidebar-toggle-listener";
@@ -9,11 +10,13 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <SidebarToggleListener />
-      <AppSidebar />
-      <SidebarBorderTrigger />
-      <SidebarInset>{children}</SidebarInset>
-    </SidebarProvider>
+    <SessionGuard>
+      <SidebarProvider>
+        <SidebarToggleListener />
+        <AppSidebar />
+        <SidebarBorderTrigger />
+        <SidebarInset>{children}</SidebarInset>
+      </SidebarProvider>
+    </SessionGuard>
   );
 }
