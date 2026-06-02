@@ -5,7 +5,8 @@ import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/api";
+import { appClient } from "@/lib/api";
+import { withApiFeedback } from "@/lib/api/utils";
 import { useSessionStore } from "@/stores/session-store";
 
 interface AvatarUploadProps {
@@ -64,10 +65,9 @@ export function AvatarUpload({
       const data = await res.json();
       const imageUrl = `/api/upload/${data.id}`;
 
-      const { error } = await authClient.updateUser({
-        image: imageUrl,
+      await withApiFeedback(appClient.api.auth["update-user"].$post)({
+        json: { image: imageUrl },
       });
-      if (error) throw new Error(error.message);
 
       onImageUpdate(imageUrl);
       setPreview(null);

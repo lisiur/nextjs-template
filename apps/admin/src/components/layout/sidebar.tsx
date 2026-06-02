@@ -2,28 +2,15 @@
 
 import {
   ChevronRight,
-  ChevronsUpDown,
   Folder,
   FolderOpen,
   icons,
-  LogOut,
   type LucideIcon,
-  UserIcon,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -33,11 +20,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { appClient } from "@/lib/api";
-import { useSession } from "@/lib/api/use-session";
-import { withApiFeedback } from "@/lib/api/utils";
 import { useMenuStore } from "@/stores/menu-store";
 import { cn } from "@/utils/cn";
+import { UserMenu } from "./user-menu";
 
 const iconsRecord = icons as Record<string, LucideIcon>;
 
@@ -154,9 +139,6 @@ function SidebarMenuNode({
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const session = useSession();
-  const user = session.data?.user;
   const t = useTranslations("Sidebar");
   const { treeMenus, loading, fetched, fetchMenus } = useMenuStore();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -164,11 +146,6 @@ export function AppSidebar() {
   const skeletonIds = useRef(
     Array.from({ length: 4 }, () => crypto.randomUUID()),
   );
-
-  const handleSignOut = async () => {
-    await withApiFeedback(appClient.api.auth["sign-out"].$post)();
-    router.push("/sign-in");
-  };
 
   useEffect(() => {
     fetchMenus();
@@ -202,15 +179,6 @@ export function AppSidebar() {
     });
   };
 
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    : "??";
-
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
@@ -242,66 +210,7 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <SidebarMenuButton
-                    size="lg"
-                    className="w-full data-[popup-open]:bg-sidebar-accent data-[popup-open]:text-sidebar-accent-foreground"
-                  />
-                }
-              >
-                <div className="relative flex aspect-square h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  {user?.image ? (
-                    <Image
-                      src={user.image}
-                      alt={user.name ?? ""}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                  ) : (
-                    <span className="text-xs font-semibold">{initials}</span>
-                  )}
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user?.name}</span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {user?.email}
-                  </span>
-                </div>
-                <ChevronsUpDown className="ml-auto h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56"
-                side="top"
-                align="start"
-                sideOffset={4}
-              >
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user?.name}
-                      </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem render={<Link href="/profile" />}>
-                  <UserIcon />
-                  {t("profile")}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-                  <LogOut />
-                  {t("signOut")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UserMenu full />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

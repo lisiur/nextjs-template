@@ -14,7 +14,8 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/api";
+import { appClient } from "@/lib/api";
+import { withApiFeedback } from "@/lib/api/utils";
 
 export function PasswordForm() {
   const t = useTranslations("Profile");
@@ -49,11 +50,12 @@ export function PasswordForm() {
   async function onSubmit(data: PasswordInput) {
     setSaving(true);
     try {
-      const { error } = await authClient.changePassword({
-        newPassword: data.newPassword,
-        currentPassword: data.currentPassword,
+      await withApiFeedback(appClient.api.auth["change-password"].$post)({
+        json: {
+          newPassword: data.newPassword,
+          currentPassword: data.currentPassword,
+        },
       });
-      if (error) throw new Error(error.message);
       toast.success(t("passwordChanged"));
       reset();
     } catch (err) {

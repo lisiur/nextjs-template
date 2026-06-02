@@ -14,7 +14,8 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/api";
+import { appClient } from "@/lib/api";
+import { withApiFeedback } from "@/lib/api/utils";
 
 interface ProfileFormProps {
   initialName: string;
@@ -43,10 +44,9 @@ export function ProfileForm({ initialName, onNameUpdate }: ProfileFormProps) {
   async function onSubmit(data: ProfileInput) {
     setSaving(true);
     try {
-      const { error } = await authClient.updateUser({
-        name: data.name,
+      await withApiFeedback(appClient.api.auth["update-user"].$post)({
+        json: { name: data.name },
       });
-      if (error) throw new Error(error.message);
       onNameUpdate(data.name);
       toast.success(t("profileUpdated"));
     } catch (err) {
