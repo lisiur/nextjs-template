@@ -6,11 +6,16 @@ import {
 } from "@hono/zod-openapi";
 import type { Env } from "hono";
 import type { H } from "hono/types";
-import { requireAdmin } from "#middleware/require-admin";
+import { requirePermission } from "#middleware/require-permission";
+import { prepend } from "#utils/list";
 import { errorSchema } from "./schema";
 
 interface ProtectedRouteOptions {
   middleware: H;
+}
+
+interface PermissionRouteOptions {
+  permission: string | { and?: string[]; or?: string[] };
 }
 
 const unauthorizedResponse = {
@@ -20,14 +25,12 @@ const unauthorizedResponse = {
   description: "Unauthorized",
 } as const;
 
-function prependMiddleware(
-  protectedMiddleware: H,
-  middleware: RouteConfig["middleware"],
-): H | H[] {
-  if (!middleware) return protectedMiddleware;
-  if (Array.isArray(middleware)) return [protectedMiddleware, ...middleware];
-  return [protectedMiddleware, middleware];
-}
+const forbiddenResponse = {
+  content: {
+    "application/json": { schema: errorSchema },
+  },
+  description: "Forbidden",
+} as const;
 
 export function defineProtectedRoute<
   R extends RouteConfig,
@@ -39,7 +42,7 @@ export function defineProtectedRoute<
 ): OpenAPIRoute<R, E, AddRoute> {
   const route = createRoute({
     ...def.route,
-    middleware: prependMiddleware(options.middleware, def.route.middleware),
+    middleware: prepend(def.route.middleware, options.middleware),
     responses: {
       401: unauthorizedResponse,
       ...def.route.responses,
@@ -49,10 +52,24 @@ export function defineProtectedRoute<
   return defineOpenAPIRoute({ ...def, route });
 }
 
-export function defineAdminRoute<
+export function definePermissionRoute<
   R extends RouteConfig,
   E extends Env = Env,
   const AddRoute extends boolean | undefined = undefined,
->(def: OpenAPIRoute<R, E, AddRoute>): OpenAPIRoute<R, E, AddRoute> {
-  return defineProtectedRoute(def, { middleware: requireAdmin });
+>(
+  def: OpenAPIRoute<R, E, AddRoute> & PermissionRouteOptions,
+): OpenAPIRoute<R, E, AddRoute> {
+  const { permission, ...routeDef } = def;
+  const middleware = requirePermission(permission);
+  const route = createRoute({
+    ...routeDef.route,
+    middleware: prepend(routeDef.route.middleware ?? [], middleware),
+    responses: {
+      401: unauthorizedResponse,
+      403: forbiddenResponse,
+      ...routeDef.route.responses,
+    },
+  }) as R;
+
+  return defineOpenAPIRoute({ ...routeDef, route });
 }

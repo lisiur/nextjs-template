@@ -10,7 +10,8 @@
     "#middleware/*": "./src/middleware/*.ts",
     "#repositories/*": "./src/repositories/*.ts",
     "#routes/*": "./src/routes/*.ts",
-    "#services/*": "./src/services/*.ts"
+    "#services/*": "./src/services/*.ts",
+    "#utils/*": "./src/utils/*.ts"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
