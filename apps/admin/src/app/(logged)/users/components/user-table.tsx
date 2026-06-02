@@ -1,7 +1,7 @@
 "use client";
 
 import { isBuiltinUser } from "@repo/shared";
-import { Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { Pencil, Plus, ShieldUser, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
@@ -161,7 +161,7 @@ export function UserTable() {
                         title={t("protected")}
                         aria-label={t("protected")}
                       >
-                        <ShieldCheck className="h-3 w-3" />
+                        <ShieldUser className="h-3 w-3" />
                       </Badge>
                     )}
                   </div>
