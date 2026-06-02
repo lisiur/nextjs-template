@@ -4,7 +4,7 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 
-export const SESSION_COOKIE_NAME = "next101.session_token";
+export const SESSION_COOKIE_NAME = "session_token";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 export const SESSION_REFRESH_AFTER_MS = 60 * 60 * 24 * 1000;
 
