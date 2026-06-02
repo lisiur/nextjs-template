@@ -2,24 +2,23 @@
 
 import { LanguagesIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { useLocale, useTranslations } from "next-intl";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 
 const locales: { value: string; label: string }[] = [
-  { value: "en", label: "EN" },
+  { value: "en", label: "English" },
   { value: "zh", label: "中文" },
 ];
 
 export function LocaleSwitcher() {
   const locale = useLocale();
   const router = useRouter();
-  const currentLabel = locales.find((l) => l.value === locale)?.label;
+  const t = useTranslations("Header");
 
   function handleChange(value: string) {
     // biome-ignore lint/suspicious/noDocumentCookie: simple cookie setter for locale
@@ -28,20 +27,22 @@ export function LocaleSwitcher() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="ghost" />}>
-        <div className="flex gap-1 items-center">
-          <LanguagesIcon className="size-4 text-muted-foreground" />
-          <span>{currentLabel}</span>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger>
+        <LanguagesIcon className="size-4 text-muted-foreground" />
+        <span>{t("language")}</span>
+      </DropdownMenuSubTrigger>
+      <DropdownMenuSubContent>
         {locales.map((l) => (
-          <DropdownMenuItem key={l.value} onClick={() => handleChange(l.value)}>
+          <DropdownMenuCheckboxItem
+            key={l.value}
+            checked={locale === l.value}
+            onClick={() => handleChange(l.value)}
+          >
             {l.label}
-          </DropdownMenuItem>
+          </DropdownMenuCheckboxItem>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownMenuSubContent>
+    </DropdownMenuSub>
   );
 }

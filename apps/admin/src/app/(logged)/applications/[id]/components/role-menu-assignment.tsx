@@ -3,11 +3,11 @@
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { RoleMenuTree } from "./role-menu-tree";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
+import { RoleMenuTree } from "./role-menu-tree";
 
 interface Role {
   id: string;

@@ -87,7 +87,9 @@
     "useAsyncData": "useAsyncData"
   },
   "Header": {
-    "brand": "Next101"
+    "brand": "Next101",
+    "appearance": "Appearance",
+    "language": "Language"
   },
   "Users": {
     "title": "User Management",
