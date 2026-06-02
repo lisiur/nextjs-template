@@ -25,7 +25,10 @@
     "creatingAccount": "Creating account...",
     "createAccountBtn": "Create account",
     "loginFailed": "Login failed",
-    "registrationFailed": "Registration failed"
+    "registrationFailed": "Registration failed",
+    "sessionExpired": "Session Expired",
+    "sessionExpiredDescription": "Your session has expired. Please sign in again.",
+    "goToLogin": "Go to Login"
   },
   "FormDemo": {
     "title": "Form Demo",
