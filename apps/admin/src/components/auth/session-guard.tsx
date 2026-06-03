@@ -47,7 +47,7 @@ export function SessionGuard({ children }: { children: React.ReactNode }) {
 
   if (fetched && !data) {
     return (
-      <Dialog open dismissible={false}>
+      <Dialog open disablePointerDismissal>
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>{t("sessionExpired")}</DialogTitle>
