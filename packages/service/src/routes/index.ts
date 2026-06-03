@@ -18,14 +18,14 @@ const routes = new OpenAPIHono()
   .route("/system-config", systemConfigRoutes)
   .route("/organizations", organizationRoutes)
   .route("/applications", applicationRoutes)
-  .route("/menu", menuRoutes)
+  .route("/menus", menuRoutes)
   .route("/roles", roleRoutes)
   .route("/role-menus", roleMenusRoutes)
   .route("/system-info", systemInfoRoutes)
   .route("/upload", uploadRoutes)
-  .route("/user-role", userRoleRoutes)
-  .route("/operation-log", operationLogRoutes)
-  .route("/audit-log", auditLogRoutes)
+  .route("/user-roles", userRoleRoutes)
+  .route("/operation-logs", operationLogRoutes)
+  .route("/audit-logs", auditLogRoutes)
   .route("/users", userRoutes);
 
 export { routes };

@@ -100,7 +100,7 @@ export function OperationLogTable({
       if (filters.startDate) query.startDate = filters.startDate.toISOString();
       if (filters.endDate) query.endDate = filters.endDate.toISOString();
 
-      const res = await withApiFeedback(appClient.api["operation-log"].$get)({
+      const res = await withApiFeedback(appClient.api["operation-logs"].$get)({
         query,
       });
       const data = await res.json();
@@ -134,7 +134,7 @@ export function OperationLogTable({
   async function handleBatchDelete() {
     if (selectedIds.size === 0) return;
     try {
-      await withApiFeedback(appClient.api["operation-log"].$delete)({
+      await withApiFeedback(appClient.api["operation-logs"].$delete)({
         json: { ids: Array.from(selectedIds) },
       });
       toast.success(t("deleteSuccess"));

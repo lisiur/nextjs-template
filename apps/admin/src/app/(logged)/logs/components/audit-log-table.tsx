@@ -108,7 +108,7 @@ export function AuditLogTable({
       if (filters.startDate) query.startDate = filters.startDate.toISOString();
       if (filters.endDate) query.endDate = filters.endDate.toISOString();
 
-      const res = await withApiFeedback(appClient.api["audit-log"].$get)({
+      const res = await withApiFeedback(appClient.api["audit-logs"].$get)({
         query,
       });
       const data = await res.json();

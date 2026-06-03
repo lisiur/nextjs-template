@@ -66,7 +66,7 @@ export function ApplicationMenuManagement({
 
     setSaving(true);
     try {
-      await withApiFeedback(appClient.api.menu[":id"].$put)({
+      await withApiFeedback(appClient.api.menus[":id"].$put)({
         param: { id: selectedMenu.id },
         json: {
           name: data.name,

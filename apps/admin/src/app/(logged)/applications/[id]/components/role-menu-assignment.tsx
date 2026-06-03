@@ -80,7 +80,7 @@ export function RoleMenuAssignment({
     setLoading(true);
     try {
       const [menusRes, roleMenusRes] = await Promise.all([
-        withApiFeedback(appClient.api.menu.$get)({
+        withApiFeedback(appClient.api.menus.$get)({
           query: { appId },
         }),
         withApiFeedback(appClient.api["role-menus"][":roleId"].$get)({
