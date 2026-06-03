@@ -1,5 +1,5 @@
 import type { Application } from "#routes/application/schema";
-import type { AuthType } from "#services/auth.service";
+import type { AuthType } from "#lib/session";
 
 declare module "hono" {
   interface ContextVariableMap {

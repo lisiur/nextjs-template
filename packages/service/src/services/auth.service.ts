@@ -1,44 +1,32 @@
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
+import { logAudit } from "#lib/logger";
 import { hashPassword, verifyPassword } from "#lib/password";
+import type { AuthSession, AuthSessionUser, AuthType } from "#lib/session";
 import {
   createSession,
   deleteSessionByToken,
-  getSessionByToken,
-  getSessionTokenFromHeaders,
+  getSessionFromHeaders,
 } from "#lib/session";
 import { code2Session } from "#lib/wechat";
 import { systemConfigRepository } from "#repositories/system-config.repository";
 
-export type AuthSessionUser = {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  image?: string | null;
-  banned?: boolean | null;
-  banReason?: string | null;
-  banExpires?: Date | null;
-  flags: string[];
-  createdAt: Date;
-  updatedAt: Date;
-};
+export type { AuthSession, AuthSessionUser, AuthType };
 
-export type AuthSession = {
-  id: string;
-  expiresAt: Date;
-  token: string;
-  ipAddress?: string | null;
-  userAgent?: string | null;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type AuthType = {
-  user: AuthSessionUser | null;
-  session: AuthSession | null;
-};
+async function logAuthLogin(session: AuthSession) {
+  await logAudit({
+    userId: session.userId,
+    sessionId: session.id,
+    event: "auth.login",
+    category: "authentication",
+    targetType: "session",
+    targetId: session.id,
+    metadata: {
+      ipAddress: session.ipAddress,
+      userAgent: session.userAgent,
+    },
+  });
+}
 
 export async function signInWithEmail(params: {
   email: string;
@@ -67,6 +55,8 @@ export async function signInWithEmail(params: {
     ipAddress: params.ipAddress,
     userAgent: params.userAgent,
   });
+
+  await logAuthLogin(session);
 
   return { user, session };
 }
@@ -99,19 +89,27 @@ export async function signUpWithEmail(params: {
     userAgent: params.userAgent,
   });
 
+  await logAuthLogin(session);
+
   return { user, session };
 }
 
 export async function signOut(token: string | null) {
-  await deleteSessionByToken(token);
+  const session = await deleteSessionByToken(token);
+  if (session) {
+    await logAudit({
+      userId: session.userId,
+      sessionId: session.id,
+      event: "auth.logout",
+      category: "authentication",
+      targetType: "session",
+      targetId: session.id,
+    });
+  }
 }
 
 export async function getSession(headers: Headers): Promise<AuthType | null> {
-  const token = getSessionTokenFromHeaders(headers);
-  const result = await getSessionByToken(token);
-  if (!result) return null;
-  const { user, ...session } = result;
-  return { user, session };
+  return getSessionFromHeaders(headers);
 }
 
 export async function createUser(body: {
@@ -236,6 +234,8 @@ export async function signInWithWechat(params: {
       userAgent: params.userAgent,
     });
 
+    await logAuthLogin(session);
+
     return { user: existingAccount.user, session };
   }
 
@@ -260,6 +260,8 @@ export async function signInWithWechat(params: {
     ipAddress: params.ipAddress,
     userAgent: params.userAgent,
   });
+
+  await logAuthLogin(session);
 
   return { user, session };
 }

@@ -4,18 +4,18 @@ import { HTTPException } from "hono/http-exception";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { definePermissionRoute, defineProtectedRoute } from "./admin-route";
 
-vi.mock("#services/auth.service", () => ({
-  getSession: vi.fn(),
+vi.mock("#lib/session", () => ({
+  getSessionFromHeaders: vi.fn(),
 }));
 
 vi.mock("#services/role-permission.service", () => ({
   getUserPermissions: vi.fn(),
 }));
 
-import { getSession } from "#services/auth.service";
+import { getSessionFromHeaders } from "#lib/session";
 import { getUserPermissions } from "#services/role-permission.service";
 
-const mockGetSession = vi.mocked(getSession);
+const mockGetSession = vi.mocked(getSessionFromHeaders);
 const mockGetUserPermissions = vi.mocked(getUserPermissions);
 
 const permissionRoute = definePermissionRoute({
@@ -114,7 +114,7 @@ describe("definePermissionRoute", () => {
     mockGetSession.mockResolvedValue({
       user: { id: "user-1" },
       session: { id: "session-1" },
-    } as Awaited<ReturnType<typeof getSession>>);
+    } as Awaited<ReturnType<typeof getSessionFromHeaders>>);
     mockGetUserPermissions.mockResolvedValue(["test::view"]);
 
     const res = await createTestApp().request("/permission-required");
@@ -135,7 +135,7 @@ describe("definePermissionRoute", () => {
     mockGetSession.mockResolvedValue({
       user: { id: "user-1" },
       session: { id: "session-1" },
-    } as Awaited<ReturnType<typeof getSession>>);
+    } as Awaited<ReturnType<typeof getSessionFromHeaders>>);
     mockGetUserPermissions.mockResolvedValue(["other::view"]);
 
     const res = await createTestApp().request("/permission-required");

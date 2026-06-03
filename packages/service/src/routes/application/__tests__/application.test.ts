@@ -14,9 +14,9 @@ vi.mock("../../../lib/db", () => ({
   },
 }));
 
-// Mock auth
-vi.mock("../../../services/auth.service", () => ({
-  getSession: vi.fn(),
+// Mock session extraction
+vi.mock("../../../lib/session", () => ({
+  getSessionFromHeaders: vi.fn(),
 }));
 
 // Mock role-permission
@@ -25,7 +25,7 @@ vi.mock("../../../services/role-permission.service", () => ({
 }));
 
 import { prisma } from "../../../lib/db";
-import { getSession } from "../../../services/auth.service";
+import { getSessionFromHeaders } from "../../../lib/session";
 import { getUserPermissions } from "../../../services/role-permission.service";
 
 const mockPrisma = prisma as unknown as {
@@ -37,7 +37,7 @@ const mockPrisma = prisma as unknown as {
     update: ReturnType<typeof vi.fn>;
   };
 };
-const mockGetSession = vi.mocked(getSession);
+const mockGetSession = vi.mocked(getSessionFromHeaders);
 const mockGetUserPermissions = vi.mocked(getUserPermissions);
 
 // Helper to create a mock Hono app for a route

@@ -1,3 +1,4 @@
+import { requireCurrentApp } from "#extractors/current-app";
 import { definePermissionRoute } from "../shared/admin-route";
 import { applicationSchema, errorSchema } from "./schema";
 
@@ -31,7 +32,7 @@ export const getCurrentApplication = definePermissionRoute({
     },
   },
   handler: async (c) => {
-    const app = c.get("currentApp");
+    const app = await requireCurrentApp(c);
     return c.json(app, 200);
   },
 });

@@ -2,28 +2,43 @@ import { randomBytes } from "node:crypto";
 import type { Context } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { prisma } from "#lib/db";
-import { logAudit } from "#lib/logger";
 
 export const SESSION_COOKIE_NAME = "session_token";
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 export const SESSION_REFRESH_AFTER_MS = 60 * 60 * 24 * 1000;
 
+export type AuthSessionUser = {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image?: string | null;
+  banned?: boolean | null;
+  banReason?: string | null;
+  banExpires?: Date | null;
+  flags: string[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type AuthSession = {
+  id: string;
+  expiresAt: Date;
+  token: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type AuthType = {
+  user: AuthSessionUser | null;
+  session: AuthSession | null;
+};
+
 export function createSessionToken() {
   return randomBytes(32).toString("base64url");
-}
-
-export function getSessionTokenFromHeaders(headers: Headers) {
-  const cookie = headers.get("cookie");
-  if (!cookie) return null;
-
-  for (const part of cookie.split(";")) {
-    const [rawName, ...rawValue] = part.trim().split("=");
-    if (rawName === SESSION_COOKIE_NAME) {
-      return decodeURIComponent(rawValue.join("="));
-    }
-  }
-
-  return null;
 }
 
 export function setSessionCookie(c: Context, token: string) {
@@ -62,20 +77,21 @@ export async function createSession(params: {
     },
   });
 
-  await logAudit({
-    userId: session.userId,
-    sessionId: session.id,
-    event: "auth.login",
-    category: "authentication",
-    targetType: "session",
-    targetId: session.id,
-    metadata: {
-      ipAddress: session.ipAddress,
-      userAgent: session.userAgent,
-    },
-  });
-
   return session;
+}
+
+export function getSessionTokenFromHeaders(headers: Headers) {
+  const cookie = headers.get("cookie");
+  if (!cookie) return null;
+
+  for (const part of cookie.split(";")) {
+    const [rawName, ...rawValue] = part.trim().split("=");
+    if (rawName === SESSION_COOKIE_NAME) {
+      return decodeURIComponent(rawValue.join("="));
+    }
+  }
+
+  return null;
 }
 
 export async function getSessionByToken(token: string | null) {
@@ -110,6 +126,16 @@ export async function getSessionByToken(token: string | null) {
   return result;
 }
 
+export async function getSessionFromHeaders(
+  headers: Headers,
+): Promise<AuthType | null> {
+  const token = getSessionTokenFromHeaders(headers);
+  const result = await getSessionByToken(token);
+  if (!result) return null;
+  const { user, ...session } = result;
+  return { user, session };
+}
+
 export async function deleteSessionByToken(token: string | null) {
   if (!token) return null;
 
@@ -119,14 +145,6 @@ export async function deleteSessionByToken(token: string | null) {
   await prisma.session.update({
     where: { id: session.id },
     data: { revokedAt: new Date() },
-  });
-  await logAudit({
-    userId: session.userId,
-    sessionId: session.id,
-    event: "auth.logout",
-    category: "authentication",
-    targetType: "session",
-    targetId: session.id,
   });
 
   return session;
