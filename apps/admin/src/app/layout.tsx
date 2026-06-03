@@ -44,9 +44,9 @@ export default async function RootLayout({
                 },
               }}
             />
-            <Frame>
-              <QueryProvider>{children}</QueryProvider>
-            </Frame>
+            <QueryProvider>
+              <Frame>{children}</Frame>
+            </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
