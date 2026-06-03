@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { getSession } from "#services/auth.service";
+import { getSession as getSessionFromHeaders } from "#services/auth.service";
 import { uploadFile as uploadFileToStorage } from "#services/upload.service";
 import { errorSchema, uploadResponseSchema } from "./schema";
 
@@ -40,7 +40,8 @@ export const uploadFile = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await getSession(c.req.raw.headers);
+    const session =
+      c.get("session") ?? (await getSessionFromHeaders(c.req.raw.headers));
     if (!session?.user) {
       throw new HTTPException(401, { message: "Unauthorized" });
     }

@@ -31,8 +31,7 @@ export const getCurrentApplication = definePermissionRoute({
     },
   },
   handler: async (c) => {
-    // biome-ignore lint/suspicious/noExplicitAny: defineOpenAPIRoute doesn't support env type inference
-    const app = (c as any).get("currentApp");
+    const app = c.get("currentApp");
     return c.json(app, 200);
   },
 });

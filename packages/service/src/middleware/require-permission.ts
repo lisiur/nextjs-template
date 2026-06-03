@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
-import { getSession } from "#services/auth.service";
+import { getSession as getSessionFromHeaders } from "#services/auth.service";
 import { getUserPermissions } from "#services/role-permission.service";
 
 function matchSinglePermission(pattern: string, permission: string): boolean {
@@ -46,7 +46,8 @@ export function requirePermission(
   permission: string | { and?: string[]; or?: string[] },
 ) {
   return createMiddleware(async (c, next) => {
-    const session = await getSession(c.req.raw.headers);
+    const session =
+      c.get("session") ?? (await getSessionFromHeaders(c.req.raw.headers));
     if (!session?.user) {
       throw new HTTPException(401, { message: "Unauthorized" });
     }

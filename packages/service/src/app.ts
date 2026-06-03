@@ -5,6 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { appContext } from "#middleware/app-context";
 import { operationLogger } from "#middleware/operation-logger";
+import { requestSession } from "#middleware/request-session";
 import { traceContext } from "#middleware/trace-context";
 import { routes } from "./routes";
 
@@ -20,6 +21,7 @@ openAPIApp.onError((err, c) => {
 openAPIApp.use("*", logger());
 openAPIApp.use("*", cors());
 openAPIApp.use("*", traceContext);
+openAPIApp.use("*", requestSession);
 openAPIApp.use("*", async (c, next) => {
   if (c.req.path.startsWith("/api/upload")) {
     return next();
