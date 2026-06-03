@@ -1,10 +1,13 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { getLogById } from "#services/operation-log.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import { errorSchema, logIdParamSchema, operationLogSchema } from "./schema";
 
-export const getLog = definePermissionRoute({
-  permission: "operation-log::view",
-  route: {
+export const getLog = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("operation-log::view")),
     method: "get",
     path: "/{id}",
     tags: ["Log"],
@@ -14,6 +17,9 @@ export const getLog = definePermissionRoute({
       params: logIdParamSchema,
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": { schema: operationLogSchema },
@@ -27,7 +33,7 @@ export const getLog = definePermissionRoute({
         description: "Not found",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { id } = c.req.valid("param");
     const log = await getLogById(id);

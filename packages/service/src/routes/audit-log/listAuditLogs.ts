@@ -1,13 +1,16 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { listAuditLogs } from "#services/audit-log.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import {
   listAuditLogsQuerySchema,
   listAuditLogsResponseSchema,
 } from "./schema";
 
-export const listAuditLogsRoute = definePermissionRoute({
-  permission: "audit-log::list",
-  route: {
+export const listAuditLogsRoute = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("audit-log::list")),
     method: "get",
     path: "/",
     tags: ["AuditLog"],
@@ -18,6 +21,9 @@ export const listAuditLogsRoute = definePermissionRoute({
       query: listAuditLogsQuerySchema,
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": {
@@ -27,7 +33,7 @@ export const listAuditLogsRoute = definePermissionRoute({
         description: "Paginated list of audit logs",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const query = c.req.valid("query");
     const result = await listAuditLogs(query);

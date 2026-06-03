@@ -1,10 +1,13 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { listRoles as listRolesService } from "#services/role.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import { listRolesQuerySchema, roleSchema } from "./schema";
 
-export const listRoles = definePermissionRoute({
-  permission: "role::list",
-  route: {
+export const listRoles = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("role::list")),
     method: "get",
     path: "/",
     tags: ["Role"],
@@ -13,6 +16,9 @@ export const listRoles = definePermissionRoute({
       query: listRolesQuerySchema,
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": { schema: roleSchema.array() },
@@ -20,7 +26,7 @@ export const listRoles = definePermissionRoute({
         description: "List of roles",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { appId } = c.req.valid("query");
     const roles = await listRolesService(appId);

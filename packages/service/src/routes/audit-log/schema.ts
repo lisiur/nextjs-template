@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 
-export { errorSchema } from "../shared/schema";
+export { errorSchema } from "#lib/openapi";
 
 export const auditLogSchema = z
   .object({

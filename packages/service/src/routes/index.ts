@@ -6,7 +6,7 @@ import { menuRoutes } from "./menu";
 import { operationLogRoutes } from "./operation-log";
 import { organizationRoutes } from "./organization";
 import { roleRoutes } from "./role";
-import { roleMenusRoutes } from "./role-menus";
+import { roleMenusRoutes } from "./role-menu";
 import { systemConfigRoutes } from "./system-config";
 import { systemInfoRoutes } from "./system-info";
 import { uploadRoutes } from "./upload";

@@ -1,14 +1,17 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { getApplicationById } from "#services/application.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import {
   applicationIdParamSchema,
   applicationSchema,
   errorSchema,
 } from "./schema";
 
-export const getApplication = definePermissionRoute({
-  permission: "application::view",
-  route: {
+export const getApplication = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("application::view")),
     method: "get",
     path: "/{id}",
     tags: ["Application"],
@@ -18,6 +21,9 @@ export const getApplication = definePermissionRoute({
       params: applicationIdParamSchema,
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": { schema: applicationSchema },
@@ -31,7 +37,7 @@ export const getApplication = definePermissionRoute({
         description: "Not found",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { id } = c.req.valid("param");
     const app = await getApplicationById(id);

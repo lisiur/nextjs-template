@@ -1,6 +1,9 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { updateRole as updateRoleService } from "#services/role.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import {
   errorSchema,
   roleIdParamSchema,
@@ -8,9 +11,9 @@ import {
   updateRoleBodySchema,
 } from "./schema";
 
-export const updateRole = definePermissionRoute({
-  permission: "role::update",
-  route: {
+export const updateRole = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("role::update")),
     method: "put",
     path: "/{id}",
     tags: ["Role"],
@@ -25,6 +28,9 @@ export const updateRole = definePermissionRoute({
       },
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: { "application/json": { schema: roleSchema } },
         description: "Updated role",
@@ -34,7 +40,7 @@ export const updateRole = definePermissionRoute({
         description: "Not Found",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { id } = c.req.valid("param");
     const data = c.req.valid("json");

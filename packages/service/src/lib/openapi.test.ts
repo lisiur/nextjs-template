@@ -1,8 +1,15 @@
-import { OpenAPIHono, z } from "@hono/zod-openapi";
+import {
+  createRoute,
+  defineOpenAPIRoute,
+  OpenAPIHono,
+  z,
+} from "@hono/zod-openapi";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { definePermissionRoute, defineProtectedRoute } from "./admin-route";
+import { requirePermission } from "#middleware/require-permission";
+import { prepend } from "#utils/list";
+import { forbiddenResponse, unauthorizedResponse } from "./openapi";
 
 vi.mock("#lib/session", () => ({
   getSessionFromHeaders: vi.fn(),
@@ -18,13 +25,16 @@ import { getUserPermissions } from "#services/role-permission.service";
 const mockGetSession = vi.mocked(getSessionFromHeaders);
 const mockGetUserPermissions = vi.mocked(getUserPermissions);
 
-const permissionRoute = definePermissionRoute({
-  route: {
+const permissionRoute = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("test::view")),
     method: "get",
     path: "/permission-required",
     tags: ["Test"],
     summary: "Permission-required test route",
     responses: {
+      ...unauthorizedResponse,
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": {
@@ -34,8 +44,7 @@ const permissionRoute = definePermissionRoute({
         description: "OK",
       },
     },
-  },
-  permission: "test::view",
+  }),
   handler: (c) => c.json({ ok: true as const }, 200),
 });
 
@@ -46,28 +55,27 @@ const requireCustomAuth = createMiddleware(async (c, next) => {
   return next();
 });
 
-const customProtectedRoute = defineProtectedRoute(
-  {
-    route: {
-      method: "get",
-      path: "/custom-protected",
-      tags: ["Test"],
-      summary: "Custom protected test route",
-      responses: {
-        200: {
-          content: {
-            "application/json": {
-              schema: z.object({ ok: z.literal(true) }),
-            },
+const customProtectedRoute = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requireCustomAuth),
+    method: "get",
+    path: "/custom-protected",
+    tags: ["Test"],
+    summary: "Custom protected test route",
+    responses: {
+      ...unauthorizedResponse,
+      200: {
+        content: {
+          "application/json": {
+            schema: z.object({ ok: z.literal(true) }),
           },
-          description: "OK",
         },
+        description: "OK",
       },
     },
-    handler: (c) => c.json({ ok: true as const }, 200),
-  },
-  { middleware: requireCustomAuth },
-);
+  }),
+  handler: (c) => c.json({ ok: true as const }, 200),
+});
 
 function createTestApp() {
   const app = new OpenAPIHono();
@@ -84,7 +92,7 @@ function createTestApp() {
   return app;
 }
 
-describe("defineProtectedRoute", () => {
+describe("protected route composition", () => {
   it("allows callers to provide custom auth middleware", async () => {
     const res = await createTestApp().request("/custom-protected", {
       headers: { authorization: "Bearer valid-token" },
@@ -105,7 +113,7 @@ describe("defineProtectedRoute", () => {
   });
 });
 
-describe("definePermissionRoute", () => {
+describe("permission route composition", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });

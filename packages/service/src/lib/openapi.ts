@@ -12,6 +12,24 @@ export const errorSchema = z
   })
   .openapi("Error");
 
+export const unauthorizedResponse = {
+  401: {
+    content: {
+      "application/json": { schema: errorSchema },
+    },
+    description: "Unauthorized",
+  },
+} as const;
+
+export const forbiddenResponse = {
+  403: {
+    content: {
+      "application/json": { schema: errorSchema },
+    },
+    description: "Forbidden",
+  },
+} as const;
+
 export const deleteSuccessSchema = z
   .object({
     success: z.literal(true),

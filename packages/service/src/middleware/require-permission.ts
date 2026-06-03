@@ -47,10 +47,6 @@ export function requirePermission(
 ) {
   return createMiddleware(async (c, next) => {
     const session = await requireSession(c);
-    if (!session?.user) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
-
     const userPermissions = await getUserPermissions(session.user.id);
 
     let hasPermission: boolean;

@@ -1,11 +1,14 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { deleteRole as deleteRoleService } from "#services/role.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import { errorSchema, roleIdParamSchema, successSchema } from "./schema";
 
-export const deleteRole = definePermissionRoute({
-  permission: "role::delete",
-  route: {
+export const deleteRole = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("role::delete")),
     method: "delete",
     path: "/{id}",
     tags: ["Role"],
@@ -14,6 +17,9 @@ export const deleteRole = definePermissionRoute({
       params: roleIdParamSchema,
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": { schema: successSchema },
@@ -25,7 +31,7 @@ export const deleteRole = definePermissionRoute({
         description: "Not Found",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { id } = c.req.valid("param");
     const { name } = await deleteRoleService(id);

@@ -1,11 +1,14 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { deleteLogs } from "#services/operation-log.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import { deleteLogsBodySchema, deleteSuccessSchema } from "./schema";
 
-export const deleteLogsRoute = definePermissionRoute({
-  permission: "operation-log::delete",
-  route: {
+export const deleteLogsRoute = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("operation-log::delete")),
     method: "delete",
     path: "/",
     tags: ["Log"],
@@ -22,6 +25,9 @@ export const deleteLogsRoute = definePermissionRoute({
       },
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": { schema: deleteSuccessSchema },
@@ -29,7 +35,7 @@ export const deleteLogsRoute = definePermissionRoute({
         description: "Successfully deleted",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { ids } = c.req.valid("json");
 

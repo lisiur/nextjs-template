@@ -1,10 +1,13 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { listAllConfigs } from "#services/system-config.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import { getConfigsQuerySchema, systemConfigItemSchema } from "./schema";
 
-export const listAllConfigsRoute = definePermissionRoute({
-  permission: "system-config::list",
-  route: {
+export const listAllConfigsRoute = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("system-config::list")),
     method: "get",
     path: "/",
     tags: ["SystemConfig"],
@@ -15,6 +18,9 @@ export const listAllConfigsRoute = definePermissionRoute({
       query: getConfigsQuerySchema,
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": {
@@ -24,7 +30,7 @@ export const listAllConfigsRoute = definePermissionRoute({
         description: "List of system configurations",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { group } = c.req.valid("query");
     const configs = await listAllConfigs(group);

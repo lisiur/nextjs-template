@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
-import { idParamSchema, paginationQuerySchema } from "../shared/schema";
+import { idParamSchema, paginationQuerySchema } from "#lib/openapi";
 
-export { deleteSuccessSchema, errorSchema } from "../shared/schema";
+export { deleteSuccessSchema, errorSchema } from "#lib/openapi";
 
 export const applicationSchema = z
   .object({

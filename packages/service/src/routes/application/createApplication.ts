@@ -1,15 +1,18 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { createApplication as createApplicationService } from "#services/application.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import {
   applicationSchema,
   createApplicationBodySchema,
   errorSchema,
 } from "./schema";
 
-export const createApplication = definePermissionRoute({
-  permission: "application::create",
-  route: {
+export const createApplication = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("application::create")),
     method: "post",
     path: "/",
     tags: ["Application"],
@@ -26,6 +29,9 @@ export const createApplication = definePermissionRoute({
       },
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       201: {
         content: {
           "application/json": { schema: applicationSchema },
@@ -39,7 +45,7 @@ export const createApplication = definePermissionRoute({
         description: "Application code already exists",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const body = c.req.valid("json");
     const app = await createApplicationService(body);

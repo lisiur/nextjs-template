@@ -1,19 +1,30 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import {
+  createRoute,
+  defineOpenAPIRoute,
+  OpenAPIHono,
+  z,
+} from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
+import {
+  errorSchema,
+  forbiddenResponse,
+  unauthorizedResponse,
+} from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { menuSchema } from "#routes/menu/schema";
-import { definePermissionRoute } from "#routes/shared/admin-route";
-import { errorSchema } from "#routes/shared/schema";
 import {
   assignPermissionByMenuIds,
   getRoleMenus,
 } from "#services/role-permission.service";
+import { prepend } from "#utils/list";
 
 const roleIdParamSchema = z.object({
   roleId: z.string().min(1),
 });
 
-export const getRoleMenusRoute = definePermissionRoute({
+export const getRoleMenusRoute = defineOpenAPIRoute({
   route: createRoute({
+    middleware: prepend([], requirePermission("role::list")),
     method: "get",
     path: "/{roleId}",
     tags: ["RoleMenus"],
@@ -23,6 +34,8 @@ export const getRoleMenusRoute = definePermissionRoute({
       params: roleIdParamSchema,
     },
     responses: {
+      ...unauthorizedResponse,
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": {
@@ -41,7 +54,6 @@ export const getRoleMenusRoute = definePermissionRoute({
       },
     },
   }),
-  permission: "role::list",
   handler: async (c) => {
     const { roleId } = c.req.valid("param");
     const menus = await getRoleMenus(roleId);
@@ -49,8 +61,9 @@ export const getRoleMenusRoute = definePermissionRoute({
   },
 });
 
-export const batchAssignRoleMenus = definePermissionRoute({
+export const batchAssignRoleMenus = defineOpenAPIRoute({
   route: createRoute({
+    middleware: prepend([], requirePermission("role::update")),
     method: "put",
     path: "/batch",
     tags: ["RoleMenus"],
@@ -73,6 +86,8 @@ export const batchAssignRoleMenus = definePermissionRoute({
       },
     },
     responses: {
+      ...unauthorizedResponse,
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": {
@@ -91,7 +106,6 @@ export const batchAssignRoleMenus = definePermissionRoute({
       },
     },
   }),
-  permission: "role::update",
   handler: async (c) => {
     const { roleId, menuIds } = c.req.valid("json");
 

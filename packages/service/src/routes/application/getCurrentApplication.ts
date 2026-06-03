@@ -1,16 +1,22 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requireCurrentApp } from "#extractors/current-app";
-import { definePermissionRoute } from "../shared/admin-route";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
+import { prepend } from "#utils/list";
 import { applicationSchema, errorSchema } from "./schema";
 
-export const getCurrentApplication = definePermissionRoute({
-  permission: "application::view",
-  route: {
+export const getCurrentApplication = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("application::view")),
     method: "get",
     path: "/current",
     tags: ["Application"],
     summary: "Get current application",
     description: "Returns the application resolved from the X-App-Code header.",
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": { schema: applicationSchema },
@@ -30,7 +36,7 @@ export const getCurrentApplication = definePermissionRoute({
         description: "Application not found",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const app = await requireCurrentApp(c);
     return c.json(app, 200);

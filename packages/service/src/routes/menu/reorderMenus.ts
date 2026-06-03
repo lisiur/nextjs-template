@@ -1,14 +1,17 @@
-import { createRoute } from "@hono/zod-openapi";
-import { definePermissionRoute } from "#routes/shared/admin-route";
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { reorderMenus as reorderMenusService } from "#services/menu.service";
+import { prepend } from "#utils/list";
 import {
   errorSchema,
   reorderMenusBodySchema,
   reorderMenusResponseSchema,
 } from "./schema";
 
-export const reorderMenus = definePermissionRoute({
+export const reorderMenus = defineOpenAPIRoute({
   route: createRoute({
+    middleware: prepend([], requirePermission("menu::reorder")),
     method: "post",
     path: "/reorder",
     tags: ["Menu"],
@@ -26,6 +29,9 @@ export const reorderMenus = definePermissionRoute({
       },
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": { schema: reorderMenusResponseSchema },
@@ -40,7 +46,6 @@ export const reorderMenus = definePermissionRoute({
       },
     },
   }),
-  permission: "menu::reorder",
   handler: async (c) => {
     const body = c.req.valid("json");
 

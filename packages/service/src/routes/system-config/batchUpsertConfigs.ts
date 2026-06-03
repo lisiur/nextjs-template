@@ -1,15 +1,18 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { batchUpsertConfigs } from "#services/system-config.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import {
   batchUpsertBodySchema,
   errorSchema,
   systemConfigItemSchema,
 } from "./schema";
 
-export const batchUpsertConfigsRoute = definePermissionRoute({
-  permission: "system-config::batchUpsert",
-  route: {
+export const batchUpsertConfigsRoute = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("system-config::batchUpsert")),
     method: "put",
     path: "/batch",
     tags: ["SystemConfig"],
@@ -27,6 +30,9 @@ export const batchUpsertConfigsRoute = definePermissionRoute({
       },
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": {
@@ -44,7 +50,7 @@ export const batchUpsertConfigsRoute = definePermissionRoute({
         description: "Validation error",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { items } = c.req.valid("json");
 

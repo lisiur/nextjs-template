@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 
-export { deleteSuccessSchema, errorSchema } from "../shared/schema";
+export { deleteSuccessSchema, errorSchema } from "#lib/openapi";
 
 export const operationLogSchema = z
   .object({

@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 
-export { errorSchema, successSchema } from "../shared/schema";
+export { errorSchema, successSchema } from "#lib/openapi";
 
 export const adminUserSchema = z
   .object({

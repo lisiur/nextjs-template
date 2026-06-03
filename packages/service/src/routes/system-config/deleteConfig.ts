@@ -1,15 +1,18 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { deleteConfig } from "#services/system-config.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import {
   deleteConfigParamSchema,
   deleteSuccessSchema,
   errorSchema,
 } from "./schema";
 
-export const deleteConfigRoute = definePermissionRoute({
-  permission: "system-config::delete",
-  route: {
+export const deleteConfigRoute = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("system-config::delete")),
     method: "delete",
     path: "/{group}/{key}",
     tags: ["SystemConfig"],
@@ -19,6 +22,9 @@ export const deleteConfigRoute = definePermissionRoute({
       params: deleteConfigParamSchema,
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": {
@@ -36,7 +42,7 @@ export const deleteConfigRoute = definePermissionRoute({
         description: "Config not found",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const { group, key } = c.req.valid("param");
 

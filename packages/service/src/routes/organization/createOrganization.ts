@@ -1,15 +1,18 @@
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { logAudit } from "#lib/logger";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { createOrganization as createOrganizationService } from "#services/organization.service";
-import { definePermissionRoute } from "../shared/admin-route";
+import { prepend } from "#utils/list";
 import {
   createOrganizationBodySchema,
   errorSchema,
   organizationSchema,
 } from "./schema";
 
-export const createOrganization = definePermissionRoute({
-  permission: "organization::create",
-  route: {
+export const createOrganization = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("organization::create")),
     method: "post",
     path: "/",
     tags: ["Organization"],
@@ -26,6 +29,9 @@ export const createOrganization = definePermissionRoute({
       },
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       201: {
         content: {
           "application/json": { schema: organizationSchema },
@@ -39,7 +45,7 @@ export const createOrganization = definePermissionRoute({
         description: "Slug already taken",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const body = c.req.valid("json");
     const org = await createOrganizationService(body);

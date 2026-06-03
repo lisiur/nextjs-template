@@ -1,10 +1,13 @@
-import { createRoute } from "@hono/zod-openapi";
-import { definePermissionRoute } from "#routes/shared/admin-route";
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
 import { listMenus as listMenusService } from "#services/menu.service";
+import { prepend } from "#utils/list";
 import { listMenusQuerySchema, listMenusResponseSchema } from "./schema";
 
-export const listMenus = definePermissionRoute({
+export const listMenus = defineOpenAPIRoute({
   route: createRoute({
+    middleware: prepend([], requirePermission("menu::list")),
     method: "get",
     path: "/",
     tags: ["Menu"],
@@ -15,6 +18,9 @@ export const listMenus = definePermissionRoute({
       query: listMenusQuerySchema,
     },
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: {
           "application/json": {
@@ -25,7 +31,6 @@ export const listMenus = definePermissionRoute({
       },
     },
   }),
-  permission: "menu::list",
   handler: async (c) => {
     const { appId } = c.req.valid("query");
 

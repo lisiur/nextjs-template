@@ -1,6 +1,9 @@
 import fs from "node:fs";
 import os from "node:os";
-import { definePermissionRoute } from "../shared/admin-route";
+import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { forbiddenResponse, unauthorizedResponse } from "#lib/openapi";
+import { requirePermission } from "#middleware/require-permission";
+import { prepend } from "#utils/list";
 import { systemInfoSchema } from "./schema";
 
 function sampleCpuTimes(): { idle: number; total: number } {
@@ -155,21 +158,24 @@ function getProcessCpuUsage(): number {
   return 0;
 }
 
-export const getSystemInfo = definePermissionRoute({
-  permission: "system-info::view",
-  route: {
+export const getSystemInfo = defineOpenAPIRoute({
+  route: createRoute({
+    middleware: prepend([], requirePermission("system-info::view")),
     method: "get",
     path: "/",
     tags: ["SystemInfo"],
     summary: "Get system resource info",
     description: "Returns current CPU, memory, and storage usage information.",
     responses: {
+      ...unauthorizedResponse,
+
+      ...forbiddenResponse,
       200: {
         content: { "application/json": { schema: systemInfoSchema } },
         description: "System resource information",
       },
     },
-  },
+  }),
   handler: async (c) => {
     const cpuUsage = await getCpuUsage();
     const cpus = os.cpus();
