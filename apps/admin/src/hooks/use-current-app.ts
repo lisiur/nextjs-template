@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { appClient, useSession } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 
@@ -16,28 +16,21 @@ interface Application {
 }
 
 export function useCurrentApp() {
-  const [app, setApp] = useState<Application | null>(null);
-  const [loading, setLoading] = useState(true);
   const session = useSession();
 
-  useEffect(() => {
-    if (session.isPending) return;
+  const query = useQuery({
+    queryKey: ["applications", "current"],
+    queryFn: async () => {
+      const res = await withApiFeedback(
+        appClient.api.applications.current.$get,
+      )();
+      return (await res.json()) as Application;
+    },
+    enabled: !session.isPending && !!session.data,
+  });
 
-    if (!session.data) {
-      setApp(null);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    withApiFeedback(appClient.api.applications.current.$get)()
-      .then(async (res) => {
-        const data = (await res.json()) as Application;
-        setApp(data);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [session.isPending, session.data]);
-
-  return { app, loading };
+  return {
+    app: query.data ?? null,
+    loading: query.isLoading,
+  };
 }
