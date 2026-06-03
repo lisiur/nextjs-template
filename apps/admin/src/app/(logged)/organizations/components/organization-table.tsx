@@ -3,7 +3,7 @@
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { PaginatedTableFrame } from "@/components/paginated-table-frame";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useConfirm } from "@/hooks/use-confirm";
-import { usePaginatedApiQuery } from "@/hooks/use-paginated-api-query";
+import { usePaginatedQuery } from "@/hooks/use-paginated-query";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDate } from "@/utils/date";
@@ -36,17 +36,6 @@ export function OrganizationTable() {
   const [showCreate, setShowCreate] = useState(false);
   const [editOrg, setEditOrg] = useState<Organization | null>(null);
 
-  const fetchOrganizationsPage = useCallback(
-    async ({ limit, offset }: { limit: number; offset: number }) => {
-      const res = await withApiFeedback(appClient.api.organizations.$get)({
-        query: { limit, offset },
-      });
-      const data = await res.json();
-      return { items: data.organizations, total: data.total };
-    },
-    [],
-  );
-
   const {
     items: organizations,
     total,
@@ -55,7 +44,16 @@ export function OrganizationTable() {
     loading,
     setPage,
     refresh: fetchOrganizations,
-  } = usePaginatedApiQuery<Organization>({ fetchPage: fetchOrganizationsPage });
+  } = usePaginatedQuery<Organization>({
+    queryKey: ["organizations"],
+    queryFn: async ({ limit, offset }) => {
+      const res = await withApiFeedback(appClient.api.organizations.$get)({
+        query: { limit, offset },
+      });
+      const data = await res.json();
+      return { items: data.organizations, total: data.total };
+    },
+  });
 
   function handleEditSuccess() {
     setEditOrg(null);
