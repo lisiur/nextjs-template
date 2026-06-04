@@ -1,5 +1,9 @@
 import { z } from "@hono/zod-openapi";
-import { idParamSchema, paginationQuerySchema } from "#lib/openapi";
+import {
+  idParamSchema,
+  paginationQuerySchema,
+  uploadUrlSchema,
+} from "#lib/openapi";
 
 export { deleteSuccessSchema, errorSchema } from "#lib/openapi";
 
@@ -26,7 +30,7 @@ export const createApplicationBodySchema = z.object({
   name: z.string().min(1).openapi({ example: "OA System" }),
   code: z.string().min(1).openapi({ example: "oa" }),
   description: z.string().optional(),
-  logo: z.string().optional(),
+  logo: uploadUrlSchema.optional(),
   sortOrder: z.number().int().default(0),
 });
 
@@ -34,7 +38,7 @@ export const updateApplicationBodySchema = z.object({
   name: z.string().min(1).optional(),
   code: z.string().min(1).optional(),
   description: z.string().nullable().optional(),
-  logo: z.string().nullable().optional(),
+  logo: uploadUrlSchema.nullable().optional(),
   sortOrder: z.number().int().optional(),
 });
 

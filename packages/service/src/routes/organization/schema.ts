@@ -1,5 +1,9 @@
 import { z } from "@hono/zod-openapi";
-import { idParamSchema, paginationQuerySchema } from "#lib/openapi";
+import {
+  idParamSchema,
+  paginationQuerySchema,
+  uploadUrlSchema,
+} from "#lib/openapi";
 
 export { deleteSuccessSchema, errorSchema } from "#lib/openapi";
 
@@ -25,7 +29,7 @@ export const createOrganizationBodySchema = z.object({
     .min(1)
     .regex(/^[a-z0-9-]+$/)
     .openapi({ example: "acme-corp" }),
-  logo: z.url().optional(),
+  logo: uploadUrlSchema.optional(),
   metadata: z.string().optional(),
 });
 
@@ -36,7 +40,7 @@ export const updateOrganizationBodySchema = z.object({
     .min(1)
     .regex(/^[a-z0-9-]+$/)
     .optional(),
-  logo: z.url().nullable().optional(),
+  logo: uploadUrlSchema.nullable().optional(),
   metadata: z.string().nullable().optional(),
 });
 

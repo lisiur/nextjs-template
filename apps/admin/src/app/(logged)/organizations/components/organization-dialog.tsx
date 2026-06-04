@@ -4,8 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ImagePlus, X } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { appClient } from "@/lib/api";
+import { uploadPublicFile } from "@/lib/api/upload-file";
 import { withApiFeedback } from "@/lib/api/utils";
 
 const orgSchema = z.object({
@@ -68,9 +70,12 @@ export function OrganizationDialog({
   const t = useTranslations("Organizations");
   const isEdit = !!organization;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoObjectUrlRef = useRef<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>(
     organization?.logo ?? "",
   );
+  const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
+  const [logoRemoved, setLogoRemoved] = useState(false);
 
   const {
     register,
@@ -91,19 +96,35 @@ export function OrganizationDialog({
 
   const watchName = watch("name");
 
+  const clearLogoObjectUrl = useCallback(() => {
+    if (logoObjectUrlRef.current) {
+      URL.revokeObjectURL(logoObjectUrlRef.current);
+      logoObjectUrlRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => clearLogoObjectUrl, [clearLogoObjectUrl]);
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      setLogoPreview(dataUrl);
-      setValue("logo", dataUrl, { shouldValidate: true });
-    };
-    reader.readAsDataURL(file);
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(t("logoTooLarge"));
+      return;
+    }
+    clearLogoObjectUrl();
+    const previewUrl = URL.createObjectURL(file);
+    logoObjectUrlRef.current = previewUrl;
+    setSelectedLogoFile(file);
+    setLogoRemoved(false);
+    setLogoPreview(previewUrl);
+    setValue("logo", previewUrl, { shouldValidate: true });
   }
 
   function handleRemoveLogo() {
+    clearLogoObjectUrl();
+    setSelectedLogoFile(null);
+    setLogoRemoved(true);
     setLogoPreview("");
     setValue("logo", "", { shouldValidate: true });
     if (fileInputRef.current) {
@@ -119,13 +140,19 @@ export function OrganizationDialog({
 
   async function onSubmit(data: OrgInput) {
     try {
+      const logo = selectedLogoFile
+        ? await uploadPublicFile(selectedLogoFile)
+        : logoRemoved
+          ? null
+          : (organization?.logo ?? null);
+
       if (isEdit) {
         await withApiFeedback(appClient.api.organizations[":id"].$put)({
           param: { id: organization.id },
           json: {
             name: data.name,
             slug: data.slug,
-            logo: data.logo || null,
+            logo,
             metadata: data.metadata || null,
           },
         });
@@ -134,11 +161,14 @@ export function OrganizationDialog({
           json: {
             name: data.name,
             slug: data.slug,
-            logo: data.logo || undefined,
+            logo: logo ?? undefined,
             metadata: data.metadata || undefined,
           },
         });
       }
+      clearLogoObjectUrl();
+      setSelectedLogoFile(null);
+      setLogoRemoved(false);
       reset();
       onSuccess();
     } catch {
@@ -148,6 +178,9 @@ export function OrganizationDialog({
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
+      clearLogoObjectUrl();
+      setSelectedLogoFile(null);
+      setLogoRemoved(false);
       reset();
       setLogoPreview(organization?.logo ?? "");
     }

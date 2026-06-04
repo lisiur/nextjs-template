@@ -134,6 +134,7 @@ export function OrganizationTable() {
                     width={24}
                     height={24}
                     className="rounded"
+                    unoptimized
                   />
                 ) : (
                   <span className="text-muted-foreground">-</span>

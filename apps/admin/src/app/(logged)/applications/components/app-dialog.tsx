@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ImagePlus, X } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { appClient } from "@/lib/api";
+import { uploadPublicFile } from "@/lib/api/upload-file";
 import { withApiFeedback } from "@/lib/api/utils";
 
 const appSchema = z.object({
@@ -59,7 +60,10 @@ export function AppDialog({
   const t = useTranslations("Applications");
   const isEdit = !!app;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoObjectUrlRef = useRef<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>(app?.logo ?? "");
+  const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
+  const [logoRemoved, setLogoRemoved] = useState(false);
 
   const {
     register,
@@ -77,6 +81,15 @@ export function AppDialog({
     },
   });
 
+  const clearLogoObjectUrl = useCallback(() => {
+    if (logoObjectUrlRef.current) {
+      URL.revokeObjectURL(logoObjectUrlRef.current);
+      logoObjectUrlRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => clearLogoObjectUrl, [clearLogoObjectUrl]);
+
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -84,16 +97,19 @@ export function AppDialog({
       toast.error(t("logoTooLarge"));
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      setLogoPreview(dataUrl);
-      setValue("logo", dataUrl, { shouldValidate: true });
-    };
-    reader.readAsDataURL(file);
+    clearLogoObjectUrl();
+    const previewUrl = URL.createObjectURL(file);
+    logoObjectUrlRef.current = previewUrl;
+    setSelectedLogoFile(file);
+    setLogoRemoved(false);
+    setLogoPreview(previewUrl);
+    setValue("logo", previewUrl, { shouldValidate: true });
   }
 
   function handleRemoveLogo() {
+    clearLogoObjectUrl();
+    setSelectedLogoFile(null);
+    setLogoRemoved(true);
     setLogoPreview("");
     setValue("logo", "", { shouldValidate: true });
     if (fileInputRef.current) {
@@ -103,6 +119,12 @@ export function AppDialog({
 
   async function onSubmit(data: AppInput) {
     try {
+      const logo = selectedLogoFile
+        ? await uploadPublicFile(selectedLogoFile)
+        : logoRemoved
+          ? null
+          : (app?.logo ?? null);
+
       if (isEdit) {
         await withApiFeedback(appClient.api.applications[":id"].$put)({
           param: { id: app.id },
@@ -110,7 +132,7 @@ export function AppDialog({
             name: data.name,
             code: data.code,
             description: data.description || null,
-            logo: data.logo || null,
+            logo,
           },
         });
       } else {
@@ -119,10 +141,13 @@ export function AppDialog({
             name: data.name,
             code: data.code,
             description: data.description || undefined,
-            logo: data.logo || undefined,
+            logo: logo ?? undefined,
           },
         });
       }
+      clearLogoObjectUrl();
+      setSelectedLogoFile(null);
+      setLogoRemoved(false);
       reset();
       onSuccess();
     } catch {
@@ -132,6 +157,9 @@ export function AppDialog({
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
+      clearLogoObjectUrl();
+      setSelectedLogoFile(null);
+      setLogoRemoved(false);
       reset();
       setLogoPreview(app?.logo ?? "");
     }

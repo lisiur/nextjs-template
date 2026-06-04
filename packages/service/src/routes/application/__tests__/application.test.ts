@@ -149,6 +149,55 @@ describe("POST / - Create Application", () => {
     expect(data.createdAt).toBeDefined();
   });
 
+  it("persists upload store logo URLs", async () => {
+    const now = new Date();
+    mockPrisma.application.findFirst.mockResolvedValue(null);
+    mockPrisma.application.create.mockResolvedValue({
+      id: "app1",
+      name: "OA System",
+      code: "oa",
+      description: null,
+      logo: "/api/upload/upload1",
+      sortOrder: 0,
+      deletedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const { createApplication } = await import("../createApplication");
+    const res = await testRoute(createApplication, {
+      method: "POST",
+      path: "/",
+      body: { name: "OA System", code: "oa", logo: "/api/upload/upload1" },
+    });
+
+    expect(res.status).toBe(201);
+    expect(mockPrisma.application.create).toHaveBeenCalledWith({
+      data: {
+        name: "OA System",
+        code: "oa",
+        logo: "/api/upload/upload1",
+        sortOrder: 0,
+      },
+    });
+  });
+
+  it("returns 400 for non-upload logo strings", async () => {
+    const { createApplication } = await import("../createApplication");
+    const res = await testRoute(createApplication, {
+      method: "POST",
+      path: "/",
+      body: {
+        name: "OA System",
+        code: "oa",
+        logo: "data:image/png;base64,abc",
+      },
+    });
+
+    expect(res.status).toBe(400);
+    expect(mockPrisma.application.create).not.toHaveBeenCalled();
+  });
+
   it("returns 409 for duplicate code (non-deleted)", async () => {
     mockPrisma.application.findFirst.mockResolvedValue({
       id: "existing",
@@ -360,6 +409,38 @@ describe("PUT /{id} - Update Application", () => {
     expect(res.status).toBe(200);
     const data = await res.json();
     expect(data.name).toBe("Updated OA");
+  });
+
+  it("allows clearing logo with null", async () => {
+    mockPrisma.application.findFirst.mockResolvedValue({
+      id: "app1",
+      name: "OA",
+      code: "oa",
+      logo: "/api/upload/upload1",
+      deletedAt: null,
+    });
+
+    mockPrisma.application.update.mockResolvedValue({
+      id: "app1",
+      name: "OA",
+      code: "oa",
+      logo: null,
+      deletedAt: null,
+    });
+
+    const { updateApplication } = await import("../updateApplication");
+    const res = await testRoute(updateApplication, {
+      method: "PUT",
+      path: "/app1",
+      params: { id: "app1" },
+      body: { logo: null },
+    });
+
+    expect(res.status).toBe(200);
+    expect(mockPrisma.application.update).toHaveBeenCalledWith({
+      where: { id: "app1" },
+      data: { logo: null },
+    });
   });
 
   it("returns 409 when code conflicts with another app", async () => {

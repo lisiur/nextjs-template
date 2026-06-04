@@ -5,6 +5,13 @@ export const paginationQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
+export const uploadUrlSchema = z
+  .string()
+  .regex(/^\/api\/upload\/[A-Za-z0-9_-]+$/, {
+    message: "Expected an upload store URL",
+  })
+  .openapi({ example: "/api/upload/clx1234567890" });
+
 export const errorSchema = z
   .object({
     code: z.number().openapi({ example: 400 }),
