@@ -1,3 +1,4 @@
+import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 
 export const systemConfigRepository = {
@@ -58,7 +59,7 @@ export const systemConfigRepository = {
 interface UpsertInput {
   value: string;
   type?: string;
-  schema?: Record<string, unknown>;
+  schema?: Prisma.InputJsonValue;
   label: string;
   description?: string;
   isSecret?: boolean;

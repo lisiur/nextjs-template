@@ -1,4 +1,5 @@
 import { HTTPException } from "hono/http-exception";
+import type { Prisma } from "#generated/prisma/client";
 import { systemConfigRepository } from "#repositories/system-config.repository";
 
 export async function upsertConfig(
@@ -7,7 +8,7 @@ export async function upsertConfig(
   data: {
     value: string;
     type?: string;
-    schema?: Record<string, unknown>;
+    schema?: Prisma.InputJsonValue;
     label: string;
     description?: string;
     isSecret?: boolean;
@@ -23,7 +24,7 @@ export async function batchUpsertConfigs(
     key: string;
     value: string;
     type?: string;
-    schema?: Record<string, unknown>;
+    schema?: Prisma.InputJsonValue;
     label: string;
     description?: string;
     isSecret?: boolean;

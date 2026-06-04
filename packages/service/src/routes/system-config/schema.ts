@@ -6,7 +6,7 @@ export const configTypeSchema = z
   .enum(["string", "number", "boolean", "json"])
   .openapi({ example: "string" });
 
-const jsonSchemaValueSchema = z.record(z.string(), z.unknown());
+const jsonSchemaValueSchema = z.any().nullable();
 
 export const systemConfigItemSchema = z
   .object({
@@ -23,8 +23,14 @@ export const systemConfigItemSchema = z
     description: z.string().nullable().optional(),
     isSecret: z.boolean().openapi({ example: false }),
     sortOrder: z.number().openapi({ example: 0 }),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: z
+      .string()
+      .datetime()
+      .openapi({ example: "2024-01-01T00:00:00.000Z" }),
+    updatedAt: z
+      .string()
+      .datetime()
+      .openapi({ example: "2024-01-01T00:00:00.000Z" }),
   })
   .openapi("SystemConfig");
 
