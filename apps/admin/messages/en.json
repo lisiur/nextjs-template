@@ -153,7 +153,8 @@
     "tabs": {
       "general": "General",
       "auth": "Authentication",
-      "smtp": "Email (SMTP)"
+      "smtp": "Email (SMTP)",
+      "upload": "Upload"
     },
     "save": "Save Changes",
     "saving": "Saving...",
@@ -161,7 +162,9 @@
     "saveFailed": "Failed to save settings",
     "loadFailed": "Failed to load settings",
     "enable": "Enable",
-    "jsonPlaceholder": "Enter JSON"
+    "jsonPlaceholder": "Enter JSON",
+    "addArrayItem": "Add",
+    "arrayItemPlaceholder": "Enter item"
   },
   "Sidebar": {
     "monitor": "Monitor",
@@ -315,7 +318,11 @@
         "smtpPort": "SMTP Port",
         "smtpUser": "SMTP Username",
         "smtpPassword": "SMTP Password",
-        "fromEmail": "From Email"
+        "fromEmail": "From Email",
+        "uploadHotlink": "Upload Hotlink Protection",
+        "uploadHotlinkEnabled": "Enable Hotlink Protection",
+        "uploadHotlinkAllowedDomains": "Allowed Domains",
+        "uploadHotlinkAllowEmptyReferer": "Allow Empty Referer"
       },
       "fieldsDesc": {
         "siteName": "The name of your application",
@@ -327,7 +334,10 @@
         "smtpPort": "SMTP server port",
         "smtpUser": "SMTP authentication username",
         "smtpPassword": "SMTP authentication password",
-        "fromEmail": "Email address used as sender"
+        "fromEmail": "Email address used as sender",
+        "uploadHotlink": "Controls global anti-theft-link protection for uploaded files",
+        "uploadHotlinkAllowedDomains": "Hostnames allowed to embed uploaded files",
+        "uploadHotlinkAllowEmptyReferer": "Allow direct access when Referer and Origin headers are absent"
       }
     }
   },

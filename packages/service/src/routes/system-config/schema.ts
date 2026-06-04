@@ -6,6 +6,8 @@ export const configTypeSchema = z
   .enum(["string", "number", "boolean", "json"])
   .openapi({ example: "string" });
 
+const jsonSchemaValueSchema = z.record(z.string(), z.unknown());
+
 export const systemConfigItemSchema = z
   .object({
     id: z.string().openapi({ example: "clx1234567890" }),
@@ -16,6 +18,7 @@ export const systemConfigItemSchema = z
       example: "string",
       description: "Value type: string, number, boolean, or json",
     }),
+    schema: jsonSchemaValueSchema.nullable().optional(),
     label: z.string().openapi({ example: "Site Name" }),
     description: z.string().nullable().optional(),
     isSecret: z.boolean().openapi({ example: false }),
@@ -43,6 +46,7 @@ export const upsertConfigParamSchema = z.object({
 export const upsertConfigBodySchema = z.object({
   value: z.string().openapi({ example: "My Application" }),
   type: configTypeSchema.default("string"),
+  schema: jsonSchemaValueSchema.optional(),
   label: z.string().min(1).openapi({ example: "Site Name" }),
   description: z.string().optional(),
   isSecret: z.boolean().default(false),
@@ -57,6 +61,7 @@ export const batchUpsertBodySchema = z.object({
         key: z.string().min(1).openapi({ example: "site.name" }),
         value: z.string().openapi({ example: "My Application" }),
         type: configTypeSchema.default("string"),
+        schema: jsonSchemaValueSchema.optional(),
         label: z.string().min(1).openapi({ example: "Site Name" }),
         description: z.string().optional(),
         isSecret: z.boolean().default(false),

@@ -3,6 +3,7 @@ import { createReadStream } from "node:fs";
 import { mkdir, stat, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 import { prisma } from "#lib/db";
 
 const ALLOWED_TYPES = [
@@ -15,6 +16,20 @@ const ALLOWED_TYPES = [
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const UPLOADS_ROOT = join(process.cwd(), "uploads");
 const SIGN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+const DEFAULT_HOTLINK_CONFIG = {
+  enabled: false,
+  allowedDomains: [],
+  allowEmptyReferer: true,
+};
+const hotlinkConfigSchema = z.object({
+  enabled: z.boolean().default(DEFAULT_HOTLINK_CONFIG.enabled),
+  allowedDomains: z
+    .array(z.string())
+    .default(DEFAULT_HOTLINK_CONFIG.allowedDomains),
+  allowEmptyReferer: z
+    .boolean()
+    .default(DEFAULT_HOTLINK_CONFIG.allowEmptyReferer),
+});
 
 function getSignSecret(): string {
   const secret = process.env.UPLOAD_SIGN_SECRET;
@@ -99,8 +114,9 @@ export async function getFileAccess(params: {
   id: string;
   token?: string;
   expires?: string;
+  headers?: Headers;
 }) {
-  const { id, token, expires } = params;
+  const { id, token, expires, headers } = params;
 
   const upload = await prisma.upload.findUnique({ where: { id } });
   if (!upload) {
@@ -123,6 +139,8 @@ export async function getFileAccess(params: {
       throw new HTTPException(403, { message: "Invalid signature" });
     }
   }
+
+  await assertHotlinkAllowed(headers);
 
   const filePath = join(UPLOADS_ROOT, upload.path);
 
@@ -150,6 +168,59 @@ export async function getFileAccess(params: {
     size: upload.size,
     visibility: upload.visibility,
   };
+}
+
+function normalizeDomain(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function getRequestHostname(headers?: Headers): string | null {
+  const source = headers?.get("referer") ?? headers?.get("origin");
+  if (!source) return null;
+  try {
+    return new URL(source).hostname.toLowerCase();
+  } catch {
+    return "";
+  }
+}
+
+async function getUploadHotlinkConfig() {
+  const config = await prisma.systemConfig.findUnique({
+    where: { group_key: { group: "upload", key: "hotlink" } },
+  });
+  if (!config) return DEFAULT_HOTLINK_CONFIG;
+
+  try {
+    return hotlinkConfigSchema.parse(JSON.parse(config.value));
+  } catch {
+    return DEFAULT_HOTLINK_CONFIG;
+  }
+}
+
+async function assertHotlinkAllowed(headers?: Headers) {
+  const config = await getUploadHotlinkConfig();
+  if (!config.enabled) return;
+
+  const hostname = getRequestHostname(headers);
+  if (hostname === null) {
+    if (config.allowEmptyReferer) return;
+    throw new HTTPException(403, {
+      message: "Hotlink protection blocked access",
+    });
+  }
+
+  if (hostname === "") {
+    throw new HTTPException(403, {
+      message: "Hotlink protection blocked access",
+    });
+  }
+
+  const allowedDomains = new Set(config.allowedDomains.map(normalizeDomain));
+  if (!allowedDomains.has(hostname)) {
+    throw new HTTPException(403, {
+      message: "Hotlink protection blocked access",
+    });
+  }
 }
 
 export async function signFile(params: { id: string; userId: string }) {

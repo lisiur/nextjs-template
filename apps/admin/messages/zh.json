@@ -153,7 +153,8 @@
     "tabs": {
       "general": "通用",
       "auth": "认证",
-      "smtp": "邮件 (SMTP)"
+      "smtp": "邮件 (SMTP)",
+      "upload": "上传"
     },
     "save": "保存更改",
     "saving": "保存中...",
@@ -161,7 +162,9 @@
     "saveFailed": "设置保存失败",
     "loadFailed": "设置加载失败",
     "enable": "启用",
-    "jsonPlaceholder": "输入 JSON"
+    "jsonPlaceholder": "输入 JSON",
+    "addArrayItem": "添加",
+    "arrayItemPlaceholder": "输入条目"
   },
   "Sidebar": {
     "monitor": "监控",
@@ -315,7 +318,11 @@
         "smtpPort": "SMTP 端口",
         "smtpUser": "SMTP 用户名",
         "smtpPassword": "SMTP 密码",
-        "fromEmail": "发件人邮箱"
+        "fromEmail": "发件人邮箱",
+        "uploadHotlink": "上传防盗链",
+        "uploadHotlinkEnabled": "启用防盗链",
+        "uploadHotlinkAllowedDomains": "允许的域名",
+        "uploadHotlinkAllowEmptyReferer": "允许空 Referer"
       },
       "fieldsDesc": {
         "siteName": "应用的名称",
@@ -327,7 +334,10 @@
         "smtpPort": "SMTP 服务器端口",
         "smtpUser": "SMTP 认证用户名",
         "smtpPassword": "SMTP 认证密码",
-        "fromEmail": "用作发件人的邮箱地址"
+        "fromEmail": "用作发件人的邮箱地址",
+        "uploadHotlink": "控制上传文件的全局防盗链保护",
+        "uploadHotlinkAllowedDomains": "允许引用上传文件的主机名",
+        "uploadHotlinkAllowEmptyReferer": "当 Referer 和 Origin 请求头缺失时允许直接访问"
       }
     }
   },

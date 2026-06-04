@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfigGroup } from "./components/config-group";
 
-const tabKeys = ["general", "auth", "smtp"] as const;
+const tabKeys = ["general", "auth", "smtp", "upload"] as const;
 
 export default function SettingsPage() {
   const t = useTranslations("Settings");

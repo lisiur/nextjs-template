@@ -132,6 +132,7 @@ model SystemConfig {
   key         String
   value       String
   type        String   @default("string")
+  schema      Json?
   label       String
   description String?
   isSecret    Boolean  @default(false)

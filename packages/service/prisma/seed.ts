@@ -135,6 +135,33 @@ const permissionDefinitions = [
   { code: "upload::sign", group: "upload", name: "Sign Upload URL" },
 ];
 
+const uploadHotlinkSchema = {
+  $schema: "https://json-schema.org/draft/2020-12/schema",
+  type: "object",
+  additionalProperties: false,
+  required: ["enabled", "allowedDomains", "allowEmptyReferer"],
+  properties: {
+    enabled: {
+      type: "boolean",
+      title: "settings.fields.uploadHotlinkEnabled",
+      default: false,
+    },
+    allowedDomains: {
+      type: "array",
+      title: "settings.fields.uploadHotlinkAllowedDomains",
+      description: "settings.fieldsDesc.uploadHotlinkAllowedDomains",
+      items: { type: "string" },
+      default: [],
+    },
+    allowEmptyReferer: {
+      type: "boolean",
+      title: "settings.fields.uploadHotlinkAllowEmptyReferer",
+      description: "settings.fieldsDesc.uploadHotlinkAllowEmptyReferer",
+      default: true,
+    },
+  },
+};
+
 const defaultConfigs = [
   {
     group: "general",
@@ -255,6 +282,21 @@ const defaultConfigs = [
     description: "settings.fieldsDesc.wechatSecret",
     isSecret: true,
     sortOrder: 1,
+  },
+  {
+    group: "upload",
+    key: "hotlink",
+    value: JSON.stringify({
+      enabled: false,
+      allowedDomains: [],
+      allowEmptyReferer: true,
+    }),
+    type: "json",
+    schema: uploadHotlinkSchema,
+    label: "settings.fields.uploadHotlink",
+    description: "settings.fieldsDesc.uploadHotlink",
+    isSecret: false,
+    sortOrder: 0,
   },
 ];
 
@@ -526,7 +568,15 @@ async function seed() {
           key: config.key,
         },
       },
-      update: { label: config.label, description: config.description },
+      update: {
+        value: config.value,
+        type: config.type,
+        schema: "schema" in config ? config.schema : undefined,
+        label: config.label,
+        description: config.description,
+        isSecret: config.isSecret,
+        sortOrder: config.sortOrder,
+      },
       create: config,
     });
   }

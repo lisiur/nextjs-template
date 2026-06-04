@@ -34,7 +34,15 @@ export const systemConfigRepository = {
         prisma.systemConfig.upsert({
           where: { group_key: { group: item.group, key: item.key } },
           create: item,
-          update: { value: item.value },
+          update: {
+            value: item.value,
+            type: item.type,
+            schema: item.schema,
+            label: item.label,
+            description: item.description,
+            isSecret: item.isSecret,
+            sortOrder: item.sortOrder,
+          },
         }),
       ),
     );
@@ -50,6 +58,7 @@ export const systemConfigRepository = {
 interface UpsertInput {
   value: string;
   type?: string;
+  schema?: Record<string, unknown>;
   label: string;
   description?: string;
   isSecret?: boolean;

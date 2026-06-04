@@ -68,6 +68,7 @@ export type SystemConfigCountAggregateOutputType = {
   key: number
   value: number
   type: number
+  schema: number
   label: number
   description: number
   isSecret: number
@@ -120,6 +121,7 @@ export type SystemConfigCountAggregateInputType = {
   key?: true
   value?: true
   type?: true
+  schema?: true
   label?: true
   description?: true
   isSecret?: true
@@ -221,6 +223,7 @@ export type SystemConfigGroupByOutputType = {
   key: string
   value: string
   type: string
+  schema: runtime.JsonValue | null
   label: string
   description: string | null
   isSecret: boolean
@@ -258,6 +261,7 @@ export type SystemConfigWhereInput = {
   key?: Prisma.StringFilter<"SystemConfig"> | string
   value?: Prisma.StringFilter<"SystemConfig"> | string
   type?: Prisma.StringFilter<"SystemConfig"> | string
+  schema?: Prisma.JsonNullableFilter<"SystemConfig">
   label?: Prisma.StringFilter<"SystemConfig"> | string
   description?: Prisma.StringNullableFilter<"SystemConfig"> | string | null
   isSecret?: Prisma.BoolFilter<"SystemConfig"> | boolean
@@ -272,6 +276,7 @@ export type SystemConfigOrderByWithRelationInput = {
   key?: Prisma.SortOrder
   value?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  schema?: Prisma.SortOrderInput | Prisma.SortOrder
   label?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isSecret?: Prisma.SortOrder
@@ -290,6 +295,7 @@ export type SystemConfigWhereUniqueInput = Prisma.AtLeast<{
   key?: Prisma.StringFilter<"SystemConfig"> | string
   value?: Prisma.StringFilter<"SystemConfig"> | string
   type?: Prisma.StringFilter<"SystemConfig"> | string
+  schema?: Prisma.JsonNullableFilter<"SystemConfig">
   label?: Prisma.StringFilter<"SystemConfig"> | string
   description?: Prisma.StringNullableFilter<"SystemConfig"> | string | null
   isSecret?: Prisma.BoolFilter<"SystemConfig"> | boolean
@@ -304,6 +310,7 @@ export type SystemConfigOrderByWithAggregationInput = {
   key?: Prisma.SortOrder
   value?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  schema?: Prisma.SortOrderInput | Prisma.SortOrder
   label?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   isSecret?: Prisma.SortOrder
@@ -326,6 +333,7 @@ export type SystemConfigScalarWhereWithAggregatesInput = {
   key?: Prisma.StringWithAggregatesFilter<"SystemConfig"> | string
   value?: Prisma.StringWithAggregatesFilter<"SystemConfig"> | string
   type?: Prisma.StringWithAggregatesFilter<"SystemConfig"> | string
+  schema?: Prisma.JsonNullableWithAggregatesFilter<"SystemConfig">
   label?: Prisma.StringWithAggregatesFilter<"SystemConfig"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"SystemConfig"> | string | null
   isSecret?: Prisma.BoolWithAggregatesFilter<"SystemConfig"> | boolean
@@ -340,6 +348,7 @@ export type SystemConfigCreateInput = {
   key: string
   value: string
   type?: string
+  schema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   label: string
   description?: string | null
   isSecret?: boolean
@@ -354,6 +363,7 @@ export type SystemConfigUncheckedCreateInput = {
   key: string
   value: string
   type?: string
+  schema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   label: string
   description?: string | null
   isSecret?: boolean
@@ -368,6 +378,7 @@ export type SystemConfigUpdateInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   value?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  schema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   label?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSecret?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -382,6 +393,7 @@ export type SystemConfigUncheckedUpdateInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   value?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  schema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   label?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSecret?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -396,6 +408,7 @@ export type SystemConfigCreateManyInput = {
   key: string
   value: string
   type?: string
+  schema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   label: string
   description?: string | null
   isSecret?: boolean
@@ -410,6 +423,7 @@ export type SystemConfigUpdateManyMutationInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   value?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  schema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   label?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSecret?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -424,6 +438,7 @@ export type SystemConfigUncheckedUpdateManyInput = {
   key?: Prisma.StringFieldUpdateOperationsInput | string
   value?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  schema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   label?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSecret?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -443,6 +458,7 @@ export type SystemConfigCountOrderByAggregateInput = {
   key?: Prisma.SortOrder
   value?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  schema?: Prisma.SortOrder
   label?: Prisma.SortOrder
   description?: Prisma.SortOrder
   isSecret?: Prisma.SortOrder
@@ -503,6 +519,7 @@ export type SystemConfigSelect<ExtArgs extends runtime.Types.Extensions.Internal
   key?: boolean
   value?: boolean
   type?: boolean
+  schema?: boolean
   label?: boolean
   description?: boolean
   isSecret?: boolean
@@ -517,6 +534,7 @@ export type SystemConfigSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   key?: boolean
   value?: boolean
   type?: boolean
+  schema?: boolean
   label?: boolean
   description?: boolean
   isSecret?: boolean
@@ -531,6 +549,7 @@ export type SystemConfigSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   key?: boolean
   value?: boolean
   type?: boolean
+  schema?: boolean
   label?: boolean
   description?: boolean
   isSecret?: boolean
@@ -545,6 +564,7 @@ export type SystemConfigSelectScalar = {
   key?: boolean
   value?: boolean
   type?: boolean
+  schema?: boolean
   label?: boolean
   description?: boolean
   isSecret?: boolean
@@ -553,7 +573,7 @@ export type SystemConfigSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SystemConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "group" | "key" | "value" | "type" | "label" | "description" | "isSecret" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["systemConfig"]>
+export type SystemConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "group" | "key" | "value" | "type" | "schema" | "label" | "description" | "isSecret" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["systemConfig"]>
 
 export type $SystemConfigPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SystemConfig"
@@ -564,6 +584,7 @@ export type $SystemConfigPayload<ExtArgs extends runtime.Types.Extensions.Intern
     key: string
     value: string
     type: string
+    schema: runtime.JsonValue | null
     label: string
     description: string | null
     isSecret: boolean
@@ -998,6 +1019,7 @@ export interface SystemConfigFieldRefs {
   readonly key: Prisma.FieldRef<"SystemConfig", 'String'>
   readonly value: Prisma.FieldRef<"SystemConfig", 'String'>
   readonly type: Prisma.FieldRef<"SystemConfig", 'String'>
+  readonly schema: Prisma.FieldRef<"SystemConfig", 'Json'>
   readonly label: Prisma.FieldRef<"SystemConfig", 'String'>
   readonly description: Prisma.FieldRef<"SystemConfig", 'String'>
   readonly isSecret: Prisma.FieldRef<"SystemConfig", 'Boolean'>

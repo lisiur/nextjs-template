@@ -2,9 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { type Control, Controller } from "react-hook-form";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ConfigFieldLabel } from "./config-field-label";
+import { isSupportedJsonSchema, JsonSchemaField } from "./json-schema-field";
 
 interface ConfigItem {
   id: string;
@@ -14,6 +16,7 @@ interface ConfigItem {
   type: string;
   label: string;
   description?: string | null;
+  schema?: unknown | null;
   isSecret: boolean;
   sortOrder: number;
 }
@@ -29,7 +32,15 @@ export function ConfigField({ item, control }: ConfigFieldProps) {
 
   return (
     <Field>
-      <FieldLabel htmlFor={item.key}>{tr(item.label)}</FieldLabel>
+      <ConfigFieldLabel
+        htmlFor={item.key}
+        label={tr(item.label)}
+        description={
+          item.description && item.type !== "boolean"
+            ? tr(item.description)
+            : undefined
+        }
+      />
       <Controller
         name={item.key}
         control={control}
@@ -54,6 +65,18 @@ export function ConfigField({ item, control }: ConfigFieldProps) {
           }
 
           if (item.type === "json") {
+            if (item.schema && isSupportedJsonSchema(item.schema)) {
+              return (
+                <div className="ml-3 border-l pl-4">
+                  <JsonSchemaField
+                    id={item.key}
+                    value={field.value ?? ""}
+                    schema={item.schema}
+                    onChange={field.onChange}
+                  />
+                </div>
+              );
+            }
             return (
               <Textarea
                 id={item.key}
@@ -87,9 +110,6 @@ export function ConfigField({ item, control }: ConfigFieldProps) {
           );
         }}
       />
-      {item.description && item.type !== "boolean" && (
-        <FieldDescription>{tr(item.description)}</FieldDescription>
-      )}
     </Field>
   );
 }

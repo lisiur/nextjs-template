@@ -3,6 +3,7 @@ import { AppSidebar } from "@/components/layout/sidebar";
 import { SidebarBorderTrigger } from "@/components/layout/sidebar-border-trigger";
 import { SidebarToggleListener } from "@/components/layout/sidebar-toggle-listener";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function Layout({
   children,
@@ -11,12 +12,14 @@ export default function Layout({
 }>) {
   return (
     <SessionGuard>
-      <SidebarProvider>
-        <SidebarToggleListener />
-        <AppSidebar />
-        <SidebarBorderTrigger />
-        <SidebarInset>{children}</SidebarInset>
-      </SidebarProvider>
+      <TooltipProvider>
+        <SidebarProvider>
+          <SidebarToggleListener />
+          <AppSidebar />
+          <SidebarBorderTrigger />
+          <SidebarInset>{children}</SidebarInset>
+        </SidebarProvider>
+      </TooltipProvider>
     </SessionGuard>
   );
 }

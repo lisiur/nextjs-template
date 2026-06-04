@@ -31,6 +31,7 @@ export const getFile = defineOpenAPIRoute({
       id,
       token,
       expires,
+      headers: c.req.raw.headers,
     });
 
     return new Response(stream, {

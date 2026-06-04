@@ -21,6 +21,7 @@ interface ConfigItem {
   type: string;
   label: string;
   description?: string | null;
+  schema?: unknown | null;
   isSecret: boolean;
   sortOrder: number;
 }
@@ -74,6 +75,8 @@ export function ConfigGroup({ group }: ConfigGroupProps) {
         group: item.group,
         key: item.key,
         value: form.getValues(item.key),
+        schema:
+          (item.schema as Record<string, unknown> | undefined) ?? undefined,
         type: item.type as "string" | "number" | "boolean" | "json",
         label: item.label,
         description: item.description ?? undefined,

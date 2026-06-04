@@ -7,6 +7,7 @@ export async function upsertConfig(
   data: {
     value: string;
     type?: string;
+    schema?: Record<string, unknown>;
     label: string;
     description?: string;
     isSecret?: boolean;
@@ -22,6 +23,7 @@ export async function batchUpsertConfigs(
     key: string;
     value: string;
     type?: string;
+    schema?: Record<string, unknown>;
     label: string;
     description?: string;
     isSecret?: boolean;

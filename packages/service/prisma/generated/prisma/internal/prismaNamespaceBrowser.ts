@@ -194,6 +194,7 @@ export const SystemConfigScalarFieldEnum = {
   key: 'key',
   value: 'value',
   type: 'type',
+  schema: 'schema',
   label: 'label',
   description: 'description',
   isSecret: 'isSecret',
