@@ -3,6 +3,7 @@
 import { PanelLeftIcon } from "lucide-react";
 import Image from "next/image";
 import { useCurrentApp } from "@/hooks/use-current-app";
+import { NotificationBell } from "./notification-bell";
 import { UserMenu } from "./user-menu";
 
 export function Header({ className }: { className?: string }) {
@@ -34,7 +35,8 @@ export function Header({ className }: { className?: string }) {
         ) : null}
         <span className="text-lg font-semibold">{app?.name ?? ""}</span>
       </div>
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-1">
+        <NotificationBell />
         <UserMenu full={false} items={["signOut"]} />
       </div>
     </header>

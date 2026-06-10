@@ -97,6 +97,13 @@
     "appearance": "Appearance",
     "language": "Language"
   },
+  "NotificationBell": {
+    "title": "Notifications",
+    "noNotifications": "No new notifications",
+    "markAllRead": "Mark all as read",
+    "markAllReadSuccess": "All notifications marked as read",
+    "viewAll": "View all notifications"
+  },
   "Users": {
     "title": "User Management",
     "description": "Manage system users",

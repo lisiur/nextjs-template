@@ -97,6 +97,13 @@
     "appearance": "外观",
     "language": "语言"
   },
+  "NotificationBell": {
+    "title": "通知",
+    "noNotifications": "暂无新通知",
+    "markAllRead": "全部标记为已读",
+    "markAllReadSuccess": "已全部标记为已读",
+    "viewAll": "查看所有通知"
+  },
   "Users": {
     "title": "用户管理",
     "description": "管理系统用户",

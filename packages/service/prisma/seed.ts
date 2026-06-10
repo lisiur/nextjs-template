@@ -182,6 +182,16 @@ const permissionDefinitions = [
     group: "notification-template",
     name: "Delete Notification Template",
   },
+  {
+    code: "notification::list",
+    group: "notification",
+    name: "List Notifications",
+  },
+  {
+    code: "notification::view",
+    group: "notification",
+    name: "View Notification",
+  },
   { code: "upload::sign", group: "upload", name: "Sign Upload URL" },
 ];
 
