@@ -1,10 +1,10 @@
 "use client";
 
+import { Button } from "@repo/ui";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { useSessionStore } from "@/stores/session-store";

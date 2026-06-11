@@ -1,5 +1,6 @@
 "use client";
 
+import { Checkbox, cn } from "@repo/ui";
 import {
   ChevronRight,
   Folder,
@@ -9,8 +10,6 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useMemo, useState } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/utils/cn";
 
 interface Menu {
   id: string;

@@ -1,26 +1,26 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+  Switch,
+} from "@repo/ui";
+import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { ChannelConfigFields } from "./channel-config-fields";

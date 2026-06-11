@@ -1,9 +1,8 @@
 "use client";
 
+import { Button, Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfigGroup } from "./components/config-group";
 
 const tabKeys = ["general", "auth", "smtp", "upload"] as const;

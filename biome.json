@@ -40,19 +40,6 @@
   "overrides": [
     {
       "includes": [
-        "apps/gateway/src/components/ui/**",
-        "apps/admin/src/components/ui/**"
-      ],
-      "linter": {
-        "rules": {
-          "a11y": {
-            "useSemanticElements": "off"
-          }
-        }
-      }
-    },
-    {
-      "includes": [
         "**/__tests__/**",
         "**/*.test.ts",
         "**/*.test.tsx",

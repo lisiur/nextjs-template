@@ -1,21 +1,21 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
 import {
+  Badge,
+  Button,
+  Spinner,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@repo/ui";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { toast } from "sonner";
 import { useConfirm } from "@/hooks/use-confirm";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";

@@ -1,28 +1,28 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
+  Switch,
+  Textarea,
+} from "@repo/ui";
+import { Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { isRecord } from "./notification-form-utils";

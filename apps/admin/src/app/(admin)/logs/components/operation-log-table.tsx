@@ -1,22 +1,22 @@
 "use client";
 
-import { Eye, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { DataTablePagination } from "@/components/data-table-pagination";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Spinner } from "@/components/ui/spinner";
 import {
+  Badge,
+  Button,
+  Checkbox,
+  Spinner,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@repo/ui";
+import { Eye, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { DataTablePagination } from "@/components/data-table-pagination";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";

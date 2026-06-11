@@ -1,6 +1,21 @@
 "use client";
 
 import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+  SidebarMenuButton,
+  Switch,
+} from "@repo/ui";
+import {
   ChevronsUpDown,
   LanguagesIcon,
   LogOut,
@@ -14,21 +29,6 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { Fragment, useMemo } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { SidebarMenuButton } from "@/components/ui/sidebar";
-import { Switch } from "@/components/ui/switch";
 import { useSession } from "@/lib/api";
 
 type UserMenuItem = "profile" | "theme" | "locale" | "signOut";

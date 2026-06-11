@@ -1,26 +1,24 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
-import { forwardRef, type Ref, useImperativeHandle } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import {
   Field,
   FieldContent,
   FieldDescription,
   FieldError,
   FieldLabel,
-} from "@/components/ui/field";
-import { IconPicker } from "@/components/ui/icon-picker";
-import { Input } from "@/components/ui/input";
-import {
+  IconPicker,
+  Input,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@repo/ui";
+import { useTranslations } from "next-intl";
+import { forwardRef, type Ref, useImperativeHandle } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 type LinkType = "GROUP" | "INTERNAL" | "EXTERNAL";
 

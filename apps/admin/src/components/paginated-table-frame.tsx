@@ -1,10 +1,8 @@
 "use client";
 
+import { cn, Spinner, Table } from "@repo/ui";
 import type { ReactNode } from "react";
 import { DataTablePagination } from "@/components/data-table-pagination";
-import { Spinner } from "@/components/ui/spinner";
-import { Table } from "@/components/ui/table";
-import { cn } from "@/utils/cn";
 
 interface PaginatedTableFrameProps {
   loading: boolean;

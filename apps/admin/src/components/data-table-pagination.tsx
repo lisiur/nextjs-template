@@ -1,7 +1,7 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import {
+  cn,
   Pagination,
   PaginationContent,
   PaginationEllipsis,
@@ -9,8 +9,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { cn } from "@/utils/cn";
+} from "@repo/ui";
+import { useTranslations } from "next-intl";
 
 interface DataTablePaginationProps {
   page: number;

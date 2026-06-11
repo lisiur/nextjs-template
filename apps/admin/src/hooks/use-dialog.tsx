@@ -1,8 +1,5 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { createRoot } from "react-dom/client";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +7,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@repo/ui";
+import type { ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 
 interface DialogOptions<R> {
   defaultValue: R;

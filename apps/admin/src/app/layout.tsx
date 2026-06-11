@@ -4,10 +4,10 @@ import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { cn } from "@repo/ui";
 import { Frame } from "@/components/layout/frame";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { Loader } from "@/lib/loading";
-import { cn } from "@/utils/cn";
 
 export const metadata: Metadata = {
   title: {

@@ -1,8 +1,8 @@
 "use client";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   type AuditLogFilters,
   AuditLogTable,

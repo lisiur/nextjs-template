@@ -1,15 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { LoginForm } from "@/components/auth/login-form";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@repo/ui";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { LoginForm } from "@/components/auth/login-form";
 import { getFirstMenuUrl, useMenuStore } from "@/stores/menu-store";
 
 const ADMIN_BASE_PATH = "/admin";

@@ -1,19 +1,19 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Button,
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+} from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 

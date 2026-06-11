@@ -1,6 +1,21 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  Input,
+  Textarea,
+} from "@repo/ui";
 import { ImagePlus, X } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -8,23 +23,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { appClient } from "@/lib/api";
 import { uploadPublicFile } from "@/lib/api/upload-file";
 import { withApiFeedback } from "@/lib/api/utils";

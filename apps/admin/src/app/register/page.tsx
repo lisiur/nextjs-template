@@ -1,15 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { RegisterForm } from "@/components/auth/register-form";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@repo/ui";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { RegisterForm } from "@/components/auth/register-form";
 
 export default function RegisterPage() {
   const router = useRouter();

@@ -1,24 +1,24 @@
 "use client";
 
+import {
+  cn,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Separator,
+  Spinner,
+} from "@repo/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { Spinner } from "@/components/ui/spinner";
-import {
   useInvalidateNotificationCount,
   useNotificationCount,
 } from "@/hooks/use-notification-count";
 import { appClient } from "@/lib/api/app-client";
 import { withApiFeedback } from "@/lib/api/utils";
-import { cn } from "@/utils/cn";
 import { formatDate } from "@/utils/date";
 
 type NotificationItem = {

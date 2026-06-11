@@ -1,6 +1,16 @@
 "use client";
 
 import {
+  cn,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  Skeleton,
+} from "@repo/ui";
+import {
   ChevronRight,
   Folder,
   FolderOpen,
@@ -11,17 +21,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useMenuStore } from "@/stores/menu-store";
-import { cn } from "@/utils/cn";
 import { UserMenu } from "./user-menu";
 
 const iconsRecord = icons as Record<string, LucideIcon>;

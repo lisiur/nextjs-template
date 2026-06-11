@@ -1,13 +1,8 @@
 "use client";
 
+import { FieldLabel, Tooltip, TooltipContent, TooltipTrigger } from "@repo/ui";
 import { Info } from "lucide-react";
 import type { ReactNode } from "react";
-import { FieldLabel } from "@/components/ui/field";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface ConfigFieldLabelProps {
   label: ReactNode;

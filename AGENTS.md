@@ -34,7 +34,7 @@
 - Dynamic RPC segments use bracket notation such as `appClient.api.organizations[':id'].$put({ param: { id }, json })`; request bodies use `json`, not `body`, and check `res.ok` before `res.json()`.
 
 ## Frontend Conventions
-- `apps/admin/AGENTS.md` requires Next 16 docs under `node_modules/next/dist/docs/` for uncertain Next APIs, `next/image` instead of `<img>`, Field primitives from `@/components/ui/field` inside forms, and sticky-right action columns in tables.
+- `apps/admin/AGENTS.md` requires Next 16 docs under `node_modules/next/dist/docs/` for uncertain Next APIs, `next/image` instead of `<img>`, Field primitives from `@repo/ui` inside forms, and sticky-right action columns in tables.
 - Overlay choice is task-scoped: `Dialog` for focused create/edit/delete/confirm forms, `Sheet` for contextual relationship/config workflows tied to a selected record, full page for primary dense or bookmarkable management surfaces.
 
 ## Tooling Quirks

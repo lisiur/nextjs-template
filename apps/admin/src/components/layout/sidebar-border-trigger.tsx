@@ -1,7 +1,7 @@
 "use client";
 
+import { useSidebar } from "@repo/ui";
 import { ChevronsLeftIcon } from "lucide-react";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarBorderTrigger() {
   const { open, isMobile } = useSidebar();

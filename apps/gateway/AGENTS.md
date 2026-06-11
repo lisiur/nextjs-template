@@ -13,7 +13,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Form Handling
 
-- Inside `<form>`, wrap form controls with the shared Field primitives from `@/components/ui/field`.
+- Inside `<form>`, wrap form controls with the shared Field primitives from `@repo/ui`.
 - Use `FieldGroup` to group related fields, `Field` for each form item, `FieldLabel` instead of raw `<label>` or `Label`, `FieldError` for validation messages, and `FieldDescription` for helper text.
 - Do not add new raw label/error wrapper markup inside forms unless there is a specific component-level reason.
 

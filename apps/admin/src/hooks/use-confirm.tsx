@@ -1,7 +1,7 @@
 "use client";
 
+import { Button } from "@repo/ui";
 import type { ReactNode } from "react";
-import { Button } from "@/components/ui/button";
 import { useDialog } from "@/hooks/use-dialog";
 
 interface ConfirmOptions {

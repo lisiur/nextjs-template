@@ -1,30 +1,28 @@
 "use client";
 
 import { isBuiltinRole } from "@repo/shared";
-import { ListChecks, ShieldUser } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
+  Badge,
+  Button,
+  cn,
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
-import {
+  Spinner,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@repo/ui";
+import { ListChecks, ShieldUser } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
-import { cn } from "@/utils/cn";
 import { RoleMenuAssignment } from "./role-menu-assignment";
 
 interface Role {

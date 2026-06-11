@@ -1,10 +1,9 @@
 "use client";
 
+import { Button, Separator } from "@repo/ui";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import {

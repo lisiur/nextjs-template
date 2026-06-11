@@ -1,9 +1,8 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle, Separator } from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { useSession } from "@/lib/api/use-session";
 import { AvatarUpload } from "./components/avatar-upload";
 import { PasswordForm } from "./components/password-form";

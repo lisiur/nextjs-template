@@ -1,8 +1,8 @@
 "use client";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { ManagementPageShell } from "@/components/management-page-shell";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NotificationChannelTable } from "./components/notification-channel-table";
 import { NotificationTemplateTable } from "./components/notification-template-table";
 

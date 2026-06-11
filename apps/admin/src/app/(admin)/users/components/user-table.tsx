@@ -1,20 +1,20 @@
 "use client";
 
 import { isBuiltinUser } from "@repo/shared";
-import { Pencil, Plus, ShieldUser, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { toast } from "sonner";
-import { PaginatedTableFrame } from "@/components/paginated-table-frame";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
+  Badge,
+  Button,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@repo/ui";
+import { Pencil, Plus, ShieldUser, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { toast } from "sonner";
+import { PaginatedTableFrame } from "@/components/paginated-table-frame";
 import { useConfirm } from "@/hooks/use-confirm";
 import { usePaginatedQuery } from "@/hooks/use-paginated-query";
 import { appClient } from "@/lib/api";

@@ -1,14 +1,14 @@
-import { Copy } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@repo/ui";
+import { Copy } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 interface LogDetailDialogProps {
   open: boolean;

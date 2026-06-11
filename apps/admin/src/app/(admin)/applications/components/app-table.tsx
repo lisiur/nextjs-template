@@ -1,5 +1,14 @@
 "use client";
 
+import {
+  Button,
+  Input,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@repo/ui";
 import { Pencil, Search, Settings } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -7,15 +16,6 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PaginatedTableFrame } from "@/components/paginated-table-frame";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { usePaginatedQuery } from "@/hooks/use-paginated-query";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";

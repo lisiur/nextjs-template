@@ -1,21 +1,19 @@
 "use client";
 
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
-import { Cpu, HardDrive, MemoryStick, Server } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import {
   ProgressIndicator,
   ProgressLabel,
   ProgressTrack,
   ProgressValue,
-} from "@/components/ui/progress";
+} from "@repo/ui";
+import { Cpu, HardDrive, MemoryStick, Server } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 

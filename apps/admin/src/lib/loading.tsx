@@ -23,8 +23,8 @@
 
 "use client";
 
+import { cn } from "@repo/ui";
 import { useEffect, useSyncExternalStore } from "react";
-import { cn } from "@/utils/cn";
 
 // ---------------------------------------------------------------------------
 // Module-level state (source of truth, lives outside React)

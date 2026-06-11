@@ -1,9 +1,7 @@
 "use client";
 
+import { Field, FieldDescription, FieldLabel, Input, Switch } from "@repo/ui";
 import { useTranslations } from "next-intl";
-import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import {
   isRecord,
   isSupportedObjectSchema,

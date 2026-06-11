@@ -1,17 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@repo/ui";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useEffect, useRef } from "react";
 import { useSession } from "@/lib/api";
 import { useMenuStore } from "@/stores/menu-store";
 import { useSessionStore } from "@/stores/session-store";

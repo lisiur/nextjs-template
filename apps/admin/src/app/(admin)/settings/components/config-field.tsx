@@ -1,10 +1,8 @@
 "use client";
 
+import { Field, FieldLabel, Input, Textarea } from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { type Control, Controller } from "react-hook-form";
-import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { ConfigFieldLabel } from "./config-field-label";
 import { isSupportedJsonSchema, JsonSchemaField } from "./json-schema-field";
 

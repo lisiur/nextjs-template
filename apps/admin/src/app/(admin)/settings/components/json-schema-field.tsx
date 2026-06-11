@@ -1,11 +1,9 @@
 "use client";
 
+import { Button, Field, FieldLabel, Input } from "@repo/ui";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Field, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { ConfigFieldLabel } from "./config-field-label";
 
 type JsonSchemaProperty = {

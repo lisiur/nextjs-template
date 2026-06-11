@@ -1,7 +1,7 @@
 "use client";
 
+import { useSidebar } from "@repo/ui";
 import { useEffect } from "react";
-import { useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarToggleListener() {
   const { toggleSidebar } = useSidebar();

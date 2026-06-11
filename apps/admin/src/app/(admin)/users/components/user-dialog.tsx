@@ -2,28 +2,26 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBuiltinUser } from "@repo/shared";
-import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
-import { type Resolver, useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
+  Input,
+  Spinner,
+} from "@repo/ui";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
+import { type Resolver, useForm } from "react-hook-form";
+import { z } from "zod";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 

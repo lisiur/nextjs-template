@@ -1,11 +1,10 @@
 "use client";
 
+import { Spinner, Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { use, useCallback, useEffect, useState } from "react";
-import { Spinner } from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { ApplicationMenuManagement } from "./components/application-menu-management";
