@@ -38,6 +38,8 @@ interface MenuState {
   resetMenus: () => void;
 }
 
+let inflight: Promise<void> | null = null;
+
 export function getFirstMenuUrl(menus: Menu[]): string | null {
   const parentIds = new Set<string>();
   for (const m of menus) {
@@ -116,19 +118,25 @@ export const useMenuStore = create<MenuState>((set, get) => ({
 
   fetchMenus: async () => {
     if (get().fetched) return;
+    if (inflight) return inflight;
 
     set({ loading: true });
-    try {
-      const res = await withApiFeedback(appClient.api.menus.mine.$get)();
-      const data = await res.json();
-      const menus = data.menus;
-      const treeMenus = buildTree(menus);
-      set({ menus, treeMenus, fetched: true });
-    } catch {
-      // Keep existing state on error
-    } finally {
-      set({ loading: false });
-    }
+    inflight = (async () => {
+      try {
+        const res = await withApiFeedback(appClient.api.menus.mine.$get)();
+        const data = await res.json();
+        const menus = data.menus;
+        const treeMenus = buildTree(menus);
+        set({ menus, treeMenus, fetched: true });
+      } catch {
+        // Keep existing state on error
+      } finally {
+        set({ loading: false });
+        inflight = null;
+      }
+    })();
+
+    return inflight;
   },
 
   refetchMenus: async () => {
