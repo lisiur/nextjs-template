@@ -10,28 +10,25 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
-import { LoginForm } from "@/components/auth/login-form";
+import { RegisterForm } from "@/components/auth/register-form";
 import { useSession } from "@/lib/api";
-import { redirectToFirstMenuOrProfile } from "@/lib/navigation/menu-redirect";
-import { useMenuStore } from "@/stores/menu-store";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const t = useTranslations("Auth");
   const { data: session, isPending, refetch } = useSession();
-  const refetchMenus = useMenuStore((state) => state.refetchMenus);
   const handledValidSessionRef = useRef(false);
 
-  async function handleLoginSuccess() {
+  async function handleRegisterSuccess() {
     await refetch();
-    await redirectToFirstMenuOrProfile(router, refetchMenus);
+    router.push("/register-organization");
   }
 
   useEffect(() => {
     if (!session || handledValidSessionRef.current) return;
     handledValidSessionRef.current = true;
-    void redirectToFirstMenuOrProfile(router, refetchMenus);
-  }, [session, router, refetchMenus]);
+    router.push("/register-organization");
+  }, [session, router]);
 
   if (isPending || session) {
     return (
@@ -45,13 +42,13 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">{t("welcomeBack")}</CardTitle>
-          <CardDescription>{t("signInDescription")}</CardDescription>
+          <CardTitle className="text-xl">{t("createAccount")}</CardTitle>
+          <CardDescription>{t("signUpDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <LoginForm
-            onSuccess={handleLoginSuccess}
-            onSwitchToRegister={() => router.push("/register")}
+          <RegisterForm
+            onSuccess={handleRegisterSuccess}
+            onSwitchToLogin={() => router.push("/sign-in")}
           />
         </CardContent>
       </Card>

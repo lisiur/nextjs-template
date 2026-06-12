@@ -108,6 +108,7 @@ export async function getMenusForUser(userId: string, appId: string) {
 export async function getUserPermissions(userId: string): Promise<string[]> {
   const permissions = await prisma.permission.findMany({
     where: {
+      appId: null,
       rolePermissions: {
         some: {
           role: {

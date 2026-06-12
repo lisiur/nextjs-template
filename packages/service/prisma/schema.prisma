@@ -210,8 +210,8 @@ model Menu {
 
 model Permission {
   id              String           @id @default(cuid())
-  appId           String
-  app             Application      @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId           String?
+  app             Application?     @relation(fields: [appId], references: [id], onDelete: Cascade)
   name            String
   code            String
   group           String

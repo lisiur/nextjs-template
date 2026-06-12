@@ -4,14 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { appClient, useSession } from "@/lib/api";
 
 interface Application {
-  id: string;
   name: string;
   code: string;
   description?: string | null;
   logo?: string | null;
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export function useCurrentApp() {

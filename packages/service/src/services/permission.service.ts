@@ -1,7 +1,7 @@
 import { prisma } from "#lib/db";
 
 export function createPermission(data: {
-  appId: string;
+  appId?: string | null;
   name: string;
   code: string;
   group: string;
@@ -10,15 +10,15 @@ export function createPermission(data: {
   return prisma.permission.create({ data });
 }
 
-export function findPermissionByCode(appId: string, code: string) {
-  return prisma.permission.findUnique({
-    where: { appId_code: { appId, code } },
+export function findPermissionByCode(code: string, appId?: string | null) {
+  return prisma.permission.findFirst({
+    where: { appId: appId ?? null, code },
   });
 }
 
-export function findPermissionsByGroup(appId: string, group: string) {
+export function findPermissionsByGroup(group: string, appId?: string | null) {
   return prisma.permission.findMany({
-    where: { appId, group },
+    where: { appId: appId ?? null, group },
   });
 }
 
@@ -28,8 +28,11 @@ export function findPermissionsByApp(appId: string) {
   });
 }
 
-export function deletePermissionByCode(appId: string, code: string) {
-  return prisma.permission.delete({
-    where: { appId_code: { appId, code } },
-  });
+export async function deletePermissionByCode(
+  code: string,
+  appId?: string | null,
+) {
+  const permission = await findPermissionByCode(code, appId);
+  if (!permission) return null;
+  return prisma.permission.delete({ where: { id: permission.id } });
 }

@@ -105,6 +105,113 @@ async function testRoute(
   return app.request(req);
 }
 
+// ─── CURRENT ────────────────────────────────────────────────────────────────
+
+describe("GET /current - Current Application", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockGetSession.mockResolvedValue({
+      user: { id: "u1" },
+      session: { id: "s1" },
+    } as any);
+    mockGetUserPermissions.mockResolvedValue([]);
+  });
+
+  it("returns a restricted current application for authenticated users without application::view", async () => {
+    const now = new Date();
+    mockPrisma.application.findFirst.mockResolvedValue({
+      id: "app1",
+      name: "Organization",
+      code: "organization",
+      description: "Organization workspace",
+      logo: "/api/upload/logo1",
+      sortOrder: 10,
+      deletedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const { getCurrentApplication } = await import("../getCurrentApplication");
+    const res = await testRoute(
+      getCurrentApplication,
+      {
+        method: "GET",
+        path: "/current",
+        headers: { "X-App-Code": "organization" },
+      },
+      { withAuth: false },
+    );
+
+    expect(res.status).toBe(200);
+    expect(mockGetUserPermissions).not.toHaveBeenCalled();
+    expect(mockPrisma.application.findFirst).toHaveBeenCalledWith({
+      where: { code: "organization", deletedAt: null },
+    });
+    await expect(res.json()).resolves.toEqual({
+      name: "Organization",
+      code: "organization",
+      description: "Organization workspace",
+      logo: "/api/upload/logo1",
+    });
+  });
+
+  it("returns 401 without a session", async () => {
+    mockGetSession.mockResolvedValue(null);
+
+    const { getCurrentApplication } = await import("../getCurrentApplication");
+    const res = await testRoute(
+      getCurrentApplication,
+      {
+        method: "GET",
+        path: "/current",
+        headers: { "X-App-Code": "organization", cookie: "" },
+      },
+      { withAuth: false },
+    );
+
+    expect(res.status).toBe(401);
+    expect(mockPrisma.application.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 without X-App-Code", async () => {
+    const { getCurrentApplication } = await import("../getCurrentApplication");
+    const res = await testRoute(
+      getCurrentApplication,
+      {
+        method: "GET",
+        path: "/current",
+      },
+      { withAuth: false },
+    );
+
+    expect(res.status).toBe(400);
+    await expect(res.json()).resolves.toMatchObject({
+      message: "Missing X-App-Code header",
+    });
+    expect(mockPrisma.application.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("returns 404 for an unknown X-App-Code", async () => {
+    mockPrisma.application.findFirst.mockResolvedValue(null);
+
+    const { getCurrentApplication } = await import("../getCurrentApplication");
+    const res = await testRoute(
+      getCurrentApplication,
+      {
+        method: "GET",
+        path: "/current",
+        headers: { "X-App-Code": "missing" },
+      },
+      { withAuth: false },
+    );
+
+    expect(res.status).toBe(404);
+    await expect(res.json()).resolves.toMatchObject({
+      message: "Application not found: missing",
+    });
+  });
+});
+
 // ─── CREATE ────────────────────────────────────────────────────────────────
 
 describe("POST / - Create Application", () => {

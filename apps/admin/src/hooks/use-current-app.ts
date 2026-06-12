@@ -5,14 +5,10 @@ import { appClient, useSession } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 
 interface Application {
-  id: string;
   name: string;
   code: string;
   description?: string | null;
   logo?: string | null;
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export function useCurrentApp() {

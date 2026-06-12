@@ -426,26 +426,66 @@ async function seedDefaultOrganization() {
   return organization;
 }
 
-async function seedPermissions(appId: string) {
+async function seedPermissions() {
   console.log("Seeding permissions...");
   const permissionIds: Record<string, string> = {};
 
   for (const def of permissionDefinitions) {
-    const perm = await prisma.permission.upsert({
-      where: { appId_code: { appId, code: def.code } },
-      update: { name: def.name, group: def.group },
-      create: {
-        appId,
-        name: def.name,
-        code: def.code,
-        group: def.group,
-      },
+    const existing = await prisma.permission.findFirst({
+      where: { appId: null, code: def.code },
     });
+    const perm = existing
+      ? await prisma.permission.update({
+          where: { id: existing.id },
+          data: { name: def.name, group: def.group },
+        })
+      : await prisma.permission.create({
+          data: {
+            appId: null,
+            name: def.name,
+            code: def.code,
+            group: def.group,
+          },
+        });
     permissionIds[def.code] = perm.id;
   }
 
   console.log(`Seeded ${permissionDefinitions.length} permissions.`);
   return permissionIds;
+}
+
+async function upsertMenuPermission(
+  appId: string,
+  params: {
+    name: string;
+    code: string;
+    description: string;
+  },
+) {
+  const existing = await prisma.permission.findFirst({
+    where: { appId, code: params.code },
+  });
+
+  if (existing) {
+    return prisma.permission.update({
+      where: { id: existing.id },
+      data: {
+        name: params.name,
+        group: "menu-item",
+        description: params.description,
+      },
+    });
+  }
+
+  return prisma.permission.create({
+    data: {
+      appId,
+      name: params.name,
+      code: params.code,
+      group: "menu-item",
+      description: params.description,
+    },
+  });
 }
 
 async function seedMenus(appId: string) {
@@ -522,16 +562,10 @@ async function seedMenus(appId: string) {
   for (const menu of menuDefinitions) {
     const permCode = menuPermissionCode(menu.code);
 
-    const permission = await prisma.permission.upsert({
-      where: { appId_code: { appId, code: permCode } },
-      update: { name: `Menu: ${menu.name}` },
-      create: {
-        appId,
-        name: `Menu: ${menu.name}`,
-        code: permCode,
-        group: "menu-item",
-        description: `View access for menu "${menu.name}"`,
-      },
+    const permission = await upsertMenuPermission(appId, {
+      name: `Menu: ${menu.name}`,
+      code: permCode,
+      description: `View access for menu "${menu.name}"`,
     });
 
     await prisma.menu.upsert({
@@ -592,16 +626,10 @@ async function seedOrganizationMenus(appId: string) {
   for (const menu of menuDefinitions) {
     const permCode = menuPermissionCode(menu.code);
 
-    const permission = await prisma.permission.upsert({
-      where: { appId_code: { appId, code: permCode } },
-      update: { name: `Menu: ${menu.name}` },
-      create: {
-        appId,
-        name: `Menu: ${menu.name}`,
-        code: permCode,
-        group: "menu-item",
-        description: `View access for menu "${menu.name}"`,
-      },
+    const permission = await upsertMenuPermission(appId, {
+      name: `Menu: ${menu.name}`,
+      code: permCode,
+      description: `View access for menu "${menu.name}"`,
     });
 
     await prisma.menu.upsert({
@@ -840,7 +868,7 @@ async function seed() {
   await seedNotificationTemplates();
 
   const adminApp = await seedAdminApplication();
-  await seedPermissions(adminApp.id);
+  await seedPermissions();
   const _menuIds = await seedMenus(adminApp.id);
   const roleIds = await seedRoles(adminApp.id);
 
@@ -849,7 +877,7 @@ async function seed() {
   await seedDefaultOrganization();
 
   const allPermissions = await prisma.permission.findMany({
-    where: { appId: adminApp.id },
+    where: { OR: [{ appId: null }, { appId: adminApp.id }] },
     select: { id: true, code: true },
   });
   const permIds: Record<string, string> = {};

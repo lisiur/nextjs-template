@@ -33,6 +33,8 @@ export const createOrganizationBodySchema = z.object({
   metadata: z.string().optional(),
 });
 
+export const registerOrganizationBodySchema = createOrganizationBodySchema;
+
 export const updateOrganizationBodySchema = z.object({
   name: z.string().min(1).optional(),
   slug: z
@@ -54,6 +56,9 @@ export const listOrganizationsResponseSchema = z
 export type Organization = z.infer<typeof organizationSchema>;
 export type CreateOrganizationBody = z.infer<
   typeof createOrganizationBodySchema
+>;
+export type RegisterOrganizationBody = z.infer<
+  typeof registerOrganizationBodySchema
 >;
 export type UpdateOrganizationBody = z.infer<
   typeof updateOrganizationBodySchema

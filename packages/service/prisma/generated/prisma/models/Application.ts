@@ -463,6 +463,11 @@ export type ApplicationScalarRelationFilter = {
   isNot?: Prisma.ApplicationWhereInput
 }
 
+export type ApplicationNullableScalarRelationFilter = {
+  is?: Prisma.ApplicationWhereInput | null
+  isNot?: Prisma.ApplicationWhereInput | null
+}
+
 export type ApplicationCreateNestedOneWithoutMenusInput = {
   create?: Prisma.XOR<Prisma.ApplicationCreateWithoutMenusInput, Prisma.ApplicationUncheckedCreateWithoutMenusInput>
   connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutMenusInput
@@ -483,10 +488,12 @@ export type ApplicationCreateNestedOneWithoutPermissionsInput = {
   connect?: Prisma.ApplicationWhereUniqueInput
 }
 
-export type ApplicationUpdateOneRequiredWithoutPermissionsNestedInput = {
+export type ApplicationUpdateOneWithoutPermissionsNestedInput = {
   create?: Prisma.XOR<Prisma.ApplicationCreateWithoutPermissionsInput, Prisma.ApplicationUncheckedCreateWithoutPermissionsInput>
   connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutPermissionsInput
   upsert?: Prisma.ApplicationUpsertWithoutPermissionsInput
+  disconnect?: Prisma.ApplicationWhereInput | boolean
+  delete?: Prisma.ApplicationWhereInput | boolean
   connect?: Prisma.ApplicationWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutPermissionsInput, Prisma.ApplicationUpdateWithoutPermissionsInput>, Prisma.ApplicationUncheckedUpdateWithoutPermissionsInput>
 }

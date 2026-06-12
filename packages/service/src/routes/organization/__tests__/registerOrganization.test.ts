@@ -1,0 +1,142 @@
+import { OpenAPIHono } from "@hono/zod-openapi";
+import { HTTPException } from "hono/http-exception";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("../../../lib/db", () => ({
+  prisma: {
+    $transaction: vi.fn(),
+    auditLog: {
+      create: vi.fn(),
+    },
+  },
+}));
+
+vi.mock("../../../lib/session", () => ({
+  getSessionFromHeaders: vi.fn(),
+}));
+
+import { prisma } from "../../../lib/db";
+import { getSessionFromHeaders } from "../../../lib/session";
+import { registerOrganization } from "../registerOrganization";
+
+const mockPrisma = prisma as unknown as {
+  $transaction: ReturnType<typeof vi.fn>;
+  auditLog: {
+    create: ReturnType<typeof vi.fn>;
+  };
+};
+const mockGetSession = vi.mocked(getSessionFromHeaders);
+
+const tx = {
+  organization: {
+    findUnique: vi.fn(),
+    create: vi.fn(),
+  },
+};
+
+async function testRoute(options: { body?: unknown; headers?: HeadersInit }) {
+  const app = new OpenAPIHono();
+
+  app.onError((err, c) => {
+    if (err instanceof HTTPException) {
+      return c.json(
+        { code: err.status, message: err.message },
+        err.status as never,
+      );
+    }
+    return c.json({ code: 500, message: "Internal Server Error" }, 500);
+  });
+
+  app.openapi(registerOrganization.route, registerOrganization.handler);
+
+  return app.request(
+    new Request("http://localhost/register", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        cookie: "session=test-session",
+        ...options.headers,
+      },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    }),
+  );
+}
+
+describe("POST /register - Register Organization", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockGetSession.mockResolvedValue({
+      user: { id: "user1", name: "User" },
+      session: { id: "session1" },
+    } as never);
+    mockPrisma.$transaction.mockImplementation((callback) => callback(tx));
+    mockPrisma.auditLog.create.mockResolvedValue({});
+  });
+
+  it("creates an organization and owner member for the current user", async () => {
+    const now = new Date();
+    tx.organization.findUnique.mockResolvedValue(null);
+    tx.organization.create.mockResolvedValue({
+      id: "org1",
+      name: "Acme Corp",
+      slug: "acme-corp",
+      logo: null,
+      metadata: null,
+      createdAt: now,
+    });
+
+    const res = await testRoute({
+      body: { name: "Acme Corp", slug: "acme-corp" },
+    });
+
+    expect(res.status).toBe(201);
+    expect(tx.organization.findUnique).toHaveBeenCalledWith({
+      where: { slug: "acme-corp" },
+    });
+    expect(tx.organization.create).toHaveBeenCalledWith({
+      data: {
+        name: "Acme Corp",
+        slug: "acme-corp",
+        createdAt: expect.any(Date),
+        members: {
+          create: {
+            userId: "user1",
+            role: "owner",
+            createdAt: expect.any(Date),
+          },
+        },
+      },
+    });
+    await expect(res.json()).resolves.toMatchObject({
+      id: "org1",
+      name: "Acme Corp",
+      slug: "acme-corp",
+    });
+  });
+
+  it("returns 409 when the slug is already taken", async () => {
+    tx.organization.findUnique.mockResolvedValue({ id: "existing" });
+
+    const res = await testRoute({
+      body: { name: "Acme Corp", slug: "acme-corp" },
+    });
+
+    expect(res.status).toBe(409);
+    await expect(res.json()).resolves.toMatchObject({
+      message: "Slug already taken",
+    });
+    expect(tx.organization.create).not.toHaveBeenCalled();
+  });
+
+  it("returns 401 without a session", async () => {
+    mockGetSession.mockResolvedValue(null);
+
+    const res = await testRoute({
+      body: { name: "Acme Corp", slug: "acme-corp" },
+      headers: { cookie: "" },
+    });
+
+    expect(res.status).toBe(401);
+    expect(tx.organization.create).not.toHaveBeenCalled();
+  });
+});

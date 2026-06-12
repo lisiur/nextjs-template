@@ -13,9 +13,15 @@ import { useState } from "react";
 import { appClient } from "@/lib/api";
 
 type FieldErrors = {
+  name?: string;
   email?: string;
   password?: string;
 };
+
+interface RegisterFormProps {
+  onSuccess?: () => void | Promise<void>;
+  onSwitchToLogin?: () => void;
+}
 
 function getErrorMessage(json: unknown) {
   if (typeof json === "object" && json !== null) {
@@ -39,15 +45,17 @@ function getErrorMessage(json: unknown) {
   return null;
 }
 
-export function LoginForm({
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+export function RegisterForm({
   onSuccess,
-  onSwitchToRegister,
-}: {
-  onSuccess?: () => void;
-  onSwitchToRegister?: () => void;
-}) {
+  onSwitchToLogin,
+}: RegisterFormProps) {
   const t = useTranslations("Auth");
   const tc = useTranslations("Common");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -58,9 +66,16 @@ export function LoginForm({
     event.preventDefault();
 
     const nextErrors: FieldErrors = {};
-    if (!email) nextErrors.email = tc("required", { field: tc("email") });
+    if (!name) nextErrors.name = tc("required", { field: tc("name") });
+    if (!email) {
+      nextErrors.email = tc("required", { field: tc("email") });
+    } else if (!isValidEmail(email)) {
+      nextErrors.email = t("invalidEmail");
+    }
     if (!password) {
       nextErrors.password = tc("required", { field: tc("password") });
+    } else if (password.length < 6) {
+      nextErrors.password = t("passwordTooShort");
     }
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
@@ -69,16 +84,16 @@ export function LoginForm({
     setIsSubmitting(true);
 
     try {
-      const res = await appClient.api.auth["sign-in"].email.$post({
-        json: { email, password },
+      const res = await appClient.api.auth["sign-up"].email.$post({
+        json: { name, email, password },
       });
       if (!res.ok) {
         const json = await res.json().catch(() => null);
-        throw new Error(getErrorMessage(json) || t("loginFailed"));
+        throw new Error(getErrorMessage(json) || t("registrationFailed"));
       }
-      onSuccess?.();
+      await onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("loginFailed"));
+      setError(err instanceof Error ? err.message : t("registrationFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -87,6 +102,20 @@ export function LoginForm({
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <FieldGroup>
+        <Field>
+          <FieldLabel htmlFor="name">{tc("name")}</FieldLabel>
+          <Input
+            id="name"
+            type="text"
+            placeholder={t("namePlaceholder")}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <FieldError
+            errors={errors.name ? [{ message: errors.name }] : undefined}
+          />
+        </Field>
+
         <Field>
           <FieldLabel htmlFor="email">{tc("email")}</FieldLabel>
           <Input
@@ -121,17 +150,17 @@ export function LoginForm({
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? t("signingIn") : t("signIn")}
+        {isSubmitting ? t("creatingAccount") : t("createAccountBtn")}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
-        {t("noAccount")}{" "}
+        {t("hasAccount")}{" "}
         <button
           type="button"
-          onClick={onSwitchToRegister}
+          onClick={onSwitchToLogin}
           className="text-primary underline-offset-4 hover:underline"
         >
-          {t("createOne")}
+          {t("signIn")}
         </button>
       </p>
     </form>

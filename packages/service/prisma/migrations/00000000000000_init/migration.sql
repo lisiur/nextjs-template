@@ -173,7 +173,7 @@ CREATE TABLE "menu" (
 -- CreateTable
 CREATE TABLE "permission" (
     "id" TEXT NOT NULL,
-    "appId" TEXT NOT NULL,
+    "appId" TEXT,
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "group" TEXT NOT NULL,

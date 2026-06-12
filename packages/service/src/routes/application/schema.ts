@@ -20,6 +20,15 @@ export const applicationSchema = z
   })
   .openapi("Application");
 
+export const currentApplicationSchema = applicationSchema
+  .pick({
+    name: true,
+    code: true,
+    description: true,
+    logo: true,
+  })
+  .openapi("CurrentApplication");
+
 export const listApplicationsQuerySchema = paginationQuerySchema.extend({
   search: z.string().optional(),
 });
@@ -50,5 +59,6 @@ export const listApplicationsResponseSchema = z
   .openapi("ListApplicationsResponse");
 
 export type Application = z.infer<typeof applicationSchema>;
+export type CurrentApplication = z.infer<typeof currentApplicationSchema>;
 export type CreateApplicationBody = z.infer<typeof createApplicationBodySchema>;
 export type UpdateApplicationBody = z.infer<typeof updateApplicationBodySchema>;

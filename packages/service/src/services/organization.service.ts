@@ -29,6 +29,39 @@ export async function createOrganization(data: {
   });
 }
 
+export async function registerOrganizationForUser(
+  userId: string,
+  data: {
+    name: string;
+    slug: string;
+    logo?: string;
+    metadata?: string;
+  },
+) {
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.organization.findUnique({
+      where: { slug: data.slug },
+    });
+    if (existing) {
+      throw new HTTPException(409, { message: "Slug already taken" });
+    }
+
+    return tx.organization.create({
+      data: {
+        ...data,
+        createdAt: new Date(),
+        members: {
+          create: {
+            userId,
+            role: "owner",
+            createdAt: new Date(),
+          },
+        },
+      },
+    });
+  });
+}
+
 export async function updateOrganization(
   id: string,
   data: {

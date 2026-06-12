@@ -1,18 +1,23 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { createMiddleware } from "hono/factory";
 import { requireCurrentApp } from "#extractors/current-app";
+import { requireSession } from "#extractors/session";
 import {
   badRequestResponse,
-  forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { prepend } from "#utils/list";
-import { applicationSchema, errorSchema } from "./schema";
+import { currentApplicationSchema, errorSchema } from "./schema";
+
+const requireAuthenticatedSession = createMiddleware(async (c, next) => {
+  await requireSession(c);
+  return next();
+});
 
 export const getCurrentApplication = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("application::view")),
+    middleware: prepend([], requireAuthenticatedSession),
     method: "get",
     path: "/current",
     tags: ["Application"],
@@ -20,9 +25,7 @@ export const getCurrentApplication = defineOpenAPIRoute({
     description: "Returns the application resolved from the X-App-Code header.",
     responses: {
       ...unauthorizedResponse,
-
-      ...forbiddenResponse,
-      ...okResponseFn(applicationSchema, "The current application"),
+      ...okResponseFn(currentApplicationSchema, "The current application"),
       ...badRequestResponse,
       404: {
         content: {
@@ -34,6 +37,14 @@ export const getCurrentApplication = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const app = await requireCurrentApp(c);
-    return c.json(app, 200);
+    return c.json(
+      {
+        name: app.name,
+        code: app.code,
+        description: app.description,
+        logo: app.logo,
+      },
+      200,
+    );
   },
 });

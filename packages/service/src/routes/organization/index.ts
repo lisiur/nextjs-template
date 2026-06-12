@@ -3,12 +3,14 @@ import { createOrganization } from "./createOrganization";
 import { deleteOrganization } from "./deleteOrganization";
 import { getOrganization } from "./getOrganization";
 import { listOrganizations } from "./listOrganizations";
+import { registerOrganization } from "./registerOrganization";
 import { updateOrganization } from "./updateOrganization";
 
 const organizationRoutes = new OpenAPIHono();
 
 const routes = organizationRoutes.openapiRoutes([
   listOrganizations,
+  registerOrganization,
   getOrganization,
   createOrganization,
   updateOrganization,
