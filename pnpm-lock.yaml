@@ -131,6 +131,64 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  apps/organization:
+    dependencies:
+      '@repo/service':
+        specifier: workspace:*
+        version: link:../../packages/service
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@repo/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@tanstack/react-query':
+        specifier: ^5.100.14
+        version: 5.100.14(react@19.2.4)
+      hono:
+        specifier: ^4.0.0
+        version: 4.12.18
+      next:
+        specifier: 16.2.6
+        version: 16.2.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      next-intl:
+        specifier: ^4.12.0
+        version: 4.12.0(next@16.2.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      next-themes:
+        specifier: 0.4.6
+        version: 0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: 19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: 19.2.4
+        version: 19.2.4(react@19.2.4)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      zustand:
+        specifier: ^5.0.13
+        version: 5.0.13(@types/react@19.2.14)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
+    devDependencies:
+      '@tailwindcss/postcss':
+        specifier: ^4
+        version: 4.3.0
+      '@types/node':
+        specifier: ^20
+        version: 20.19.40
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.3(@types/react@19.2.14)
+      tailwindcss:
+        specifier: ^4
+        version: 4.3.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   packages/service:
     dependencies:
       '@hono/node-server':

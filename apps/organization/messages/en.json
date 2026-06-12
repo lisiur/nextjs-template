@@ -1,0 +1,26 @@
+{
+  "Auth": {
+    "welcomeBack": "Welcome back",
+    "signInDescription": "Sign in to your organization workspace",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "loginFailed": "Login failed",
+    "sessionExpired": "Session Expired",
+    "sessionExpiredDescription": "Your session has expired. Please sign in again.",
+    "goToLogin": "Go to Login"
+  },
+  "Common": {
+    "email": "Email",
+    "password": "Password",
+    "required": "{field} is required"
+  },
+  "Home": {
+    "title": "Organization Portal",
+    "description": "Your organization workspace is ready.",
+    "eyebrow": "Organization",
+    "statusLabel": "Status",
+    "status": "Scaffold ready",
+    "nextStepLabel": "Next step",
+    "nextStep": "Add organization-specific workflows when their scope is defined."
+  }
+}

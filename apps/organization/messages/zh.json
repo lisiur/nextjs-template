@@ -1,0 +1,26 @@
+{
+  "Auth": {
+    "welcomeBack": "欢迎回来",
+    "signInDescription": "登录你的组织工作区",
+    "signIn": "登录",
+    "signingIn": "登录中...",
+    "loginFailed": "登录失败",
+    "sessionExpired": "会话已过期",
+    "sessionExpiredDescription": "您的会话已过期，请重新登录。",
+    "goToLogin": "前往登录"
+  },
+  "Common": {
+    "email": "邮箱",
+    "password": "密码",
+    "required": "请输入{field}"
+  },
+  "Home": {
+    "title": "组织门户",
+    "description": "你的组织工作区已准备就绪。",
+    "eyebrow": "组织",
+    "statusLabel": "状态",
+    "status": "脚手架已就绪",
+    "nextStepLabel": "下一步",
+    "nextStep": "在范围明确后添加组织相关工作流。"
+  }
+}
