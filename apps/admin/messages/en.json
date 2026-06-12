@@ -175,10 +175,11 @@
   },
   "Notifications": {
     "title": "Notification Management",
-    "description": "Manage delivery channels and channel-bound notification templates.",
+    "description": "Manage delivery channels, channel-bound templates, and delivered notification records.",
     "tabs": {
       "channels": "Channels",
-      "templates": "Templates"
+      "templates": "Templates",
+      "records": "Records"
     },
     "fields": {
       "name": "Name",
@@ -241,6 +242,59 @@
       "createSuccess": "Notification template created",
       "updateSuccess": "Notification template updated",
       "deleteSuccess": "Notification template deleted"
+    },
+    "records": {
+      "empty": "No notification records found",
+      "view": "View",
+      "detailTitle": "Notification Record",
+      "filters": {
+        "recipientEmail": "Recipient email",
+        "recipientName": "Recipient name",
+        "status": "Status",
+        "allProviders": "All providers",
+        "readState": "Read state",
+        "allReadStates": "All read states",
+        "archivedState": "Archive state",
+        "clear": "Clear"
+      },
+      "columns": {
+        "recipient": "Recipient",
+        "notification": "Notification",
+        "readState": "Read"
+      },
+      "readState": {
+        "read": "Read",
+        "unread": "Unread"
+      },
+      "archivedState": {
+        "active": "Active",
+        "archived": "Archived",
+        "all": "All records"
+      },
+      "sections": {
+        "content": "Content",
+        "routing": "Routing",
+        "delivery": "Delivery",
+        "data": "Data"
+      },
+      "detail": {
+        "subject": "Subject",
+        "title": "Title",
+        "body": "Body",
+        "template": "Template",
+        "source": "Source",
+        "correlationId": "Correlation ID",
+        "attempts": "Attempts",
+        "providerMessageId": "Provider Message ID",
+        "errorMessage": "Error Message",
+        "nextAttemptAt": "Next Attempt At",
+        "sentAt": "Sent At",
+        "failedAt": "Failed At",
+        "readAt": "Read At",
+        "archivedAt": "Archived At",
+        "variables": "Variables",
+        "metadata": "Metadata"
+      }
     }
   },
   "Sidebar": {

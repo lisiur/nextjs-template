@@ -1,0 +1,176 @@
+"use client";
+
+import {
+  DateRangePicker,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@repo/ui";
+import { useCallback, useRef, useState } from "react";
+import type { DateRange } from "react-day-picker";
+
+export interface NotificationRecordFilters {
+  recipientEmail?: string;
+  recipientName?: string;
+  status?: string;
+  providerKey?: string;
+  readState?: "all" | "read" | "unread";
+  archivedState?: "all" | "active" | "archived";
+  startDate?: Date;
+  endDate?: Date;
+}
+
+interface NotificationRecordFilterProps {
+  filters: NotificationRecordFilters;
+  onFiltersChange: (
+    newFiltersOrFn:
+      | NotificationRecordFilters
+      | ((prev: NotificationRecordFilters) => NotificationRecordFilters),
+  ) => void;
+  labels: {
+    recipientEmail: string;
+    recipientName: string;
+    status: string;
+    provider: string;
+    allProviders: string;
+    readState: string;
+    allReadStates: string;
+    read: string;
+    unread: string;
+    archivedState: string;
+    active: string;
+    archived: string;
+    allArchivedStates: string;
+    clear: string;
+  };
+}
+
+const PROVIDER_OPTIONS = ["in-app", "smtp-email", "sms"] as const;
+
+export function NotificationRecordFilter({
+  filters,
+  onFiltersChange,
+  labels,
+}: NotificationRecordFilterProps) {
+  const onFiltersChangeRef = useRef(onFiltersChange);
+  onFiltersChangeRef.current = onFiltersChange;
+  const [resetKey, setResetKey] = useState(0);
+
+  const hasFilters = Object.values(filters).some(
+    (value) => value && value !== "all" && value !== "active",
+  );
+
+  const handleDateChange = useCallback((range: DateRange | undefined) => {
+    onFiltersChangeRef.current((prev) => ({
+      ...prev,
+      startDate: range?.from,
+      endDate: range?.to,
+    }));
+  }, []);
+
+  function setFilter(key: keyof NotificationRecordFilters, value: string) {
+    onFiltersChange({ ...filters, [key]: value || undefined });
+  }
+
+  function handleClear() {
+    setResetKey((key) => key + 1);
+    onFiltersChange({ archivedState: "active" });
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <Input
+        className="h-9 w-48"
+        placeholder={labels.recipientEmail}
+        value={filters.recipientEmail ?? ""}
+        onChange={(event) => setFilter("recipientEmail", event.target.value)}
+      />
+      <Input
+        className="h-9 w-40"
+        placeholder={labels.recipientName}
+        value={filters.recipientName ?? ""}
+        onChange={(event) => setFilter("recipientName", event.target.value)}
+      />
+      <Input
+        className="h-9 w-32"
+        placeholder={labels.status}
+        value={filters.status ?? ""}
+        onChange={(event) => setFilter("status", event.target.value)}
+      />
+      <Select
+        value={filters.providerKey ?? "all"}
+        onValueChange={(value) =>
+          setFilter("providerKey", !value || value === "all" ? "" : value)
+        }
+      >
+        <SelectTrigger className="h-9 w-40">
+          {filters.providerKey ?? labels.allProviders}
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{labels.allProviders}</SelectItem>
+          {PROVIDER_OPTIONS.map((provider) => (
+            <SelectItem key={provider} value={provider}>
+              {provider}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Select
+        value={filters.readState ?? "all"}
+        onValueChange={(value) =>
+          setFilter("readState", !value || value === "all" ? "" : value)
+        }
+      >
+        <SelectTrigger className="h-9 w-36">
+          {filters.readState === "read"
+            ? labels.read
+            : filters.readState === "unread"
+              ? labels.unread
+              : labels.allReadStates}
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{labels.allReadStates}</SelectItem>
+          <SelectItem value="read">{labels.read}</SelectItem>
+          <SelectItem value="unread">{labels.unread}</SelectItem>
+        </SelectContent>
+      </Select>
+      <Select
+        value={filters.archivedState ?? "active"}
+        onValueChange={(value) =>
+          setFilter("archivedState", !value || value === "active" ? "" : value)
+        }
+      >
+        <SelectTrigger className="h-9 w-40">
+          {filters.archivedState === "all"
+            ? labels.allArchivedStates
+            : filters.archivedState === "archived"
+              ? labels.archived
+              : labels.active}
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="active">{labels.active}</SelectItem>
+          <SelectItem value="archived">{labels.archived}</SelectItem>
+          <SelectItem value="all">{labels.allArchivedStates}</SelectItem>
+        </SelectContent>
+      </Select>
+      <DateRangePicker
+        key={resetKey}
+        startDate={filters.startDate ?? null}
+        endDate={filters.endDate ?? null}
+        onChange={handleDateChange}
+        className="w-auto"
+      />
+      {hasFilters && (
+        <button
+          type="button"
+          className="text-muted-foreground text-sm hover:text-foreground"
+          onClick={handleClear}
+        >
+          {labels.clear}
+        </button>
+      )}
+    </div>
+  );
+}

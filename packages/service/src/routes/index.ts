@@ -5,6 +5,7 @@ import { authRoutes } from "./auth";
 import { menuRoutes } from "./menu";
 import { notificationRoutes } from "./notification";
 import { notificationChannelRoutes } from "./notification-channel";
+import { notificationRecordRoutes } from "./notification-record";
 import { notificationTemplateRoutes } from "./notification-template";
 import { operationLogRoutes } from "./operation-log";
 import { organizationRoutes } from "./organization";
@@ -25,6 +26,7 @@ const routes = new OpenAPIHono()
   .route("/notification-channels", notificationChannelRoutes)
   .route("/notification-templates", notificationTemplateRoutes)
   .route("/notifications", notificationRoutes)
+  .route("/notification-records", notificationRecordRoutes)
   .route("/roles", roleRoutes)
   .route("/role-menus", roleMenusRoutes)
   .route("/system-info", systemInfoRoutes)

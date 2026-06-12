@@ -192,6 +192,16 @@ const permissionDefinitions = [
     group: "notification",
     name: "View Notification",
   },
+  {
+    code: "notification-record::list",
+    group: "notification-record",
+    name: "List Notification Records",
+  },
+  {
+    code: "notification-record::view",
+    group: "notification-record",
+    name: "View Notification Record",
+  },
   { code: "upload::sign", group: "upload", name: "Sign Upload URL" },
 ];
 

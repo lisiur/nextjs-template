@@ -175,10 +175,11 @@
   },
   "Notifications": {
     "title": "通知管理",
-    "description": "管理通知发送渠道和绑定渠道的通知模板。",
+    "description": "管理通知发送渠道、绑定渠道的通知模板和已发送的通知记录。",
     "tabs": {
       "channels": "渠道",
-      "templates": "模板"
+      "templates": "模板",
+      "records": "记录"
     },
     "fields": {
       "name": "名称",
@@ -241,6 +242,59 @@
       "createSuccess": "通知模板已创建",
       "updateSuccess": "通知模板已更新",
       "deleteSuccess": "通知模板已删除"
+    },
+    "records": {
+      "empty": "暂无通知记录",
+      "view": "查看",
+      "detailTitle": "通知记录",
+      "filters": {
+        "recipientEmail": "接收人邮箱",
+        "recipientName": "接收人姓名",
+        "status": "状态",
+        "allProviders": "全部提供方",
+        "readState": "阅读状态",
+        "allReadStates": "全部阅读状态",
+        "archivedState": "归档状态",
+        "clear": "清除"
+      },
+      "columns": {
+        "recipient": "接收人",
+        "notification": "通知",
+        "readState": "已读"
+      },
+      "readState": {
+        "read": "已读",
+        "unread": "未读"
+      },
+      "archivedState": {
+        "active": "有效",
+        "archived": "已归档",
+        "all": "全部记录"
+      },
+      "sections": {
+        "content": "内容",
+        "routing": "路由",
+        "delivery": "投递",
+        "data": "数据"
+      },
+      "detail": {
+        "subject": "主题",
+        "title": "标题",
+        "body": "正文",
+        "template": "模板",
+        "source": "来源",
+        "correlationId": "关联 ID",
+        "attempts": "尝试次数",
+        "providerMessageId": "提供方消息 ID",
+        "errorMessage": "错误信息",
+        "nextAttemptAt": "下次尝试时间",
+        "sentAt": "发送时间",
+        "failedAt": "失败时间",
+        "readAt": "阅读时间",
+        "archivedAt": "归档时间",
+        "variables": "变量",
+        "metadata": "元数据"
+      }
     }
   },
   "Sidebar": {
