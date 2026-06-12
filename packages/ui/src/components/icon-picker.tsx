@@ -75,7 +75,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
             <button
               type="button"
               className={cn(
-                "flex h-8 w-full items-center gap-2 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors hover:bg-accent focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+                "flex h-8 w-full items-center gap-2 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors ring-inset hover:bg-accent focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
                 value && "pr-8",
                 className,
               )}
@@ -97,7 +97,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
             aria-label="Clear icon selection"
             onClick={handleClear}
             className={cn(
-              "absolute top-1/2 right-2 z-10 flex size-5 -translate-y-1/2 items-center justify-center rounded text-muted-foreground hover:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+              "absolute top-1/2 right-2 z-10 flex size-5 -translate-y-1/2 items-center justify-center rounded text-muted-foreground ring-inset hover:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
             )}
           >
             ×
