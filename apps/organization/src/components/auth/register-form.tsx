@@ -1,5 +1,6 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   Field,
@@ -9,44 +10,13 @@ import {
   Input,
 } from "@repo/ui";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { appClient } from "@/lib/api";
-
-type FieldErrors = {
-  name?: string;
-  email?: string;
-  password?: string;
-};
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { appClient, withApiFeedback } from "@/lib/api";
 
 interface RegisterFormProps {
   onSuccess?: () => void | Promise<void>;
   onSwitchToLogin?: () => void;
-}
-
-function getErrorMessage(json: unknown) {
-  if (typeof json === "object" && json !== null) {
-    if ("message" in json && typeof json.message === "string") {
-      return json.message;
-    }
-    if ("error" in json) {
-      const { error } = json;
-      if (typeof error === "string") return error;
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error &&
-        typeof error.message === "string"
-      ) {
-        return error.message;
-      }
-    }
-  }
-
-  return null;
-}
-
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
 export function RegisterForm({
@@ -55,52 +25,37 @@ export function RegisterForm({
 }: RegisterFormProps) {
   const t = useTranslations("Auth");
   const tc = useTranslations("Common");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<FieldErrors>({});
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const registerSchema = z.object({
+    name: z.string().min(1, tc("required", { field: tc("name") })),
+    email: z
+      .string()
+      .min(1, tc("required", { field: tc("email") }))
+      .email(t("invalidEmail")),
+    password: z.string().min(6, t("passwordTooShort")),
+  });
 
-    const nextErrors: FieldErrors = {};
-    if (!name) nextErrors.name = tc("required", { field: tc("name") });
-    if (!email) {
-      nextErrors.email = tc("required", { field: tc("email") });
-    } else if (!isValidEmail(email)) {
-      nextErrors.email = t("invalidEmail");
-    }
-    if (!password) {
-      nextErrors.password = tc("required", { field: tc("password") });
-    } else if (password.length < 6) {
-      nextErrors.password = t("passwordTooShort");
-    }
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+  type RegisterInput = z.infer<typeof registerSchema>;
 
-    setError(null);
-    setIsSubmitting(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
+  });
 
-    try {
-      const res = await appClient.api.auth["sign-up"].email.$post({
-        json: { name, email, password },
-      });
-      if (!res.ok) {
-        const json = await res.json().catch(() => null);
-        throw new Error(getErrorMessage(json) || t("registrationFailed"));
-      }
-      await onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("registrationFailed"));
-    } finally {
-      setIsSubmitting(false);
-    }
+  async function onSubmit(data: RegisterInput) {
+    await withApiFeedback(appClient.api.auth["sign-up"].email.$post, {
+      showError: false,
+    })({
+      json: data,
+    });
+    await onSuccess?.();
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="name">{tc("name")}</FieldLabel>
@@ -108,12 +63,9 @@ export function RegisterForm({
             id="name"
             type="text"
             placeholder={t("namePlaceholder")}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
+            {...register("name")}
           />
-          <FieldError
-            errors={errors.name ? [{ message: errors.name }] : undefined}
-          />
+          <FieldError errors={errors.name ? [errors.name] : undefined} />
         </Field>
 
         <Field>
@@ -122,12 +74,9 @@ export function RegisterForm({
             id="email"
             type="email"
             placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            {...register("email")}
           />
-          <FieldError
-            errors={errors.email ? [{ message: errors.email }] : undefined}
-          />
+          <FieldError errors={errors.email ? [errors.email] : undefined} />
         </Field>
 
         <Field>
@@ -136,18 +85,13 @@ export function RegisterForm({
             id="password"
             type="password"
             placeholder="********"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            {...register("password")}
           />
           <FieldError
-            errors={
-              errors.password ? [{ message: errors.password }] : undefined
-            }
+            errors={errors.password ? [errors.password] : undefined}
           />
         </Field>
       </FieldGroup>
-
-      {error && <p className="text-sm text-destructive">{error}</p>}
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? t("creatingAccount") : t("createAccountBtn")}

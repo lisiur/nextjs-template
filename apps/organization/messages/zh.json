@@ -29,6 +29,8 @@
   "RegisterOrganization": {
     "title": "注册组织",
     "description": "创建你的团队将在组织门户中使用的工作区。",
+    "detailsTitle": "组织详情",
+    "additionalInfoTitle": "附加信息",
     "name": "组织名称",
     "namePlaceholder": "Acme Corp",
     "slug": "标识",
@@ -52,10 +54,48 @@
     "nextStep": "在范围明确后添加组织相关工作流。"
   },
   "Profile": {
-    "title": "个人资料"
+    "title": "个人资料",
+    "description": "管理你的账户设置",
+    "avatar": "头像",
+    "personalInfo": "个人信息",
+    "email": "邮箱",
+    "changePassword": "修改密码",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "confirmPassword": "确认新密码",
+    "name": "姓名",
+    "save": "保存",
+    "saving": "保存中...",
+    "changeBtn": "修改密码",
+    "changing": "修改中...",
+    "chooseFile": "选择文件",
+    "uploading": "上传中...",
+    "cancel": "取消",
+    "avatarHint": "JPEG、PNG、GIF 或 WebP，最大 5MB。",
+    "profileUpdated": "资料更新成功",
+    "passwordChanged": "密码修改成功",
+    "avatarUpdated": "头像更新成功",
+    "updateFailed": "更新失败",
+    "changePasswordFailed": "密码修改失败",
+    "uploadFailed": "上传失败",
+    "fileTooLarge": "文件过大，最大 5MB。",
+    "loadFailed": "加载资料失败",
+    "validation": {
+      "nameRequired": "姓名不能为空",
+      "currentPasswordRequired": "当前密码不能为空",
+      "newPasswordMin": "新密码至少需要 6 个字符",
+      "confirmPasswordRequired": "请确认新密码",
+      "passwordsMismatch": "两次输入的密码不一致"
+    }
+  },
+  "Header": {
+    "appearance": "外观",
+    "language": "语言"
   },
   "Sidebar": {
     "noMenus": "暂无菜单",
+    "profile": "个人资料",
+    "registerOrganization": "注册组织",
     "signOut": "退出登录"
   }
 }

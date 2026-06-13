@@ -1,47 +1,101 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
-import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle, Separator } from "@repo/ui";
 import { useTranslations } from "next-intl";
-import { useSession } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { useSession } from "@/lib/api/use-session";
+import { AvatarUpload } from "./components/avatar-upload";
+import { PasswordForm } from "./components/password-form";
+import { ProfileForm } from "./components/profile-form";
 
-export default function OrganizationProfilePage() {
+export default function ProfilePage() {
   const t = useTranslations("Profile");
-  const { data: session } = useSession();
-  const user = session?.user;
+  const session = useSession();
+  const [user, setUser] = useState<{
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (session.data?.user) {
+      setUser({
+        id: session.data.user.id,
+        name: session.data.user.name,
+        email: session.data.user.email,
+        image: session.data.user.image,
+      });
+    }
+  }, [session.data]);
+
+  if (session.isPending) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="flex items-center justify-center py-16">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="container mx-auto py-8">
+        <p className="text-muted-foreground">{t("loadFailed")}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-1 items-center justify-center py-10">
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle>{t("title")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-muted-foreground">
-              {user?.image ? (
-                <Image
-                  src={user.image}
-                  alt={user.name ?? ""}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              ) : (
-                <span className="font-semibold text-sm">
-                  {user?.name?.slice(0, 2).toUpperCase() ?? ""}
-                </span>
-              )}
+    <div className="container mx-auto py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("description")}</p>
+      </div>
+
+      <div className="flex flex-col gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("avatar")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AvatarUpload
+              currentImage={user.image}
+              name={user.name}
+              onImageUpdate={(url) => setUser({ ...user, image: url })}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("personalInfo")}</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("email")}
+              </label>
+              <p className="text-sm">{user.email}</p>
             </div>
-            <div className="min-w-0">
-              <p className="truncate font-medium">{user?.name}</p>
-              <p className="truncate text-muted-foreground text-sm">
-                {user?.email}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            <Separator />
+            <ProfileForm
+              initialName={user.name}
+              onNameUpdate={(name) => setUser({ ...user, name })}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("changePassword")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PasswordForm />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

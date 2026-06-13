@@ -29,6 +29,8 @@
   "RegisterOrganization": {
     "title": "Register your organization",
     "description": "Create the workspace your team will use in the organization portal.",
+    "detailsTitle": "Organization Details",
+    "additionalInfoTitle": "Additional Information",
     "name": "Organization name",
     "namePlaceholder": "Acme Corp",
     "slug": "Slug",
@@ -52,10 +54,48 @@
     "nextStep": "Add organization-specific workflows when their scope is defined."
   },
   "Profile": {
-    "title": "Profile"
+    "title": "Profile",
+    "description": "Manage your account settings",
+    "avatar": "Avatar",
+    "personalInfo": "Personal Information",
+    "email": "Email",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "name": "Name",
+    "save": "Save",
+    "saving": "Saving...",
+    "changeBtn": "Change Password",
+    "changing": "Changing...",
+    "chooseFile": "Choose File",
+    "uploading": "Uploading...",
+    "cancel": "Cancel",
+    "avatarHint": "JPEG, PNG, GIF or WebP. Max 5MB.",
+    "profileUpdated": "Profile updated",
+    "passwordChanged": "Password changed",
+    "avatarUpdated": "Avatar updated",
+    "updateFailed": "Update failed",
+    "changePasswordFailed": "Failed to change password",
+    "uploadFailed": "Upload failed",
+    "fileTooLarge": "File too large. Maximum size is 5MB.",
+    "loadFailed": "Failed to load profile",
+    "validation": {
+      "nameRequired": "Name is required",
+      "currentPasswordRequired": "Current password is required",
+      "newPasswordMin": "New password must be at least 6 characters",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordsMismatch": "Passwords do not match"
+    }
+  },
+  "Header": {
+    "appearance": "Appearance",
+    "language": "Language"
   },
   "Sidebar": {
     "noMenus": "No menus available",
+    "profile": "Profile",
+    "registerOrganization": "Register Organization",
     "signOut": "Sign Out"
   }
 }

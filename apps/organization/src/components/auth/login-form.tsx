@@ -1,5 +1,6 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
   Field,
@@ -9,35 +10,9 @@ import {
   Input,
 } from "@repo/ui";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { appClient } from "@/lib/api";
-
-type FieldErrors = {
-  email?: string;
-  password?: string;
-};
-
-function getErrorMessage(json: unknown) {
-  if (typeof json === "object" && json !== null) {
-    if ("message" in json && typeof json.message === "string") {
-      return json.message;
-    }
-    if ("error" in json) {
-      const { error } = json;
-      if (typeof error === "string") return error;
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error &&
-        typeof error.message === "string"
-      ) {
-        return error.message;
-      }
-    }
-  }
-
-  return null;
-}
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { appClient, withApiFeedback } from "@/lib/api";
 
 export function LoginForm({
   onSuccess,
@@ -48,44 +23,33 @@ export function LoginForm({
 }) {
   const t = useTranslations("Auth");
   const tc = useTranslations("Common");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<FieldErrors>({});
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const loginSchema = z.object({
+    email: z.string().min(1, tc("required", { field: tc("email") })),
+    password: z.string().min(1, tc("required", { field: tc("password") })),
+  });
 
-    const nextErrors: FieldErrors = {};
-    if (!email) nextErrors.email = tc("required", { field: tc("email") });
-    if (!password) {
-      nextErrors.password = tc("required", { field: tc("password") });
-    }
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
+  type LoginInput = z.infer<typeof loginSchema>;
 
-    setError(null);
-    setIsSubmitting(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+  });
 
-    try {
-      const res = await appClient.api.auth["sign-in"].email.$post({
-        json: { email, password },
-      });
-      if (!res.ok) {
-        const json = await res.json().catch(() => null);
-        throw new Error(getErrorMessage(json) || t("loginFailed"));
-      }
-      onSuccess?.();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("loginFailed"));
-    } finally {
-      setIsSubmitting(false);
-    }
+  async function onSubmit(data: LoginInput) {
+    await withApiFeedback(appClient.api.auth["sign-in"].email.$post, {
+      showError: false,
+    })({
+      json: data,
+    });
+    onSuccess?.();
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <FieldGroup>
         <Field>
           <FieldLabel htmlFor="email">{tc("email")}</FieldLabel>
@@ -93,12 +57,9 @@ export function LoginForm({
             id="email"
             type="email"
             placeholder="you@example.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            {...register("email")}
           />
-          <FieldError
-            errors={errors.email ? [{ message: errors.email }] : undefined}
-          />
+          <FieldError errors={errors.email ? [errors.email] : undefined} />
         </Field>
 
         <Field>
@@ -107,21 +68,16 @@ export function LoginForm({
             id="password"
             type="password"
             placeholder="********"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            {...register("password")}
           />
           <FieldError
-            errors={
-              errors.password ? [{ message: errors.password }] : undefined
-            }
+            errors={errors.password ? [errors.password] : undefined}
           />
         </Field>
       </FieldGroup>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
-
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? t("signingIn") : t("signIn")}
+      <Button type="submit" className="w-full">
+        {t("signIn")}
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">

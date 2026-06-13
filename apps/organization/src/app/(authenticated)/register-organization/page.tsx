@@ -1,12 +1,5 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { redirectToFirstMenuOrProfile } from "@/lib/navigation/menu-redirect";
@@ -23,16 +16,12 @@ export default function RegisterOrganizationPage() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center p-4 py-10">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">{t("title")}</CardTitle>
-          <CardDescription>{t("description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <OrganizationRegistrationForm onSuccess={handleSuccess} />
-        </CardContent>
-      </Card>
+    <div className="container mx-auto py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <p className="text-muted-foreground">{t("description")}</p>
+      </div>
+      <OrganizationRegistrationForm onSuccess={handleSuccess} />
     </div>
   );
 }

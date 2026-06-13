@@ -2,36 +2,66 @@
 
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   SidebarMenuButton,
+  Switch,
 } from "@repo/ui";
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import {
+  Building2,
+  ChevronsUpDown,
+  LanguagesIcon,
+  LogOut,
+  Moon,
+  Sun,
+  UserIcon,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
+import { Fragment, useMemo } from "react";
 import { useSession } from "@/lib/api/use-session";
 
-type UserMenuItem = "signOut";
+type UserMenuItem =
+  | "profile"
+  | "theme"
+  | "locale"
+  | "registerOrganization"
+  | "signOut";
 
 interface UserMenuProps {
   full: boolean;
   items?: UserMenuItem[];
 }
 
+const locales: { value: string; label: string }[] = [
+  { value: "en", label: "English" },
+  { value: "zh", label: "中文" },
+];
+
 export function UserMenu({ full, items }: UserMenuProps) {
   const session = useSession();
   const user = session.data?.user;
   const router = useRouter();
+  const locale = useLocale();
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
   const t = useTranslations("Sidebar");
+  const th = useTranslations("Header");
 
-  const visible = new Set(items ?? ["signOut"]);
-  const showSignOut = visible.has("signOut");
+  const visible = new Set(
+    items ?? ["profile", "theme", "locale", "registerOrganization", "signOut"],
+  );
 
   const initials = useMemo(() => {
     const label = user?.name || user?.email || "";
@@ -51,6 +81,18 @@ export function UserMenu({ full, items }: UserMenuProps) {
       // Keep the current UI state if sign-out or navigation fails.
     }
   };
+
+  function handleLocaleChange(value: string) {
+    // biome-ignore lint/suspicious/noDocumentCookie: simple cookie setter for locale
+    document.cookie = `locale=${value};path=/;max-age=31536000`;
+    router.refresh();
+  }
+
+  const showLabel = full;
+  const showProfile = visible.has("profile");
+  const showRegisterOrg = visible.has("registerOrganization");
+  const showUtilities = visible.has("theme") || visible.has("locale");
+  const showSignOut = visible.has("signOut");
 
   const avatar = (
     <div
@@ -114,7 +156,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
         align={full ? "start" : "end"}
         sideOffset={full ? 4 : undefined}
       >
-        {full ? (
+        {showLabel && (
           <DropdownMenuGroup>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col gap-1">
@@ -125,9 +167,73 @@ export function UserMenu({ full, items }: UserMenuProps) {
               </div>
             </DropdownMenuLabel>
           </DropdownMenuGroup>
-        ) : null}
-        {full && showSignOut ? <DropdownMenuSeparator /> : null}
-        {showSignOut ? (
+        )}
+        {showLabel &&
+          (showProfile || showRegisterOrg || showUtilities || showSignOut) && (
+            <DropdownMenuSeparator />
+          )}
+        {showProfile && (
+          <DropdownMenuItem render={<Link href="/profile" />}>
+            <UserIcon />
+            {t("profile")}
+          </DropdownMenuItem>
+        )}
+        {showProfile && showRegisterOrg && <DropdownMenuSeparator />}
+        {showRegisterOrg && (
+          <DropdownMenuItem render={<Link href="/register-organization" />}>
+            <Building2 />
+            {t("registerOrganization")}
+          </DropdownMenuItem>
+        )}
+        {(showProfile || showRegisterOrg) && showUtilities && (
+          <DropdownMenuSeparator />
+        )}
+        {showUtilities && (
+          <Fragment>
+            {visible.has("theme") && (
+              <DropdownMenuItem closeOnClick={false} className="cursor-default">
+                <div className="flex items-center justify-between w-full">
+                  <span className="flex items-center gap-1.5">
+                    {isDark ? (
+                      <Moon className="size-4" />
+                    ) : (
+                      <Sun className="size-4" />
+                    )}
+                    {th("appearance")}
+                  </span>
+                  <Switch
+                    checked={isDark}
+                    onCheckedChange={(checked) =>
+                      setTheme(checked ? "dark" : "light")
+                    }
+                  />
+                </div>
+              </DropdownMenuItem>
+            )}
+            {visible.has("locale") && (
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <LanguagesIcon className="size-4 text-muted-foreground" />
+                  <span>{th("language")}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  {locales.map((l) => (
+                    <DropdownMenuCheckboxItem
+                      key={l.value}
+                      checked={locale === l.value}
+                      onClick={() => handleLocaleChange(l.value)}
+                    >
+                      {l.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            )}
+          </Fragment>
+        )}
+        {(showLabel || showProfile || showRegisterOrg || showUtilities) &&
+          showSignOut && <DropdownMenuSeparator />}
+        {showSignOut && (
           <DropdownMenuItem
             variant="destructive"
             onClick={() => void handleSignOut()}
@@ -135,7 +241,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
             <LogOut className="h-4 w-4" />
             {t("signOut")}
           </DropdownMenuItem>
-        ) : null}
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
