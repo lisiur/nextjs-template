@@ -1,13 +1,13 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   badRequestResponse,
   createdResponseFn,
   forbiddenResponse,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { createNotificationTemplate } from "#services/notification/template.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import {
   createNotificationTemplateBodySchema,
   notificationTemplateSchema,
@@ -15,7 +15,6 @@ import {
 
 export const createNotificationTemplateRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("notification-template::create")),
     method: "post",
     path: "/",
     tags: ["NotificationTemplate"],
@@ -39,6 +38,8 @@ export const createNotificationTemplateRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "notification-template::create");
     const body = c.req.valid("json");
     const template = await createNotificationTemplate(body);
     return c.json(template, 201);

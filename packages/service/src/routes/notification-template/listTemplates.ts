@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { listNotificationTemplates } from "#services/notification/template.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import {
   listNotificationTemplatesQuerySchema,
   listNotificationTemplatesResponseSchema,
@@ -14,7 +14,6 @@ import {
 
 export const listNotificationTemplatesRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("notification-template::list")),
     method: "get",
     path: "/",
     tags: ["NotificationTemplate"],
@@ -30,6 +29,8 @@ export const listNotificationTemplatesRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "notification-template::list");
     const query = c.req.valid("query");
     const templates = await listNotificationTemplates(query);
     return c.json({ templates }, 200);

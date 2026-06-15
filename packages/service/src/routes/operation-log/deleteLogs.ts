@@ -1,18 +1,17 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { deleteLogs } from "#services/operation-log.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import { deleteLogsBodySchema, deleteSuccessSchema } from "./schema";
 
 export const deleteLogsRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("operation-log::delete")),
     method: "delete",
     path: "/",
     tags: ["Log"],
@@ -35,6 +34,8 @@ export const deleteLogsRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "operation-log::delete");
     const { ids } = c.req.valid("json");
 
     await deleteLogs(ids);

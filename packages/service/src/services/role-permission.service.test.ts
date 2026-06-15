@@ -38,8 +38,11 @@ describe("getUserPermissions", () => {
         rolePermissions: {
           some: {
             role: {
-              userRoles: {
-                some: { userId: "user1" },
+              roleAssignments: {
+                some: {
+                  OR: [{ scopeId: "", scopeType: "PLATFORM" }],
+                  userId: "user1",
+                },
               },
             },
           },

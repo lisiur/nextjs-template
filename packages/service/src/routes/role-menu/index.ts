@@ -4,6 +4,7 @@ import {
   OpenAPIHono,
   z,
 } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   errorSchema,
@@ -11,13 +12,12 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { menuSchema } from "#routes/menu/schema";
 import {
+  assertPermission,
   assignPermissionByMenuIds,
   getRoleMenus,
 } from "#services/role-permission.service";
-import { prepend } from "#utils/list";
 
 const roleIdParamSchema = z.object({
   roleId: z.string().min(1),
@@ -25,7 +25,6 @@ const roleIdParamSchema = z.object({
 
 export const getRoleMenusRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("role::list")),
     method: "get",
     path: "/{roleId}",
     tags: ["RoleMenus"],
@@ -50,6 +49,8 @@ export const getRoleMenusRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "role::list");
     const { roleId } = c.req.valid("param");
     const menus = await getRoleMenus(roleId);
     return c.json({ menus }, 200);
@@ -58,7 +59,6 @@ export const getRoleMenusRoute = defineOpenAPIRoute({
 
 export const batchAssignRoleMenus = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("role::update")),
     method: "put",
     path: "/batch",
     tags: ["RoleMenus"],
@@ -96,6 +96,8 @@ export const batchAssignRoleMenus = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "role::update");
     const { roleId, menuIds } = c.req.valid("json");
 
     const menus = await assignPermissionByMenuIds(roleId, menuIds);

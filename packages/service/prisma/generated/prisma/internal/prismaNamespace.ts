@@ -398,6 +398,7 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   UserRole: 'UserRole',
+  RoleAssignment: 'RoleAssignment',
   Role: 'Role',
   OperationLog: 'OperationLog',
   AuditLog: 'AuditLog',
@@ -419,7 +420,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "systemConfig" | "upload" | "application" | "menu" | "permission" | "rolePermission" | "userRole" | "role" | "operationLog" | "auditLog" | "notificationChannel" | "notificationTemplate" | "notification"
+    modelProps: "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "systemConfig" | "upload" | "application" | "menu" | "permission" | "rolePermission" | "userRole" | "roleAssignment" | "role" | "operationLog" | "auditLog" | "notificationChannel" | "notificationTemplate" | "notification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1459,6 +1460,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RoleAssignment: {
+      payload: Prisma.$RoleAssignmentPayload<ExtArgs>
+      fields: Prisma.RoleAssignmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RoleAssignmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RoleAssignmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>
+        }
+        findFirst: {
+          args: Prisma.RoleAssignmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RoleAssignmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>
+        }
+        findMany: {
+          args: Prisma.RoleAssignmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>[]
+        }
+        create: {
+          args: Prisma.RoleAssignmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>
+        }
+        createMany: {
+          args: Prisma.RoleAssignmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RoleAssignmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>[]
+        }
+        delete: {
+          args: Prisma.RoleAssignmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>
+        }
+        update: {
+          args: Prisma.RoleAssignmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.RoleAssignmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RoleAssignmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RoleAssignmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.RoleAssignmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RoleAssignmentPayload>
+        }
+        aggregate: {
+          args: Prisma.RoleAssignmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRoleAssignment>
+        }
+        groupBy: {
+          args: Prisma.RoleAssignmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RoleAssignmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RoleAssignmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RoleAssignmentCountAggregateOutputType> | number
+        }
+      }
+    }
     Role: {
       payload: Prisma.$RolePayload<ExtArgs>
       fields: Prisma.RoleFieldRefs
@@ -2142,9 +2217,23 @@ export const UserRoleScalarFieldEnum = {
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
+export const RoleAssignmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roleId: 'roleId',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
+  createdAt: 'createdAt'
+} as const
+
+export type RoleAssignmentScalarFieldEnum = (typeof RoleAssignmentScalarFieldEnum)[keyof typeof RoleAssignmentScalarFieldEnum]
+
+
 export const RoleScalarFieldEnum = {
   id: 'id',
   appId: 'appId',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
   name: 'name',
   code: 'code',
   flags: 'flags',
@@ -2391,6 +2480,20 @@ export type ListEnumLinkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 
 
 /**
+ * Reference to a field of type 'RoleScopeType'
+ */
+export type EnumRoleScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScopeType'>
+    
+
+
+/**
+ * Reference to a field of type 'RoleScopeType[]'
+ */
+export type ListEnumRoleScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScopeType[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -2527,6 +2630,7 @@ export type GlobalOmitConfig = {
   permission?: Prisma.PermissionOmit
   rolePermission?: Prisma.RolePermissionOmit
   userRole?: Prisma.UserRoleOmit
+  roleAssignment?: Prisma.RoleAssignmentOmit
   role?: Prisma.RoleOmit
   operationLog?: Prisma.OperationLogOmit
   auditLog?: Prisma.AuditLogOmit

@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   badRequestResponse,
   forbiddenResponse,
@@ -6,14 +7,12 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
+import { assertPermission } from "#services/role-permission.service";
 import { deleteUser as deleteUserSvc } from "#services/user.service";
-import { prepend } from "#utils/list";
 import { successSchema, userIdParamSchema } from "./schema";
 
 export const deleteUser = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("user::delete")),
     method: "delete",
     path: "/{id}",
     tags: ["AdminUser"],
@@ -30,6 +29,8 @@ export const deleteUser = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "user::delete");
     const { id } = c.req.valid("param");
     const result = await deleteUserSvc(id);
     return c.json(result, 200);

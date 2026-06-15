@@ -25,6 +25,7 @@ model User {
   invitations   Invitation[]
   uploads       Upload[]
   userRoles     UserRole[]
+  roleAssignments RoleAssignment[]
   notifications Notification[]
 
   @@unique([email])
@@ -166,6 +167,12 @@ enum LinkType {
   EXTERNAL
 }
 
+enum RoleScopeType {
+  PLATFORM
+  ORGANIZATION
+  APPLICATION
+}
+
 model Application {
   id          String       @id @default(cuid())
   name        String
@@ -255,10 +262,29 @@ model UserRole {
   @@map("user_role")
 }
 
+model RoleAssignment {
+  id        String        @id @default(cuid())
+  userId    String
+  roleId    String
+  role      Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scopeType RoleScopeType @default(PLATFORM)
+  scopeId   String        @default("")
+  createdAt DateTime      @default(now())
+
+  @@unique([userId, roleId, scopeType, scopeId])
+  @@index([userId])
+  @@index([roleId])
+  @@index([scopeType, scopeId])
+  @@map("role_assignment")
+}
+
 model Role {
   id              String           @id @default(cuid())
   appId           String
   app             Application      @relation(fields: [appId], references: [id], onDelete: Cascade)
+  scopeType       RoleScopeType    @default(PLATFORM)
+  scopeId         String           @default("")
   name            String
   code            String
   flags           String[]         @default([])
@@ -266,9 +292,11 @@ model Role {
   updatedAt       DateTime         @updatedAt
   rolePermissions RolePermission[]
   userRoles       UserRole[]
+  roleAssignments RoleAssignment[]
 
-  @@unique([appId, code])
+  @@unique([appId, scopeType, scopeId, code])
   @@index([appId])
+  @@index([scopeType, scopeId])
   @@map("role")
 }
 

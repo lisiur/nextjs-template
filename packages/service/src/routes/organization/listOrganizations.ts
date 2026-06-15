@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { listOrganizations as listOrganizationsService } from "#services/organization.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import {
   listOrganizationsQuerySchema,
   listOrganizationsResponseSchema,
@@ -14,7 +14,6 @@ import {
 
 export const listOrganizations = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("organization::list")),
     method: "get",
     path: "/",
     tags: ["Organization"],
@@ -33,6 +32,8 @@ export const listOrganizations = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "organization::list");
     const { limit, offset } = c.req.valid("query");
     const result = await listOrganizationsService({ limit, offset });
     return c.json(result, 200);

@@ -11,6 +11,9 @@ vi.mock("../../../lib/db", () => ({
       create: vi.fn(),
       update: vi.fn(),
     },
+    auditLog: {
+      create: vi.fn(),
+    },
   },
 }));
 
@@ -21,12 +24,16 @@ vi.mock("../../../lib/session", () => ({
 
 // Mock role-permission
 vi.mock("../../../services/role-permission.service", () => ({
+  assertPermission: vi.fn(),
   getUserPermissions: vi.fn(),
 }));
 
 import { prisma } from "../../../lib/db";
 import { getSessionFromHeaders } from "../../../lib/session";
-import { getUserPermissions } from "../../../services/role-permission.service";
+import {
+  assertPermission,
+  getUserPermissions,
+} from "../../../services/role-permission.service";
 
 const mockPrisma = prisma as unknown as {
   application: {
@@ -36,8 +43,12 @@ const mockPrisma = prisma as unknown as {
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
   };
+  auditLog: {
+    create: ReturnType<typeof vi.fn>;
+  };
 };
 const mockGetSession = vi.mocked(getSessionFromHeaders);
+const mockAssertPermission = vi.mocked(assertPermission);
 const mockGetUserPermissions = vi.mocked(getUserPermissions);
 
 // Helper to create a mock Hono app for a route
@@ -53,6 +64,8 @@ async function testRoute(
   },
   { withAuth = true } = {},
 ) {
+  mockAssertPermission.mockResolvedValue(undefined);
+
   // Create a minimal Hono app with the route
   const { OpenAPIHono } = await import("@hono/zod-openapi");
   const app = new OpenAPIHono();

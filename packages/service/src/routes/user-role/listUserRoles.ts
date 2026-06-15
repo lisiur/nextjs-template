@@ -1,17 +1,16 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
+import { assertPermission } from "#services/role-permission.service";
 import { listUserRoles as listUserRolesSvc } from "#services/user-role.service";
-import { prepend } from "#utils/list";
 import { listUserRolesQuerySchema, userRoleSchema } from "./schema";
 
 export const listUserRoles = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("user-role::list")),
     method: "get",
     path: "/",
     tags: ["UserRole"],
@@ -26,8 +25,10 @@ export const listUserRoles = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const { userId } = c.req.valid("query");
-    const userRoles = await listUserRolesSvc(userId);
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "user-role::list");
+    const { scopeId, scopeType, userId } = c.req.valid("query");
+    const userRoles = await listUserRolesSvc(userId, { scopeId, scopeType });
     return c.json(userRoles, 200);
   },
 });

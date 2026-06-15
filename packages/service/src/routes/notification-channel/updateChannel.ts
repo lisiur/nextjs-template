@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   badRequestResponse,
   forbiddenResponse,
@@ -6,9 +7,8 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { updateNotificationChannel } from "#services/notification/channel.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import {
   notificationChannelIdParamSchema,
   notificationChannelSchema,
@@ -17,7 +17,6 @@ import {
 
 export const updateNotificationChannelRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("notification-channel::update")),
     method: "put",
     path: "/{id}",
     tags: ["NotificationChannel"],
@@ -43,6 +42,8 @@ export const updateNotificationChannelRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "notification-channel::update");
     const { id } = c.req.valid("param");
     const body = c.req.valid("json");
     const channel = await updateNotificationChannel(id, body);

@@ -1,18 +1,17 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   forbiddenResponse,
   notFoundResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { getApplicationById } from "#services/application.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import { applicationIdParamSchema, applicationSchema } from "./schema";
 
 export const getApplication = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("application::view")),
     method: "get",
     path: "/{id}",
     tags: ["Application"],
@@ -30,6 +29,8 @@ export const getApplication = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "application::view");
     const { id } = c.req.valid("param");
     const app = await getApplicationById(id);
     return c.json(app, 200);

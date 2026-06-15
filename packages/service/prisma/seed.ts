@@ -681,13 +681,24 @@ async function seedRoles(appId: string) {
 
   for (const def of roleDefinitions) {
     const role = await prisma.role.upsert({
-      where: { appId_code: { appId, code: def.code } },
+      where: {
+        appId_scopeType_scopeId_code: {
+          appId,
+          scopeType: "PLATFORM",
+          scopeId: "",
+          code: def.code,
+        },
+      },
       update: {
         name: def.name,
         flags: def.flags,
+        scopeType: "PLATFORM",
+        scopeId: "",
       },
       create: {
         appId,
+        scopeType: "PLATFORM",
+        scopeId: "",
         name: def.name,
         code: def.code,
         flags: def.flags,
@@ -832,11 +843,25 @@ async function seedUser(params: {
 }
 
 async function seedUserRole(userId: string, roleId: string) {
-  await prisma.userRole.upsert({
-    where: { userId_roleId: { userId, roleId } },
-    update: {},
-    create: { userId, roleId },
-  });
+  await prisma.$transaction([
+    prisma.userRole.upsert({
+      where: { userId_roleId: { userId, roleId } },
+      update: {},
+      create: { userId, roleId },
+    }),
+    prisma.roleAssignment.upsert({
+      where: {
+        userId_roleId_scopeType_scopeId: {
+          userId,
+          roleId,
+          scopeType: "PLATFORM",
+          scopeId: "",
+        },
+      },
+      update: {},
+      create: { userId, roleId, scopeType: "PLATFORM", scopeId: "" },
+    }),
+  ]);
 }
 
 async function seed() {

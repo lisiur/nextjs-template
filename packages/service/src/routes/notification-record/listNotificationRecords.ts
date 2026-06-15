@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { listNotificationRecords } from "#services/notification-record.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import {
   listNotificationRecordsQuerySchema,
   listNotificationRecordsResponseSchema,
@@ -14,7 +14,6 @@ import {
 
 export const listNotificationRecordsRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("notification-record::list")),
     method: "get",
     path: "/",
     tags: ["NotificationRecord"],
@@ -32,6 +31,8 @@ export const listNotificationRecordsRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "notification-record::list");
     const query = c.req.valid("query");
     const result = await listNotificationRecords(query);
     return c.json(result, 200);

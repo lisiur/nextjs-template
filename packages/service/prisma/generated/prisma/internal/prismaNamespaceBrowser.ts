@@ -65,6 +65,7 @@ export const ModelName = {
   Permission: 'Permission',
   RolePermission: 'RolePermission',
   UserRole: 'UserRole',
+  RoleAssignment: 'RoleAssignment',
   Role: 'Role',
   OperationLog: 'OperationLog',
   AuditLog: 'AuditLog',
@@ -289,9 +290,23 @@ export const UserRoleScalarFieldEnum = {
 export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
+export const RoleAssignmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  roleId: 'roleId',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
+  createdAt: 'createdAt'
+} as const
+
+export type RoleAssignmentScalarFieldEnum = (typeof RoleAssignmentScalarFieldEnum)[keyof typeof RoleAssignmentScalarFieldEnum]
+
+
 export const RoleScalarFieldEnum = {
   id: 'id',
   appId: 'appId',
+  scopeType: 'scopeType',
+  scopeId: 'scopeId',
   name: 'name',
   code: 'code',
   flags: 'flags',

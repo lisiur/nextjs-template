@@ -1,5 +1,47 @@
 import { HTTPException } from "hono/http-exception";
+import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
+
+const PLATFORM_SCOPE_ID = "";
+
+type RoleScopeType = "PLATFORM" | "ORGANIZATION" | "APPLICATION";
+
+export type PermissionScope = {
+  organizationId?: string | null;
+  appId?: string | null;
+};
+
+function toScopeId(scopeId?: string | null) {
+  return scopeId ?? PLATFORM_SCOPE_ID;
+}
+
+function getRoleAssignmentScopeConditions(
+  scope?: PermissionScope,
+): Prisma.RoleAssignmentWhereInput[] {
+  const conditions: Prisma.RoleAssignmentWhereInput[] = [
+    { scopeType: "PLATFORM", scopeId: PLATFORM_SCOPE_ID },
+  ];
+
+  if (scope?.organizationId) {
+    conditions.push({
+      scopeType: "ORGANIZATION",
+      scopeId: scope.organizationId,
+    });
+  }
+
+  if (scope?.appId) {
+    conditions.push({ scopeType: "APPLICATION", scopeId: scope.appId });
+  }
+
+  return conditions;
+}
+
+function getPermissionAppWhere(
+  appId?: string | null,
+): Pick<Prisma.PermissionWhereInput, "OR" | "appId"> {
+  if (!appId) return { appId: null };
+  return { OR: [{ appId: null }, { appId }] };
+}
 
 export async function assignPermissions(
   roleId: string,
@@ -83,7 +125,52 @@ export async function assignPermissionByMenuIds(
   });
 }
 
-export async function getMenusForUser(userId: string, appId: string) {
+export async function assignRole(params: {
+  userId: string;
+  roleId: string;
+  scopeType: RoleScopeType;
+  scopeId?: string | null;
+}) {
+  const role = await prisma.role.findUnique({ where: { id: params.roleId } });
+  if (!role) {
+    throw new HTTPException(404, { message: "Role not found" });
+  }
+
+  const scopeId = toScopeId(params.scopeId);
+  if (
+    role.scopeType === "ORGANIZATION" &&
+    (params.scopeType !== "ORGANIZATION" || scopeId !== role.scopeId)
+  ) {
+    throw new HTTPException(400, {
+      message:
+        "Organization-specific role can only be assigned in its organization",
+    });
+  }
+
+  return prisma.roleAssignment.upsert({
+    where: {
+      userId_roleId_scopeType_scopeId: {
+        userId: params.userId,
+        roleId: params.roleId,
+        scopeType: params.scopeType,
+        scopeId,
+      },
+    },
+    update: {},
+    create: {
+      userId: params.userId,
+      roleId: params.roleId,
+      scopeType: params.scopeType,
+      scopeId,
+    },
+  });
+}
+
+export async function getMenusForUser(
+  userId: string,
+  appId: string,
+  scope?: PermissionScope,
+) {
   const menus = await prisma.menu.findMany({
     where: {
       appId,
@@ -91,8 +178,11 @@ export async function getMenusForUser(userId: string, appId: string) {
         rolePermissions: {
           some: {
             role: {
-              userRoles: {
-                some: { userId },
+              roleAssignments: {
+                some: {
+                  userId,
+                  OR: getRoleAssignmentScopeConditions(scope),
+                },
               },
             },
           },
@@ -105,15 +195,21 @@ export async function getMenusForUser(userId: string, appId: string) {
   return menus;
 }
 
-export async function getUserPermissions(userId: string): Promise<string[]> {
+export async function getUserPermissions(
+  userId: string,
+  scope?: PermissionScope,
+): Promise<string[]> {
   const permissions = await prisma.permission.findMany({
     where: {
-      appId: null,
+      ...getPermissionAppWhere(scope?.appId),
       rolePermissions: {
         some: {
           role: {
-            userRoles: {
-              some: { userId },
+            roleAssignments: {
+              some: {
+                userId,
+                OR: getRoleAssignmentScopeConditions(scope),
+              },
             },
           },
         },
@@ -167,7 +263,19 @@ function matchPermission(
 export async function checkPermission(
   userId: string,
   permission: string,
+  scope?: PermissionScope,
 ): Promise<boolean> {
-  const userPermissions = await getUserPermissions(userId);
+  const userPermissions = await getUserPermissions(userId, scope);
   return matchPermission(userPermissions, permission);
+}
+
+export async function assertPermission(
+  userId: string,
+  permission: string,
+  scope?: PermissionScope,
+) {
+  const allowed = await checkPermission(userId, permission, scope);
+  if (!allowed) {
+    throw new HTTPException(403, { message: "Permission denied" });
+  }
 }

@@ -6,13 +6,11 @@ import {
   successSchema,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { markAllNotificationsRead } from "#services/notification/notification-query.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 
 export const markAllReadRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("notification::view")),
     method: "patch",
     path: "/read-all",
     tags: ["Notification"],
@@ -25,6 +23,7 @@ export const markAllReadRoute = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const session = await requireSession(c);
+    await assertPermission(session.user.id, "notification::view");
     await markAllNotificationsRead(session.user.id);
     return c.json({ success: true }, 200);
   },

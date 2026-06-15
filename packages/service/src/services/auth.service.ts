@@ -29,6 +29,16 @@ async function logAuthLogin(session: AuthSession, traceId?: string) {
   });
 }
 
+async function getDefaultActiveOrganizationId(userId: string) {
+  const membership = await prisma.member.findFirst({
+    where: { userId },
+    orderBy: { createdAt: "asc" },
+    select: { organizationId: true },
+  });
+
+  return membership?.organizationId ?? null;
+}
+
 export async function signInWithEmail(params: {
   email: string;
   password: string;
@@ -56,6 +66,7 @@ export async function signInWithEmail(params: {
     userId: user.id,
     ipAddress: params.ipAddress,
     userAgent: params.userAgent,
+    activeOrganizationId: await getDefaultActiveOrganizationId(user.id),
   });
 
   await logAuthLogin(session, params.traceId);
@@ -231,6 +242,9 @@ export async function signInWithWechat(params: {
       userId: existingAccount.userId,
       ipAddress: params.ipAddress,
       userAgent: params.userAgent,
+      activeOrganizationId: await getDefaultActiveOrganizationId(
+        existingAccount.userId,
+      ),
     });
 
     await logAuthLogin(session, params.traceId);

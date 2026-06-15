@@ -1,18 +1,17 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   forbiddenResponse,
   notFoundResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { getAuditLogById } from "#services/audit-log.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import { auditLogIdParamSchema, auditLogSchema } from "./schema";
 
 export const getAuditLog = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("audit-log::view")),
     method: "get",
     path: "/{id}",
     tags: ["AuditLog"],
@@ -30,6 +29,8 @@ export const getAuditLog = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "audit-log::view");
     const { id } = c.req.valid("param");
     const log = await getAuditLogById(id);
     return c.json(log, 200);

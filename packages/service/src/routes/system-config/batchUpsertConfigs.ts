@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -6,14 +7,12 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
+import { assertPermission } from "#services/role-permission.service";
 import { batchUpsertConfigs } from "#services/system-config.service";
-import { prepend } from "#utils/list";
 import { batchUpsertBodySchema, systemConfigItemSchema } from "./schema";
 
 export const batchUpsertConfigsRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("system-config::batchUpsert")),
     method: "put",
     path: "/batch",
     tags: ["SystemConfig"],
@@ -41,6 +40,8 @@ export const batchUpsertConfigsRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "system-config::batchUpsert");
     const { items } = c.req.valid("json");
 
     const configs = await batchUpsertConfigs(items);

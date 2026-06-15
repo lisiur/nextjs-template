@@ -32,6 +32,7 @@ export const authSessionSchema = z
     ipAddress: z.string().nullable().optional(),
     userAgent: z.string().nullable().optional(),
     userId: z.string(),
+    activeOrganizationId: z.string().nullable().optional(),
     createdAt: z.date(),
     updatedAt: z.date(),
   })

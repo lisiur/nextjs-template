@@ -88,6 +88,11 @@ export type RolePermission = Prisma.RolePermissionModel
  */
 export type UserRole = Prisma.UserRoleModel
 /**
+ * Model RoleAssignment
+ * 
+ */
+export type RoleAssignment = Prisma.RoleAssignmentModel
+/**
  * Model Role
  * 
  */

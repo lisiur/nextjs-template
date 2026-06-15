@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   forbiddenResponse,
@@ -6,14 +7,12 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { updateMenu as updateMenuService } from "#services/menu.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import { menuIdParamSchema, menuSchema, updateMenuBodySchema } from "./schema";
 
 export const updateMenu = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("menu::update")),
     method: "put",
     path: "/{id}",
     tags: ["Menu"],
@@ -39,6 +38,8 @@ export const updateMenu = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "menu::update");
     const { id } = c.req.valid("param");
     const body = c.req.valid("json");
 

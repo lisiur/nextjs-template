@@ -5,9 +5,8 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { listUserNotifications } from "#services/notification/notification-query.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import {
   listNotificationsQuerySchema,
   listNotificationsResponseSchema,
@@ -15,7 +14,6 @@ import {
 
 export const listNotificationsRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("notification::list")),
     method: "get",
     path: "/",
     tags: ["Notification"],
@@ -29,6 +27,7 @@ export const listNotificationsRoute = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const session = await requireSession(c);
+    await assertPermission(session.user.id, "notification::list");
     const query = c.req.valid("query");
     const result = await listUserNotifications({
       userId: session.user.id,

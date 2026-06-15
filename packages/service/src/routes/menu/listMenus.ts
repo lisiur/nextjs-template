@@ -1,17 +1,16 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { listMenus as listMenusService } from "#services/menu.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import { listMenusQuerySchema, listMenusResponseSchema } from "./schema";
 
 export const listMenus = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("menu::list")),
     method: "get",
     path: "/",
     tags: ["Menu"],
@@ -28,6 +27,8 @@ export const listMenus = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "menu::list");
     const { appId } = c.req.valid("query");
 
     const result = await listMenusService(appId);

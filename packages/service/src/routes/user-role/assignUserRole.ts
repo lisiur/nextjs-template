@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -6,14 +7,12 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
+import { assertPermission } from "#services/role-permission.service";
 import { assignUserRole as assignUserRoleSvc } from "#services/user-role.service";
-import { prepend } from "#utils/list";
 import { assignUserRoleBodySchema, userRoleSchema } from "./schema";
 
 export const assignUserRole = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("user-role::assign")),
     method: "post",
     path: "/",
     tags: ["UserRole"],
@@ -34,14 +33,19 @@ export const assignUserRole = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const { userId, roleId } = c.req.valid("json");
-    const userRole = await assignUserRoleSvc(userId, roleId);
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "user-role::assign");
+    const { roleId, scopeId, scopeType, userId } = c.req.valid("json");
+    const userRole = await assignUserRoleSvc(userId, roleId, {
+      scopeId,
+      scopeType,
+    });
 
     logAudit({
       event: "user_role.assigned",
       category: "user_role",
       targetId: userRole.id,
-      metadata: { userId, roleId },
+      metadata: { userId, roleId, scopeType, scopeId },
       c,
     });
 

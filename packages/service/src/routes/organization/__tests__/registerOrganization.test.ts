@@ -8,6 +8,9 @@ vi.mock("../../../lib/db", () => ({
     auditLog: {
       create: vi.fn(),
     },
+    session: {
+      update: vi.fn(),
+    },
   },
 }));
 
@@ -23,6 +26,9 @@ const mockPrisma = prisma as unknown as {
   $transaction: ReturnType<typeof vi.fn>;
   auditLog: {
     create: ReturnType<typeof vi.fn>;
+  };
+  session: {
+    update: ReturnType<typeof vi.fn>;
   };
 };
 const mockGetSession = vi.mocked(getSessionFromHeaders);
@@ -71,6 +77,7 @@ describe("POST /register - Register Organization", () => {
     } as never);
     mockPrisma.$transaction.mockImplementation((callback) => callback(tx));
     mockPrisma.auditLog.create.mockResolvedValue({});
+    mockPrisma.session.update.mockResolvedValue({});
   });
 
   it("creates an organization and owner member for the current user", async () => {
@@ -106,6 +113,10 @@ describe("POST /register - Register Organization", () => {
           },
         },
       },
+    });
+    expect(mockPrisma.session.update).toHaveBeenCalledWith({
+      where: { id: "session1" },
+      data: { activeOrganizationId: "org1" },
     });
     await expect(res.json()).resolves.toMatchObject({
       id: "org1",

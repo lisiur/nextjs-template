@@ -9,9 +9,13 @@ export const userRoleSchema = z
     role: z.object({
       id: z.string(),
       appId: z.string(),
+      scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]),
+      scopeId: z.string(),
       name: z.string(),
       code: z.string(),
     }),
+    scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]),
+    scopeId: z.string(),
     createdAt: z.date(),
   })
   .openapi("UserRole");
@@ -19,15 +23,21 @@ export const userRoleSchema = z
 export const assignUserRoleBodySchema = z.object({
   userId: z.string().min(1),
   roleId: z.string().min(1),
+  scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
+  scopeId: z.string().optional(),
 });
 
 export const removeUserRoleParamSchema = z.object({
   userId: z.string().min(1),
   roleId: z.string().min(1),
+  scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
+  scopeId: z.string().optional(),
 });
 
 export const listUserRolesQuerySchema = z.object({
   userId: z.string().min(1),
+  scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
+  scopeId: z.string().optional(),
 });
 
 export const errorSchema = z

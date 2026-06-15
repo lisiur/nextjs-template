@@ -28,6 +28,7 @@ export type AuthSession = {
   ipAddress?: string | null;
   userAgent?: string | null;
   userId: string;
+  activeOrganizationId?: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -63,6 +64,7 @@ export async function createSession(params: {
   userId: string;
   ipAddress?: string | null;
   userAgent?: string | null;
+  activeOrganizationId?: string | null;
 }) {
   const token = createSessionToken();
   const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_SECONDS * 1000);
@@ -74,6 +76,7 @@ export async function createSession(params: {
       expiresAt,
       ipAddress: params.ipAddress,
       userAgent: params.userAgent,
+      activeOrganizationId: params.activeOrganizationId ?? null,
     },
   });
 

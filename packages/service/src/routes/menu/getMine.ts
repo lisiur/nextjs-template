@@ -30,7 +30,10 @@ export const getMine = defineOpenAPIRoute({
     }
 
     const appId = await requireAppId(c);
-    const menus = await getMenusForUser(session.user.id, appId);
+    const menus = await getMenusForUser(session.user.id, appId, {
+      appId,
+      organizationId: session.session.activeOrganizationId,
+    });
     return c.json({ menus }, 200);
   },
 });

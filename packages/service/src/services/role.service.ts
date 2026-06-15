@@ -2,6 +2,8 @@ import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
 import { roleRepository } from "#repositories/role.repository";
 
+type RoleScopeType = "PLATFORM" | "ORGANIZATION" | "APPLICATION";
+
 export async function getRoleById(id: string) {
   const role = await roleRepository.findById(id);
   if (!role) {
@@ -12,14 +14,23 @@ export async function getRoleById(id: string) {
 
 export async function createRole(data: {
   appId: string;
+  scopeType?: RoleScopeType;
+  scopeId?: string | null;
   name: string;
   code: string;
   flags?: string[];
 }) {
-  const existing = await roleRepository.findByAppAndCode(data.appId, data.code);
+  const existing = await roleRepository.findByAppAndCode(
+    data.appId,
+    data.code,
+    {
+      scopeId: data.scopeId,
+      scopeType: data.scopeType,
+    },
+  );
   if (existing) {
     throw new HTTPException(409, {
-      message: "Role code already exists in this application",
+      message: "Role code already exists in this scope",
     });
   }
   return roleRepository.create(data);
@@ -41,10 +52,11 @@ export async function updateRole(
     const codeTaken = await roleRepository.findByAppAndCode(
       role.appId,
       data.code,
+      { scopeId: role.scopeId, scopeType: role.scopeType },
     );
     if (codeTaken) {
       throw new HTTPException(409, {
-        message: "Role code already exists in this application",
+        message: "Role code already exists in this scope",
       });
     }
   }
@@ -58,11 +70,15 @@ export async function deleteRole(id: string) {
   }
   await prisma.$transaction([
     prisma.userRole.deleteMany({ where: { roleId: id } }),
+    prisma.roleAssignment.deleteMany({ where: { roleId: id } }),
     prisma.role.delete({ where: { id } }),
   ]);
   return { name: role.name };
 }
 
-export async function listRoles(appId: string) {
-  return roleRepository.findByAppId(appId);
+export async function listRoles(
+  appId: string,
+  scope?: { scopeType?: RoleScopeType; scopeId?: string | null },
+) {
+  return roleRepository.findByAppId(appId, scope);
 }

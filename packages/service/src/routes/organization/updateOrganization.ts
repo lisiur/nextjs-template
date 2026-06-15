@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { requireSession } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   forbiddenResponse,
@@ -6,9 +7,8 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { requirePermission } from "#middleware/require-permission";
 import { updateOrganization as updateOrganizationService } from "#services/organization.service";
-import { prepend } from "#utils/list";
+import { assertPermission } from "#services/role-permission.service";
 import {
   errorSchema,
   organizationIdParamSchema,
@@ -18,7 +18,6 @@ import {
 
 export const updateOrganization = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("organization::update")),
     method: "put",
     path: "/{id}",
     tags: ["Organization"],
@@ -50,6 +49,8 @@ export const updateOrganization = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "organization::update");
     const { id } = c.req.valid("param");
     const body = c.req.valid("json");
     const org = await updateOrganizationService(id, body);

@@ -7,7 +7,8 @@ import {
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { requirePermission } from "#middleware/require-permission";
+import { requireSession } from "#extractors/session";
+import { assertPermission } from "#services/role-permission.service";
 import { prepend } from "#utils/list";
 import { forbiddenResponse, unauthorizedResponse } from "./openapi";
 
@@ -16,18 +17,16 @@ vi.mock("#lib/session", () => ({
 }));
 
 vi.mock("#services/role-permission.service", () => ({
-  getUserPermissions: vi.fn(),
+  assertPermission: vi.fn(),
 }));
 
 import { getSessionFromHeaders } from "#lib/session";
-import { getUserPermissions } from "#services/role-permission.service";
 
 const mockGetSession = vi.mocked(getSessionFromHeaders);
-const mockGetUserPermissions = vi.mocked(getUserPermissions);
+const mockAssertPermission = vi.mocked(assertPermission);
 
 const permissionRoute = defineOpenAPIRoute({
   route: createRoute({
-    middleware: prepend([], requirePermission("test::view")),
     method: "get",
     path: "/permission-required",
     tags: ["Test"],
@@ -45,7 +44,11 @@ const permissionRoute = defineOpenAPIRoute({
       },
     },
   }),
-  handler: (c) => c.json({ ok: true as const }, 200),
+  handler: async (c) => {
+    const session = await requireSession(c);
+    await assertPermission(session.user.id, "test::view");
+    return c.json({ ok: true as const }, 200);
+  },
 });
 
 const requireCustomAuth = createMiddleware(async (c, next) => {
@@ -123,7 +126,7 @@ describe("permission route composition", () => {
       user: { id: "user-1" },
       session: { id: "session-1" },
     } as Awaited<ReturnType<typeof getSessionFromHeaders>>);
-    mockGetUserPermissions.mockResolvedValue(["test::view"]);
+    mockAssertPermission.mockResolvedValue(undefined);
 
     const res = await createTestApp().request("/permission-required");
 
@@ -144,7 +147,9 @@ describe("permission route composition", () => {
       user: { id: "user-1" },
       session: { id: "session-1" },
     } as Awaited<ReturnType<typeof getSessionFromHeaders>>);
-    mockGetUserPermissions.mockResolvedValue(["other::view"]);
+    mockAssertPermission.mockRejectedValue(
+      new HTTPException(403, { message: "Permission denied" }),
+    );
 
     const res = await createTestApp().request("/permission-required");
 
