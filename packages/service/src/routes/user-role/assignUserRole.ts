@@ -9,18 +9,18 @@ import {
 } from "#lib/openapi";
 import { assertPermission } from "#services/role-permission.service";
 import { assignUserRole as assignUserRoleSvc } from "#services/user-role.service";
-import { assignUserRoleBodySchema, userRoleSchema } from "./schema";
+import { assignRoleAssignmentBodySchema, roleAssignmentSchema } from "./schema";
 
-export const assignUserRole = defineOpenAPIRoute({
+export const assignRoleAssignment = defineOpenAPIRoute({
   route: createRoute({
     method: "post",
     path: "/",
-    tags: ["UserRole"],
+    tags: ["RoleAssignment"],
     summary: "Assign a role to a user",
     request: {
       body: {
         content: {
-          "application/json": { schema: assignUserRoleBodySchema },
+          "application/json": { schema: assignRoleAssignmentBodySchema },
         },
         required: true,
       },
@@ -29,26 +29,26 @@ export const assignUserRole = defineOpenAPIRoute({
       ...unauthorizedResponse,
       ...forbiddenResponse,
       ...badRequestResponse,
-      ...okResponseFn(userRoleSchema, "Assigned user role"),
+      ...okResponseFn(roleAssignmentSchema, "Assigned role assignment"),
     },
   }),
   handler: async (c) => {
     const session = await requireSession(c);
     await assertPermission(session.user.id, "user-role::assign");
     const { roleId, scopeId, scopeType, userId } = c.req.valid("json");
-    const userRole = await assignUserRoleSvc(userId, roleId, {
+    const roleAssignment = await assignUserRoleSvc(userId, roleId, {
       scopeId,
       scopeType,
     });
 
     logAudit({
-      event: "user_role.assigned",
-      category: "user_role",
-      targetId: userRole.id,
+      event: "role_assignment.assigned",
+      category: "role_assignment",
+      targetId: roleAssignment.id,
       metadata: { userId, roleId, scopeType, scopeId },
       c,
     });
 
-    return c.json(userRole, 200);
+    return c.json(roleAssignment, 200);
   },
 });

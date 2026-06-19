@@ -7,28 +7,31 @@ import {
 } from "#lib/openapi";
 import { assertPermission } from "#services/role-permission.service";
 import { listUserRoles as listUserRolesSvc } from "#services/user-role.service";
-import { listUserRolesQuerySchema, userRoleSchema } from "./schema";
+import { listRoleAssignmentsQuerySchema, roleAssignmentSchema } from "./schema";
 
-export const listUserRoles = defineOpenAPIRoute({
+export const listRoleAssignments = defineOpenAPIRoute({
   route: createRoute({
     method: "get",
     path: "/",
-    tags: ["UserRole"],
+    tags: ["RoleAssignment"],
     summary: "List roles for a user",
     request: {
-      query: listUserRolesQuerySchema,
+      query: listRoleAssignmentsQuerySchema,
     },
     responses: {
       ...unauthorizedResponse,
       ...forbiddenResponse,
-      ...okResponseFn(userRoleSchema.array(), "User roles"),
+      ...okResponseFn(roleAssignmentSchema.array(), "Role assignments"),
     },
   }),
   handler: async (c) => {
     const session = await requireSession(c);
     await assertPermission(session.user.id, "user-role::list");
     const { scopeId, scopeType, userId } = c.req.valid("query");
-    const userRoles = await listUserRolesSvc(userId, { scopeId, scopeType });
-    return c.json(userRoles, 200);
+    const roleAssignments = await listUserRolesSvc(userId, {
+      scopeId,
+      scopeType,
+    });
+    return c.json(roleAssignments, 200);
   },
 });

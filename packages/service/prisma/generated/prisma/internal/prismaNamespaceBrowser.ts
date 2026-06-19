@@ -64,7 +64,6 @@ export const ModelName = {
   Menu: 'Menu',
   Permission: 'Permission',
   RolePermission: 'RolePermission',
-  UserRole: 'UserRole',
   RoleAssignment: 'RoleAssignment',
   Role: 'Role',
   OperationLog: 'OperationLog',
@@ -278,16 +277,6 @@ export const RolePermissionScalarFieldEnum = {
 } as const
 
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
-
-
-export const UserRoleScalarFieldEnum = {
-  id: 'id',
-  userId: 'userId',
-  roleId: 'roleId',
-  createdAt: 'createdAt'
-} as const
-
-export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
 export const RoleAssignmentScalarFieldEnum = {

@@ -24,7 +24,6 @@ model User {
   members       Member[]
   invitations   Invitation[]
   uploads       Upload[]
-  userRoles     UserRole[]
   roleAssignments RoleAssignment[]
   notifications Notification[]
 
@@ -248,20 +247,6 @@ model RolePermission {
   @@map("role_permission")
 }
 
-model UserRole {
-  id        String   @id @default(cuid())
-  userId    String
-  roleId    String
-  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-
-  @@unique([userId, roleId])
-  @@index([userId])
-  @@index([roleId])
-  @@map("user_role")
-}
-
 model RoleAssignment {
   id        String        @id @default(cuid())
   userId    String
@@ -291,7 +276,6 @@ model Role {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   rolePermissions RolePermission[]
-  userRoles       UserRole[]
   roleAssignments RoleAssignment[]
 
   @@unique([appId, scopeType, scopeId, code])

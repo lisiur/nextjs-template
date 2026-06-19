@@ -843,25 +843,18 @@ async function seedUser(params: {
 }
 
 async function seedUserRole(userId: string, roleId: string) {
-  await prisma.$transaction([
-    prisma.userRole.upsert({
-      where: { userId_roleId: { userId, roleId } },
-      update: {},
-      create: { userId, roleId },
-    }),
-    prisma.roleAssignment.upsert({
-      where: {
-        userId_roleId_scopeType_scopeId: {
-          userId,
-          roleId,
-          scopeType: "PLATFORM",
-          scopeId: "",
-        },
+  await prisma.roleAssignment.upsert({
+    where: {
+      userId_roleId_scopeType_scopeId: {
+        userId,
+        roleId,
+        scopeType: "PLATFORM",
+        scopeId: "",
       },
-      update: {},
-      create: { userId, roleId, scopeType: "PLATFORM", scopeId: "" },
-    }),
-  ]);
+    },
+    update: {},
+    create: { userId, roleId, scopeType: "PLATFORM", scopeId: "" },
+  });
 }
 
 async function seed() {

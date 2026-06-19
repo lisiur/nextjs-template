@@ -29,8 +29,15 @@ export const userRoleRepository = {
   },
 
   findByUserAndRole(userId: string, roleId: string) {
-    return prisma.userRole.findUnique({
-      where: { userId_roleId: { userId, roleId } },
+    return prisma.roleAssignment.findUnique({
+      where: {
+        userId_roleId_scopeType_scopeId: {
+          userId,
+          roleId,
+          scopeType: "PLATFORM",
+          scopeId: PLATFORM_SCOPE_ID,
+        },
+      },
     });
   },
 
@@ -58,14 +65,6 @@ export const userRoleRepository = {
     }
 
     return prisma.$transaction(async (tx) => {
-      if (scopeType === "PLATFORM" && scopeId === PLATFORM_SCOPE_ID) {
-        await tx.userRole.upsert({
-          where: { userId_roleId: { userId, roleId } },
-          update: {},
-          create: { userId, roleId },
-        });
-      }
-
       return tx.roleAssignment.upsert({
         where: {
           userId_roleId_scopeType_scopeId: {
@@ -89,16 +88,8 @@ export const userRoleRepository = {
   ) {
     const scopeType = scope?.scopeType ?? "PLATFORM";
     const scopeId = scopeIdOrDefault(scope?.scopeId);
-    return prisma.$transaction(async (tx) => {
-      if (scopeType === "PLATFORM" && scopeId === PLATFORM_SCOPE_ID) {
-        await tx.userRole.deleteMany({
-          where: { userId, roleId },
-        });
-      }
-
-      return tx.roleAssignment.deleteMany({
-        where: { userId, roleId, scopeType, scopeId },
-      });
+    return prisma.roleAssignment.deleteMany({
+      where: { userId, roleId, scopeType, scopeId },
     });
   },
 

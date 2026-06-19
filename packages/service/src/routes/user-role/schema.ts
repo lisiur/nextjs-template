@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
 import { menuSchema } from "#routes/menu/schema";
 
-export const userRoleSchema = z
+export const roleAssignmentSchema = z
   .object({
     id: z.string(),
     userId: z.string(),
@@ -18,23 +18,23 @@ export const userRoleSchema = z
     scopeId: z.string(),
     createdAt: z.date(),
   })
-  .openapi("UserRole");
+  .openapi("RoleAssignment");
 
-export const assignUserRoleBodySchema = z.object({
+export const assignRoleAssignmentBodySchema = z.object({
   userId: z.string().min(1),
   roleId: z.string().min(1),
   scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
   scopeId: z.string().optional(),
 });
 
-export const removeUserRoleParamSchema = z.object({
+export const removeRoleAssignmentParamSchema = z.object({
   userId: z.string().min(1),
   roleId: z.string().min(1),
   scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
   scopeId: z.string().optional(),
 });
 
-export const listUserRolesQuerySchema = z.object({
+export const listRoleAssignmentsQuerySchema = z.object({
   userId: z.string().min(1),
   scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
   scopeId: z.string().optional(),

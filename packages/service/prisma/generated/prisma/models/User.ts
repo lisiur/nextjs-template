@@ -231,7 +231,6 @@ export type UserWhereInput = {
   members?: Prisma.MemberListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
   uploads?: Prisma.UploadListRelationFilter
-  userRoles?: Prisma.UserRoleListRelationFilter
   roleAssignments?: Prisma.RoleAssignmentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
 }
@@ -253,7 +252,6 @@ export type UserOrderByWithRelationInput = {
   members?: Prisma.MemberOrderByRelationAggregateInput
   invitations?: Prisma.InvitationOrderByRelationAggregateInput
   uploads?: Prisma.UploadOrderByRelationAggregateInput
-  userRoles?: Prisma.UserRoleOrderByRelationAggregateInput
   roleAssignments?: Prisma.RoleAssignmentOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
@@ -278,7 +276,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   members?: Prisma.MemberListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
   uploads?: Prisma.UploadListRelationFilter
-  userRoles?: Prisma.UserRoleListRelationFilter
   roleAssignments?: Prisma.RoleAssignmentListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
 }, "id" | "email">
@@ -334,7 +331,6 @@ export type UserCreateInput = {
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
 }
@@ -356,7 +352,6 @@ export type UserUncheckedCreateInput = {
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadUncheckedCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
 }
@@ -378,7 +373,6 @@ export type UserUpdateInput = {
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
 }
@@ -400,7 +394,6 @@ export type UserUncheckedUpdateInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUncheckedUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
 }
@@ -603,20 +596,6 @@ export type UserUpdateOneRequiredWithoutUploadsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUploadsInput, Prisma.UserUpdateWithoutUploadsInput>, Prisma.UserUncheckedUpdateWithoutUploadsInput>
 }
 
-export type UserCreateNestedOneWithoutUserRolesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserRolesInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneRequiredWithoutUserRolesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutUserRolesInput
-  upsert?: Prisma.UserUpsertWithoutUserRolesInput
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutUserRolesInput, Prisma.UserUpdateWithoutUserRolesInput>, Prisma.UserUncheckedUpdateWithoutUserRolesInput>
-}
-
 export type UserCreateNestedOneWithoutRoleAssignmentsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutRoleAssignmentsInput, Prisma.UserUncheckedCreateWithoutRoleAssignmentsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutRoleAssignmentsInput
@@ -661,7 +640,6 @@ export type UserCreateWithoutSessionsInput = {
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
 }
@@ -682,7 +660,6 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadUncheckedCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
 }
@@ -719,7 +696,6 @@ export type UserUpdateWithoutSessionsInput = {
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
 }
@@ -740,7 +716,6 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUncheckedUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
 }
@@ -761,7 +736,6 @@ export type UserCreateWithoutAccountsInput = {
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
 }
@@ -782,7 +756,6 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadUncheckedCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
 }
@@ -819,7 +792,6 @@ export type UserUpdateWithoutAccountsInput = {
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
 }
@@ -840,7 +812,6 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUncheckedUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
 }
@@ -861,7 +832,6 @@ export type UserCreateWithoutMembersInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
 }
@@ -882,7 +852,6 @@ export type UserUncheckedCreateWithoutMembersInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadUncheckedCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
 }
@@ -919,7 +888,6 @@ export type UserUpdateWithoutMembersInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
 }
@@ -940,7 +908,6 @@ export type UserUncheckedUpdateWithoutMembersInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUncheckedUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
 }
@@ -961,7 +928,6 @@ export type UserCreateWithoutInvitationsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
 }
@@ -982,7 +948,6 @@ export type UserUncheckedCreateWithoutInvitationsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadUncheckedCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
 }
@@ -1019,7 +984,6 @@ export type UserUpdateWithoutInvitationsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
 }
@@ -1040,7 +1004,6 @@ export type UserUncheckedUpdateWithoutInvitationsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUncheckedUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
 }
@@ -1061,7 +1024,6 @@ export type UserCreateWithoutUploadsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
-  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
 }
@@ -1082,7 +1044,6 @@ export type UserUncheckedCreateWithoutUploadsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
-  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
 }
@@ -1119,7 +1080,6 @@ export type UserUpdateWithoutUploadsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
-  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
 }
@@ -1140,107 +1100,6 @@ export type UserUncheckedUpdateWithoutUploadsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
-  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
-  roleAssignments?: Prisma.RoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
-}
-
-export type UserCreateWithoutUserRolesInput = {
-  id?: string
-  name: string
-  email: string
-  emailVerified?: boolean
-  image?: string | null
-  banned?: boolean | null
-  banReason?: string | null
-  banExpires?: Date | string | null
-  flags?: Prisma.UserCreateflagsInput | string[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
-  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
-  members?: Prisma.MemberCreateNestedManyWithoutUserInput
-  invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
-  uploads?: Prisma.UploadCreateNestedManyWithoutUploaderInput
-  roleAssignments?: Prisma.RoleAssignmentCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
-}
-
-export type UserUncheckedCreateWithoutUserRolesInput = {
-  id?: string
-  name: string
-  email: string
-  emailVerified?: boolean
-  image?: string | null
-  banned?: boolean | null
-  banReason?: string | null
-  banExpires?: Date | string | null
-  flags?: Prisma.UserCreateflagsInput | string[]
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
-  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
-  members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
-  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
-  uploads?: Prisma.UploadUncheckedCreateNestedManyWithoutUploaderInput
-  roleAssignments?: Prisma.RoleAssignmentUncheckedCreateNestedManyWithoutUserInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
-}
-
-export type UserCreateOrConnectWithoutUserRolesInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
-}
-
-export type UserUpsertWithoutUserRolesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutUserRolesInput, Prisma.UserUncheckedUpdateWithoutUserRolesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutUserRolesInput, Prisma.UserUncheckedCreateWithoutUserRolesInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutUserRolesInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutUserRolesInput, Prisma.UserUncheckedUpdateWithoutUserRolesInput>
-}
-
-export type UserUpdateWithoutUserRolesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  flags?: Prisma.UserUpdateflagsInput | string[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
-  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
-  members?: Prisma.MemberUpdateManyWithoutUserNestedInput
-  invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
-  uploads?: Prisma.UploadUpdateManyWithoutUploaderNestedInput
-  roleAssignments?: Prisma.RoleAssignmentUpdateManyWithoutUserNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
-}
-
-export type UserUncheckedUpdateWithoutUserRolesInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  email?: Prisma.StringFieldUpdateOperationsInput | string
-  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
-  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  flags?: Prisma.UserUpdateflagsInput | string[]
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
-  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
-  members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
-  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
-  uploads?: Prisma.UploadUncheckedUpdateManyWithoutUploaderNestedInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
 }
@@ -1262,7 +1121,6 @@ export type UserCreateWithoutRoleAssignmentsInput = {
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutRecipientInput
 }
 
@@ -1283,7 +1141,6 @@ export type UserUncheckedCreateWithoutRoleAssignmentsInput = {
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadUncheckedCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutRecipientInput
 }
 
@@ -1320,7 +1177,6 @@ export type UserUpdateWithoutRoleAssignmentsInput = {
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutRecipientNestedInput
 }
 
@@ -1341,7 +1197,6 @@ export type UserUncheckedUpdateWithoutRoleAssignmentsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUncheckedUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
@@ -1362,7 +1217,6 @@ export type UserCreateWithoutNotificationsInput = {
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentCreateNestedManyWithoutUserInput
 }
 
@@ -1383,7 +1237,6 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutUserInput
   uploads?: Prisma.UploadUncheckedCreateNestedManyWithoutUploaderInput
-  userRoles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1420,7 +1273,6 @@ export type UserUpdateWithoutNotificationsInput = {
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUpdateManyWithoutUserNestedInput
 }
 
@@ -1441,7 +1293,6 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutUserNestedInput
   uploads?: Prisma.UploadUncheckedUpdateManyWithoutUploaderNestedInput
-  userRoles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   roleAssignments?: Prisma.RoleAssignmentUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1456,7 +1307,6 @@ export type UserCountOutputType = {
   members: number
   invitations: number
   uploads: number
-  userRoles: number
   roleAssignments: number
   notifications: number
 }
@@ -1467,7 +1317,6 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   members?: boolean | UserCountOutputTypeCountMembersArgs
   invitations?: boolean | UserCountOutputTypeCountInvitationsArgs
   uploads?: boolean | UserCountOutputTypeCountUploadsArgs
-  userRoles?: boolean | UserCountOutputTypeCountUserRolesArgs
   roleAssignments?: boolean | UserCountOutputTypeCountRoleAssignmentsArgs
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
 }
@@ -1520,13 +1369,6 @@ export type UserCountOutputTypeCountUploadsArgs<ExtArgs extends runtime.Types.Ex
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountUserRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserRoleWhereInput
-}
-
-/**
- * UserCountOutputType without action
- */
 export type UserCountOutputTypeCountRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.RoleAssignmentWhereInput
 }
@@ -1556,7 +1398,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   members?: boolean | Prisma.User$membersArgs<ExtArgs>
   invitations?: boolean | Prisma.User$invitationsArgs<ExtArgs>
   uploads?: boolean | Prisma.User$uploadsArgs<ExtArgs>
-  userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
   roleAssignments?: boolean | Prisma.User$roleAssignmentsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1611,7 +1452,6 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   members?: boolean | Prisma.User$membersArgs<ExtArgs>
   invitations?: boolean | Prisma.User$invitationsArgs<ExtArgs>
   uploads?: boolean | Prisma.User$uploadsArgs<ExtArgs>
-  userRoles?: boolean | Prisma.User$userRolesArgs<ExtArgs>
   roleAssignments?: boolean | Prisma.User$roleAssignmentsArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1627,7 +1467,6 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     members: Prisma.$MemberPayload<ExtArgs>[]
     invitations: Prisma.$InvitationPayload<ExtArgs>[]
     uploads: Prisma.$UploadPayload<ExtArgs>[]
-    userRoles: Prisma.$UserRolePayload<ExtArgs>[]
     roleAssignments: Prisma.$RoleAssignmentPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
@@ -2042,7 +1881,6 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   members<T extends Prisma.User$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invitations<T extends Prisma.User$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   uploads<T extends Prisma.User$uploadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$uploadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UploadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  userRoles<T extends Prisma.User$userRolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userRolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   roleAssignments<T extends Prisma.User$roleAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$roleAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2595,30 +2433,6 @@ export type User$uploadsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.UploadScalarFieldEnum | Prisma.UploadScalarFieldEnum[]
-}
-
-/**
- * User.userRoles
- */
-export type User$userRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the UserRole
-   */
-  select?: Prisma.UserRoleSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserRole
-   */
-  omit?: Prisma.UserRoleOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserRoleInclude<ExtArgs> | null
-  where?: Prisma.UserRoleWhereInput
-  orderBy?: Prisma.UserRoleOrderByWithRelationInput | Prisma.UserRoleOrderByWithRelationInput[]
-  cursor?: Prisma.UserRoleWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserRoleScalarFieldEnum | Prisma.UserRoleScalarFieldEnum[]
 }
 
 /**

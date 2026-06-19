@@ -1,15 +1,15 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { assignUserRole } from "./assignUserRole";
+import { assignRoleAssignment } from "./assignUserRole";
 import { getUserAppRoles } from "./getUserAppRoles";
-import { listUserRoles } from "./listUserRoles";
-import { removeUserRole } from "./removeUserRole";
+import { listRoleAssignments } from "./listUserRoles";
+import { removeRoleAssignment } from "./removeUserRole";
 
 const userRoleRoutes = new OpenAPIHono();
 
 const routes = userRoleRoutes.openapiRoutes([
-  assignUserRole,
-  removeUserRole,
-  listUserRoles,
+  assignRoleAssignment,
+  removeRoleAssignment,
+  listRoleAssignments,
   getUserAppRoles,
 ] as const);
 

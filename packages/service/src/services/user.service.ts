@@ -6,7 +6,8 @@ import { assertUserIsNotBuiltin } from "#lib/protected-user";
 import { createUser as createAuthUser } from "#services/auth.service";
 
 const userWithRolesInclude = {
-  userRoles: {
+  roleAssignments: {
+    where: { scopeType: "PLATFORM", scopeId: "" },
     include: {
       role: {
         select: {
@@ -78,10 +79,17 @@ export async function createUser(data: {
   try {
     await prisma.$transaction(async (tx) => {
       for (const roleId of roleIds) {
-        await tx.userRole.upsert({
-          where: { userId_roleId: { userId, roleId } },
+        await tx.roleAssignment.upsert({
+          where: {
+            userId_roleId_scopeType_scopeId: {
+              userId,
+              roleId,
+              scopeType: "PLATFORM",
+              scopeId: "",
+            },
+          },
           update: {},
-          create: { userId, roleId },
+          create: { userId, roleId, scopeType: "PLATFORM", scopeId: "" },
         });
       }
     });
@@ -173,15 +181,22 @@ export async function updateUser(
 
   if (!builtin && roleIds !== undefined) {
     await prisma.$transaction(async (tx) => {
-      await tx.userRole.deleteMany({
-        where: { userId: id },
+      await tx.roleAssignment.deleteMany({
+        where: { userId: id, scopeType: "PLATFORM", scopeId: "" },
       });
 
       for (const roleId of roleIds) {
-        await tx.userRole.upsert({
-          where: { userId_roleId: { userId: id, roleId } },
+        await tx.roleAssignment.upsert({
+          where: {
+            userId_roleId_scopeType_scopeId: {
+              userId: id,
+              roleId,
+              scopeType: "PLATFORM",
+              scopeId: "",
+            },
+          },
           update: {},
-          create: { userId: id, roleId },
+          create: { userId: id, roleId, scopeType: "PLATFORM", scopeId: "" },
         });
       }
     });

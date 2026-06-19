@@ -8,18 +8,21 @@ import {
 } from "#lib/openapi";
 import { assertPermission } from "#services/role-permission.service";
 import { removeUserRole as removeUserRoleSvc } from "#services/user-role.service";
-import { removeUserRoleParamSchema, successResponseSchema } from "./schema";
+import {
+  removeRoleAssignmentParamSchema,
+  successResponseSchema,
+} from "./schema";
 
-export const removeUserRole = defineOpenAPIRoute({
+export const removeRoleAssignment = defineOpenAPIRoute({
   route: createRoute({
     method: "post",
     path: "/remove",
-    tags: ["UserRole"],
+    tags: ["RoleAssignment"],
     summary: "Remove a role from a user",
     request: {
       body: {
         content: {
-          "application/json": { schema: removeUserRoleParamSchema },
+          "application/json": { schema: removeRoleAssignmentParamSchema },
         },
         required: true,
       },
@@ -37,8 +40,8 @@ export const removeUserRole = defineOpenAPIRoute({
     await removeUserRoleSvc(userId, roleId, { scopeId, scopeType });
 
     logAudit({
-      event: "user_role.removed",
-      category: "user_role",
+      event: "role_assignment.removed",
+      category: "role_assignment",
       metadata: { userId, roleId, scopeType, scopeId },
       c,
     });

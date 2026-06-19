@@ -69,7 +69,6 @@ export async function deleteRole(id: string) {
     throw new HTTPException(404, { message: "Role not found" });
   }
   await prisma.$transaction([
-    prisma.userRole.deleteMany({ where: { roleId: id } }),
     prisma.roleAssignment.deleteMany({ where: { roleId: id } }),
     prisma.role.delete({ where: { id } }),
   ]);

@@ -4,6 +4,9 @@ CREATE SCHEMA IF NOT EXISTS "public";
 -- CreateEnum
 CREATE TYPE "LinkType" AS ENUM ('GROUP', 'INTERNAL', 'EXTERNAL');
 
+-- CreateEnum
+CREATE TYPE "RoleScopeType" AS ENUM ('PLATFORM', 'ORGANIZATION', 'APPLICATION');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -195,19 +198,23 @@ CREATE TABLE "role_permission" (
 );
 
 -- CreateTable
-CREATE TABLE "user_role" (
+CREATE TABLE "role_assignment" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "roleId" TEXT NOT NULL,
+    "scopeType" "RoleScopeType" NOT NULL DEFAULT 'PLATFORM',
+    "scopeId" TEXT NOT NULL DEFAULT '',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "user_role_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "role_assignment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "role" (
     "id" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
+    "scopeType" "RoleScopeType" NOT NULL DEFAULT 'PLATFORM',
+    "scopeId" TEXT NOT NULL DEFAULT '',
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "flags" TEXT[] DEFAULT ARRAY[]::TEXT[],
@@ -401,19 +408,25 @@ CREATE INDEX "role_permission_permissionId_idx" ON "role_permission"("permission
 CREATE UNIQUE INDEX "role_permission_roleId_permissionId_key" ON "role_permission"("roleId", "permissionId");
 
 -- CreateIndex
-CREATE INDEX "user_role_userId_idx" ON "user_role"("userId");
+CREATE INDEX "role_assignment_userId_idx" ON "role_assignment"("userId");
 
 -- CreateIndex
-CREATE INDEX "user_role_roleId_idx" ON "user_role"("roleId");
+CREATE INDEX "role_assignment_roleId_idx" ON "role_assignment"("roleId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_role_userId_roleId_key" ON "user_role"("userId", "roleId");
+CREATE INDEX "role_assignment_scopeType_scopeId_idx" ON "role_assignment"("scopeType", "scopeId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "role_assignment_userId_roleId_scopeType_scopeId_key" ON "role_assignment"("userId", "roleId", "scopeType", "scopeId");
 
 -- CreateIndex
 CREATE INDEX "role_appId_idx" ON "role"("appId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "role_appId_code_key" ON "role"("appId", "code");
+CREATE INDEX "role_scopeType_scopeId_idx" ON "role"("scopeType", "scopeId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "role_appId_scopeType_scopeId_code_key" ON "role"("appId", "scopeType", "scopeId", "code");
 
 -- CreateIndex
 CREATE INDEX "operation_log_traceId_idx" ON "operation_log"("traceId");
@@ -542,10 +555,10 @@ ALTER TABLE "role_permission" ADD CONSTRAINT "role_permission_roleId_fkey" FOREI
 ALTER TABLE "role_permission" ADD CONSTRAINT "role_permission_permissionId_fkey" FOREIGN KEY ("permissionId") REFERENCES "permission"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_role" ADD CONSTRAINT "user_role_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "role"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "role_assignment" ADD CONSTRAINT "role_assignment_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "role"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_role" ADD CONSTRAINT "user_role_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "role_assignment" ADD CONSTRAINT "role_assignment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "role" ADD CONSTRAINT "role_appId_fkey" FOREIGN KEY ("appId") REFERENCES "application"("id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -9,7 +9,7 @@ export const getUserAppRoles = defineOpenAPIRoute({
   route: createRoute({
     method: "get",
     path: "/mine",
-    tags: ["UserRole"],
+    tags: ["RoleAssignment"],
     summary: "Get current user's menus from all app-scoped roles",
     responses: {
       ...unauthorizedResponse,
