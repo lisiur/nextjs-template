@@ -1,7 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { mkdir, stat, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { dirname, extname, join } from "node:path";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import { prisma } from "#lib/db";
@@ -46,7 +46,7 @@ function computeHash(buffer: Buffer): string {
 }
 
 function shardPath(hash: string, ext: string): string {
-  return `${hash[0]}/${hash[1]}/${hash}${ext}`;
+  return `${hash.slice(0, 2)}/${hash.slice(2, 4)}/${hash}${ext}`;
 }
 
 export async function uploadFile(params: {
@@ -75,7 +75,7 @@ export async function uploadFile(params: {
   const dir = visibility === "public" ? "public" : "private";
   const fullPath = join(UPLOADS_ROOT, dir, relPath);
 
-  await mkdir(join(UPLOADS_ROOT, dir, hash[0], hash[1]), {
+  await mkdir(join(UPLOADS_ROOT, dir, dirname(relPath)), {
     recursive: true,
   });
   await writeFile(fullPath, buffer);
