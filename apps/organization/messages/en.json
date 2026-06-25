@@ -155,6 +155,8 @@
   "Sidebar": {
     "noMenus": "No menus available",
     "profile": "Profile",
+    "switchOrganization": "Switch Organization",
+    "switchSuccess": "Organization switched",
     "registerOrganization": "Register Organization",
     "signOut": "Sign Out"
   }

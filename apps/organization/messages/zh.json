@@ -155,6 +155,8 @@
   "Sidebar": {
     "noMenus": "暂无菜单",
     "profile": "个人资料",
+    "switchOrganization": "切换组织",
+    "switchSuccess": "已切换组织",
     "registerOrganization": "注册组织",
     "signOut": "退出登录"
   }

@@ -13,11 +13,8 @@ import { Building2, Plus } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
-import { toast } from "sonner";
-import { appClient, useSession, withApiFeedback } from "@/lib/api";
-import { redirectToFirstMenuOrProfile } from "@/lib/navigation/menu-redirect";
-import { useMenuStore } from "@/stores/menu-store";
+import { useSwitchOrganization } from "@/hooks/use-switch-organization";
+import { appClient } from "@/lib/api";
 
 interface Organization {
   id: string;
@@ -31,9 +28,7 @@ interface Organization {
 export function OrganizationChooser() {
   const router = useRouter();
   const t = useTranslations("ChooseOrganization");
-  const { refetch: refetchSession } = useSession();
-  const refetchMenus = useMenuStore((state) => state.refetchMenus);
-  const [activatingId, setActivatingId] = useState<string | null>(null);
+  const { switchOrg, activatingId } = useSwitchOrganization();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["organizations", "mine"],
@@ -47,17 +42,7 @@ export function OrganizationChooser() {
   const organizations = data?.organizations ?? [];
 
   async function handleSelect(org: Organization) {
-    setActivatingId(org.id);
-    try {
-      await withApiFeedback(appClient.api.organizations[":id"].activate.$post)({
-        param: { id: org.id },
-      });
-      await refetchSession();
-      toast.success(t("activateSuccess"));
-      await redirectToFirstMenuOrProfile(router, refetchMenus);
-    } catch {
-      setActivatingId(null);
-    }
+    await switchOrg(org, t("activateSuccess"));
   }
 
   if (isLoading) {

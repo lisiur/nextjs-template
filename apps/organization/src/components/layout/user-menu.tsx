@@ -15,6 +15,7 @@ import {
   SidebarMenuButton,
   Switch,
 } from "@repo/ui";
+import { useQuery } from "@tanstack/react-query";
 import {
   Building2,
   ChevronsUpDown,
@@ -30,10 +31,13 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { Fragment, useMemo } from "react";
+import { useSwitchOrganization } from "@/hooks/use-switch-organization";
+import { appClient } from "@/lib/api";
 import { useSession } from "@/lib/api/use-session";
 
 type UserMenuItem =
   | "profile"
+  | "switchOrganization"
   | "theme"
   | "locale"
   | "registerOrganization"
@@ -60,7 +64,14 @@ export function UserMenu({ full, items }: UserMenuProps) {
   const th = useTranslations("Header");
 
   const visible = new Set(
-    items ?? ["profile", "theme", "locale", "registerOrganization", "signOut"],
+    items ?? [
+      "profile",
+      "switchOrganization",
+      "theme",
+      "locale",
+      "registerOrganization",
+      "signOut",
+    ],
   );
 
   const initials = useMemo(() => {
@@ -90,9 +101,33 @@ export function UserMenu({ full, items }: UserMenuProps) {
 
   const showLabel = full;
   const showProfile = visible.has("profile");
+  const showSwitch = visible.has("switchOrganization");
   const showRegisterOrg = visible.has("registerOrganization");
   const showUtilities = visible.has("theme") || visible.has("locale");
   const showSignOut = visible.has("signOut");
+
+  const { switchOrg, activatingId, activeOrganizationId } =
+    useSwitchOrganization();
+
+  const { data: mineData } = useQuery({
+    queryKey: ["organizations", "mine"],
+    queryFn: async () => {
+      const res = await appClient.api.organizations.mine.$get();
+      if (!res.ok) throw new Error("Failed to load organizations");
+      return (await res.json()) as {
+        organizations: {
+          id: string;
+          name: string;
+          slug: string;
+          logo?: string | null;
+        }[];
+      };
+    },
+    enabled: !!user,
+  });
+
+  const organizations = mineData?.organizations ?? [];
+  const canSwitch = showSwitch && organizations.length > 1;
 
   const avatar = (
     <div
@@ -169,23 +204,51 @@ export function UserMenu({ full, items }: UserMenuProps) {
           </DropdownMenuGroup>
         )}
         {showLabel &&
-          (showProfile || showRegisterOrg || showUtilities || showSignOut) && (
-            <DropdownMenuSeparator />
-          )}
+          (showProfile ||
+            canSwitch ||
+            showRegisterOrg ||
+            showUtilities ||
+            showSignOut) && <DropdownMenuSeparator />}
         {showProfile && (
           <DropdownMenuItem render={<Link href="/profile" />}>
             <UserIcon />
             {t("profile")}
           </DropdownMenuItem>
         )}
-        {showProfile && showRegisterOrg && <DropdownMenuSeparator />}
+        {canSwitch && (
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Building2 className="size-4" />
+              <span>{t("switchOrganization")}</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              {organizations.map((org) => (
+                <DropdownMenuCheckboxItem
+                  key={org.id}
+                  checked={org.id === activeOrganizationId}
+                  disabled={activatingId !== null}
+                  onClick={() => {
+                    if (org.id !== activeOrganizationId) {
+                      void switchOrg(org, t("switchSuccess"));
+                    }
+                  }}
+                >
+                  {org.name}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        )}
+        {(showProfile || canSwitch) && showRegisterOrg && (
+          <DropdownMenuSeparator />
+        )}
         {showRegisterOrg && (
           <DropdownMenuItem render={<Link href="/register-organization" />}>
             <Building2 />
             {t("registerOrganization")}
           </DropdownMenuItem>
         )}
-        {(showProfile || showRegisterOrg) && showUtilities && (
+        {(showProfile || canSwitch || showRegisterOrg) && showUtilities && (
           <DropdownMenuSeparator />
         )}
         {showUtilities && (
@@ -231,7 +294,11 @@ export function UserMenu({ full, items }: UserMenuProps) {
             )}
           </Fragment>
         )}
-        {(showLabel || showProfile || showRegisterOrg || showUtilities) &&
+        {(showLabel ||
+          showProfile ||
+          canSwitch ||
+          showRegisterOrg ||
+          showUtilities) &&
           showSignOut && <DropdownMenuSeparator />}
         {showSignOut && (
           <DropdownMenuItem
