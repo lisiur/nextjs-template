@@ -126,6 +126,32 @@
     "removeSuccess": "Member removed",
     "lastOwnerError": "An organization must have at least one owner"
   },
+  "Settings": {
+    "title": "Settings",
+    "description": "Manage your organization",
+    "logo": "Logo",
+    "generalInfo": "General Information",
+    "name": "Organization name",
+    "slug": "Slug",
+    "slugDescription": "Use lowercase letters, numbers, and hyphens.",
+    "invalidSlug": "Use only lowercase letters, numbers, and hyphens",
+    "save": "Save",
+    "saving": "Saving...",
+    "chooseFile": "Choose File",
+    "uploading": "Uploading...",
+    "cancel": "Cancel",
+    "logoHint": "JPEG, PNG, GIF or WebP. Max 5MB.",
+    "logoUpdated": "Logo updated",
+    "updateSuccess": "Settings updated",
+    "updateFailed": "Update failed",
+    "uploadFailed": "Upload failed",
+    "fileTooLarge": "File too large. Maximum size is 5MB.",
+    "loadFailed": "Failed to load settings",
+    "validation": {
+      "nameRequired": "Organization name is required",
+      "slugRequired": "Slug is required"
+    }
+  },
   "Sidebar": {
     "noMenus": "No menus available",
     "profile": "Profile",

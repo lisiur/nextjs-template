@@ -7,10 +7,12 @@ import { activateOrganization } from "./activateOrganization";
 import { createOrganization } from "./createOrganization";
 import { deleteOrganization } from "./deleteOrganization";
 import { getOrganization } from "./getOrganization";
+import { getOrganizationSettings } from "./getSettings";
 import { listMyOrganizations } from "./listMyOrganizations";
 import { listOrganizations } from "./listOrganizations";
 import { registerOrganization } from "./registerOrganization";
 import { updateOrganization } from "./updateOrganization";
+import { updateOrganizationSettings } from "./updateSettings";
 
 const organizationRoutes = new OpenAPIHono();
 
@@ -25,6 +27,8 @@ const routes = organizationRoutes.openapiRoutes([
   deleteOrganization,
   listOrganizationMembers,
   removeOrganizationMember,
+  getOrganizationSettings,
+  updateOrganizationSettings,
 ] as const);
 
 export { routes as organizationRoutes };

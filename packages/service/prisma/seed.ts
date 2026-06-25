@@ -545,6 +545,18 @@ const organizationFeaturePermissionDefinitions = [
     name: "Remove Organization Member",
     description: "Remove a member from an organization",
   },
+  {
+    code: "organization-settings::view",
+    group: "organization-settings",
+    name: "View Organization Settings",
+    description: "View an organization's settings",
+  },
+  {
+    code: "organization-settings::update",
+    group: "organization-settings",
+    name: "Update Organization Settings",
+    description: "Update an organization's settings",
+  },
 ];
 
 async function seedOrganizationFeaturePermissions(appId: string) {
@@ -1031,7 +1043,6 @@ async function seed() {
 
   const orgMemberPermCodes = [
     "menu-item:members::view",
-    "menu-item:settings::view",
     "organization-member::list",
   ];
   const orgMemberPermIds: Record<string, string> = {};

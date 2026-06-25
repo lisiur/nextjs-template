@@ -3,12 +3,17 @@
 import { PanelLeftIcon } from "lucide-react";
 import Image from "next/image";
 import { useCurrentApp } from "@/hooks/use-current-app";
+import { useCurrentOrganization } from "@/hooks/use-current-organization";
 import { useSession } from "@/lib/api/use-session";
 import { UserMenu } from "./user-menu";
 
 export function Header({ className }: { className?: string }) {
   const { app } = useCurrentApp();
+  const { organization } = useCurrentOrganization();
   const { data: session } = useSession();
+
+  const label = organization?.name ?? app?.name ?? "";
+  const logo = organization?.logo ?? app?.logo ?? null;
 
   return (
     <header
@@ -23,10 +28,10 @@ export function Header({ className }: { className?: string }) {
           <PanelLeftIcon />
           <span className="sr-only">Toggle Sidebar</span>
         </button>
-        {app?.logo ? (
+        {logo ? (
           <Image
-            src={app.logo}
-            alt={app.name}
+            src={logo}
+            alt={label}
             width={24}
             height={24}
             className="shrink-0 rounded"
@@ -34,7 +39,7 @@ export function Header({ className }: { className?: string }) {
             unoptimized
           />
         ) : null}
-        <span className="font-semibold text-lg">{app?.name ?? ""}</span>
+        <span className="font-semibold text-lg">{label}</span>
       </div>
       <div className="ml-auto flex items-center gap-1">
         {session ? <UserMenu full={false} items={["signOut"]} /> : null}
