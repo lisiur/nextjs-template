@@ -30,7 +30,10 @@ import {
 import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import { cn } from "../utils/cn";
 
-export type { DraggableAttributes, DraggableSyntheticListeners } from "@dnd-kit/core";
+export type {
+  DraggableAttributes,
+  DraggableSyntheticListeners,
+} from "@dnd-kit/core";
 export interface DraggableTreeNode {
   id: string;
   parentId: string | null;

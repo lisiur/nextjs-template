@@ -177,7 +177,11 @@ export function DepartmentDialog({
             form="department-dialog-form"
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? t("saving") : isEdit ? t("save") : t("create")}
+            {mutation.isPending
+              ? t("saving")
+              : isEdit
+                ? t("save")
+                : t("create")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -12,10 +12,7 @@ export default function DepartmentsPage() {
   const orgId = session?.session.activeOrganizationId;
 
   return (
-    <ManagementPageShell
-      title={t("title")}
-      description={t("description")}
-    >
+    <ManagementPageShell title={t("title")} description={t("description")}>
       {orgId ? (
         <DepartmentTable orgId={orgId} />
       ) : (
