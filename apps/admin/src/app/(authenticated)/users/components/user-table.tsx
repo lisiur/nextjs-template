@@ -121,7 +121,7 @@ export function UserTable() {
         toolbar={
           <div className="flex w-full justify-end">
             <Button onClick={() => setShowCreate(true)}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="h-4 w-4" />
               {t("addUser")}
             </Button>
           </div>

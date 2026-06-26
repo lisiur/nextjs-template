@@ -122,7 +122,7 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
       <DepartmentBreadcrumb path={path} onNavigate={handleNavigate} />
       <div className="mb-4 shrink-0">
         <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           {t("createDepartment")}
         </Button>
       </div>
@@ -138,7 +138,6 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
                 <TableHead>{t("name")}</TableHead>
                 <TableHead>{t("code")}</TableHead>
                 <TableHead>{t("description_label")}</TableHead>
-                <TableHead>{t("children")}</TableHead>
                 <TableHead>{t("createdAt")}</TableHead>
                 <TableHead sticky="right" align="right">
                   {t("edit")}
@@ -155,7 +154,6 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
                   <TableCell className="max-w-[200px] truncate text-muted-foreground">
                     {dept.description ?? "—"}
                   </TableCell>
-                  <TableCell>{dept.childrenCount}</TableCell>
                   <TableCell>{formatDate(dept.createdAt)}</TableCell>
                   <TableCell sticky="right" align="right">
                     <div className="flex justify-end gap-1">

@@ -75,7 +75,7 @@ export function OrganizationChooser() {
         </CardHeader>
         <CardContent className="flex justify-center">
           <Button onClick={() => router.push("/register-organization")}>
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="h-4 w-4" />
             {t("createButton")}
           </Button>
         </CardContent>
@@ -130,7 +130,7 @@ export function OrganizationChooser() {
             variant="ghost"
             onClick={() => router.push("/register-organization")}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="h-4 w-4" />
             {t("createButton")}
           </Button>
         </CardContent>

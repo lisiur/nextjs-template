@@ -116,7 +116,7 @@ export function NotificationTemplateTable() {
           onClick={() => setShowCreate(true)}
           disabled={channels.length === 0}
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           {t("templates.create")}
         </Button>
       </div>

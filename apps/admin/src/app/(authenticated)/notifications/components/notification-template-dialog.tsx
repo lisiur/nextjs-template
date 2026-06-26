@@ -365,7 +365,7 @@ export function NotificationTemplateDialog({
                     size="sm"
                     onClick={addVariableRow}
                   >
-                    <Plus className="mr-2 h-4 w-4" />
+                    <Plus className="h-4 w-4" />
                     {t("fields.addVariable")}
                   </Button>
                 </div>

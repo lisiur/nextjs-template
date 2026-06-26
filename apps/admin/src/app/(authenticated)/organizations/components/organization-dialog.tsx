@@ -247,7 +247,7 @@ export function OrganizationDialog({
                     variant="outline"
                     onClick={() => fileInputRef.current?.click()}
                   >
-                    <ImagePlus className="mr-2 h-4 w-4" />
+                    <ImagePlus className="h-4 w-4" />
                     {t("uploadLogo")}
                   </Button>
                 )}

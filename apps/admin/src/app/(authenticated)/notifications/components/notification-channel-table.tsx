@@ -120,7 +120,7 @@ export function NotificationChannelTable() {
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <div className="mb-4 flex shrink-0 justify-end">
         <Button onClick={() => setShowCreate(true)}>
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="h-4 w-4" />
           {t("channels.create")}
         </Button>
       </div>

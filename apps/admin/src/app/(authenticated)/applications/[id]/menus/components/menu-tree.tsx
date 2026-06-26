@@ -459,7 +459,7 @@ export function MenuTree({
               {t("cancel")}
             </Button>
             <Button onClick={handleAddChildSubmit} disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               {t("add")}
             </Button>
           </DialogFooter>
@@ -487,7 +487,7 @@ export function MenuTree({
               onClick={handleDeleteSubmit}
               disabled={deleting}
             >
-              {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
               {t("delete")}
             </Button>
           </DialogFooter>
