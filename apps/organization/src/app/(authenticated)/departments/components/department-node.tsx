@@ -9,7 +9,11 @@ import {
 } from "@repo/ui";
 import { type DraggableTreeNode } from "@repo/ui";
 import { FolderTree, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/hooks/use-confirm";
+import { appClient, withApiFeedback } from "@/lib/api";
 import { DepartmentDialog } from "./department-dialog";
 
 interface DepartmentNodeProps {
@@ -38,6 +42,30 @@ export function DepartmentNode({
 }: DepartmentNodeProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [createChildOpen, setCreateChildOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const confirm = useConfirm();
+
+  async function handleDelete() {
+    const confirmed = await confirm({
+      title: "Delete Department",
+      description: `Are you sure you want to delete "${node.name}"? Child departments will be reparented.`,
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+    });
+    if (!confirmed) return;
+
+    try {
+      await withApiFeedback(
+        appClient.api.organizations[":orgId"].departments[":id"].$delete,
+      )({
+        param: { orgId, id: node.id },
+      });
+      queryClient.invalidateQueries({ queryKey: ["departments", orgId] });
+      toast.success("Department deleted");
+    } catch {
+      // Error handled by withApiFeedback
+    }
+  }
 
   return (
     <>
@@ -74,7 +102,7 @@ export function DepartmentNode({
               <Plus className="mr-2 h-4 w-4" />
               Add Child
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem onClick={handleDelete} className="text-destructive">
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
             </DropdownMenuItem>
