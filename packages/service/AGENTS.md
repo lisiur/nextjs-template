@@ -19,6 +19,19 @@
 - Business logic, database operations, and validation rules belong in service files under `src/services/`.
 - Services throw `HTTPException` for errors (404, 409, 400, etc.).
 
+## Permissions
+- Permission codes follow `group::action` format, e.g. `department::create`, `organization-member::list`.
+- Platform permissions (admin app) are in `systemPermissions` array in `prisma/seed.ts`.
+- Organization permissions (org app) are in `organizationPermissions` array in `prisma/seed.ts`.
+- Use `assertPermission(userId, "permission::code", { appId, organizationId })` in route handlers to enforce permissions.
+- Import `assertPermission` from `#services/role-permission.service`.
+- For org-scoped permissions, pass `{ appId: "organization", organizationId }` as the scope.
+- Platform permissions need no scope (defaults to PLATFORM).
+- When adding new permissions, add them to the appropriate array in `seed.ts` and run `pnpm db:seed`.
+- Role-permission mappings are in `adminRolePermissions` and `organizationRolePermissions` objects in `seed.ts`.
+- `ORG_OWNER_ROLE_CODE` gets ALL `organizationPermissions` automatically via `.map()`.
+- `ORG_MEMBER_ROLE_CODE` must be explicitly granted permissions (e.g. `["organization-member::list", "department::list"]`).
+
 ## Seed & Menus
 - Menu entries are defined in `prisma/seed.ts` under `adminMenus` and `organizationMenus`.
 - Menu entries require: `id`, `code`, `name`, `icon`, `linkType: "INTERNAL"`, `url`, `sortOrder`, and `permissions`.
