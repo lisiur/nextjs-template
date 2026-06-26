@@ -126,6 +126,10 @@
     "removeSuccess": "Member removed",
     "lastOwnerError": "An organization must have at least one owner"
   },
+  "Departments": {
+    "title": "Departments",
+    "createDepartment": "Create Department"
+  },
   "Settings": {
     "title": "Settings",
     "description": "Manage your organization",

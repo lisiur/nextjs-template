@@ -89,7 +89,7 @@
     "profileUpdated": "资料更新成功",
     "passwordChanged": "密码修改成功",
     "avatarUpdated": "头像更新成功",
-    "updateFailed": "更新失败",
+    "updateFailed": "资料更新失败",
     "changePasswordFailed": "密码修改失败",
     "uploadFailed": "上传失败",
     "fileTooLarge": "文件过大，最大 5MB。",
@@ -98,7 +98,7 @@
       "nameRequired": "姓名不能为空",
       "currentPasswordRequired": "当前密码不能为空",
       "newPasswordMin": "新密码至少需要 6 个字符",
-      "confirmPasswordRequired": "请确认新密码",
+      "confirmPasswordRequired": "请确认你的密码",
       "passwordsMismatch": "两次输入的密码不一致"
     }
   },
@@ -126,6 +126,10 @@
     "removeSuccess": "成员已移除",
     "lastOwnerError": "组织必须至少有一个所有者"
   },
+  "Departments": {
+    "title": "部门",
+    "createDepartment": "创建部门"
+  },
   "Settings": {
     "title": "设置",
     "description": "管理你的组织",
@@ -143,7 +147,7 @@
     "logoHint": "JPEG、PNG、GIF 或 WebP，最大 5MB。",
     "logoUpdated": "Logo 已更新",
     "updateSuccess": "设置已更新",
-    "updateFailed": "更新失败",
+    "updateFailed": "设置更新失败",
     "uploadFailed": "上传失败",
     "fileTooLarge": "文件过大，最大 5MB。",
     "loadFailed": "加载设置失败",
@@ -157,7 +161,7 @@
     "profile": "个人资料",
     "switchOrganization": "切换组织",
     "switchSuccess": "已切换组织",
-    "registerOrganization": "注册组织",
+    "registerOrganization": "创建组织",
     "signOut": "退出登录"
   }
 }
