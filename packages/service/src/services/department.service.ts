@@ -137,20 +137,3 @@ export async function deleteDepartment(organizationId: string, id: string) {
     return tx.department.delete({ where: { id } });
   });
 }
-
-export async function reorderDepartments(
-  organizationId: string,
-  items: { id: string; parentId: string | null; sortOrder: number }[],
-) {
-  return prisma.$transaction(
-    items.map((item) =>
-      prisma.department.update({
-        where: { id: item.id, organizationId },
-        data: {
-          parentId: item.parentId,
-          sortOrder: item.sortOrder,
-        },
-      }),
-    ),
-  );
-}
