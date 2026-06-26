@@ -1,5 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requireSession } from "#extractors/session";
+import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
