@@ -415,6 +415,12 @@ const organizationPermissions = [
     description: "Remove a member from an organization",
   },
   {
+    code: "organization-member::update",
+    group: "organization-member",
+    name: "Update Organization Member",
+    description: "Update an organization member's department assignment",
+  },
+  {
     code: "organization-settings::view",
     group: "organization-settings",
     name: "View Organization Settings",
