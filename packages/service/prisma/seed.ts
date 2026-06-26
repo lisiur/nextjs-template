@@ -667,6 +667,7 @@ const builtInUsers = [
     password: "admin123",
     flags: [BUILTIN_USER_FLAG],
     roleCode: ADMIN_ROLE_CODE,
+    appCode: ADMIN_APP_CODE,
   },
   {
     id: "user",
@@ -675,6 +676,7 @@ const builtInUsers = [
     password: "admin123",
     flags: [BUILTIN_USER_FLAG],
     roleCode: USER_ROLE_CODE,
+    appCode: ADMIN_APP_CODE,
   },
 ];
 
@@ -928,6 +930,8 @@ async function upsertUser(params: {
   email: string;
   password: string;
   flags: string[];
+  roleCode?: string;
+  appCode?: string;
 }) {
   const user = await prisma.user.upsert({
     where: { email: params.email },
@@ -964,6 +968,44 @@ async function upsertUser(params: {
 
   console.log(`  User: ${params.email}`);
   return user;
+}
+
+async function upsertRoleAssignment(params: {
+  userId: string;
+  roleCode: string;
+  appId: string;
+}) {
+  const role = await prisma.role.findFirst({
+    where: {
+      appId: params.appId,
+      scopeType: "PLATFORM",
+      scopeId: "",
+      code: params.roleCode,
+    },
+  });
+  if (!role) {
+    console.warn(
+      `  [seed] Role not found for assignment: appId=${params.appId} code=${params.roleCode}`,
+    );
+    return;
+  }
+  await prisma.roleAssignment.upsert({
+    where: {
+      userId_roleId_scopeType_scopeId: {
+        userId: params.userId,
+        roleId: role.id,
+        scopeType: "PLATFORM",
+        scopeId: "",
+      },
+    },
+    update: {},
+    create: {
+      userId: params.userId,
+      roleId: role.id,
+      scopeType: "PLATFORM",
+      scopeId: "",
+    },
+  });
 }
 
 // ============================================================
@@ -1086,12 +1128,28 @@ async function seed() {
   }
   console.log();
 
-  // 13. Built-in Users (create user + account only, no role assignment)
+  // 13. Built-in Users (create user + account)
   console.log("Built-in users:");
+  const builtInUserRecords: Record<string, string> = {};
   for (const user of builtInUsers) {
-    await upsertUser(user);
+    const record = await upsertUser(user);
+    builtInUserRecords[user.id] = record.id;
   }
   console.log(`  ${builtInUsers.length} users ready.\n`);
+
+  // 14. Built-in User Role Assignments
+  console.log("Built-in user role assignments:");
+  for (const user of builtInUsers) {
+    if (user.roleCode && user.appCode) {
+      await upsertRoleAssignment({
+        userId: builtInUserRecords[user.id],
+        roleCode: user.roleCode,
+        appId: appRecords[user.appCode],
+      });
+      console.log(`  ${user.email} → ${user.roleCode}`);
+    }
+  }
+  console.log();
 
   console.log("=== Seed complete ===");
 }
