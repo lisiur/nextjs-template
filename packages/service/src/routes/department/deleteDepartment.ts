@@ -14,7 +14,7 @@ import { departmentIdParamSchema, orgIdParamSchema } from "./schema";
 export const deleteDepartmentRoute = defineOpenAPIRoute({
   route: createRoute({
     method: "delete",
-    path: "/organizations/{orgId}/departments/{id}",
+    path: "/{orgId}/departments/{id}",
     tags: ["Department"],
     summary: "Delete a department",
     request: {
@@ -49,6 +49,6 @@ export const deleteDepartmentRoute = defineOpenAPIRoute({
       c,
     });
 
-    return c.json({ success: true }, 200);
+    return c.json({ success: true } as const, 200);
   },
 });

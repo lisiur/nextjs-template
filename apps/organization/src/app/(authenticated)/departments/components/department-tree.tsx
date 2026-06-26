@@ -5,14 +5,27 @@ import {
   type DraggableTreeNode,
   type ReorderChange,
 } from "@repo/ui";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 import { appClient, withApiFeedback } from "@/lib/api";
 import { DepartmentNode } from "./department-node";
 
-interface Department extends DraggableTreeNode {
+interface DepartmentNodeData extends DraggableTreeNode {
+  code: string;
   description: string | null;
   organizationId: string;
+}
+
+/** Flat department record returned by the API (no children). */
+interface DepartmentRecord {
+  id: string;
+  organizationId: string;
+  parentId: string | null;
+  name: string;
+  code: string;
+  description?: string | null;
+  sortOrder: number;
+  createdAt: string;
 }
 
 export function DepartmentTree({ orgId }: { orgId: string }) {
@@ -58,19 +71,19 @@ export function DepartmentTree({ orgId }: { orgId: string }) {
       data={treeData}
       onReorder={handleReorder}
       renderNode={(node, props) => (
-        <DepartmentNode node={node as Department} {...props} orgId={orgId} />
+        <DepartmentNode node={node as DepartmentNodeData} {...props} orgId={orgId} />
       )}
       emptyLabel="No departments"
     />
   );
 }
 
-function buildTree(departments: Department[]): Department[] {
-  const map = new Map<string, Department>();
-  const roots: Department[] = [];
+function buildTree(departments: DepartmentRecord[]): DepartmentNodeData[] {
+  const map = new Map<string, DepartmentNodeData>();
+  const roots: DepartmentNodeData[] = [];
 
   for (const dept of departments) {
-    map.set(dept.id, { ...dept, children: [] });
+    map.set(dept.id, { ...dept, children: [], description: dept.description ?? null });
   }
 
   for (const dept of departments) {

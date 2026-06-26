@@ -16,7 +16,7 @@ const reorderResponseSchema = z
 export const reorderDepartmentsRoute = defineOpenAPIRoute({
   route: createRoute({
     method: "put",
-    path: "/organizations/{orgId}/departments/reorder",
+    path: "/{orgId}/departments/reorder",
     tags: ["Department"],
     summary: "Reorder departments",
     request: {

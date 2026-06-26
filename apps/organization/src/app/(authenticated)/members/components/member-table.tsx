@@ -31,10 +31,10 @@ interface MemberRow {
   id: string;
   userId: string;
   role: string;
-  departmentId: string | null;
+  departmentId?: string | null;
   createdAt: string;
   user: MemberUser;
-  department: { id: string; name: string } | null;
+  department?: { id: string; name: string } | null;
 }
 
 export function MemberTable({ organizationId }: { organizationId: string }) {

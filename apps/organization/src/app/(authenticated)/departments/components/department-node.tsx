@@ -1,15 +1,18 @@
 "use client";
 
-import { Button, Badge } from "@repo/ui";
 import {
+  Badge,
+  Button,
+  type DraggableAttributes,
+  type DraggableSyntheticListeners,
+  type DraggableTreeNode,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@repo/ui";
-import { type DraggableTreeNode } from "@repo/ui";
+import { useQueryClient } from "@tanstack/react-query";
 import { FolderTree, MoreHorizontal, Pencil, Plus, Trash2 } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
 import { toast } from "sonner";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -17,7 +20,7 @@ import { appClient, withApiFeedback } from "@/lib/api";
 import { DepartmentDialog } from "./department-dialog";
 
 interface DepartmentNodeProps {
-  node: DraggableTreeNode & { description: string | null };
+  node: DraggableTreeNode & { description: string | null; code: string };
   orgId: string;
   isDragging: boolean;
   isSelected: boolean;
@@ -25,8 +28,8 @@ interface DepartmentNodeProps {
   hasChildren: boolean;
   canExpand: boolean;
   level: number;
-  attributes: Record<string, unknown>;
-  listeners: Record<string, unknown> | undefined;
+  attributes: DraggableAttributes;
+  listeners: DraggableSyntheticListeners | undefined;
   expandToggle: ReactNode;
 }
 
@@ -88,10 +91,12 @@ export function DepartmentNode({
           {node.code}
         </Badge>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" />
+            }
+          >
+            <MoreHorizontal className="h-4 w-4" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => setEditOpen(true)}>
@@ -102,7 +107,10 @@ export function DepartmentNode({
               <Plus className="mr-2 h-4 w-4" />
               Add Child
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+            <DropdownMenuItem
+              onClick={handleDelete}
+              className="text-destructive"
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete
             </DropdownMenuItem>
