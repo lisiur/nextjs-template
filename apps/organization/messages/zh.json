@@ -167,6 +167,10 @@
     "memberUnassigned": "成员已从部门移除",
     "noMembersInDepartment": "此部门暂无成员",
     "noAvailableMembers": "没有可用的未分配成员",
+    "selectAll": "全选",
+    "selectNone": "取消全选",
+    "addSelected": "添加 {count} 个成员",
+    "membersAssigned": "成员已添加到部门",
     "actions": "操作"
   },
   "Settings": {

@@ -48,4 +48,11 @@ export const listMembersResponseSchema = z
   })
   .openapi("ListMembersResponse");
 
+export const batchUpdateMembersBodySchema = z
+  .object({
+    memberIds: z.array(z.string()),
+    departmentId: z.string().nullable(),
+  })
+  .openapi("BatchUpdateMembersBody");
+
 export type Member = z.infer<typeof memberSchema>;

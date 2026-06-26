@@ -7,6 +7,7 @@ import {
   updateDepartment,
 } from "../department";
 import {
+  batchUpdateOrganizationMembers,
   listOrganizationMembers,
   removeOrganizationMember,
   updateOrganizationMember,
@@ -36,6 +37,7 @@ const routes = organizationRoutes.openapiRoutes([
   listOrganizationMembers,
   removeOrganizationMember,
   updateOrganizationMember,
+  batchUpdateOrganizationMembers,
   getOrganizationSettings,
   updateOrganizationSettings,
   listDepartments,

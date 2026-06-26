@@ -167,6 +167,10 @@
     "memberUnassigned": "Member removed from department",
     "noMembersInDepartment": "No members in this department",
     "noAvailableMembers": "No unassigned members available",
+    "selectAll": "Select all",
+    "selectNone": "Deselect all",
+    "addSelected": "Add {count, plural, one {# member} other {# members}}",
+    "membersAssigned": "Members added to department",
     "actions": "Actions"
   },
   "Settings": {

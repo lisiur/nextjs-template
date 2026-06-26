@@ -2,10 +2,12 @@
 
 import {
   Button,
+  Checkbox,
   Sheet,
   SheetBody,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   Spinner,
@@ -188,6 +190,7 @@ function AddMemberDialog({
 }: AddMemberDialogProps) {
   const t = useTranslations("Departments");
   const queryClient = useQueryClient();
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { data: allMembers, isLoading } = useQuery({
     queryKey: ["organization-members", orgId],
@@ -209,13 +212,37 @@ function AddMemberDialog({
       (m) => !excludeMemberIds.includes(m.id) && !m.departmentId,
     ) ?? [];
 
-  const assignMutation = useMutation({
-    mutationFn: async (memberId: string) => {
+  const allSelected =
+    availableMembers.length > 0 &&
+    availableMembers.every((m) => selectedIds.has(m.id));
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(availableMembers.map((m) => m.id)));
+    }
+  }
+
+  function toggleMember(memberId: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(memberId)) {
+        next.delete(memberId);
+      } else {
+        next.add(memberId);
+      }
+      return next;
+    });
+  }
+
+  const batchAssignMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
       await withApiFeedback(
-        appClient.api.organizations[":id"].members[":memberId"].$patch,
+        appClient.api.organizations[":id"].members.batch.$patch,
       )({
-        param: { id: orgId, memberId },
-        json: { departmentId },
+        param: { id: orgId },
+        json: { memberIds: ids, departmentId },
       });
     },
     onSuccess: () => {
@@ -223,10 +250,20 @@ function AddMemberDialog({
         queryKey: ["department-members", orgId, departmentId],
       });
       queryClient.invalidateQueries({ queryKey: ["departments", orgId] });
-      toast.success(t("memberAssigned"));
+      queryClient.invalidateQueries({
+        queryKey: ["organization-members", orgId],
+      });
+      toast.success(t("membersAssigned"));
+      setSelectedIds(new Set());
       onOpenChange(false);
     },
   });
+
+  function handleAddSelected() {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+    batchAssignMutation.mutate(ids);
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -234,6 +271,17 @@ function AddMemberDialog({
         <SheetHeader>
           <SheetTitle>{t("addMember")}</SheetTitle>
           <SheetDescription>{t("addMemberDescription")}</SheetDescription>
+          {availableMembers.length > 0 && (
+            <div className="flex items-center gap-2 pt-2">
+              <Checkbox
+                checked={allSelected}
+                onCheckedChange={toggleSelectAll}
+              />
+              <span className="text-sm text-muted-foreground">
+                {allSelected ? t("selectNone") : t("selectAll")}
+              </span>
+            </div>
+          )}
         </SheetHeader>
         <SheetBody>
           {isLoading ? (
@@ -249,27 +297,35 @@ function AddMemberDialog({
               {availableMembers.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between rounded-md border px-3 py-2"
+                  className="flex items-center gap-3 rounded-md border px-3 py-2"
                 >
+                  <Checkbox
+                    checked={selectedIds.has(member.id)}
+                    onCheckedChange={() => toggleMember(member.id)}
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="font-medium">{member.user.name}</div>
                     <div className="text-sm text-muted-foreground">
                       {member.user.email}
                     </div>
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={() => assignMutation.mutate(member.id)}
-                    disabled={assignMutation.isPending}
-                  >
-                    <Plus className="mr-1 h-3.5 w-3.5" />
-                    {t("add")}
-                  </Button>
                 </div>
               ))}
             </div>
           )}
         </SheetBody>
+        {selectedIds.size > 0 && (
+          <SheetFooter>
+            <Button
+              onClick={handleAddSelected}
+              disabled={batchAssignMutation.isPending}
+            >
+              {batchAssignMutation.isPending
+                ? t("saving")
+                : t("addSelected", { count: selectedIds.size })}
+            </Button>
+          </SheetFooter>
+        )}
       </SheetContent>
     </Sheet>
   );

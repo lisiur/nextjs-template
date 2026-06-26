@@ -1,3 +1,4 @@
+import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
 
 export async function listMembers(
@@ -75,6 +76,33 @@ export async function updateMember(
 
   return prisma.member.update({
     where: { id: memberId },
+    data: { departmentId: data.departmentId },
+  });
+}
+
+export async function batchUpdateMembers(
+  organizationId: string,
+  memberIds: string[],
+  data: { departmentId: string | null },
+) {
+  const members = await prisma.member.findMany({
+    where: { id: { in: memberIds }, organizationId },
+  });
+  if (members.length !== memberIds.length) {
+    throw new HTTPException(400, { message: "One or more members not found" });
+  }
+
+  if (data.departmentId) {
+    const department = await prisma.department.findFirst({
+      where: { id: data.departmentId, organizationId },
+    });
+    if (!department) {
+      throw new HTTPException(400, { message: "Department not found" });
+    }
+  }
+
+  return prisma.member.updateMany({
+    where: { id: { in: memberIds } },
     data: { departmentId: data.departmentId },
   });
 }
