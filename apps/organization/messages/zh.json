@@ -129,6 +129,7 @@
   },
   "Departments": {
     "title": "部门",
+    "description": "管理部门组织结构",
     "createDepartment": "创建部门"
   },
   "Settings": {

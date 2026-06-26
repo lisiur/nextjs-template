@@ -129,6 +129,7 @@
   },
   "Departments": {
     "title": "Departments",
+    "description": "Manage the organizational structure",
     "createDepartment": "Create Department"
   },
   "Settings": {
