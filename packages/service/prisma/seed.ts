@@ -1,3 +1,27 @@
+/**
+ * ============================================================
+ * SEED CONTRACT
+ * ============================================================
+ * This file defines the DESIRED STATE of all reference/config data.
+ * Safe to run in production - only touches reference tables, never user data.
+ *
+ * Tables managed by seed (idempotent):
+ *   Application, Permission, Menu, MenuPermission, Role,
+ *   RolePermission, SystemConfig, NotificationChannel,
+ *   NotificationTemplate
+ *
+ * Tables NOT touched by seed (user-owned):
+ *   User*, Account*, RoleAssignment, Organization, Member,
+ *   Invitation, Upload, Notification, AuditLog, OperationLog
+ *   (* except built-in admin user creation)
+ *
+ * To add new reference data:
+ *   1. Add definition to the appropriate section below
+ *   2. Use stable unique keys (code, slug, etc.)
+ *   3. Run `pnpm db:seed`
+ * ============================================================
+ */
+
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import {
@@ -13,14 +37,176 @@ import {
 import { hashPassword } from "../src/lib/password";
 import { PrismaClient } from "./generated/prisma/client";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("DATABASE_URL environment variable is not set");
-}
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+// ============================================================
+// 1. REFERENCE DATA DEFINITIONS
+// ============================================================
 
-const permissionDefinitions = [
+// --- System Configs ---
+const systemConfigs = [
+  {
+    group: "general",
+    key: "site.name",
+    value: "My Application",
+    type: "string",
+    label: "settings.fields.siteName",
+    description: "settings.fieldsDesc.siteName",
+    isSecret: false,
+    sortOrder: 0,
+  },
+  {
+    group: "general",
+    key: "site.url",
+    value: "http://localhost:3000",
+    type: "string",
+    label: "settings.fields.siteUrl",
+    description: "settings.fieldsDesc.siteUrl",
+    isSecret: false,
+    sortOrder: 1,
+  },
+  {
+    group: "general",
+    key: "site.description",
+    value: "",
+    type: "string",
+    label: "settings.fields.siteDescription",
+    description: "settings.fieldsDesc.siteDescription",
+    isSecret: false,
+    sortOrder: 2,
+  },
+  {
+    group: "auth",
+    key: "registration.enabled",
+    value: "true",
+    type: "boolean",
+    label: "settings.fields.enableRegistration",
+    description: "settings.fieldsDesc.enableRegistration",
+    isSecret: false,
+    sortOrder: 0,
+  },
+  {
+    group: "auth",
+    key: "session.maxAge",
+    value: "7",
+    type: "number",
+    label: "settings.fields.sessionMaxAge",
+    description: "settings.fieldsDesc.sessionMaxAge",
+    isSecret: false,
+    sortOrder: 1,
+  },
+  {
+    group: "smtp",
+    key: "host",
+    value: "",
+    type: "string",
+    label: "settings.fields.smtpHost",
+    description: "settings.fieldsDesc.smtpHost",
+    isSecret: false,
+    sortOrder: 0,
+  },
+  {
+    group: "smtp",
+    key: "port",
+    value: "587",
+    type: "number",
+    label: "settings.fields.smtpPort",
+    description: "settings.fieldsDesc.smtpPort",
+    isSecret: false,
+    sortOrder: 1,
+  },
+  {
+    group: "smtp",
+    key: "user",
+    value: "",
+    type: "string",
+    label: "settings.fields.smtpUser",
+    description: "settings.fieldsDesc.smtpUser",
+    isSecret: false,
+    sortOrder: 2,
+  },
+  {
+    group: "smtp",
+    key: "password",
+    value: "",
+    type: "string",
+    label: "settings.fields.smtpPassword",
+    description: "settings.fieldsDesc.smtpPassword",
+    isSecret: true,
+    sortOrder: 3,
+  },
+  {
+    group: "smtp",
+    key: "from",
+    value: "",
+    type: "string",
+    label: "settings.fields.fromEmail",
+    description: "settings.fieldsDesc.fromEmail",
+    isSecret: false,
+    sortOrder: 4,
+  },
+  {
+    group: "wechat",
+    key: "appid",
+    value: "",
+    type: "string",
+    label: "settings.fields.wechatAppid",
+    description: "settings.fieldsDesc.wechatAppid",
+    isSecret: false,
+    sortOrder: 0,
+  },
+  {
+    group: "wechat",
+    key: "secret",
+    value: "",
+    type: "string",
+    label: "settings.fields.wechatSecret",
+    description: "settings.fieldsDesc.wechatSecret",
+    isSecret: true,
+    sortOrder: 1,
+  },
+  {
+    group: "upload",
+    key: "hotlink",
+    value: JSON.stringify({
+      enabled: false,
+      allowedDomains: [],
+      allowEmptyReferer: true,
+    }),
+    type: "json",
+    schema: {
+      $schema: "https://json-schema.org/draft/2020-12/schema",
+      type: "object",
+      additionalProperties: false,
+      required: ["enabled", "allowedDomains", "allowEmptyReferer"],
+      properties: {
+        enabled: {
+          type: "boolean",
+          title: "settings.fields.uploadHotlinkEnabled",
+          default: false,
+        },
+        allowedDomains: {
+          type: "array",
+          title: "settings.fields.uploadHotlinkAllowedDomains",
+          description: "settings.fieldsDesc.uploadHotlinkAllowedDomains",
+          items: { type: "string" },
+          default: [],
+        },
+        allowEmptyReferer: {
+          type: "boolean",
+          title: "settings.fields.uploadHotlinkAllowEmptyReferer",
+          description: "settings.fieldsDesc.uploadHotlinkAllowEmptyReferer",
+          default: true,
+        },
+      },
+    },
+    label: "settings.fields.uploadHotlink",
+    description: "settings.fieldsDesc.uploadHotlink",
+    isSecret: false,
+    sortOrder: 0,
+  },
+];
+
+// --- System Permissions (appId: null) ---
+const systemPermissions = [
   {
     code: "system-config::list",
     group: "system-config",
@@ -55,16 +241,8 @@ const permissionDefinitions = [
   { code: "role::create", group: "role", name: "Create Role" },
   { code: "role::update", group: "role", name: "Update Role" },
   { code: "role::delete", group: "role", name: "Delete Role" },
-  {
-    code: "permission::list",
-    group: "permission",
-    name: "List Permissions",
-  },
-  {
-    code: "permission::view",
-    group: "permission",
-    name: "View Permission",
-  },
+  { code: "permission::list", group: "permission", name: "List Permissions" },
+  { code: "permission::view", group: "permission", name: "View Permission" },
   {
     code: "user-role::list",
     group: "user-role",
@@ -222,314 +400,8 @@ const permissionDefinitions = [
   { code: "upload::sign", group: "upload", name: "Sign Upload URL" },
 ];
 
-const uploadHotlinkSchema = {
-  $schema: "https://json-schema.org/draft/2020-12/schema",
-  type: "object",
-  additionalProperties: false,
-  required: ["enabled", "allowedDomains", "allowEmptyReferer"],
-  properties: {
-    enabled: {
-      type: "boolean",
-      title: "settings.fields.uploadHotlinkEnabled",
-      default: false,
-    },
-    allowedDomains: {
-      type: "array",
-      title: "settings.fields.uploadHotlinkAllowedDomains",
-      description: "settings.fieldsDesc.uploadHotlinkAllowedDomains",
-      items: { type: "string" },
-      default: [],
-    },
-    allowEmptyReferer: {
-      type: "boolean",
-      title: "settings.fields.uploadHotlinkAllowEmptyReferer",
-      description: "settings.fieldsDesc.uploadHotlinkAllowEmptyReferer",
-      default: true,
-    },
-  },
-};
-
-const defaultConfigs = [
-  {
-    group: "general",
-    key: "site.name",
-    value: "My Application",
-    type: "string",
-    label: "settings.fields.siteName",
-    description: "settings.fieldsDesc.siteName",
-    isSecret: false,
-    sortOrder: 0,
-  },
-  {
-    group: "general",
-    key: "site.url",
-    value: "http://localhost:3000",
-    type: "string",
-    label: "settings.fields.siteUrl",
-    description: "settings.fieldsDesc.siteUrl",
-    isSecret: false,
-    sortOrder: 1,
-  },
-  {
-    group: "general",
-    key: "site.description",
-    value: "",
-    type: "string",
-    label: "settings.fields.siteDescription",
-    description: "settings.fieldsDesc.siteDescription",
-    isSecret: false,
-    sortOrder: 2,
-  },
-  {
-    group: "auth",
-    key: "registration.enabled",
-    value: "true",
-    type: "boolean",
-    label: "settings.fields.enableRegistration",
-    description: "settings.fieldsDesc.enableRegistration",
-    isSecret: false,
-    sortOrder: 0,
-  },
-  {
-    group: "auth",
-    key: "session.maxAge",
-    value: "7",
-    type: "number",
-    label: "settings.fields.sessionMaxAge",
-    description: "settings.fieldsDesc.sessionMaxAge",
-    isSecret: false,
-    sortOrder: 1,
-  },
-  {
-    group: "smtp",
-    key: "host",
-    value: "",
-    type: "string",
-    label: "settings.fields.smtpHost",
-    description: "settings.fieldsDesc.smtpHost",
-    isSecret: false,
-    sortOrder: 0,
-  },
-  {
-    group: "smtp",
-    key: "port",
-    value: "587",
-    type: "number",
-    label: "settings.fields.smtpPort",
-    description: "settings.fieldsDesc.smtpPort",
-    isSecret: false,
-    sortOrder: 1,
-  },
-  {
-    group: "smtp",
-    key: "user",
-    value: "",
-    type: "string",
-    label: "settings.fields.smtpUser",
-    description: "settings.fieldsDesc.smtpUser",
-    isSecret: false,
-    sortOrder: 2,
-  },
-  {
-    group: "smtp",
-    key: "password",
-    value: "",
-    type: "string",
-    label: "settings.fields.smtpPassword",
-    description: "settings.fieldsDesc.smtpPassword",
-    isSecret: true,
-    sortOrder: 3,
-  },
-  {
-    group: "smtp",
-    key: "from",
-    value: "",
-    type: "string",
-    label: "settings.fields.fromEmail",
-    description: "settings.fieldsDesc.fromEmail",
-    isSecret: false,
-    sortOrder: 4,
-  },
-  {
-    group: "wechat",
-    key: "appid",
-    value: "",
-    type: "string",
-    label: "settings.fields.wechatAppid",
-    description: "settings.fieldsDesc.wechatAppid",
-    isSecret: false,
-    sortOrder: 0,
-  },
-  {
-    group: "wechat",
-    key: "secret",
-    value: "",
-    type: "string",
-    label: "settings.fields.wechatSecret",
-    description: "settings.fieldsDesc.wechatSecret",
-    isSecret: true,
-    sortOrder: 1,
-  },
-  {
-    group: "upload",
-    key: "hotlink",
-    value: JSON.stringify({
-      enabled: false,
-      allowedDomains: [],
-      allowEmptyReferer: true,
-    }),
-    type: "json",
-    schema: uploadHotlinkSchema,
-    label: "settings.fields.uploadHotlink",
-    description: "settings.fieldsDesc.uploadHotlink",
-    isSecret: false,
-    sortOrder: 0,
-  },
-];
-
-async function seedAdminApplication() {
-  console.log("Seeding admin application...");
-  const app = await prisma.application.upsert({
-    where: { code: ADMIN_APP_CODE },
-    update: {
-      name: "Admin Panel",
-      description: "Administrative dashboard application",
-    },
-    create: {
-      id: ADMIN_APP_CODE,
-      name: "Admin Panel",
-      code: ADMIN_APP_CODE,
-      description: "Administrative dashboard application",
-    },
-  });
-  console.log(`Admin application ready: ${app.id}`);
-  return app;
-}
-
-async function seedOrganizationApplication() {
-  console.log("Seeding organization application...");
-  const app = await prisma.application.upsert({
-    where: { code: ORGANIZATION_APP_CODE },
-    update: {
-      name: "Organization",
-      description: "Organization workspace application",
-    },
-    create: {
-      id: ORGANIZATION_APP_CODE,
-      name: "Organization",
-      code: ORGANIZATION_APP_CODE,
-      description: "Organization workspace application",
-    },
-  });
-  console.log(`Organization application ready: ${app.id}`);
-  return app;
-}
-
-async function seedDefaultOrganization() {
-  console.log("Seeding default organization...");
-  const organization = await prisma.organization.upsert({
-    where: { slug: "demo" },
-    update: {
-      name: "Demo",
-    },
-    create: {
-      id: "demo",
-      name: "Demo",
-      slug: "demo",
-      createdAt: new Date(),
-    },
-  });
-  console.log(`Default organization ready: ${organization.id}`);
-  return organization;
-}
-
-async function seedPermissions() {
-  console.log("Seeding permissions...");
-  const permissionIds: Record<string, string> = {};
-
-  for (const def of permissionDefinitions) {
-    const existing = await prisma.permission.findFirst({
-      where: { appId: null, code: def.code },
-    });
-    const perm = existing
-      ? await prisma.permission.update({
-          where: { id: existing.id },
-          data: { name: def.name, group: def.group },
-        })
-      : await prisma.permission.create({
-          data: {
-            appId: null,
-            name: def.name,
-            code: def.code,
-            group: def.group,
-          },
-        });
-    permissionIds[def.code] = perm.id;
-  }
-
-  console.log(`Seeded ${permissionDefinitions.length} permissions.`);
-  return permissionIds;
-}
-
-async function linkMenuPermissions(
-  appId: string,
-  menuId: string,
-  codes: string[],
-) {
-  for (const code of codes) {
-    const permission = await prisma.permission.findFirst({
-      where: { code, OR: [{ appId }, { appId: null }] },
-    });
-    if (!permission) {
-      console.warn(`[seed] Permission not found for menu link: ${code}`);
-      continue;
-    }
-    await prisma.menuPermission.upsert({
-      where: {
-        menuId_permissionId: { menuId, permissionId: permission.id },
-      },
-      update: {},
-      create: { menuId, permissionId: permission.id },
-    });
-  }
-}
-
-async function upsertFeaturePermission(
-  appId: string,
-  params: {
-    name: string;
-    code: string;
-    group: string;
-    description: string;
-  },
-) {
-  const existing = await prisma.permission.findFirst({
-    where: { appId, code: params.code },
-  });
-
-  if (existing) {
-    return prisma.permission.update({
-      where: { id: existing.id },
-      data: {
-        name: params.name,
-        group: params.group,
-        description: params.description,
-      },
-    });
-  }
-
-  return prisma.permission.create({
-    data: {
-      appId,
-      name: params.name,
-      code: params.code,
-      group: params.group,
-      description: params.description,
-    },
-  });
-}
-
-const organizationFeaturePermissionDefinitions = [
+// --- Organization App Permissions ---
+const organizationPermissions = [
   {
     code: "organization-member::list",
     group: "organization-member",
@@ -556,360 +428,442 @@ const organizationFeaturePermissionDefinitions = [
   },
 ];
 
-async function seedOrganizationFeaturePermissions(appId: string) {
-  console.log("Seeding organization feature permissions...");
-  for (const def of organizationFeaturePermissionDefinitions) {
-    await upsertFeaturePermission(appId, def);
-  }
-  console.log(
-    `Seeded ${organizationFeaturePermissionDefinitions.length} organization feature permissions.`,
-  );
+// --- Applications ---
+const applications = [
+  {
+    code: ADMIN_APP_CODE,
+    name: "Admin Panel",
+    description: "Administrative dashboard application",
+  },
+  {
+    code: ORGANIZATION_APP_CODE,
+    name: "Organization",
+    description: "Organization workspace application",
+  },
+];
+
+// --- Admin App Menus ---
+const adminMenus = [
+  {
+    id: "applications",
+    code: "applications",
+    name: "Applications",
+    icon: "Layers",
+    linkType: "INTERNAL" as const,
+    url: "/admin/applications",
+    sortOrder: 0,
+    permissions: ["application::list"],
+  },
+  {
+    id: "organizations",
+    code: "organizations",
+    name: "Organizations",
+    icon: "Building2",
+    linkType: "INTERNAL" as const,
+    url: "/admin/organizations",
+    sortOrder: 1,
+    permissions: ["organization::list"],
+  },
+  {
+    id: "users",
+    code: "users",
+    name: "Users",
+    icon: "Users",
+    linkType: "INTERNAL" as const,
+    url: "/admin/users",
+    sortOrder: 2,
+    permissions: ["user::list"],
+  },
+  {
+    id: "notifications",
+    code: "notifications",
+    name: "Notifications",
+    icon: "Bell",
+    linkType: "INTERNAL" as const,
+    url: "/admin/notifications",
+    sortOrder: 3,
+    permissions: ["notification::list"],
+  },
+  {
+    id: "logs",
+    code: "logs",
+    name: "Logs",
+    icon: "FileText",
+    linkType: "INTERNAL" as const,
+    url: "/admin/logs",
+    sortOrder: 4,
+    permissions: ["audit-log::list", "operation-log::list"],
+  },
+  {
+    id: "monitor",
+    code: "monitor",
+    name: "Monitor",
+    icon: "LayoutDashboard",
+    linkType: "INTERNAL" as const,
+    url: "/admin/monitor",
+    sortOrder: 5,
+    permissions: ["system-info::view"],
+  },
+  {
+    id: "settings",
+    code: "settings",
+    name: "Settings",
+    icon: "Settings",
+    linkType: "INTERNAL" as const,
+    url: "/admin/settings",
+    sortOrder: 6,
+    permissions: ["system-config::list"],
+  },
+];
+
+// --- Organization App Menus ---
+const organizationMenus = [
+  {
+    id: "organization-members",
+    code: "members",
+    name: "Members",
+    icon: "Users",
+    linkType: "INTERNAL" as const,
+    url: "/organization/members",
+    sortOrder: 0,
+    permissions: ["organization-member::list"],
+  },
+  {
+    id: "organization-settings",
+    code: "settings",
+    name: "Settings",
+    icon: "Settings",
+    linkType: "INTERNAL" as const,
+    url: "/organization/settings",
+    sortOrder: 1,
+    permissions: ["organization-settings::view"],
+  },
+];
+
+// --- Roles ---
+const adminRoles = [
+  { code: ADMIN_ROLE_CODE, name: "Administrator", flags: [BUILTIN_ROLE_FLAG] },
+  { code: USER_ROLE_CODE, name: "User", flags: [BUILTIN_ROLE_FLAG] },
+];
+
+const organizationRoles = [
+  { code: ORG_OWNER_ROLE_CODE, name: "Owner", flags: [BUILTIN_ROLE_FLAG] },
+  { code: ORG_MEMBER_ROLE_CODE, name: "Member", flags: [BUILTIN_ROLE_FLAG] },
+];
+
+// --- Role -> Permission mappings (by role code) ---
+const adminRolePermissions: Record<string, string[]> = {
+  [ADMIN_ROLE_CODE]: systemPermissions.map((p) => p.code),
+  [USER_ROLE_CODE]: ["upload::sign"],
+};
+
+const organizationRolePermissions: Record<string, string[]> = {
+  [ORG_OWNER_ROLE_CODE]: organizationPermissions.map((p) => p.code),
+  [ORG_MEMBER_ROLE_CODE]: ["organization-member::list"],
+};
+
+// --- Notification Channels ---
+const notificationChannels = [
+  { key: "in-app", name: "In-App", providerKey: "in-app", enabled: true },
+];
+
+// --- Notification Templates (keyed by channel key) ---
+const notificationTemplates = [
+  {
+    channelKey: "in-app",
+    key: "welcome",
+    name: "Welcome",
+    enabled: true,
+    bodyTemplate: "Welcome, {{userName}}!",
+    variablesSchema: {
+      properties: {
+        userName: { type: "string", description: "The user's name" },
+      },
+      required: ["userName"],
+    },
+  },
+];
+
+// --- Built-in Users ---
+const builtInUsers = [
+  {
+    id: "admin",
+    name: "Admin",
+    email: "admin@system.local",
+    password: "admin123",
+    flags: [BUILTIN_USER_FLAG],
+    roleCode: ADMIN_ROLE_CODE,
+  },
+  {
+    id: "user",
+    name: "User",
+    email: "user@system.local",
+    password: "admin123",
+    flags: [BUILTIN_USER_FLAG],
+    roleCode: USER_ROLE_CODE,
+  },
+];
+
+// ============================================================
+// 2. DATABASE CLIENT
+// ============================================================
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL environment variable is not set");
+}
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
+
+// ============================================================
+// 3. GENERIC UPSERT HELPERS (idempotent)
+// ============================================================
+
+async function upsertApplication(data: {
+  code: string;
+  name: string;
+  description: string;
+}) {
+  console.log(`  Application: ${data.code}`);
+  return prisma.application.upsert({
+    where: { code: data.code },
+    update: { name: data.name, description: data.description },
+    create: {
+      id: data.code,
+      code: data.code,
+      name: data.name,
+      description: data.description,
+    },
+  });
 }
 
-async function seedMenus(appId: string) {
-  console.log("Seeding admin menus...");
+async function upsertPermission(
+  appId: string | null,
+  data: { code: string; name: string; group: string; description?: string },
+) {
+  const existing = await prisma.permission.findFirst({
+    where: { appId, code: data.code },
+  });
 
-  const menuDefinitions = [
-    {
-      id: "applications",
-      name: "Applications",
-      code: "applications",
-      icon: "Layers",
-      linkType: "INTERNAL" as const,
-      url: "/admin/applications",
-      sortOrder: 0,
-      permissions: ["application::list"],
-    },
-    {
-      id: "organizations",
-      name: "Organizations",
-      code: "organizations",
-      icon: "Building2",
-      linkType: "INTERNAL" as const,
-      url: "/admin/organizations",
-      sortOrder: 1,
-      permissions: ["organization::list"],
-    },
-    {
-      id: "users",
-      name: "Users",
-      code: "users",
-      icon: "Users",
-      linkType: "INTERNAL" as const,
-      url: "/admin/users",
-      sortOrder: 2,
-      permissions: ["user::list"],
-    },
-    {
-      id: "notifications",
-      name: "Notifications",
-      code: "notifications",
-      icon: "Bell",
-      linkType: "INTERNAL" as const,
-      url: "/admin/notifications",
-      sortOrder: 3,
-      permissions: ["notification::list"],
-    },
-    {
-      id: "logs",
-      name: "Logs",
-      code: "logs",
-      icon: "FileText",
-      linkType: "INTERNAL" as const,
-      url: "/admin/logs",
-      sortOrder: 4,
-      permissions: ["audit-log::list", "operation-log::list"],
-    },
-    {
-      id: "monitor",
-      name: "Monitor",
-      code: "monitor",
-      icon: "LayoutDashboard",
-      linkType: "INTERNAL" as const,
-      url: "/admin/monitor",
-      sortOrder: 5,
-      permissions: ["system-info::view"],
-    },
-    {
-      id: "settings",
-      name: "Settings",
-      code: "settings",
-      icon: "Settings",
-      linkType: "INTERNAL" as const,
-      url: "/admin/settings",
-      sortOrder: 6,
-      permissions: ["system-config::list"],
-    },
-  ];
-
-  const menuIds: string[] = [];
-
-  for (const menu of menuDefinitions) {
-    await prisma.menu.upsert({
-      where: { id: menu.id },
-      update: {
-        name: menu.name,
-        icon: menu.icon,
-        linkType: menu.linkType,
-        url: menu.url,
-        sortOrder: menu.sortOrder,
-      },
-      create: {
-        id: menu.id,
-        appId,
-        name: menu.name,
-        code: menu.code,
-        icon: menu.icon,
-        linkType: menu.linkType,
-        url: menu.url,
-        sortOrder: menu.sortOrder,
+  if (existing) {
+    return prisma.permission.update({
+      where: { id: existing.id },
+      data: {
+        name: data.name,
+        group: data.group,
+        description: data.description,
       },
     });
-    await linkMenuPermissions(appId, menu.id, menu.permissions);
-    menuIds.push(menu.id);
   }
 
-  console.log(`Seeded ${menuIds.length} menus.`);
-  return menuIds;
+  return prisma.permission.create({
+    data: {
+      appId,
+      code: data.code,
+      name: data.name,
+      group: data.group,
+      description: data.description,
+    },
+  });
 }
 
-async function seedOrganizationMenus(appId: string) {
-  console.log("Seeding organization menus...");
-
-  const menuDefinitions = [
-    {
-      id: "organization-members",
-      name: "Members",
-      code: "members",
-      icon: "Users",
-      linkType: "INTERNAL" as const,
-      url: "/organization/members",
-      sortOrder: 0,
-      permissions: ["organization-member::list"],
-    },
-    {
-      id: "organization-settings",
-      name: "Settings",
-      code: "settings",
-      icon: "Settings",
-      linkType: "INTERNAL" as const,
-      url: "/organization/settings",
-      sortOrder: 1,
-      permissions: ["organization-settings::view"],
-    },
-  ];
-
-  const menuIds: string[] = [];
-
-  for (const menu of menuDefinitions) {
-    await prisma.menu.upsert({
-      where: { id: menu.id },
-      update: {
-        name: menu.name,
-        icon: menu.icon,
-        linkType: menu.linkType,
-        url: menu.url,
-        sortOrder: menu.sortOrder,
-      },
-      create: {
-        id: menu.id,
-        appId,
-        name: menu.name,
-        code: menu.code,
-        icon: menu.icon,
-        linkType: menu.linkType,
-        url: menu.url,
-        sortOrder: menu.sortOrder,
-      },
-    });
-    await linkMenuPermissions(appId, menu.id, menu.permissions);
-    menuIds.push(menu.id);
+async function upsertPermissions(
+  appId: string | null,
+  definitions: {
+    code: string;
+    name: string;
+    group: string;
+    description?: string;
+  }[],
+) {
+  const ids: Record<string, string> = {};
+  for (const def of definitions) {
+    const perm = await upsertPermission(appId, def);
+    ids[def.code] = perm.id;
   }
-
-  console.log(`Seeded ${menuIds.length} organization menus.`);
-  return menuIds;
+  return ids;
 }
 
-async function seedRolesForApp(
+async function upsertMenu(
   appId: string,
-  roleDefinitions: { name: string; code: string; flags: string[] }[],
+  data: {
+    id: string;
+    code: string;
+    name: string;
+    icon: string;
+    linkType: "INTERNAL";
+    url: string;
+    sortOrder: number;
+  },
 ) {
-  const roleIds: Record<string, string> = {};
+  return prisma.menu.upsert({
+    where: { id: data.id },
+    update: {
+      name: data.name,
+      icon: data.icon,
+      linkType: data.linkType,
+      url: data.url,
+      sortOrder: data.sortOrder,
+    },
+    create: {
+      id: data.id,
+      appId,
+      code: data.code,
+      name: data.name,
+      icon: data.icon,
+      linkType: data.linkType,
+      url: data.url,
+      sortOrder: data.sortOrder,
+    },
+  });
+}
 
-  for (const def of roleDefinitions) {
-    const role = await prisma.role.upsert({
-      where: {
-        appId_scopeType_scopeId_code: {
-          appId,
-          scopeType: "PLATFORM",
-          scopeId: "",
-          code: def.code,
-        },
-      },
-      update: {
-        name: def.name,
-        flags: def.flags,
-        scopeType: "PLATFORM",
-        scopeId: "",
-      },
-      create: {
+async function linkMenuPermissions(
+  menuId: string,
+  permissionCodes: string[],
+  permissionLookup: Record<string, string>,
+) {
+  for (const code of permissionCodes) {
+    const permissionId = permissionLookup[code];
+    if (!permissionId) {
+      console.warn(`  [seed] Permission not found for menu link: ${code}`);
+      continue;
+    }
+    await prisma.menuPermission.upsert({
+      where: { menuId_permissionId: { menuId, permissionId } },
+      update: {},
+      create: { menuId, permissionId },
+    });
+  }
+}
+
+async function upsertRole(
+  appId: string,
+  data: { code: string; name: string; flags: string[] },
+) {
+  return prisma.role.upsert({
+    where: {
+      appId_scopeType_scopeId_code: {
         appId,
         scopeType: "PLATFORM",
         scopeId: "",
-        name: def.name,
-        code: def.code,
-        flags: def.flags,
+        code: data.code,
       },
-    });
-    roleIds[def.code] = role.id;
-  }
-
-  return roleIds;
-}
-
-async function seedRoles(appId: string) {
-  console.log("Seeding roles...");
-
-  const roleIds = await seedRolesForApp(appId, [
-    {
-      name: "Administrator",
-      code: ADMIN_ROLE_CODE,
-      flags: [BUILTIN_ROLE_FLAG],
     },
-    {
-      name: "User",
-      code: USER_ROLE_CODE,
-      flags: [BUILTIN_ROLE_FLAG],
-    },
-  ]);
-
-  console.log(`Seeded ${Object.keys(roleIds).length} roles.`);
-  return roleIds;
-}
-
-async function seedOrganizationRoles(appId: string) {
-  console.log("Seeding organization roles...");
-
-  const roleIds = await seedRolesForApp(appId, [
-    {
-      name: "Owner",
-      code: ORG_OWNER_ROLE_CODE,
-      flags: [BUILTIN_ROLE_FLAG],
-    },
-    {
-      name: "Member",
-      code: ORG_MEMBER_ROLE_CODE,
-      flags: [BUILTIN_ROLE_FLAG],
-    },
-  ]);
-
-  console.log(`Seeded ${Object.keys(roleIds).length} organization roles.`);
-  return roleIds;
-}
-
-async function seedNotificationChannels() {
-  console.log("Seeding notification channels...");
-
-  await prisma.notificationChannel.upsert({
-    where: { key: "in-app" },
-    update: {
-      name: "In-App",
-      providerKey: "in-app",
-      enabled: true,
-      config: null,
-      deletedAt: null,
-    },
+    update: { name: data.name, flags: data.flags },
     create: {
-      key: "in-app",
-      name: "In-App",
-      providerKey: "in-app",
-      enabled: true,
+      appId,
+      scopeType: "PLATFORM",
+      scopeId: "",
+      name: data.name,
+      code: data.code,
+      flags: data.flags,
     },
   });
-
-  console.log("Notification channels ready.");
 }
 
-async function seedNotificationTemplates() {
-  console.log("Seeding notification templates...");
-
-  const inAppChannel = await prisma.notificationChannel.findUnique({
-    where: { key: "in-app" },
-  });
-
-  if (!inAppChannel) {
-    console.log("Skipping notification templates: in-app channel not found");
-    return;
-  }
-
-  await prisma.notificationTemplate.upsert({
-    where: { key: "welcome" },
-    update: {
-      name: "Welcome",
-      channelId: inAppChannel.id,
-      enabled: true,
-      bodyTemplate: "Welcome, {{userName}}!",
-      variablesSchema: {
-        properties: {
-          userName: { type: "string", description: "The user's name" },
-        },
-        required: ["userName"],
-      },
-      deletedAt: null,
-    },
-    create: {
-      key: "welcome",
-      channelId: inAppChannel.id,
-      name: "Welcome",
-      enabled: true,
-      bodyTemplate: "Welcome, {{userName}}!",
-      variablesSchema: {
-        properties: {
-          userName: { type: "string", description: "The user's name" },
-        },
-        required: ["userName"],
-      },
-    },
-  });
-
-  console.log("Notification templates ready.");
-}
-
-async function seedRolePermissions(
-  roleId: string,
-  permissionIds: Record<string, string>,
-) {
-  console.log(`Assigning permissions to role...`);
-
-  const allPermissionIds = Object.values(permissionIds);
-
-  for (const permissionId of allPermissionIds) {
+async function upsertRolePermissions(roleId: string, permissionIds: string[]) {
+  for (const permissionId of permissionIds) {
     await prisma.rolePermission.upsert({
       where: { roleId_permissionId: { roleId, permissionId } },
       update: {},
       create: { roleId, permissionId },
     });
   }
-
-  console.log(`Assigned ${allPermissionIds.length} permissions to role.`);
 }
 
-async function seedUser(params: {
+async function upsertSystemConfig(data: {
+  group: string;
+  key: string;
+  value: string;
+  type: string;
+  label: string;
+  description: string;
+  isSecret: boolean;
+  sortOrder: number;
+  schema?: object;
+}) {
+  return prisma.systemConfig.upsert({
+    where: { group_key: { group: data.group, key: data.key } },
+    update: {
+      value: data.value,
+      type: data.type,
+      schema: data.schema,
+      label: data.label,
+      description: data.description,
+      isSecret: data.isSecret,
+      sortOrder: data.sortOrder,
+    },
+    create: data,
+  });
+}
+
+async function upsertNotificationChannel(data: {
+  key: string;
+  name: string;
+  providerKey: string;
+  enabled: boolean;
+}) {
+  return prisma.notificationChannel.upsert({
+    where: { key: data.key },
+    update: {
+      name: data.name,
+      providerKey: data.providerKey,
+      enabled: data.enabled,
+      config: null,
+      deletedAt: null,
+    },
+    create: data,
+  });
+}
+
+async function upsertNotificationTemplate(
+  channelId: string,
+  data: {
+    key: string;
+    name: string;
+    enabled: boolean;
+    bodyTemplate: string;
+    variablesSchema: object;
+  },
+) {
+  return prisma.notificationTemplate.upsert({
+    where: { key: data.key },
+    update: {
+      name: data.name,
+      channelId,
+      enabled: data.enabled,
+      bodyTemplate: data.bodyTemplate,
+      variablesSchema: data.variablesSchema,
+      deletedAt: null,
+    },
+    create: {
+      key: data.key,
+      channelId,
+      name: data.name,
+      enabled: data.enabled,
+      bodyTemplate: data.bodyTemplate,
+      variablesSchema: data.variablesSchema,
+    },
+  });
+}
+
+async function upsertUser(params: {
   id: string;
   name: string;
   email: string;
   password: string;
-  flags?: string[];
+  flags: string[];
 }) {
   const user = await prisma.user.upsert({
     where: { email: params.email },
-    update: { flags: params.flags ?? [] },
+    update: { flags: params.flags },
     create: {
       id: params.id,
       name: params.name,
       email: params.email,
       emailVerified: true,
-      flags: params.flags ?? [],
+      flags: params.flags,
     },
   });
 
@@ -934,125 +888,143 @@ async function seedUser(params: {
     });
   }
 
-  console.log(`User ready: ${params.email}`);
+  console.log(`  User: ${params.email}`);
   return user;
 }
 
-async function seedUserRole(userId: string, roleId: string) {
-  await prisma.roleAssignment.upsert({
-    where: {
-      userId_roleId_scopeType_scopeId: {
-        userId,
-        roleId,
-        scopeType: "PLATFORM",
-        scopeId: "",
-      },
-    },
-    update: {},
-    create: { userId, roleId, scopeType: "PLATFORM", scopeId: "" },
-  });
-}
+// ============================================================
+// 4. MAIN SEED (orchestrates desired state)
+// ============================================================
 
 async function seed() {
-  console.log("Seeding system configs...");
+  console.log("=== Seeding desired state ===\n");
 
-  for (const config of defaultConfigs) {
-    await prisma.systemConfig.upsert({
-      where: {
-        group_key: {
-          group: config.group,
-          key: config.key,
-        },
-      },
-      update: {
-        value: config.value,
-        type: config.type,
-        schema: "schema" in config ? config.schema : undefined,
-        label: config.label,
-        description: config.description,
-        isSecret: config.isSecret,
-        sortOrder: config.sortOrder,
-      },
-      create: config,
+  // 1. System Configs
+  console.log("System configs:");
+  for (const config of systemConfigs) {
+    await upsertSystemConfig(config);
+  }
+  console.log(`  ${systemConfigs.length} configs ready.\n`);
+
+  // 2. Notification Channels
+  console.log("Notification channels:");
+  for (const ch of notificationChannels) {
+    await upsertNotificationChannel(ch);
+  }
+  console.log(`  ${notificationChannels.length} channels ready.\n`);
+
+  // 3. Notification Templates
+  console.log("Notification templates:");
+  for (const tpl of notificationTemplates) {
+    const channel = await prisma.notificationChannel.findUnique({
+      where: { key: tpl.channelKey },
     });
-  }
-
-  console.log(`Seeded ${defaultConfigs.length} default configurations.`);
-  await seedNotificationChannels();
-  await seedNotificationTemplates();
-
-  const adminApp = await seedAdminApplication();
-  await seedPermissions();
-  const _menuIds = await seedMenus(adminApp.id);
-  const roleIds = await seedRoles(adminApp.id);
-
-  const organizationApp = await seedOrganizationApplication();
-  await seedOrganizationFeaturePermissions(organizationApp.id);
-  const _organizationMenuIds = await seedOrganizationMenus(organizationApp.id);
-  const orgRoleIds = await seedOrganizationRoles(organizationApp.id);
-  await seedDefaultOrganization();
-
-  const allPermissions = await prisma.permission.findMany({
-    where: { OR: [{ appId: null }, { appId: adminApp.id }] },
-    select: { id: true, code: true },
-  });
-  const permIds: Record<string, string> = {};
-  for (const p of allPermissions) {
-    permIds[p.code] = p.id;
-  }
-
-  await seedRolePermissions(roleIds.admin, permIds);
-
-  // Assign basic permissions to user role
-  const userPermCodes = [
-    "upload::sign",
-  ];
-  const userPermIds: Record<string, string> = {};
-  for (const code of userPermCodes) {
-    if (permIds[code]) {
-      userPermIds[code] = permIds[code];
+    if (!channel) {
+      console.warn(`  [seed] Channel not found: ${tpl.channelKey}`);
+      continue;
     }
+    await upsertNotificationTemplate(channel.id, tpl);
   }
-  await seedRolePermissions(roleIds.user, userPermIds);
+  console.log(`  ${notificationTemplates.length} templates ready.\n`);
 
-  // Organization app: owner gets all app permissions, member gets view-only menus
-  const orgPermissions = await prisma.permission.findMany({
-    where: { appId: organizationApp.id },
-    select: { id: true, code: true },
-  });
-  const orgPermIds: Record<string, string> = {};
-  for (const p of orgPermissions) {
-    orgPermIds[p.code] = p.id;
+  // 4. Applications
+  console.log("Applications:");
+  const appRecords: Record<string, string> = {};
+  for (const app of applications) {
+    const record = await upsertApplication(app);
+    appRecords[app.code] = record.id;
   }
-  await seedRolePermissions(orgRoleIds[ORG_OWNER_ROLE_CODE], orgPermIds);
+  console.log(`  ${applications.length} applications ready.\n`);
 
-  const orgMemberPermCodes = ["organization-member::list"];
-  const orgMemberPermIds: Record<string, string> = {};
-  for (const code of orgMemberPermCodes) {
-    if (orgPermIds[code]) {
-      orgMemberPermIds[code] = orgPermIds[code];
-    }
+  // 5. System Permissions (appId: null)
+  console.log("System permissions:");
+  const systemPermIds = await upsertPermissions(null, systemPermissions);
+  console.log(`  ${systemPermissions.length} system permissions ready.\n`);
+
+  // 6. Organization App Permissions
+  console.log("Organization app permissions:");
+  const orgPermIds = await upsertPermissions(
+    appRecords[ORGANIZATION_APP_CODE],
+    organizationPermissions,
+  );
+  console.log(
+    `  ${organizationPermissions.length} organization permissions ready.\n`,
+  );
+
+  // 7. Admin Menus + Permissions
+  console.log("Admin menus:");
+  const allAdminPermIds = { ...systemPermIds };
+  for (const menu of adminMenus) {
+    await upsertMenu(appRecords[ADMIN_APP_CODE], menu);
+    await linkMenuPermissions(menu.id, menu.permissions, allAdminPermIds);
   }
-  await seedRolePermissions(orgRoleIds[ORG_MEMBER_ROLE_CODE], orgMemberPermIds);
+  console.log(`  ${adminMenus.length} admin menus ready.\n`);
 
-  const adminUser = await seedUser({
-    id: "admin",
-    name: "Admin",
-    email: "admin@system.local",
-    password: "admin123",
-    flags: [BUILTIN_USER_FLAG],
-  });
-  await seedUserRole(adminUser.id, roleIds.admin);
+  // 8. Organization Menus + Permissions
+  console.log("Organization menus:");
+  for (const menu of organizationMenus) {
+    await upsertMenu(appRecords[ORGANIZATION_APP_CODE], menu);
+    await linkMenuPermissions(menu.id, menu.permissions, orgPermIds);
+  }
+  console.log(`  ${organizationMenus.length} organization menus ready.\n`);
 
-  const regularUser = await seedUser({
-    id: "user",
-    name: "User",
-    email: "user@system.local",
-    password: "admin123",
-    flags: [BUILTIN_USER_FLAG],
-  });
-  await seedUserRole(regularUser.id, roleIds.user);
+  // 9. Admin Roles
+  console.log("Admin roles:");
+  const adminRoleRecords: Record<string, string> = {};
+  for (const role of adminRoles) {
+    const record = await upsertRole(appRecords[ADMIN_APP_CODE], role);
+    adminRoleRecords[role.code] = record.id;
+  }
+  console.log(`  ${adminRoles.length} admin roles ready.\n`);
+
+  // 10. Organization Roles
+  console.log("Organization roles:");
+  const orgRoleRecords: Record<string, string> = {};
+  for (const role of organizationRoles) {
+    const record = await upsertRole(appRecords[ORGANIZATION_APP_CODE], role);
+    orgRoleRecords[role.code] = record.id;
+  }
+  console.log(`  ${organizationRoles.length} organization roles ready.\n`);
+
+  // 11. Admin Role -> Permission assignments
+  console.log("Admin role permissions:");
+  for (const [roleCode, permCodes] of Object.entries(adminRolePermissions)) {
+    const roleId = adminRoleRecords[roleCode];
+    if (!roleId) continue;
+    const permIds = permCodes
+      .map((code) => allAdminPermIds[code])
+      .filter(Boolean);
+    await upsertRolePermissions(roleId, permIds);
+    console.log(`  ${roleCode}: ${permIds.length} permissions`);
+  }
+  console.log();
+
+  // 12. Organization Role -> Permission assignments
+  console.log("Organization role permissions:");
+  for (const [roleCode, permCodes] of Object.entries(
+    organizationRolePermissions,
+  )) {
+    const roleId = orgRoleRecords[roleCode];
+    if (!roleId) continue;
+    const permIds = permCodes.map((code) => orgPermIds[code]).filter(Boolean);
+    await upsertRolePermissions(roleId, permIds);
+    console.log(`  ${roleCode}: ${permIds.length} permissions`);
+  }
+  console.log();
+
+  // 13. Built-in Users (create user + account only, no role assignment)
+  console.log("Built-in users:");
+  for (const user of builtInUsers) {
+    await upsertUser(user);
+  }
+  console.log(`  ${builtInUsers.length} users ready.\n`);
+
+  console.log("=== Seed complete ===");
 }
+
+// ============================================================
+// 5. RUN
+// ============================================================
 
 seed()
   .catch((e) => {
