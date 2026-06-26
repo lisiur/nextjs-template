@@ -175,7 +175,6 @@ export const DepartmentScalarFieldEnum = {
   name: 'name',
   code: 'code',
   description: 'description',
-  sortOrder: 'sortOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
