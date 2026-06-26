@@ -154,7 +154,20 @@
     "confirmDeleteDescription": "确定要删除 \"{name}\" 吗？子部门将被重新分配。",
     "createSuccess": "部门已创建",
     "updateSuccess": "部门已更新",
-    "deleteSuccess": "部门已删除"
+    "deleteSuccess": "部门已删除",
+    "manageMembers": "管理人员",
+    "manageMembersDescription": "查看和管理人员",
+    "addMember": "添加成员",
+    "addMemberDescription": "选择未分配的成员添加到此部门",
+    "add": "添加",
+    "unassign": "取消分配",
+    "unassignMember": "取消分配成员",
+    "unassignMemberDescription": "将 {name} 从此部门移除？他们将保留在组织中。",
+    "memberAssigned": "成员已添加到部门",
+    "memberUnassigned": "成员已从部门移除",
+    "noMembersInDepartment": "此部门暂无成员",
+    "noAvailableMembers": "没有可用的未分配成员",
+    "actions": "操作"
   },
   "Settings": {
     "title": "设置",

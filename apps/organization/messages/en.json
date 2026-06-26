@@ -154,7 +154,20 @@
     "confirmDeleteDescription": "Are you sure you want to delete \"{name}\"? Child departments will be reparented.",
     "createSuccess": "Department created",
     "updateSuccess": "Department updated",
-    "deleteSuccess": "Department deleted"
+    "deleteSuccess": "Department deleted",
+    "manageMembers": "Manage Members",
+    "manageMembersDescription": "View and manage members in this department",
+    "addMember": "Add Member",
+    "addMemberDescription": "Select an unassigned member to add to this department",
+    "add": "Add",
+    "unassign": "Unassign",
+    "unassignMember": "Unassign Member",
+    "unassignMemberDescription": "Remove {name} from this department? They will remain in the organization.",
+    "memberAssigned": "Member added to department",
+    "memberUnassigned": "Member removed from department",
+    "noMembersInDepartment": "No members in this department",
+    "noAvailableMembers": "No unassigned members available",
+    "actions": "Actions"
   },
   "Settings": {
     "title": "Settings",

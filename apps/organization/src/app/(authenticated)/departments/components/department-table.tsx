@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@repo/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { FolderTree, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ import { appClient, withApiFeedback } from "@/lib/api";
 import { formatDate } from "@/utils/date";
 import { DepartmentBreadcrumb } from "./department-breadcrumb";
 import { DepartmentDialog } from "./department-dialog";
+import { DepartmentMembersDialog } from "./department-members-dialog";
 
 interface DepartmentRow {
   id: string;
@@ -51,6 +52,8 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
   const [editDepartment, setEditDepartment] = useState<DepartmentRow | null>(
     null,
   );
+  const [createChildDept, setCreateChildDept] = useState<DepartmentRow | null>(null);
+  const [manageMembersDept, setManageMembersDept] = useState<DepartmentRow | null>(null);
 
   const { data: departments, isLoading } = useQuery({
     queryKey: ["departments", orgId],
@@ -174,6 +177,30 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
+                        title={t("addChild")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCreateChildDept(dept);
+                        }}
+                      >
+                        <FolderTree className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        title={t("manageMembers")}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setManageMembersDept(dept);
+                        }}
+                      >
+                        <Users className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
                         title={t("edit")}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -214,6 +241,23 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
           onOpenChange={(open) => !open && setEditDepartment(null)}
           orgId={orgId}
           department={editDepartment}
+        />
+      )}
+      {createChildDept && (
+        <DepartmentDialog
+          open={!!createChildDept}
+          onOpenChange={(open) => !open && setCreateChildDept(null)}
+          orgId={orgId}
+          parentId={createChildDept.id}
+        />
+      )}
+      {manageMembersDept && (
+        <DepartmentMembersDialog
+          open={!!manageMembersDept}
+          onOpenChange={(open) => !open && setManageMembersDept(null)}
+          orgId={orgId}
+          departmentId={manageMembersDept.id}
+          departmentName={manageMembersDept.name}
         />
       )}
     </>
