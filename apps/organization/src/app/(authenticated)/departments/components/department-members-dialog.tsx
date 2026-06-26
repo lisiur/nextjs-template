@@ -107,7 +107,9 @@ export function DepartmentMembersDialog({
               <Users className="h-5 w-5" />
               {t("manageMembers")} — {departmentName}
             </DialogTitle>
-            <DialogDescription>{t("manageMembersDescription")}</DialogDescription>
+            <DialogDescription>
+              {t("manageMembersDescription")}
+            </DialogDescription>
           </DialogHeader>
           <DialogBody>
             {isLoading ? (
@@ -122,7 +124,7 @@ export function DepartmentMembersDialog({
                     {t("addMember")}
                   </Button>
                 </div>
-                {(!members || members.length === 0) ? (
+                {!members || members.length === 0 ? (
                   <div className="py-4 text-center text-muted-foreground">
                     {t("noMembersInDepartment")}
                   </div>

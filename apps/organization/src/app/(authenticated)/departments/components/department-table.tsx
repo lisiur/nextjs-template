@@ -52,8 +52,11 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
   const [editDepartment, setEditDepartment] = useState<DepartmentRow | null>(
     null,
   );
-  const [createChildDept, setCreateChildDept] = useState<DepartmentRow | null>(null);
-  const [manageMembersDept, setManageMembersDept] = useState<DepartmentRow | null>(null);
+  const [createChildDept, setCreateChildDept] = useState<DepartmentRow | null>(
+    null,
+  );
+  const [manageMembersDept, setManageMembersDept] =
+    useState<DepartmentRow | null>(null);
 
   const { data: departments, isLoading } = useQuery({
     queryKey: ["departments", orgId],

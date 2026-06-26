@@ -1,7 +1,6 @@
-import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { createRoute, defineOpenAPIRoute, z } from "@hono/zod-openapi";
 import { requireSession } from "#extractors/session";
 import { logAudit } from "#lib/logger";
-import { z } from "@hono/zod-openapi";
 import {
   badRequestResponse,
   deleteSuccessSchema,
