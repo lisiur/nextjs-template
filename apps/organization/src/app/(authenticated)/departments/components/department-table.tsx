@@ -140,7 +140,7 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
                 <TableHead>{t("description_label")}</TableHead>
                 <TableHead>{t("createdAt")}</TableHead>
                 <TableHead sticky="right" align="right">
-                  {t("edit")}
+                  {t("actions")}
                 </TableHead>
               </TableRow>
             </TableHeader>
