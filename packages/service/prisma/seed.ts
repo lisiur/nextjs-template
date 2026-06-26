@@ -1005,9 +1005,6 @@ async function seed() {
 
   // Assign basic permissions to user role
   const userPermCodes = [
-    "application::view",
-    "menu::list",
-    "menu::view",
     "upload::sign",
   ];
   const userPermIds: Record<string, string> = {};
