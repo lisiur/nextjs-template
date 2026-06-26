@@ -22,3 +22,19 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - For any table with an operation/action column, fix that column to the right side of the horizontally scrollable table.
 - Apply the fixed-right behavior to both the header and body cells, for example: `className="sticky right-0 bg-background text-right shadow-[-1px_0_0_0_var(--border)]"`.
 - Do not treat data fields named `action` as operation columns unless they contain row-level action controls such as edit, delete, view, configure, or permission buttons.
+
+# Frontend API Use
+
+- Use `appClient` from `@/lib/api`; never raw `fetch` for app API calls.
+- `src/lib/api/app-client.ts` uses `hc<AppType>('', { headers: { 'X-App-Code': 'admin' } })`; keep the app-code header unless the backend contract changes.
+- Dynamic RPC segments use bracket notation such as `appClient.api.organizations[':id'].$put({ param: { id }, json })`; request bodies use `json`, not `body`, and check `res.ok` before `res.json()`.
+
+# Overlay Choice
+
+- `Dialog` for focused create/edit/delete/confirm forms.
+- `Sheet` for contextual relationship/config workflows tied to a selected record.
+- Full page for primary dense or bookmarkable management surfaces.
+
+# Aliases
+
+- `@/*` maps to `src/*`.

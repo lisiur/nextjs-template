@@ -35,20 +35,18 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Place the submit button in `DialogFooter` with `form="form-id"` attribute, not inside the `<form>`.
 - Reset form state in `handleOpenChange` when closing.
 
-# Service Layer
+# Frontend API Use
 
-- Routes should only handle: session extraction, permission checks, input validation, service calls, audit logging, and response formatting.
-- Business logic, database operations, and validation rules belong in service files under `packages/service/src/services/`.
-- Services throw `HTTPException` for errors (404, 409, 400, etc.).
-
-# Seed & Menus
-
-- When adding a new page, add a corresponding menu entry in `packages/service/prisma/seed.ts` under `organizationMenus`.
-- Menu entries require: `id`, `code`, `name`, `icon`, `linkType: "INTERNAL"`, `url`, `sortOrder`, and `permissions`.
-- Run `pnpm db:seed` after menu changes.
+- Use `appClient` from `@/lib/api`; never raw `fetch` for app API calls.
+- Dynamic RPC segments use bracket notation such as `appClient.api.organizations[':orgId'].departments.$get({ param: { orgId } })`; request bodies use `json`, not `body`.
+- Check `res.ok` before `res.json()`.
 
 # Translations
 
 - All user-facing strings must use `useTranslations("Namespace")` hook.
-- Add translation keys to both `apps/organization/messages/en.json` and `zh.json`.
+- Add translation keys to both `messages/en.json` and `zh.json`.
 - Use descriptive key names like `createDescription`, `editDepartment`, `updateSuccess`.
+
+# Aliases
+
+- `@/*` maps to `src/*`.
