@@ -4,7 +4,8 @@ import { prisma } from "#lib/db";
 export async function listDepartments(organizationId: string) {
   return prisma.department.findMany({
     where: { organizationId },
-    orderBy: { sortOrder: "asc" },
+    include: { _count: { select: { children: true } } },
+    orderBy: { name: "asc" },
   });
 }
 
@@ -114,14 +115,14 @@ export async function updateDepartment(
 }
 
 export async function deleteDepartment(organizationId: string, id: string) {
-  const department = await prisma.department.findFirst({
-    where: { id, organizationId },
-  });
-  if (!department) {
-    throw new HTTPException(404, { message: "Department not found" });
-  }
-
   return prisma.$transaction(async (tx) => {
+    const department = await tx.department.findFirst({
+      where: { id, organizationId },
+    });
+    if (!department) {
+      throw new HTTPException(404, { message: "Department not found" });
+    }
+
     // Reparent children to deleted department's parent
     await tx.department.updateMany({
       where: { parentId: id },
