@@ -11,7 +11,7 @@ export const departmentSchema = z
     name: z.string().openapi({ example: "Engineering" }),
     code: z.string().openapi({ example: "engineering" }),
     description: z.string().nullable().optional(),
-    sortOrder: z.number(),
+    childrenCount: z.number().openapi({ example: 2 }),
     createdAt: z.date(),
   })
   .openapi("Department");
