@@ -180,7 +180,7 @@ function matchSinglePermission(pattern: string, permission: string): boolean {
   return pattern === permission;
 }
 
-function matchPermission(
+export function matchPermission(
   userPermissions: string[],
   requiredPermission: string,
 ): boolean {

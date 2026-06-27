@@ -12,7 +12,11 @@ vi.mock("#lib/db", () => ({
 }));
 
 import { prisma } from "#lib/db";
-import { getMenusForUser, getUserPermissions } from "./role-permission.service";
+import {
+  getMenusForUser,
+  getUserPermissions,
+  matchPermission,
+} from "./role-permission.service";
 
 const mockPrisma = prisma as unknown as {
   permission: {
@@ -174,5 +178,38 @@ describe("getMenusForUser", () => {
         },
       },
     });
+  });
+});
+
+describe("matchPermission", () => {
+  it("matches an exact positive permission", () => {
+    expect(matchPermission(["department::create"], "department::create")).toBe(
+      true,
+    );
+  });
+
+  it("matches a wildcard scope group::*", () => {
+    expect(matchPermission(["department::*"], "department::delete")).toBe(true);
+  });
+
+  it("matches the global wildcard *", () => {
+    expect(matchPermission(["*"], "anything::goes")).toBe(true);
+  });
+
+  it("negation overrides an otherwise-matching positive rule", () => {
+    expect(
+      matchPermission(
+        ["department::*", "!department::delete"],
+        "department::delete",
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false when no permission matches", () => {
+    expect(matchPermission(["role::create"], "department::create")).toBe(false);
+  });
+
+  it("returns false for an empty permission set", () => {
+    expect(matchPermission([], "department::create")).toBe(false);
   });
 });
