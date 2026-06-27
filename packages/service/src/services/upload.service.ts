@@ -1,18 +1,16 @@
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { mkdir, stat, writeFile } from "node:fs/promises";
-import { dirname, extname, join } from "node:path";
+import { dirname, join } from "node:path";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import { prisma } from "#lib/db";
+import {
+  allowedMimeTypes,
+  extensionForMime,
+  verifyMagicBytes,
+} from "#lib/mime";
 
-const ALLOWED_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-  "application/pdf",
-];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const UPLOADS_ROOT = join(process.cwd(), "uploads");
 const SIGN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
@@ -55,10 +53,11 @@ export async function uploadFile(params: {
   uploaderId: string;
 }) {
   const { file, visibility, uploaderId } = params;
+  const allowedTypes = allowedMimeTypes();
 
-  if (!ALLOWED_TYPES.includes(file.type)) {
+  if (!allowedTypes.includes(file.type)) {
     throw new HTTPException(400, {
-      message: `Invalid file type. Allowed: ${ALLOWED_TYPES.join(", ")}`,
+      message: `Invalid file type. Allowed: ${allowedTypes.join(", ")}`,
     });
   }
 
@@ -69,8 +68,19 @@ export async function uploadFile(params: {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
+
+  if (!verifyMagicBytes(buffer, file.type)) {
+    throw new HTTPException(400, {
+      message: "File content does not match its declared type",
+    });
+  }
+
+  const ext = extensionForMime(file.type);
+  if (!ext) {
+    throw new HTTPException(400, { message: "Unsupported file type" });
+  }
+
   const hash = computeHash(buffer);
-  const ext = extname(file.name) || ".bin";
   const relPath = shardPath(hash, ext);
   const dir = visibility === "public" ? "public" : "private";
   const fullPath = join(UPLOADS_ROOT, dir, relPath);

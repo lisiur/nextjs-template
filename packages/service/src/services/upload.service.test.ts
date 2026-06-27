@@ -14,16 +14,19 @@ vi.mock("node:fs/promises", () => ({
 
 vi.mock("#lib/db", () => ({
   prisma: {
-    upload: { findUnique: vi.fn() },
+    upload: { create: vi.fn(), findUnique: vi.fn() },
     systemConfig: { findUnique: vi.fn() },
   },
 }));
 
 import { prisma } from "#lib/db";
-import { getFileAccess } from "./upload.service";
+import { getFileAccess, uploadFile } from "./upload.service";
 
 const mockPrisma = prisma as unknown as {
-  upload: { findUnique: ReturnType<typeof vi.fn> };
+  upload: {
+    create: ReturnType<typeof vi.fn>;
+    findUnique: ReturnType<typeof vi.fn>;
+  };
   systemConfig: { findUnique: ReturnType<typeof vi.fn> };
 };
 
@@ -204,5 +207,92 @@ describe("upload hotlink protection", () => {
         headers: new Headers({ referer: "https://evil.test/page" }),
       }),
     ).rejects.toMatchObject({ status: 403 });
+  });
+});
+
+const mkFile = (name: string, type: string, data: Buffer): File =>
+  new File([new Uint8Array(data)], name, { type });
+
+describe("uploadFile validation", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    process.env.UPLOAD_SIGN_SECRET = "test-secret";
+  });
+
+  it("rejects a disallowed mime type regardless of filename", async () => {
+    await expect(
+      uploadFile({
+        file: mkFile("evil.html", "text/html", Buffer.from([0x3c, 0x68])),
+        visibility: "public",
+        uploaderId: "user1",
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("rejects an html payload claiming image/jpeg (magic-byte mismatch)", async () => {
+    await expect(
+      uploadFile({
+        file: mkFile(
+          "evil.html",
+          "image/jpeg",
+          Buffer.from("<html><script>xss()</script>"),
+        ),
+        visibility: "public",
+        uploaderId: "user1",
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("accepts a valid PNG and uses the canonical .png extension", async () => {
+    const png = Buffer.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00,
+    ]);
+    (mockPrisma.upload.create as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "up1",
+    });
+    const result = await uploadFile({
+      file: mkFile("photo.jpeg", "image/png", png),
+      visibility: "public",
+      uploaderId: "user1",
+    });
+    expect(result.id).toBe("up1");
+    const createArgs = (mockPrisma.upload.create as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0].data;
+    expect(createArgs.path).toMatch(/\.png$/);
+    expect(createArgs.mimeType).toBe("image/png");
+  });
+
+  it("rejects a file exceeding the size limit", async () => {
+    const png = Buffer.from([
+      0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00,
+    ]);
+    const oversized = mkFile("big.png", "image/png", png);
+    Object.defineProperty(oversized, "size", { value: 6 * 1024 * 1024 });
+
+    await expect(
+      uploadFile({
+        file: oversized,
+        visibility: "public",
+        uploaderId: "user1",
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("accepts a valid PDF and uses the .pdf extension", async () => {
+    const pdf = Buffer.from("%PDF-1.4\nstuff");
+    (mockPrisma.upload.create as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "up2",
+    });
+    const result = await uploadFile({
+      file: mkFile("document.txt", "application/pdf", pdf),
+      visibility: "private",
+      uploaderId: "user1",
+    });
+    expect(result.id).toBe("up2");
+    const createArgs = (mockPrisma.upload.create as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0].data;
+    expect(createArgs.path).toMatch(/\.pdf$/);
+    expect(createArgs.mimeType).toBe("application/pdf");
+    expect(createArgs.visibility).toBe("private");
   });
 });
