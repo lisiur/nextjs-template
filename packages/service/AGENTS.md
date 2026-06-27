@@ -35,3 +35,6 @@
 ## Commands
 - Standalone dev server: `pnpm dev` on `PORT` or `3001`.
 - Tests: `pnpm exec vitest --run`; focus one file with `pnpm exec vitest --run src/routes/application/__tests__/application.test.ts`.
+
+## Environment
+- `CORS_ALLOWED_ORIGINS` — comma-separated list of allowed cross-origin requesters, e.g. `http://localhost:3001,https://admin.example.com`. When set, only these origins are reflected by CORS. When unset in production, CORS fails closed (no cross-origin allowed). When unset in development, any origin is allowed.

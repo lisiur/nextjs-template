@@ -18,7 +18,25 @@ openAPIApp.onError((err, c) => {
 });
 
 openAPIApp.use("*", logger());
-openAPIApp.use("*", cors());
+const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+openAPIApp.use(
+  "*",
+  cors(
+    allowedOrigins.length > 0
+      ? {
+          origin: (origin) =>
+            origin && allowedOrigins.includes(origin) ? origin : null,
+          credentials: true,
+        }
+      : process.env.NODE_ENV === "production"
+        ? { origin: () => null, credentials: true }
+        : { origin: (origin) => origin, credentials: true },
+  ),
+);
 openAPIApp.use("*", traceContext);
 openAPIApp.use("*", operationLogger);
 
