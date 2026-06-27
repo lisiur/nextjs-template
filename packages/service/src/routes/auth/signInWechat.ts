@@ -2,7 +2,6 @@ import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { setSessionCookie } from "#lib/session";
 import { signInWithWechat } from "#services/auth.service";
-import { createNotificationsFromTemplate } from "#services/notification/notification.service";
 import { authMutationResponseSchema, signInWechatBodySchema } from "./schema";
 
 export const signInWechat = defineOpenAPIRoute({
@@ -35,13 +34,6 @@ export const signInWechat = defineOpenAPIRoute({
     });
 
     setSessionCookie(c, session.token);
-
-    createNotificationsFromTemplate({
-      templateKey: "welcome",
-      recipientUserIds: [user.id],
-      variables: { userName: user.name },
-      source: "auth",
-    }).catch(() => null);
 
     return c.json({ data: { user, session }, error: null }, 200);
   },

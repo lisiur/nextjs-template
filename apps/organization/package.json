@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@repo/frontend": "workspace:*",
     "@repo/service": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",

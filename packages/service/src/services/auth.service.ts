@@ -13,6 +13,21 @@ import { systemConfigRepository } from "#repositories/system-config.repository";
 
 export type { AuthSession, AuthSessionUser, AuthType };
 
+function assertNotBanned(user: {
+  banned?: boolean | null;
+  banReason?: string | null;
+  banExpires?: Date | null;
+}) {
+  if (
+    user.banned &&
+    (!user.banExpires || user.banExpires.getTime() > Date.now())
+  ) {
+    throw new HTTPException(403, {
+      message: user.banReason ?? "Account banned",
+    });
+  }
+}
+
 async function logAuthLogin(session: AuthSession, traceId?: string) {
   await logAudit({
     traceId,
@@ -67,6 +82,8 @@ export async function signInWithEmail(params: {
   ) {
     throw new HTTPException(401, { message: "Invalid email or password" });
   }
+
+  assertNotBanned(user);
 
   const session = await createSession({
     userId: user.id,
@@ -239,6 +256,8 @@ export async function signInWithWechat(params: {
   });
 
   if (existingAccount) {
+    assertNotBanned(existingAccount.user);
+
     await prisma.account.update({
       where: { id: existingAccount.id },
       data: { accessToken: wechatResult.session_key },

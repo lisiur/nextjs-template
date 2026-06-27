@@ -1,1 +1,1 @@
-export { loading } from "@/lib/loading";
+export { loading } from "@repo/frontend";

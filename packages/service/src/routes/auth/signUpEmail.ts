@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { badRequestResponse, okResponseFn } from "#lib/openapi";
+import { badRequestResponse, createdResponseFn } from "#lib/openapi";
 import { setSessionCookie } from "#lib/session";
 import { signUpWithEmail } from "#services/auth.service";
 import { authMutationResponseSchema, signUpEmailBodySchema } from "./schema";
@@ -18,7 +18,7 @@ export const signUpEmail = defineOpenAPIRoute({
     },
     responses: {
       ...badRequestResponse,
-      ...okResponseFn(authMutationResponseSchema, "Signed up"),
+      ...createdResponseFn(authMutationResponseSchema, "Signed up"),
     },
   }),
   handler: async (c) => {
@@ -34,6 +34,6 @@ export const signUpEmail = defineOpenAPIRoute({
     });
 
     setSessionCookie(c, session.token);
-    return c.json({ data: { user, session }, error: null }, 200);
+    return c.json({ data: { user, session }, error: null }, 201);
   },
 });
