@@ -12,6 +12,7 @@ export async function listDepartments(organizationId: string) {
 export async function getDepartment(organizationId: string, id: string) {
   const department = await prisma.department.findFirst({
     where: { id, organizationId },
+    include: { _count: { select: { children: true } } },
   });
   if (!department) {
     throw new HTTPException(404, { message: "Department not found" });
@@ -54,6 +55,7 @@ export async function createDepartment(
       parentId: data.parentId ?? null,
       description: data.description ?? null,
     },
+    include: { _count: { select: { children: true } } },
   });
 }
 
@@ -111,6 +113,7 @@ export async function updateDepartment(
       ...(data.parentId !== undefined && { parentId: data.parentId }),
       ...(data.description !== undefined && { description: data.description }),
     },
+    include: { _count: { select: { children: true } } },
   });
 }
 

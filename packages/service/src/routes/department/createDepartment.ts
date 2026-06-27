@@ -68,6 +68,9 @@ export const createDepartmentRoute = defineOpenAPIRoute({
       c,
     });
 
-    return c.json(department, 201);
+    return c.json(
+      { ...department, childrenCount: department._count.children },
+      201,
+    );
   },
 });

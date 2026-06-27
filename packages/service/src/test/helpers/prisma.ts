@@ -1,13 +1,13 @@
-import { vi } from "vitest";
+import { type Mock, vi } from "vitest";
 
 // Proxy that auto-creates vi.fn() for any model.method path accessed,
 // so tests don't have to hand-list every prisma method they touch.
-export function mockPrisma() {
-  const store = new Map<string, ReturnType<typeof vi.fn>>();
-  const prisma: Record<
-    string,
-    Record<string, ReturnType<typeof vi.fn>>
-  > = new Proxy(
+export function mockPrisma(): {
+  prisma: Record<string, Record<string, Mock>>;
+  reset: () => void;
+} {
+  const store = new Map<string, Mock>();
+  const prisma: Record<string, Record<string, Mock>> = new Proxy(
     {},
     {
       get: (_t, model: string | symbol) => {

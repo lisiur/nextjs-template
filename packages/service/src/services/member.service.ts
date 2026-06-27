@@ -77,6 +77,10 @@ export async function updateMember(
   return prisma.member.update({
     where: { id: memberId },
     data: { departmentId: data.departmentId },
+    include: {
+      user: { select: { id: true, name: true, email: true, image: true } },
+      department: { select: { id: true, name: true } },
+    },
   });
 }
 

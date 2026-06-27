@@ -66,6 +66,9 @@ export const updateDepartmentRoute = defineOpenAPIRoute({
       c,
     });
 
-    return c.json(department, 200);
+    return c.json(
+      { ...department, childrenCount: department._count.children },
+      200,
+    );
   },
 });

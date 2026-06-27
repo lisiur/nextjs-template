@@ -35,6 +35,14 @@ export const listDepartmentsRoute = defineOpenAPIRoute({
     });
 
     const departments = await listDepartments(orgId);
-    return c.json({ departments }, 200);
+    return c.json(
+      {
+        departments: departments.map((d) => ({
+          ...d,
+          childrenCount: d._count.children,
+        })),
+      },
+      200,
+    );
   },
 });

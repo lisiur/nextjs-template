@@ -78,6 +78,7 @@ export async function createPosition(
       description: data.description ?? null,
       sortOrder: data.sortOrder ?? 0,
     },
+    include: { _count: { select: { memberPositions: true } } },
   });
 }
 
@@ -117,6 +118,7 @@ export async function updatePosition(
       ...(data.description !== undefined && { description: data.description }),
       ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
     },
+    include: { _count: { select: { memberPositions: true } } },
   });
 }
 

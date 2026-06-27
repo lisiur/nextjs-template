@@ -40,6 +40,9 @@ export const getDepartmentRoute = defineOpenAPIRoute({
     });
 
     const department = await getDepartment(orgId, id);
-    return c.json(department, 200);
+    return c.json(
+      { ...department, childrenCount: department._count.children },
+      200,
+    );
   },
 });

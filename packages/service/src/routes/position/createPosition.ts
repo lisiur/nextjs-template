@@ -68,6 +68,9 @@ export const createPositionRoute = defineOpenAPIRoute({
       c,
     });
 
-    return c.json(position, 201);
+    return c.json(
+      { ...position, membersCount: position._count.memberPositions },
+      201,
+    );
   },
 });
