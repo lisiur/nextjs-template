@@ -480,6 +480,12 @@ const organizationPermissions = [
     name: "Delete Position",
     description: "Delete a position from an organization",
   },
+  {
+    code: "position-permission::manage",
+    group: "position-permission",
+    name: "Manage Position Permissions",
+    description: "Assign permissions to positions in an organization",
+  },
 ];
 
 // --- Applications ---
