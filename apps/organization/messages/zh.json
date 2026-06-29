@@ -234,7 +234,12 @@
     "membersAddedToPosition": "成员已添加到职位",
     "selectAll": "全选",
     "selectNone": "取消全选",
-    "addSelected": "添加 {count} 个成员"
+    "addSelected": "添加 {count} 个成员",
+    "permissions": "权限",
+    "managePermissions": "管理权限",
+    "managePermissionsDescription": "为拥有「{name}」职位的成员分配权限",
+    "permissionsUpdated": "权限已更新",
+    "noPermissionsAvailable": "没有可用权限"
   },
   "Settings": {
     "title": "设置",

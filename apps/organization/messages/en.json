@@ -234,7 +234,12 @@
     "membersAddedToPosition": "Members added to position",
     "selectAll": "Select all",
     "selectNone": "Deselect all",
-    "addSelected": "Add {count, plural, one {# member} other {# members}}"
+    "addSelected": "Add {count, plural, one {# member} other {# members}}",
+    "permissions": "Permissions",
+    "managePermissions": "Manage Permissions",
+    "managePermissionsDescription": "Assign permissions to members with the \"{name}\" position",
+    "permissionsUpdated": "Permissions updated",
+    "noPermissionsAvailable": "No permissions available"
   },
   "Settings": {
     "title": "Settings",
