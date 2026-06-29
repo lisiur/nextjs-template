@@ -1,6 +1,5 @@
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
-import { listPermissionsForApp } from "#services/permission.service";
 import { getPermissionsForRole } from "#services/role-permission.service";
 
 const ORGANIZATION_APP_ID = "organization";
@@ -307,8 +306,10 @@ export async function getPositionPermissions(
     ? await getPermissionsForRole(position.roleId)
     : [];
 
-  const { permissions: available } =
-    await listPermissionsForApp(ORGANIZATION_APP_ID);
+  const available = await prisma.permission.findMany({
+    where: { appId: ORGANIZATION_APP_ID },
+    orderBy: [{ group: "asc" }, { code: "asc" }],
+  });
 
   return { assigned, available };
 }
@@ -329,7 +330,7 @@ export async function setPositionPermissions(
     const validPerms = await prisma.permission.findMany({
       where: {
         id: { in: permissionIds },
-        OR: [{ appId: ORGANIZATION_APP_ID }, { appId: null }],
+        appId: ORGANIZATION_APP_ID,
       },
       select: { id: true },
     });
@@ -393,7 +394,7 @@ export async function setPositionPermissions(
       where: { rolePermissions: { some: { roleId: finalRoleId } } },
     });
     const available = await tx.permission.findMany({
-      where: { OR: [{ appId: ORGANIZATION_APP_ID }, { appId: null }] },
+      where: { appId: ORGANIZATION_APP_ID },
       orderBy: [{ group: "asc" }, { code: "asc" }],
     });
 
