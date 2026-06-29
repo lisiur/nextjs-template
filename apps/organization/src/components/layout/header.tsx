@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCurrentApp } from "@/hooks/use-current-app";
 import { useCurrentOrganization } from "@/hooks/use-current-organization";
 import { useSession } from "@/lib/api/use-session";
+import { NotificationBell } from "./notification-bell";
 import { UserMenu } from "./user-menu";
 
 export function Header({ className }: { className?: string }) {
@@ -46,6 +47,7 @@ export function Header({ className }: { className?: string }) {
         <span className="font-semibold text-lg">{label}</span>
       </div>
       <div className="ml-auto flex items-center gap-1">
+        {session ? <NotificationBell /> : null}
         {session ? <UserMenu full={false} items={["signOut"]} /> : null}
       </div>
     </header>

@@ -106,6 +106,19 @@
     "appearance": "外观",
     "language": "语言"
   },
+  "Notifications": {
+    "title": "通知",
+    "description": "你的近期动态与消息",
+    "all": "全部",
+    "unread": "未读",
+    "markAllRead": "全部标为已读",
+    "markRead": "标为已读",
+    "viewAll": "查看全部通知",
+    "empty": "已全部读完",
+    "noNotifications": "暂无通知",
+    "markAllReadSuccess": "已将全部通知标为已读",
+    "justNow": "刚刚"
+  },
   "Members": {
     "title": "成员",
     "description": "管理本组织的成员",

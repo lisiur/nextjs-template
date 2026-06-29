@@ -106,6 +106,19 @@
     "appearance": "Appearance",
     "language": "Language"
   },
+  "Notifications": {
+    "title": "Notifications",
+    "description": "Your recent activity and updates",
+    "all": "All",
+    "unread": "Unread",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
+    "viewAll": "View all notifications",
+    "empty": "You're all caught up",
+    "noNotifications": "No notifications",
+    "markAllReadSuccess": "All notifications marked as read",
+    "justNow": "Just now"
+  },
   "Members": {
     "title": "Members",
     "description": "Manage the members of this organization",

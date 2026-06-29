@@ -639,7 +639,12 @@ const adminRolePermissions: Record<string, string[]> = {
 
 const organizationRolePermissions: Record<string, string[]> = {
   [ORG_OWNER_ROLE_CODE]: organizationPermissions.map((p) => p.code),
-  [ORG_MEMBER_ROLE_CODE]: ["organization-member::list", "department::list"],
+  [ORG_MEMBER_ROLE_CODE]: [
+    "organization-member::list",
+    "department::list",
+    "notification::list",
+    "notification::view",
+  ],
 };
 
 // --- Notification Channels ---
