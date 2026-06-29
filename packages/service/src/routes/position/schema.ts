@@ -12,6 +12,7 @@ export const positionSchema = z
     description: z.string().nullable().optional(),
     sortOrder: z.number().openapi({ example: 0 }),
     membersCount: z.number().openapi({ example: 5 }),
+    permissionsCount: z.number().openapi({ example: 3 }),
     createdAt: z.date(),
   })
   .openapi("Position");
@@ -53,3 +54,22 @@ export const listPositionsResponseSchema = z
 export type Position = z.infer<typeof positionSchema>;
 export type CreatePositionBody = z.infer<typeof createPositionBodySchema>;
 export type UpdatePositionBody = z.infer<typeof updatePositionBodySchema>;
+
+export const permissionItemSchema = z.object({
+  id: z.string(),
+  code: z.string(),
+  name: z.string(),
+  group: z.string(),
+  description: z.string().nullable(),
+});
+
+export const positionPermissionsResponseSchema = z
+  .object({
+    assigned: permissionItemSchema.array(),
+    available: permissionItemSchema.array(),
+  })
+  .openapi("PositionPermissionsResponse");
+
+export const setPositionPermissionsBodySchema = z.object({
+  permissionIds: z.array(z.string()),
+});
