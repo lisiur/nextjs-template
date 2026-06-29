@@ -16,8 +16,10 @@ import {
 import {
   createPosition,
   deletePosition,
+  getPositionPermissions,
   listPositionMembers,
   listPositions,
+  setPositionPermissions,
   updatePosition,
 } from "../position";
 import { activateOrganization } from "./activateOrganization";
@@ -59,6 +61,8 @@ const routes = organizationRoutes.openapiRoutes([
   updatePosition,
   deletePosition,
   listPositionMembers,
+  getPositionPermissions,
+  setPositionPermissions,
 ] as const);
 
 export { routes as organizationRoutes };

@@ -1,11 +1,11 @@
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
+import { roleRepository } from "#repositories/role.repository";
+import { listPermissionsForApp } from "#services/permission.service";
 import {
   assignPermissions,
   getPermissionsForRole,
 } from "#services/role-permission.service";
-import { listPermissionsForApp } from "#services/permission.service";
-import { roleRepository } from "#repositories/role.repository";
 
 const ORGANIZATION_APP_ID = "organization";
 
@@ -233,9 +233,7 @@ export async function setMemberPositions(
     const removedRoleIds = oldRoleIds.filter(
       (rid) => !newRoleIds.includes(rid),
     );
-    const addedRoleIds = newRoleIds.filter(
-      (rid) => !oldRoleIds.includes(rid),
-    );
+    const addedRoleIds = newRoleIds.filter((rid) => !oldRoleIds.includes(rid));
 
     for (const roleId of removedRoleIds) {
       await tx.roleAssignment.deleteMany({

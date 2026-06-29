@@ -2,35 +2,33 @@ import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requireSession } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
-  badRequestResponse,
   forbiddenResponse,
   notFoundResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { updatePosition } from "#services/position.service";
+import { setPositionPermissions } from "#services/position.service";
 import { assertPermission } from "#services/role-permission.service";
 import {
-  errorSchema,
   orgIdParamSchema,
   positionIdParamSchema,
-  positionSchema,
-  updatePositionBodySchema,
+  positionPermissionsResponseSchema,
+  setPositionPermissionsBodySchema,
 } from "./schema";
 
-export const updatePositionRoute = defineOpenAPIRoute({
+export const setPositionPermissionsRoute = defineOpenAPIRoute({
   route: createRoute({
     method: "put",
-    path: "/{orgId}/positions/{id}",
+    path: "/{orgId}/positions/{id}/permissions",
     tags: ["Position"],
-    summary: "Update a position",
-    description: "Update a position in an organization.",
+    summary: "Set position permissions",
+    description: "Replace all permissions assigned to a position.",
     request: {
       params: orgIdParamSchema.merge(positionIdParamSchema),
       body: {
         content: {
           "application/json": {
-            schema: updatePositionBodySchema,
+            schema: setPositionPermissionsBodySchema,
           },
         },
         required: true,
@@ -39,15 +37,11 @@ export const updatePositionRoute = defineOpenAPIRoute({
     responses: {
       ...unauthorizedResponse,
       ...forbiddenResponse,
-      ...badRequestResponse,
       ...notFoundResponse,
-      409: {
-        content: {
-          "application/json": { schema: errorSchema },
-        },
-        description: "Code already taken",
-      },
-      ...okResponseFn(positionSchema, "The updated position"),
+      ...okResponseFn(
+        positionPermissionsResponseSchema,
+        "Updated position permissions",
+      ),
     },
   }),
   handler: async (c) => {
@@ -55,22 +49,22 @@ export const updatePositionRoute = defineOpenAPIRoute({
     const { orgId, id } = c.req.valid("param");
     const body = c.req.valid("json");
 
-    await assertPermission(session.user.id, "position::update", {
+    await assertPermission(session.user.id, "position-permission::manage", {
       appId: "organization",
       organizationId: orgId,
     });
 
-    const position = await updatePosition(orgId, id, body);
+    const result = await setPositionPermissions(orgId, id, body.permissionIds);
 
     logAudit({
-      event: "position.updated",
+      event: "position.permissions_updated",
       category: "position",
       targetType: "position",
-      targetId: position.id,
-      targetName: position.name,
+      targetId: id,
+      metadata: { permissionIds: body.permissionIds },
       c,
     });
 
-    return c.json(position, 200);
+    return c.json(result, 200);
   },
 });

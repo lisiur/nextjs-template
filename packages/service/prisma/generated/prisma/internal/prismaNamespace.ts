@@ -2340,6 +2340,7 @@ export const PositionScalarFieldEnum = {
   code: 'code',
   description: 'description',
   sortOrder: 'sortOrder',
+  roleId: 'roleId',
   createdAt: 'createdAt'
 } as const
 

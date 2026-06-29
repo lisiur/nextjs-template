@@ -37,14 +37,6 @@ export const listPositionsRoute = defineOpenAPIRoute({
 
     const positions = await listPositions(orgId);
 
-    return c.json(
-      {
-        positions: positions.map((p) => ({
-          ...p,
-          membersCount: p._count.memberPositions,
-        })),
-      },
-      200,
-    );
+    return c.json({ positions }, 200);
   },
 });
