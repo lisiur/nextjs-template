@@ -126,6 +126,8 @@ model Position {
   code           String
   description    String?
   sortOrder      Int              @default(0)
+  roleId         String?          @unique
+  role           Role?            @relation(fields: [roleId], references: [id], onDelete: SetNull)
   memberPositions MemberPosition[]
   createdAt      DateTime         @default(now())
 
@@ -345,6 +347,7 @@ model Role {
   updatedAt       DateTime         @updatedAt
   rolePermissions RolePermission[]
   roleAssignments RoleAssignment[]
+  position        Position?
 
   @@unique([appId, scopeType, scopeId, code])
   @@index([appId])
