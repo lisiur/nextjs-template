@@ -67,6 +67,19 @@
     "nextStepLabel": "Next step",
     "nextStep": "Add organization-specific workflows when their scope is defined."
   },
+  "Dashboard": {
+    "title": "Dashboard",
+    "description": "Overview of your organization",
+    "welcome": "Welcome back, {name}",
+    "welcomeDescription": "Here's what's happening in your organization.",
+    "statMembers": "Members",
+    "statDepartments": "Departments",
+    "statPositions": "Positions",
+    "statUnread": "Unread Notifications",
+    "recentActivity": "Recent Activity",
+    "viewAll": "View all",
+    "noRecentActivity": "No recent activity"
+  },
   "Profile": {
     "title": "Profile",
     "description": "Manage your account settings",
@@ -282,6 +295,7 @@
   },
   "Sidebar": {
     "noMenus": "No menus available",
+    "dashboard": "Dashboard",
     "profile": "Profile",
     "switchOrganization": "Switch Organization",
     "switchSuccess": "Organization switched",

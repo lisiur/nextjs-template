@@ -67,6 +67,19 @@
     "nextStepLabel": "下一步",
     "nextStep": "在范围明确后添加组织相关工作流。"
   },
+  "Dashboard": {
+    "title": "仪表盘",
+    "description": "你的组织概览",
+    "welcome": "欢迎回来，{name}",
+    "welcomeDescription": "以下是你的组织近期动态。",
+    "statMembers": "成员",
+    "statDepartments": "部门",
+    "statPositions": "职位",
+    "statUnread": "未读通知",
+    "recentActivity": "近期动态",
+    "viewAll": "查看全部",
+    "noRecentActivity": "暂无近期动态"
+  },
   "Profile": {
     "title": "个人资料",
     "description": "管理你的账户设置",
@@ -282,6 +295,7 @@
   },
   "Sidebar": {
     "noMenus": "暂无菜单",
+    "dashboard": "仪表盘",
     "profile": "个人资料",
     "switchOrganization": "切换组织",
     "switchSuccess": "已切换组织",

@@ -403,6 +403,12 @@ const systemPermissions = [
 // --- Organization App Permissions ---
 const organizationPermissions = [
   {
+    code: "dashboard::view",
+    group: "dashboard",
+    name: "View Dashboard",
+    description: "View the organization dashboard",
+  },
+  {
     code: "organization-member::list",
     group: "organization-member",
     name: "List Organization Members",
@@ -579,13 +585,23 @@ const adminMenus = [
 // --- Organization App Menus ---
 const organizationMenus = [
   {
+    id: "organization-dashboard",
+    code: "dashboard",
+    name: "Dashboard",
+    icon: "LayoutDashboard",
+    linkType: "INTERNAL" as const,
+    url: "/organization/dashboard",
+    sortOrder: 0,
+    permissions: ["dashboard::view"],
+  },
+  {
     id: "organization-members",
     code: "members",
     name: "Members",
     icon: "Users",
     linkType: "INTERNAL" as const,
     url: "/organization/members",
-    sortOrder: 0,
+    sortOrder: 1,
     permissions: ["organization-member::list"],
   },
   {
@@ -595,7 +611,7 @@ const organizationMenus = [
     icon: "Briefcase",
     linkType: "INTERNAL" as const,
     url: "/organization/positions",
-    sortOrder: 1,
+    sortOrder: 2,
     permissions: ["position::list"],
   },
   {
@@ -605,7 +621,7 @@ const organizationMenus = [
     icon: "FolderTree",
     linkType: "INTERNAL" as const,
     url: "/organization/departments",
-    sortOrder: 2,
+    sortOrder: 3,
     permissions: ["department::list"],
   },
   {
@@ -615,7 +631,7 @@ const organizationMenus = [
     icon: "Settings",
     linkType: "INTERNAL" as const,
     url: "/organization/settings",
-    sortOrder: 3,
+    sortOrder: 4,
     permissions: ["organization-settings::view"],
   },
 ];
@@ -640,6 +656,7 @@ const adminRolePermissions: Record<string, string[]> = {
 const organizationRolePermissions: Record<string, string[]> = {
   [ORG_OWNER_ROLE_CODE]: organizationPermissions.map((p) => p.code),
   [ORG_MEMBER_ROLE_CODE]: [
+    "dashboard::view",
     "organization-member::list",
     "department::list",
     "notification::list",
