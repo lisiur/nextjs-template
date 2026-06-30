@@ -68,8 +68,6 @@
     "nextStep": "在范围明确后添加组织相关工作流。"
   },
   "Dashboard": {
-    "title": "仪表盘",
-    "description": "你的组织概览",
     "welcome": "欢迎回来，{name}",
     "welcomeDescription": "以下是你的组织近期动态。",
     "statMembers": "成员",
@@ -296,6 +294,10 @@
   "Sidebar": {
     "noMenus": "暂无菜单",
     "dashboard": "仪表盘",
+    "members": "成员",
+    "positions": "职位",
+    "departments": "部门",
+    "settings": "设置",
     "profile": "个人资料",
     "switchOrganization": "切换组织",
     "switchSuccess": "已切换组织",

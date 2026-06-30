@@ -312,7 +312,8 @@
     "noMenus": "No menus available",
     "fetchError": "Failed to load menus",
     "signOut": "Sign Out",
-    "logs": "Logs"
+    "logs": "Logs",
+    "menus": "Menus"
   },
   "Organizations": {
     "title": "Organization Management",
