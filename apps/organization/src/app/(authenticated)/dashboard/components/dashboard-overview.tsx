@@ -69,15 +69,6 @@ export function DashboardOverview() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="space-y-1">
-        <h2 className="font-semibold text-xl">
-          {t("welcome", { name: session?.user.name ?? "" })}
-        </h2>
-        <p className="text-muted-foreground text-sm">
-          {t("welcomeDescription")}
-        </p>
-      </div>
-
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={Users}
