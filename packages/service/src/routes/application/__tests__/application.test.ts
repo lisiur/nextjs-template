@@ -168,8 +168,20 @@ describe("GET /current - Current Application", () => {
     });
   });
 
-  it("returns 401 without a session", async () => {
+  it("returns the current application without a session (public)", async () => {
+    const now = new Date();
     mockGetSession.mockResolvedValue(null);
+    mockPrisma.application.findFirst.mockResolvedValue({
+      id: "app1",
+      name: "Organization",
+      code: "organization",
+      description: "Organization workspace",
+      logo: "/api/upload/logo1",
+      sortOrder: 10,
+      deletedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
 
     const { getCurrentApplication } = await import("../getCurrentApplication");
     const res = await testRoute(
@@ -182,8 +194,16 @@ describe("GET /current - Current Application", () => {
       { withAuth: false },
     );
 
-    expect(res.status).toBe(401);
-    expect(mockPrisma.application.findFirst).not.toHaveBeenCalled();
+    expect(res.status).toBe(200);
+    expect(mockPrisma.application.findFirst).toHaveBeenCalledWith({
+      where: { code: "organization", deletedAt: null },
+    });
+    await expect(res.json()).resolves.toEqual({
+      name: "Organization",
+      code: "organization",
+      description: "Organization workspace",
+      logo: "/api/upload/logo1",
+    });
   });
 
   it("returns 400 without X-App-Code", async () => {
