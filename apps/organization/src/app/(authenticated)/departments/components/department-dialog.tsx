@@ -44,7 +44,7 @@ interface DepartmentDialogProps {
     id: string;
     name: string;
     code: string;
-    description: string | null;
+    description?: string | null;
   };
 }
 

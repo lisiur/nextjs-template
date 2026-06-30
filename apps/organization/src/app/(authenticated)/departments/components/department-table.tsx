@@ -213,7 +213,7 @@ export function DepartmentTable({ orgId }: DepartmentTableProps) {
         open={createOpen}
         onOpenChange={setCreateOpen}
         orgId={orgId}
-        parentId={currentParentId}
+        parentId={currentParentId ?? undefined}
       />
       {editDepartment && (
         <DepartmentDialog
