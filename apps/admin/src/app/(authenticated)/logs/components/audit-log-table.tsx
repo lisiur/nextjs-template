@@ -3,6 +3,7 @@
 import {
   Badge,
   Button,
+  ButtonGroup,
   Spinner,
   Table,
   TableBody,
@@ -10,6 +11,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { Eye, GitBranch } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -236,26 +240,40 @@ export function AuditLogTable({
                     sticky="right"
                     className="bg-background text-right"
                   >
-                    <div className="flex items-center justify-end gap-1">
+                    <ButtonGroup className="ml-auto">
                       {onTraceChange && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onTraceChange(log.traceId)}
-                        >
-                          <GitBranch className="mr-1 h-3 w-3" />
-                          {t("trace")}
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={t("trace")}
+                                onClick={() => onTraceChange(log.traceId)}
+                              >
+                                <GitBranch />
+                              </Button>
+                            }
+                          />
+                          <TooltipContent>{t("trace")}</TooltipContent>
+                        </Tooltip>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDetailLog(log)}
-                      >
-                        <Eye className="mr-1 h-3 w-3" />
-                        {t("viewDetail")}
-                      </Button>
-                    </div>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("viewDetail")}
+                              onClick={() => setDetailLog(log)}
+                            >
+                              <Eye />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("viewDetail")}</TooltipContent>
+                      </Tooltip>
+                    </ButtonGroup>
                   </TableCell>
                 </TableRow>
               ))}

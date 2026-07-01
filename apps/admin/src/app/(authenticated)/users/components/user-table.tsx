@@ -10,6 +10,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { Pencil, Plus, ShieldUser, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -183,29 +186,42 @@ export function UserTable() {
                 <TableCell>{formatDate(user.createdAt)}</TableCell>
                 <TableCell sticky="right" align="right">
                   <ButtonGroup className="ml-auto">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      title={
-                        builtinUser ? t("protectedActionDisabled") : undefined
-                      }
-                      onClick={() => setEditUser(user)}
-                    >
-                      <Pencil />
-                      {t("edit")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      title={
-                        builtinUser ? t("protectedActionDisabled") : undefined
-                      }
-                      disabled={builtinUser}
-                      onClick={() => handleDelete(user)}
-                    >
-                      <Trash2 />
-                      {t("delete")}
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("edit")}
+                            onClick={() => setEditUser(user)}
+                          >
+                            <Pencil />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("edit")}</TooltipContent>
+                    </Tooltip>
+                    {builtinUser ? (
+                      <Button variant="ghost" size="icon-sm" disabled>
+                        <Trash2 />
+                      </Button>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("delete")}
+                              onClick={() => handleDelete(user)}
+                            >
+                              <Trash2 />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("delete")}</TooltipContent>
+                      </Tooltip>
+                    )}
                   </ButtonGroup>
                 </TableCell>
               </TableRow>

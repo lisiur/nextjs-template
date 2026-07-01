@@ -11,6 +11,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -164,22 +167,36 @@ export function NotificationTemplateTable() {
                 <TableCell>{formatDate(template.createdAt)}</TableCell>
                 <TableCell sticky="right" align="right">
                   <ButtonGroup className="ml-auto">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setEditTemplate(template)}
-                    >
-                      <Pencil />
-                      {t("actions.edit")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(template)}
-                    >
-                      <Trash2 />
-                      {t("actions.delete")}
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("actions.edit")}
+                            onClick={() => setEditTemplate(template)}
+                          >
+                            <Pencil />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("actions.edit")}</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("actions.delete")}
+                            onClick={() => handleDelete(template)}
+                          >
+                            <Trash2 />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("actions.delete")}</TooltipContent>
+                    </Tooltip>
                   </ButtonGroup>
                 </TableCell>
               </TableRow>

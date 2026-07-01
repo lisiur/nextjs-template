@@ -8,6 +8,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -144,22 +147,36 @@ export function OrganizationTable() {
               <TableCell>{formatDate(org.createdAt)}</TableCell>
               <TableCell sticky="right" align="right">
                 <ButtonGroup className="ml-auto">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setEditOrg(org)}
-                  >
-                    <Pencil />
-                    {t("edit")}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(org)}
-                  >
-                    <Trash2 />
-                    {t("delete")}
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={t("edit")}
+                          onClick={() => setEditOrg(org)}
+                        >
+                          <Pencil />
+                        </Button>
+                      }
+                    />
+                    <TooltipContent>{t("edit")}</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={t("delete")}
+                          onClick={() => handleDelete(org)}
+                        >
+                          <Trash2 />
+                        </Button>
+                      }
+                    />
+                    <TooltipContent>{t("delete")}</TooltipContent>
+                  </Tooltip>
                 </ButtonGroup>
               </TableCell>
             </TableRow>

@@ -19,6 +19,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { ListChecks, Pencil, Plus, ShieldUser, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -173,41 +176,68 @@ export function ApplicationRoleManagement({
                   </TableCell>
                   <TableCell sticky="right" align="right">
                     <ButtonGroup className="ml-auto">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        title={
-                          builtin ? t("protectedActionDisabled") : undefined
-                        }
-                        disabled={builtin}
-                        onClick={() => setEditRole(role)}
-                      >
-                        <Pencil />
-                        {t("edit")}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedRole(role);
-                          setPermissionDrawerOpen(true);
-                        }}
-                      >
-                        <ListChecks />
-                        {t("managePermissions")}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        title={
-                          builtin ? t("protectedActionDisabled") : undefined
-                        }
-                        disabled={builtin}
-                        onClick={() => handleDelete(role)}
-                      >
-                        <Trash2 />
-                        {t("delete")}
-                      </Button>
+                      {builtin ? (
+                        <Button variant="ghost" size="icon-sm" disabled>
+                          <Pencil />
+                        </Button>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={t("edit")}
+                                onClick={() => setEditRole(role)}
+                              >
+                                <Pencil />
+                              </Button>
+                            }
+                          />
+                          <TooltipContent>{t("edit")}</TooltipContent>
+                        </Tooltip>
+                      )}
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("managePermissions")}
+                              onClick={() => {
+                                setSelectedRole(role);
+                                setPermissionDrawerOpen(true);
+                              }}
+                            >
+                              <ListChecks />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>
+                          {t("managePermissions")}
+                        </TooltipContent>
+                      </Tooltip>
+                      {builtin ? (
+                        <Button variant="ghost" size="icon-sm" disabled>
+                          <Trash2 />
+                        </Button>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={t("delete")}
+                                onClick={() => handleDelete(role)}
+                              >
+                                <Trash2 />
+                              </Button>
+                            }
+                          />
+                          <TooltipContent>{t("delete")}</TooltipContent>
+                        </Tooltip>
+                      )}
                     </ButtonGroup>
                   </TableCell>
                 </TableRow>

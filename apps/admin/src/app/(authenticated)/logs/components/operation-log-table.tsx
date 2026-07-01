@@ -3,6 +3,7 @@
 import {
   Badge,
   Button,
+  ButtonGroup,
   Checkbox,
   Spinner,
   Table,
@@ -11,6 +12,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { Eye, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -265,14 +269,23 @@ export function OperationLogTable({
                     sticky="right"
                     className="bg-background text-right"
                   >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDetailLog(log)}
-                    >
-                      <Eye className="mr-1 h-3 w-3" />
-                      {t("viewDetail")}
-                    </Button>
+                    <ButtonGroup className="ml-auto">
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("viewDetail")}
+                              onClick={() => setDetailLog(log)}
+                            >
+                              <Eye />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("viewDetail")}</TooltipContent>
+                      </Tooltip>
+                    </ButtonGroup>
                   </TableCell>
                 </TableRow>
               ))}

@@ -3,6 +3,7 @@
 import {
   Badge,
   Button,
+  ButtonGroup,
   Sheet,
   SheetBody,
   SheetContent,
@@ -14,6 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -217,15 +221,29 @@ export function NotificationRecordTable() {
                 {formatDateTime(record.createdAt)}
               </TableCell>
               <TableCell sticky="right" align="right">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={loadingDetailId === record.id}
-                  onClick={() => handleViewRecord(record.id)}
-                >
-                  <Eye className="mr-1 h-3 w-3" />
-                  {t("records.view")}
-                </Button>
+                <ButtonGroup className="ml-auto">
+                  {loadingDetailId === record.id ? (
+                    <Button variant="ghost" size="icon-sm" disabled>
+                      <Eye />
+                    </Button>
+                  ) : (
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("records.view")}
+                            onClick={() => handleViewRecord(record.id)}
+                          >
+                            <Eye />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("records.view")}</TooltipContent>
+                    </Tooltip>
+                  )}
+                </ButtonGroup>
               </TableCell>
             </TableRow>
           ))}

@@ -9,6 +9,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { Search, Settings } from "lucide-react";
 import Image from "next/image";
@@ -145,14 +148,21 @@ export function AppTable() {
             <TableCell>{formatDate(app.createdAt)}</TableCell>
             <TableCell sticky="right" align="right">
               <ButtonGroup className="ml-auto">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => router.push(`/applications/${app.id}`)}
-                >
-                  <Settings />
-                  {t("settings")}
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={t("settings")}
+                        onClick={() => router.push(`/applications/${app.id}`)}
+                      >
+                        <Settings />
+                      </Button>
+                    }
+                  />
+                  <TooltipContent>{t("settings")}</TooltipContent>
+                </Tooltip>
               </ButtonGroup>
             </TableCell>
           </TableRow>
