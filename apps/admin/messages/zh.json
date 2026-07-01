@@ -380,6 +380,7 @@
     "backToApps": "返回应用列表",
     "notFound": "应用不存在",
     "tabs": {
+      "general": "通用",
       "roles": "角色管理",
       "menus": "菜单管理"
     },

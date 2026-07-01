@@ -3,13 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
-  Dialog,
-  DialogBody,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
   Field,
   FieldError,
   FieldGroup,
@@ -41,8 +38,8 @@ const appSchema = z.object({
 
 type AppInput = z.infer<typeof appSchema>;
 
-interface AppDialogProps {
-  app?: {
+interface ApplicationSettingsFormProps {
+  app: {
     id: string;
     name: string;
     code: string;
@@ -50,28 +47,23 @@ interface AppDialogProps {
     logo?: string | null;
     favicon?: string | null;
   };
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-export function AppDialog({
+export function ApplicationSettingsForm({
   app,
-  open,
-  onOpenChange,
   onSuccess,
-}: AppDialogProps) {
+}: ApplicationSettingsFormProps) {
   const t = useTranslations("Applications");
-  const isEdit = !!app;
   const logoInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
   const logoObjectUrlRef = useRef<string | null>(null);
   const faviconObjectUrlRef = useRef<string | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string>(app?.logo ?? "");
+  const [logoPreview, setLogoPreview] = useState<string>(app.logo ?? "");
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
   const [logoRemoved, setLogoRemoved] = useState(false);
   const [faviconPreview, setFaviconPreview] = useState<string>(
-    app?.favicon ?? "",
+    app.favicon ?? "",
   );
   const [selectedFaviconFile, setSelectedFaviconFile] = useState<File | null>(
     null,
@@ -81,17 +73,16 @@ export function AppDialog({
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
     setValue,
-    reset,
   } = useForm<AppInput>({
     resolver: zodResolver(appSchema),
     defaultValues: {
-      name: app?.name ?? "",
-      code: app?.code ?? "",
-      description: app?.description ?? "",
-      logo: app?.logo ?? "",
-      favicon: app?.favicon ?? "",
+      name: app.name,
+      code: app.code,
+      description: app.description ?? "",
+      logo: app.logo ?? "",
+      favicon: app.favicon ?? "",
     },
   });
 
@@ -125,7 +116,7 @@ export function AppDialog({
     setSelectedLogoFile(file);
     setLogoRemoved(false);
     setLogoPreview(previewUrl);
-    setValue("logo", previewUrl, { shouldValidate: true });
+    setValue("logo", previewUrl, { shouldDirty: true });
   }
 
   function handleRemoveLogo() {
@@ -133,7 +124,7 @@ export function AppDialog({
     setSelectedLogoFile(null);
     setLogoRemoved(true);
     setLogoPreview("");
-    setValue("logo", "", { shouldValidate: true });
+    setValue("logo", "", { shouldDirty: true });
     if (logoInputRef.current) {
       logoInputRef.current.value = "";
     }
@@ -152,7 +143,7 @@ export function AppDialog({
     setSelectedFaviconFile(file);
     setFaviconRemoved(false);
     setFaviconPreview(previewUrl);
-    setValue("favicon", previewUrl, { shouldValidate: true });
+    setValue("favicon", previewUrl, { shouldDirty: true });
   }
 
   function handleRemoveFavicon() {
@@ -160,7 +151,7 @@ export function AppDialog({
     setSelectedFaviconFile(null);
     setFaviconRemoved(true);
     setFaviconPreview("");
-    setValue("favicon", "", { shouldValidate: true });
+    setValue("favicon", "", { shouldDirty: true });
     if (faviconInputRef.current) {
       faviconInputRef.current.value = "";
     }
@@ -172,78 +163,52 @@ export function AppDialog({
         ? await uploadPublicFile(selectedLogoFile)
         : logoRemoved
           ? null
-          : (app?.logo ?? null);
+          : (app.logo ?? null);
 
       const favicon = selectedFaviconFile
         ? await uploadPublicFile(selectedFaviconFile)
         : faviconRemoved
           ? null
-          : (app?.favicon ?? null);
+          : (app.favicon ?? null);
 
-      if (isEdit) {
-        await withApiFeedback(appClient.api.applications[":id"].$put)({
-          param: { id: app.id },
-          json: {
-            name: data.name,
-            code: data.code,
-            description: data.description || null,
-            logo,
-            favicon,
-          },
-        });
-      } else {
-        await withApiFeedback(appClient.api.applications.$post)({
-          json: {
-            name: data.name,
-            code: data.code,
-            description: data.description || undefined,
-            logo: logo ?? undefined,
-            favicon: favicon ?? undefined,
-          },
-        });
-      }
-      clearLogoObjectUrl();
-      clearFaviconObjectUrl();
+      await withApiFeedback(appClient.api.applications[":id"].$put)({
+        param: { id: app.id },
+        json: {
+          name: data.name,
+          code: data.code,
+          description: data.description || null,
+          logo,
+          favicon,
+        },
+      });
       setSelectedLogoFile(null);
       setSelectedFaviconFile(null);
       setLogoRemoved(false);
       setFaviconRemoved(false);
-      reset();
+      toast.success(t("updateSuccess"));
       onSuccess();
     } catch {
       // Error handled by client
     }
   }
 
-  function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen) {
-      clearLogoObjectUrl();
-      clearFaviconObjectUrl();
-      setSelectedLogoFile(null);
-      setSelectedFaviconFile(null);
-      setLogoRemoved(false);
-      setFaviconRemoved(false);
-      reset();
-      setLogoPreview(app?.logo ?? "");
-      setFaviconPreview(app?.favicon ?? "");
-    }
-    onOpenChange(nextOpen);
-  }
+  const dirty =
+    isDirty ||
+    selectedLogoFile !== null ||
+    logoRemoved ||
+    selectedFaviconFile !== null ||
+    faviconRemoved;
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? t("editApp") : t("addApp")}</DialogTitle>
-          <DialogDescription>
-            {isEdit ? t("editAppDescription") : t("addAppDescription")}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogBody>
+    <div className="flex min-h-0 flex-1 justify-start overflow-auto">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{t("editApp")}</CardTitle>
+        </CardHeader>
+        <CardContent>
           <form
-            id="application-dialog-form"
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-4"
+            className="flex flex-col gap-4"
           >
             <FieldGroup>
               <Field>
@@ -354,25 +319,14 @@ export function AppDialog({
                 />
               </Field>
             </FieldGroup>
+            <div className="flex justify-end">
+              <Button type="submit" disabled={isSubmitting || !dirty}>
+                {isSubmitting ? t("saving") : t("save")}
+              </Button>
+            </div>
           </form>
-        </DialogBody>
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleOpenChange(false)}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form="application-dialog-form"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? t("saving") : t("save")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

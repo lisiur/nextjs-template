@@ -380,6 +380,7 @@
     "backToApps": "Back to Applications",
     "notFound": "Application not found",
     "tabs": {
+      "general": "General",
       "roles": "Role Management",
       "menus": "Menus Management"
     },

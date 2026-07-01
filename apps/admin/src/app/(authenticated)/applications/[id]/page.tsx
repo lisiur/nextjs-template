@@ -10,6 +10,7 @@ import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { ApplicationMenuManagement } from "./components/application-menu-management";
 import { ApplicationRoleManagement } from "./components/application-role-management";
+import { ApplicationSettingsForm } from "./components/application-settings-form";
 
 interface Application {
   id: string;
@@ -99,13 +100,21 @@ export default function ApplicationDetailPage({
       header={backLink}
     >
       <Tabs
-        defaultValue="roles"
+        defaultValue="general"
         className="flex min-h-0 flex-col overflow-hidden"
       >
         <TabsList className="mb-6 w-fit shrink-0">
+          <TabsTrigger value="general">{t("tabs.general")}</TabsTrigger>
           <TabsTrigger value="roles">{t("tabs.roles")}</TabsTrigger>
           <TabsTrigger value="menus">{t("tabs.menus")}</TabsTrigger>
         </TabsList>
+
+        <TabsContent
+          value="general"
+          className="flex min-h-0 flex-1 overflow-hidden"
+        >
+          <ApplicationSettingsForm app={app} onSuccess={fetchApp} />
+        </TabsContent>
 
         <TabsContent
           value="roles"
