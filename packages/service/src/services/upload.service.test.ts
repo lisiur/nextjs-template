@@ -295,4 +295,52 @@ describe("uploadFile validation", () => {
     expect(createArgs.mimeType).toBe("application/pdf");
     expect(createArgs.visibility).toBe("private");
   });
+
+  it("accepts a valid ICO favicon and uses the .ico extension", async () => {
+    const ico = Buffer.from([0x00, 0x00, 0x01, 0x00, 0x01, 0x00]);
+    (mockPrisma.upload.create as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "up3",
+    });
+    const result = await uploadFile({
+      file: mkFile("favicon.ico", "image/x-icon", ico),
+      visibility: "public",
+      uploaderId: "user1",
+    });
+    expect(result.id).toBe("up3");
+    const createArgs = (mockPrisma.upload.create as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0].data;
+    expect(createArgs.path).toMatch(/\.ico$/);
+    expect(createArgs.mimeType).toBe("image/x-icon");
+  });
+
+  it("accepts a valid SVG favicon and uses the .svg extension", async () => {
+    const svg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>');
+    (mockPrisma.upload.create as ReturnType<typeof vi.fn>).mockResolvedValue({
+      id: "up4",
+    });
+    const result = await uploadFile({
+      file: mkFile("favicon.svg", "image/svg+xml", svg),
+      visibility: "public",
+      uploaderId: "user1",
+    });
+    expect(result.id).toBe("up4");
+    const createArgs = (mockPrisma.upload.create as ReturnType<typeof vi.fn>)
+      .mock.calls[0][0].data;
+    expect(createArgs.path).toMatch(/\.svg$/);
+    expect(createArgs.mimeType).toBe("image/svg+xml");
+  });
+
+  it("rejects an html payload claiming image/svg+xml (magic-byte mismatch)", async () => {
+    await expect(
+      uploadFile({
+        file: mkFile(
+          "evil.svg",
+          "image/svg+xml",
+          Buffer.from("<script>xss()</script>"),
+        ),
+        visibility: "public",
+        uploaderId: "user1",
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
 });

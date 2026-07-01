@@ -14,6 +14,7 @@ export const applicationSchema = z
     code: z.string().openapi({ example: "oa" }),
     description: z.string().nullable().optional(),
     logo: z.string().nullable().optional(),
+    favicon: z.string().nullable().optional(),
     sortOrder: z.number().openapi({ example: 0 }),
     createdAt: z.date(),
     updatedAt: z.date(),
@@ -26,6 +27,7 @@ export const currentApplicationSchema = applicationSchema
     code: true,
     description: true,
     logo: true,
+    favicon: true,
   })
   .openapi("CurrentApplication");
 
@@ -40,6 +42,7 @@ export const createApplicationBodySchema = z.object({
   code: z.string().min(1).openapi({ example: "oa" }),
   description: z.string().optional(),
   logo: uploadUrlSchema.optional(),
+  favicon: uploadUrlSchema.optional(),
   sortOrder: z.number().int().default(0),
 });
 
@@ -48,6 +51,7 @@ export const updateApplicationBodySchema = z.object({
   code: z.string().min(1).optional(),
   description: z.string().nullable().optional(),
   logo: uploadUrlSchema.nullable().optional(),
+  favicon: uploadUrlSchema.nullable().optional(),
   sortOrder: z.number().int().optional(),
 });
 

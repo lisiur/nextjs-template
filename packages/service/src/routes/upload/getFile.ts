@@ -39,6 +39,9 @@ export const getFile = defineOpenAPIRoute({
       "image/png",
       "image/gif",
       "image/webp",
+      "image/x-icon",
+      "image/vnd.microsoft.icon",
+      "image/svg+xml",
     ];
     const isInlineImage = inlineImageTypes.includes(mimeType);
 

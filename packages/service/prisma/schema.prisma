@@ -235,6 +235,7 @@ model Application {
   code        String
   description String?
   logo        String?
+  favicon     String?
   sortOrder   Int          @default(0)
   deletedAt   DateTime?
   createdAt   DateTime     @default(now())

@@ -351,6 +351,8 @@
     "description_label": "Description",
     "logo": "Logo",
     "uploadLogo": "Upload Logo",
+    "favicon": "Favicon",
+    "uploadFavicon": "Upload Favicon",
     "sortOrder": "Sort Order",
     "createdAt": "Created At",
     "actions": "Actions",
@@ -381,7 +383,8 @@
       "roles": "Role Management",
       "menus": "Menus Management"
     },
-    "logoTooLarge": "Logo file size must be less than 2MB"
+    "logoTooLarge": "Logo file size must be less than 2MB",
+    "faviconTooLarge": "Favicon file size must be less than 2MB"
   },
   "Profile": {
     "title": "Profile",

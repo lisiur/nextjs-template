@@ -10,21 +10,25 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { appClient } from "@/lib/api/app-client";
 import { Loader } from "@/lib/loading";
 
-async function getAppName(): Promise<string> {
+async function getAppMeta(): Promise<{
+  name: string;
+  favicon?: string | null;
+}> {
   try {
     const res = await appClient.api.applications.current.$get();
-    if (!res.ok) return "Admin";
+    if (!res.ok) return { name: "Admin" };
     const app = await res.json();
-    return app.name ?? "Admin";
+    return { name: app.name ?? "Admin", favicon: app.favicon };
   } catch {
-    return "Admin";
+    return { name: "Admin" };
   }
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const name = await getAppName();
+  const { name, favicon } = await getAppMeta();
   return {
     title: { template: `%s | ${name}`, default: name },
+    ...(favicon ? { icons: { icon: [{ url: favicon }] } } : {}),
   };
 }
 

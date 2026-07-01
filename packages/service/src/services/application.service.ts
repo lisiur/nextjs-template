@@ -17,6 +17,7 @@ export async function createApplication(data: {
   code: string;
   description?: string;
   logo?: string;
+  favicon?: string;
   sortOrder?: number;
 }) {
   const existing = await prisma.application.findFirst({
@@ -37,6 +38,7 @@ export async function updateApplication(
     code?: string;
     description?: string | null;
     logo?: string | null;
+    favicon?: string | null;
     sortOrder?: number;
   },
 ) {

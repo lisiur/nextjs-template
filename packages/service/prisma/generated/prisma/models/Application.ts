@@ -40,6 +40,7 @@ export type ApplicationMinAggregateOutputType = {
   code: string | null
   description: string | null
   logo: string | null
+  favicon: string | null
   sortOrder: number | null
   deletedAt: Date | null
   createdAt: Date | null
@@ -52,6 +53,7 @@ export type ApplicationMaxAggregateOutputType = {
   code: string | null
   description: string | null
   logo: string | null
+  favicon: string | null
   sortOrder: number | null
   deletedAt: Date | null
   createdAt: Date | null
@@ -64,6 +66,7 @@ export type ApplicationCountAggregateOutputType = {
   code: number
   description: number
   logo: number
+  favicon: number
   sortOrder: number
   deletedAt: number
   createdAt: number
@@ -86,6 +89,7 @@ export type ApplicationMinAggregateInputType = {
   code?: true
   description?: true
   logo?: true
+  favicon?: true
   sortOrder?: true
   deletedAt?: true
   createdAt?: true
@@ -98,6 +102,7 @@ export type ApplicationMaxAggregateInputType = {
   code?: true
   description?: true
   logo?: true
+  favicon?: true
   sortOrder?: true
   deletedAt?: true
   createdAt?: true
@@ -110,6 +115,7 @@ export type ApplicationCountAggregateInputType = {
   code?: true
   description?: true
   logo?: true
+  favicon?: true
   sortOrder?: true
   deletedAt?: true
   createdAt?: true
@@ -209,6 +215,7 @@ export type ApplicationGroupByOutputType = {
   code: string
   description: string | null
   logo: string | null
+  favicon: string | null
   sortOrder: number
   deletedAt: Date | null
   createdAt: Date
@@ -244,6 +251,7 @@ export type ApplicationWhereInput = {
   code?: Prisma.StringFilter<"Application"> | string
   description?: Prisma.StringNullableFilter<"Application"> | string | null
   logo?: Prisma.StringNullableFilter<"Application"> | string | null
+  favicon?: Prisma.StringNullableFilter<"Application"> | string | null
   sortOrder?: Prisma.IntFilter<"Application"> | number
   deletedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
@@ -260,6 +268,7 @@ export type ApplicationOrderByWithRelationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
+  favicon?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -279,6 +288,7 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Application"> | string
   description?: Prisma.StringNullableFilter<"Application"> | string | null
   logo?: Prisma.StringNullableFilter<"Application"> | string | null
+  favicon?: Prisma.StringNullableFilter<"Application"> | string | null
   sortOrder?: Prisma.IntFilter<"Application"> | number
   deletedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
@@ -295,6 +305,7 @@ export type ApplicationOrderByWithAggregationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
+  favicon?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -315,6 +326,7 @@ export type ApplicationScalarWhereWithAggregatesInput = {
   code?: Prisma.StringWithAggregatesFilter<"Application"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   logo?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
+  favicon?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"Application"> | number
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Application"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
@@ -327,6 +339,7 @@ export type ApplicationCreateInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -343,6 +356,7 @@ export type ApplicationUncheckedCreateInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -359,6 +373,7 @@ export type ApplicationUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -375,6 +390,7 @@ export type ApplicationUncheckedUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -391,6 +407,7 @@ export type ApplicationCreateManyInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -403,6 +420,7 @@ export type ApplicationUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -415,6 +433,7 @@ export type ApplicationUncheckedUpdateManyInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -427,6 +446,7 @@ export type ApplicationCountOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  favicon?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -443,6 +463,7 @@ export type ApplicationMaxOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  favicon?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -455,6 +476,7 @@ export type ApplicationMinOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  favicon?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -541,6 +563,7 @@ export type ApplicationCreateWithoutMenusInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -556,6 +579,7 @@ export type ApplicationUncheckedCreateWithoutMenusInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -587,6 +611,7 @@ export type ApplicationUpdateWithoutMenusInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -602,6 +627,7 @@ export type ApplicationUncheckedUpdateWithoutMenusInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -617,6 +643,7 @@ export type ApplicationCreateWithoutPermissionsInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -632,6 +659,7 @@ export type ApplicationUncheckedCreateWithoutPermissionsInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -663,6 +691,7 @@ export type ApplicationUpdateWithoutPermissionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -678,6 +707,7 @@ export type ApplicationUncheckedUpdateWithoutPermissionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -693,6 +723,7 @@ export type ApplicationCreateWithoutRolesInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -708,6 +739,7 @@ export type ApplicationUncheckedCreateWithoutRolesInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -739,6 +771,7 @@ export type ApplicationUpdateWithoutRolesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -754,6 +787,7 @@ export type ApplicationUncheckedUpdateWithoutRolesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -769,6 +803,7 @@ export type ApplicationCreateWithoutNotificationsInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -784,6 +819,7 @@ export type ApplicationUncheckedCreateWithoutNotificationsInput = {
   code: string
   description?: string | null
   logo?: string | null
+  favicon?: string | null
   sortOrder?: number
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -815,6 +851,7 @@ export type ApplicationUpdateWithoutNotificationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -830,6 +867,7 @@ export type ApplicationUncheckedUpdateWithoutNotificationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -903,6 +941,7 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   code?: boolean
   description?: boolean
   logo?: boolean
+  favicon?: boolean
   sortOrder?: boolean
   deletedAt?: boolean
   createdAt?: boolean
@@ -920,6 +959,7 @@ export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   code?: boolean
   description?: boolean
   logo?: boolean
+  favicon?: boolean
   sortOrder?: boolean
   deletedAt?: boolean
   createdAt?: boolean
@@ -932,6 +972,7 @@ export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   code?: boolean
   description?: boolean
   logo?: boolean
+  favicon?: boolean
   sortOrder?: boolean
   deletedAt?: boolean
   createdAt?: boolean
@@ -944,13 +985,14 @@ export type ApplicationSelectScalar = {
   code?: boolean
   description?: boolean
   logo?: boolean
+  favicon?: boolean
   sortOrder?: boolean
   deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "description" | "logo" | "sortOrder" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
+export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "description" | "logo" | "favicon" | "sortOrder" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menus?: boolean | Prisma.Application$menusArgs<ExtArgs>
   roles?: boolean | Prisma.Application$rolesArgs<ExtArgs>
@@ -975,6 +1017,7 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     code: string
     description: string | null
     logo: string | null
+    favicon: string | null
     sortOrder: number
     deletedAt: Date | null
     createdAt: Date
@@ -1411,6 +1454,7 @@ export interface ApplicationFieldRefs {
   readonly code: Prisma.FieldRef<"Application", 'String'>
   readonly description: Prisma.FieldRef<"Application", 'String'>
   readonly logo: Prisma.FieldRef<"Application", 'String'>
+  readonly favicon: Prisma.FieldRef<"Application", 'String'>
   readonly sortOrder: Prisma.FieldRef<"Application", 'Int'>
   readonly deletedAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Application", 'DateTime'>

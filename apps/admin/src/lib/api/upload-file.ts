@@ -2,12 +2,8 @@ import { appClient } from "./app-client";
 import { withApiFeedback } from "./utils";
 
 export async function uploadPublicFile(file: File): Promise<string> {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("visibility", "public");
-
   const res = await withApiFeedback(appClient.api.upload.$post)({
-    body: formData,
+    form: { file, visibility: "public" },
   });
   const data = await res.json();
 

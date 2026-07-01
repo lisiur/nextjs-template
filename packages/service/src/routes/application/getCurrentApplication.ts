@@ -29,6 +29,7 @@ export const getCurrentApplication = defineOpenAPIRoute({
         code: app.code,
         description: app.description,
         logo: app.logo,
+        favicon: app.favicon,
       },
       200,
     );

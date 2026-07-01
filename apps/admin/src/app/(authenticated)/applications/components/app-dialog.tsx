@@ -28,11 +28,15 @@ import { appClient } from "@/lib/api";
 import { uploadPublicFile } from "@/lib/api/upload-file";
 import { withApiFeedback } from "@/lib/api/utils";
 
+const FAVICON_ACCEPT =
+  ".ico,image/x-icon,image/vnd.microsoft.icon,image/png,image/svg+xml,image/gif,image/webp";
+
 const appSchema = z.object({
   name: z.string().min(1),
   code: z.string().min(1),
   description: z.string().optional(),
   logo: z.string().optional().or(z.literal("")),
+  favicon: z.string().optional().or(z.literal("")),
 });
 
 type AppInput = z.infer<typeof appSchema>;
@@ -44,6 +48,7 @@ interface AppDialogProps {
     code: string;
     description?: string | null;
     logo?: string | null;
+    favicon?: string | null;
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -58,11 +63,20 @@ export function AppDialog({
 }: AppDialogProps) {
   const t = useTranslations("Applications");
   const isEdit = !!app;
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
   const logoObjectUrlRef = useRef<string | null>(null);
+  const faviconObjectUrlRef = useRef<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>(app?.logo ?? "");
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
   const [logoRemoved, setLogoRemoved] = useState(false);
+  const [faviconPreview, setFaviconPreview] = useState<string>(
+    app?.favicon ?? "",
+  );
+  const [selectedFaviconFile, setSelectedFaviconFile] = useState<File | null>(
+    null,
+  );
+  const [faviconRemoved, setFaviconRemoved] = useState(false);
 
   const {
     register,
@@ -77,6 +91,7 @@ export function AppDialog({
       code: app?.code ?? "",
       description: app?.description ?? "",
       logo: app?.logo ?? "",
+      favicon: app?.favicon ?? "",
     },
   });
 
@@ -87,9 +102,17 @@ export function AppDialog({
     }
   }, []);
 
-  useEffect(() => clearLogoObjectUrl, [clearLogoObjectUrl]);
+  const clearFaviconObjectUrl = useCallback(() => {
+    if (faviconObjectUrlRef.current) {
+      URL.revokeObjectURL(faviconObjectUrlRef.current);
+      faviconObjectUrlRef.current = null;
+    }
+  }, []);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  useEffect(() => clearLogoObjectUrl, [clearLogoObjectUrl]);
+  useEffect(() => clearFaviconObjectUrl, [clearFaviconObjectUrl]);
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
@@ -111,8 +134,35 @@ export function AppDialog({
     setLogoRemoved(true);
     setLogoPreview("");
     setValue("logo", "", { shouldValidate: true });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+    if (logoInputRef.current) {
+      logoInputRef.current.value = "";
+    }
+  }
+
+  function handleFaviconChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error(t("faviconTooLarge"));
+      return;
+    }
+    clearFaviconObjectUrl();
+    const previewUrl = URL.createObjectURL(file);
+    faviconObjectUrlRef.current = previewUrl;
+    setSelectedFaviconFile(file);
+    setFaviconRemoved(false);
+    setFaviconPreview(previewUrl);
+    setValue("favicon", previewUrl, { shouldValidate: true });
+  }
+
+  function handleRemoveFavicon() {
+    clearFaviconObjectUrl();
+    setSelectedFaviconFile(null);
+    setFaviconRemoved(true);
+    setFaviconPreview("");
+    setValue("favicon", "", { shouldValidate: true });
+    if (faviconInputRef.current) {
+      faviconInputRef.current.value = "";
     }
   }
 
@@ -124,6 +174,12 @@ export function AppDialog({
           ? null
           : (app?.logo ?? null);
 
+      const favicon = selectedFaviconFile
+        ? await uploadPublicFile(selectedFaviconFile)
+        : faviconRemoved
+          ? null
+          : (app?.favicon ?? null);
+
       if (isEdit) {
         await withApiFeedback(appClient.api.applications[":id"].$put)({
           param: { id: app.id },
@@ -132,6 +188,7 @@ export function AppDialog({
             code: data.code,
             description: data.description || null,
             logo,
+            favicon,
           },
         });
       } else {
@@ -141,12 +198,16 @@ export function AppDialog({
             code: data.code,
             description: data.description || undefined,
             logo: logo ?? undefined,
+            favicon: favicon ?? undefined,
           },
         });
       }
       clearLogoObjectUrl();
+      clearFaviconObjectUrl();
       setSelectedLogoFile(null);
+      setSelectedFaviconFile(null);
       setLogoRemoved(false);
+      setFaviconRemoved(false);
       reset();
       onSuccess();
     } catch {
@@ -157,10 +218,14 @@ export function AppDialog({
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       clearLogoObjectUrl();
+      clearFaviconObjectUrl();
       setSelectedLogoFile(null);
+      setSelectedFaviconFile(null);
       setLogoRemoved(false);
+      setFaviconRemoved(false);
       reset();
       setLogoPreview(app?.logo ?? "");
+      setFaviconPreview(app?.favicon ?? "");
     }
     onOpenChange(nextOpen);
   }
@@ -208,10 +273,10 @@ export function AppDialog({
                 <FieldLabel>{t("logo")}</FieldLabel>
                 <input
                   type="file"
-                  ref={fileInputRef}
+                  ref={logoInputRef}
                   accept="image/*"
                   className="hidden"
-                  onChange={handleFileChange}
+                  onChange={handleLogoChange}
                 />
                 {logoPreview ? (
                   <div className="relative inline-block">
@@ -237,13 +302,56 @@ export function AppDialog({
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => logoInputRef.current?.click()}
                   >
                     <ImagePlus className="h-4 w-4" />
                     {t("uploadLogo")}
                   </Button>
                 )}
                 <FieldError errors={errors.logo ? [errors.logo] : undefined} />
+              </Field>
+              <Field>
+                <FieldLabel>{t("favicon")}</FieldLabel>
+                <input
+                  type="file"
+                  ref={faviconInputRef}
+                  accept={FAVICON_ACCEPT}
+                  className="hidden"
+                  onChange={handleFaviconChange}
+                />
+                {faviconPreview ? (
+                  <div className="relative inline-block">
+                    <Image
+                      src={faviconPreview}
+                      alt="Favicon preview"
+                      width={32}
+                      height={32}
+                      className="rounded border object-contain"
+                      unoptimized
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6"
+                      onClick={handleRemoveFavicon}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => faviconInputRef.current?.click()}
+                  >
+                    <ImagePlus className="h-4 w-4" />
+                    {t("uploadFavicon")}
+                  </Button>
+                )}
+                <FieldError
+                  errors={errors.favicon ? [errors.favicon] : undefined}
+                />
               </Field>
             </FieldGroup>
           </form>

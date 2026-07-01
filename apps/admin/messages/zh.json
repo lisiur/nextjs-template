@@ -351,6 +351,8 @@
     "description_label": "描述",
     "logo": "Logo",
     "uploadLogo": "上传 Logo",
+    "favicon": "网站图标",
+    "uploadFavicon": "上传网站图标",
     "sortOrder": "排序",
     "createdAt": "创建时间",
     "actions": "操作",
@@ -381,7 +383,8 @@
       "roles": "角色管理",
       "menus": "菜单管理"
     },
-    "logoTooLarge": "Logo 文件大小不能超过 2MB"
+    "logoTooLarge": "Logo 文件大小不能超过 2MB",
+    "faviconTooLarge": "网站图标文件大小不能超过 2MB"
   },
   "Profile": {
     "title": "个人资料",

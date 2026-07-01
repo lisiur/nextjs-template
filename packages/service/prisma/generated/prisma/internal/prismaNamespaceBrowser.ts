@@ -271,6 +271,7 @@ export const ApplicationScalarFieldEnum = {
   code: 'code',
   description: 'description',
   logo: 'logo',
+  favicon: 'favicon',
   sortOrder: 'sortOrder',
   deletedAt: 'deletedAt',
   createdAt: 'createdAt',

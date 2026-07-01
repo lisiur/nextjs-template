@@ -17,6 +17,7 @@ interface Application {
   code: string;
   description?: string | null;
   logo?: string | null;
+  favicon?: string | null;
   sortOrder: number;
   createdAt: string;
 }

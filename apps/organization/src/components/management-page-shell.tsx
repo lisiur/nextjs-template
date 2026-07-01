@@ -20,9 +20,7 @@ export function ManagementPageShell({
         <h1 className="text-2xl font-bold">{title}</h1>
         {description && <p className="text-muted-foreground">{description}</p>}
       </div>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        {children}
-      </div>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
     </div>
   );
 }

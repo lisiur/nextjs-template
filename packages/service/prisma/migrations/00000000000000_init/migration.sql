@@ -186,6 +186,7 @@ CREATE TABLE "application" (
     "code" TEXT NOT NULL,
     "description" TEXT,
     "logo" TEXT,
+    "favicon" TEXT,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

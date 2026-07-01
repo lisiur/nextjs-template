@@ -4,6 +4,9 @@ const MIME_EXT: Record<string, string> = {
   "image/gif": ".gif",
   "image/webp": ".webp",
   "application/pdf": ".pdf",
+  "image/x-icon": ".ico",
+  "image/vnd.microsoft.icon": ".ico",
+  "image/svg+xml": ".svg",
 };
 
 export function extensionForMime(mime: string): string | null {
@@ -27,9 +30,15 @@ const SIGNATURES: Record<string, Sig[]> = {
     { offset: 8, bytes: [0x57, 0x45, 0x42, 0x50] },
   ],
   "application/pdf": [{ offset: 0, bytes: [0x25, 0x50, 0x44, 0x46] }],
+  "image/x-icon": [{ offset: 0, bytes: [0x00, 0x00, 0x01, 0x00] }],
+  "image/vnd.microsoft.icon": [{ offset: 0, bytes: [0x00, 0x00, 0x01, 0x00] }],
 };
 
 export function verifyMagicBytes(buf: Buffer, mime: string): boolean {
+  if (mime === "image/svg+xml") {
+    const head = buf.subarray(0, 256).toString("utf8").trimStart();
+    return head.startsWith("<?xml") || head.startsWith("<svg");
+  }
   const sigs = SIGNATURES[mime];
   if (!sigs) return false;
   return sigs.every(({ offset, bytes }) =>
