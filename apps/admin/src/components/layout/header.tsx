@@ -41,7 +41,10 @@ export function Header({ className }: { className?: string }) {
         {session ? (
           <>
             <NotificationBell />
-            <UserMenu full={false} items={["signOut"]} />
+            <UserMenu
+              full={false}
+              items={["userInfo", "profile", "theme", "locale", "signOut"]}
+            />
           </>
         ) : null}
       </div>

@@ -31,7 +31,7 @@ import { useTheme } from "next-themes";
 import { Fragment, useMemo } from "react";
 import { useSession } from "@/lib/api";
 
-type UserMenuItem = "profile" | "theme" | "locale" | "signOut";
+type UserMenuItem = "userInfo" | "profile" | "theme" | "locale" | "signOut";
 
 interface UserMenuProps {
   full: boolean;
@@ -54,7 +54,9 @@ export function UserMenu({ full, items, avatarRadius }: UserMenuProps) {
   const t = useTranslations("Sidebar");
   const th = useTranslations("Header");
 
-  const visible = new Set(items ?? ["profile", "theme", "locale", "signOut"]);
+  const visible = new Set(
+    items ?? ["userInfo", "profile", "theme", "locale", "signOut"],
+  );
   const radius = avatarRadius ?? (full ? "rounded" : "circle");
   const radiusClass = radius === "circle" ? "rounded-full" : "rounded-lg";
 
@@ -80,7 +82,7 @@ export function UserMenu({ full, items, avatarRadius }: UserMenuProps) {
     router.refresh();
   }
 
-  const showLabel = full;
+  const showLabel = visible.has("userInfo");
   const showProfile = visible.has("profile");
   const showUtilities = visible.has("theme") || visible.has("locale");
   const showSignOut = visible.has("signOut");

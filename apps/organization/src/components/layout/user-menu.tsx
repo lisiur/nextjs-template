@@ -36,6 +36,7 @@ import { appClient } from "@/lib/api";
 import { useSession } from "@/lib/api/use-session";
 
 type UserMenuItem =
+  | "userInfo"
   | "profile"
   | "switchOrganization"
   | "theme"
@@ -65,6 +66,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
 
   const visible = new Set(
     items ?? [
+      "userInfo",
       "profile",
       "switchOrganization",
       "theme",
@@ -99,7 +101,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
     router.refresh();
   }
 
-  const showLabel = full;
+  const showLabel = visible.has("userInfo");
   const showProfile = visible.has("profile");
   const showSwitch = visible.has("switchOrganization");
   const showRegisterOrg = visible.has("registerOrganization");
