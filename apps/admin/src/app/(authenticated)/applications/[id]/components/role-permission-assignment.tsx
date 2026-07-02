@@ -21,7 +21,6 @@ export function RolePermissionAssignment({
   onSaved,
 }: RolePermissionAssignmentProps) {
   const t = useTranslations("RolePermissions");
-  const tc = useTranslations("Common");
   const [permissions, setPermissions] = useState<PermissionItem[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -85,15 +84,6 @@ export function RolePermissionAssignment({
             permissions={permissions}
             value={selectedIds}
             onChange={setSelectedIds}
-            emptyText={t("noPermissions")}
-            noResultsText={t("noResults")}
-            searchPlaceholder={t("search")}
-            selectAllText={t("selectAll")}
-            selectedHeaderText={t("selected")}
-            selectedEmptyText={t("noPermissionsSelected")}
-            clearAllText={t("clearAll")}
-            previousText={tc("previous")}
-            nextText={tc("next")}
           />
         )}
       </div>

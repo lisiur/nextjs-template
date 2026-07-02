@@ -65,7 +65,6 @@ interface MenuFormProps {
 export const MenuForm = forwardRef<MenuFormRef, MenuFormProps>(
   function MenuForm({ defaultValues, appId }, ref) {
     const t = useTranslations("Menus");
-    const tc = useTranslations("Common");
     const [permissions, setPermissions] = useState<PermissionItem[]>([]);
 
     const form = useForm<MenuInput>({
@@ -207,15 +206,6 @@ export const MenuForm = forwardRef<MenuFormRef, MenuFormProps>(
                 setValue("permissionIds", ids, { shouldDirty: true })
               }
               height={300}
-              emptyText={t("noPermissionsAvailable")}
-              noResultsText={t("noResults")}
-              searchPlaceholder={t("search")}
-              selectAllText={t("selectAll")}
-              selectedHeaderText={t("selected")}
-              selectedEmptyText={t("noPermissionsSelected")}
-              clearAllText={t("clearAll")}
-              previousText={tc("previous")}
-              nextText={tc("next")}
             />
           </Field>
         )}

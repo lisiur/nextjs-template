@@ -35,7 +35,6 @@ export function PositionPermissionsDialog({
   positionName,
 }: PositionPermissionsDialogProps) {
   const t = useTranslations("Positions");
-  const tc = useTranslations("Common");
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -106,15 +105,6 @@ export function PositionPermissionsDialog({
               value={currentIds}
               onChange={setSelectedIds}
               height={400}
-              emptyText={t("noPermissionsAvailable")}
-              noResultsText={t("noResults")}
-              searchPlaceholder={t("search")}
-              selectAllText={t("selectAll")}
-              selectedHeaderText={t("selected")}
-              selectedEmptyText={t("noPermissionsSelected")}
-              clearAllText={t("clearAll")}
-              previousText={tc("previous")}
-              nextText={tc("next")}
             />
           )}
         </DialogBody>

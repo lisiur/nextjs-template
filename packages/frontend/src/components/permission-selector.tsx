@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@repo/ui";
 import { ArrowDown, ArrowUp, ArrowUpDown, Search, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export interface PermissionItem {
@@ -45,6 +46,7 @@ interface PermissionSelectorProps {
   pageSize?: number;
   height?: number;
   showDescription?: boolean;
+  i18nNamespace?: string;
   emptyText?: string;
   noResultsText?: string;
   searchPlaceholder?: string;
@@ -93,17 +95,10 @@ export function PermissionSelector({
   pageSize = 10,
   height,
   showDescription = true,
-  emptyText = "No permissions available",
-  noResultsText = "No matching permissions",
-  searchPlaceholder = "Search permissions...",
-  selectAllText = "Select all",
-  selectedHeaderText = "Selected",
-  selectedEmptyText = "No permissions selected",
-  clearAllText = "Clear all",
-  previousText = "Previous",
-  nextText = "Next",
+  i18nNamespace = "Frontend.permissionSelector",
   className,
 }: PermissionSelectorProps) {
+  const t = useTranslations(i18nNamespace);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortState>({ key: null, dir: "asc" });
   const [page, setPage] = useState(1);
@@ -261,7 +256,7 @@ export function PermissionSelector({
             disabled={permissions.length === 0}
           />
           <span className="text-xs text-muted-foreground">
-            {selectAllText}
+            {t("selectAll")}
             {filteredSelectedCount > 0 && ` (${filteredSelectedCount})`}
           </span>
           <div className="relative ml-auto w-40">
@@ -269,7 +264,7 @@ export function PermissionSelector({
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={searchPlaceholder}
+              placeholder={t("searchPlaceholder")}
               className="h-7 pl-7 text-xs"
             />
           </div>
@@ -277,18 +272,18 @@ export function PermissionSelector({
         <div className="min-h-0 flex-1 overflow-auto">
           {permissions.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              {emptyText}
+              {t("empty")}
             </div>
           ) : sorted.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              {noResultsText}
+              {t("noResults")}
             </div>
           ) : (
             <Table containerClassName="overflow-visible">
               <TableHeader sticky>
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="w-8 [&:has([role=checkbox])]:pr-0">
-                    <span className="sr-only">{selectAllText}</span>
+                    <span className="sr-only">{t("selectAll")}</span>
                   </TableHead>
                   <SortableHead keyName="name" label="name" />
                   {showDescription && (
@@ -347,7 +342,7 @@ export function PermissionSelector({
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious
-                      text={previousText}
+                      text={t("previous")}
                       onClick={() => setPage(currentPage - 1)}
                       className={
                         currentPage === 1
@@ -378,7 +373,7 @@ export function PermissionSelector({
                   })}
                   <PaginationItem>
                     <PaginationNext
-                      text={nextText}
+                      text={t("next")}
                       onClick={() => setPage(currentPage + 1)}
                       className={
                         currentPage === totalPages
@@ -401,7 +396,7 @@ export function PermissionSelector({
       >
         <div className="flex shrink-0 items-center justify-between border-b px-3 py-2">
           <span className="text-sm font-medium">
-            {selectedHeaderText} ({selectedItems.length})
+            {t("selected")} ({selectedItems.length})
           </span>
           <Button
             variant="ghost"
@@ -409,13 +404,13 @@ export function PermissionSelector({
             onClick={() => onChange([])}
             disabled={selectedItems.length === 0}
           >
-            {clearAllText}
+            {t("clearAll")}
           </Button>
         </div>
         <div className="min-h-0 flex-1 overflow-auto">
           {selectedItems.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              {selectedEmptyText}
+              {t("noSelected")}
             </div>
           ) : (
             <ul className="divide-y">
@@ -436,7 +431,7 @@ export function PermissionSelector({
                     variant="ghost"
                     size="icon-xs"
                     onClick={() => toggle(item.id, false)}
-                    aria-label={`Remove ${item.name}`}
+                    aria-label={t("remove", { name: item.name })}
                   >
                     <X />
                   </Button>

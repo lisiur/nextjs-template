@@ -262,13 +262,7 @@
     "permissions": "权限",
     "managePermissions": "管理权限",
     "managePermissionsDescription": "为拥有「{name}」职位的成员分配权限",
-    "permissionsUpdated": "权限已更新",
-    "noPermissionsAvailable": "没有可用权限",
-    "search": "搜索权限...",
-    "selected": "已选",
-    "noPermissionsSelected": "未选择权限",
-    "noResults": "没有匹配的权限",
-    "clearAll": "清除全部"
+    "permissionsUpdated": "权限已更新"
   },
   "Settings": {
     "title": "设置",
@@ -308,5 +302,19 @@
     "switchSuccess": "已切换组织",
     "registerOrganization": "创建组织",
     "signOut": "退出登录"
+  },
+  "Frontend": {
+    "permissionSelector": {
+      "empty": "没有可用权限",
+      "noResults": "没有匹配的权限",
+      "searchPlaceholder": "搜索权限...",
+      "selectAll": "全选",
+      "selected": "已选",
+      "noSelected": "未选择权限",
+      "clearAll": "清除全部",
+      "previous": "上一页",
+      "next": "下一页",
+      "remove": "移除 {name}"
+    }
   }
 }
