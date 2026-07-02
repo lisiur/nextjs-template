@@ -263,6 +263,7 @@ export function PermissionSelector({
           pageSize={pageSize}
           onPageChange={setPage}
           pageSlots={5}
+          showCount={false}
           toolbar={toolbar}
           tableContainerClassName="min-h-0 min-w-0 flex-1 overflow-auto"
         >

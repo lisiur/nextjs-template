@@ -17,6 +17,7 @@ interface DataTablePaginationProps {
   total: number;
   pageSize?: number;
   pageSlots?: number;
+  showCount?: boolean;
   className?: string;
   onPageChange: (page: number) => void;
 }
@@ -175,6 +176,7 @@ export function DataTablePagination({
   total,
   pageSize = 10,
   pageSlots = 7,
+  showCount = true,
   className,
   onPageChange,
 }: DataTablePaginationProps) {
@@ -189,9 +191,11 @@ export function DataTablePagination({
 
   return (
     <div className={cn("flex items-center justify-between py-4", className)}>
-      <p className="text-sm text-muted-foreground whitespace-nowrap">
-        {t("showing")} {start}-{end} {t("of")} {total}
-      </p>
+      {showCount && (
+        <p className="text-sm text-muted-foreground whitespace-nowrap">
+          {t("showing")} {start}-{end} {t("of")} {total}
+        </p>
+      )}
       <Pagination>
         <PaginationContent>
           <PaginationItem>

@@ -12,6 +12,7 @@ interface PaginatedTableFrameProps {
   total: number;
   pageSize: number;
   pageSlots?: number;
+  showCount?: boolean;
   onPageChange: (page: number) => void;
   toolbar?: ReactNode;
   children: ReactNode;
@@ -27,6 +28,7 @@ export function PaginatedTableFrame({
   total,
   pageSize,
   pageSlots,
+  showCount,
   onPageChange,
   toolbar,
   children,
@@ -62,6 +64,7 @@ export function PaginatedTableFrame({
               total={total}
               pageSize={pageSize}
               pageSlots={pageSlots}
+              showCount={showCount}
               onPageChange={onPageChange}
             />
           )}
