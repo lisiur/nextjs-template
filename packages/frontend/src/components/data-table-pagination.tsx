@@ -30,7 +30,7 @@ type PageItem =
     }
   | {
       type: "page";
-      label: number;
+      page: number;
       active: boolean;
       mayBeFastBackward: boolean;
       mayBeFastForward: boolean;
@@ -48,7 +48,7 @@ function createPageItemsInfo(
       items: [
         {
           type: "page",
-          label: 1,
+          page: 1,
           active: currentPage === 1,
           mayBeFastBackward: false,
           mayBeFastForward: false,
@@ -62,14 +62,14 @@ function createPageItemsInfo(
       items: [
         {
           type: "page",
-          label: 1,
+          page: 1,
           active: currentPage === 1,
           mayBeFastBackward: false,
           mayBeFastForward: false,
         },
         {
           type: "page",
-          label: 2,
+          page: 2,
           active: currentPage === 2,
           mayBeFastBackward: true,
           mayBeFastForward: false,
@@ -104,7 +104,7 @@ function createPageItemsInfo(
 
   items.push({
     type: "page",
-    label: 1,
+    page: 1,
     active: currentPage === 1,
     mayBeFastBackward: false,
     mayBeFastForward: false,
@@ -120,7 +120,7 @@ function createPageItemsInfo(
   } else if (lastPage >= firstPage + 1) {
     items.push({
       type: "page",
-      label: firstPage + 1,
+      page: firstPage + 1,
       mayBeFastBackward: true,
       mayBeFastForward: false,
       active: currentPage === firstPage + 1,
@@ -130,7 +130,7 @@ function createPageItemsInfo(
   for (let i = middleStart; i <= middleEnd; ++i) {
     items.push({
       type: "page",
-      label: i,
+      page: i,
       mayBeFastBackward: false,
       mayBeFastForward: false,
       active: currentPage === i,
@@ -146,23 +146,23 @@ function createPageItemsInfo(
     });
   } else if (
     middleEnd === lastPage - 2 &&
-    items[items.length - 1].label !== lastPage - 1
+    items[items.length - 1].page !== lastPage - 1
   ) {
     items.push({
       type: "page",
       mayBeFastForward: true,
       mayBeFastBackward: false,
-      label: lastPage - 1,
+      page: lastPage - 1,
       active: currentPage === lastPage - 1,
     });
   }
 
-  if (items[items.length - 1].label !== lastPage) {
+  if (items[items.length - 1].page !== lastPage) {
     items.push({
       type: "page",
       mayBeFastForward: false,
       mayBeFastBackward: false,
-      label: lastPage,
+      page: lastPage,
       active: currentPage === lastPage,
     });
   }
@@ -212,13 +212,13 @@ export function DataTablePagination({
               );
             }
             return (
-              <PaginationItem key={item.label}>
+              <PaginationItem key={item.page}>
                 <PaginationLink
                   isActive={item.active}
-                  onClick={() => onPageChange(item.label as number)}
+                  onClick={() => onPageChange(item.page)}
                   className="cursor-pointer"
                 >
-                  {item.label}
+                  {item.page}
                 </PaginationLink>
               </PaginationItem>
             );
