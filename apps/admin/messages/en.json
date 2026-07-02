@@ -649,6 +649,8 @@
   },
   "Frontend": {
     "permissionSelector": {
+      "name": "Name",
+      "description": "Description",
       "empty": "No permissions available",
       "noResults": "No matching permissions",
       "searchPlaceholder": "Search permissions...",

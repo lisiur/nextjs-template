@@ -305,6 +305,8 @@
   },
   "Frontend": {
     "permissionSelector": {
+      "name": "名称",
+      "description": "描述",
       "empty": "没有可用权限",
       "noResults": "没有匹配的权限",
       "searchPlaceholder": "搜索权限...",

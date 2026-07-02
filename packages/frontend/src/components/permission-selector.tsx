@@ -198,11 +198,17 @@ export function PermissionSelector({
 
   function renderSortIcon(key: PermissionSortKey) {
     if (sort.key !== key)
-      return <ArrowUpDown className="size-3 text-muted-foreground/50" />;
+      return (
+        <ArrowUpDown
+          width={14}
+          height={14}
+          className="text-muted-foreground/50"
+        />
+      );
     return sort.dir === "asc" ? (
-      <ArrowUp className="size-3" />
+      <ArrowUp width={14} height={14} />
     ) : (
-      <ArrowDown className="size-3" />
+      <ArrowDown width={14} height={14} />
     );
   }
 
@@ -230,14 +236,16 @@ export function PermissionSelector({
   }
 
   const toolbar = (
-    <div className="relative ml-auto w-40">
-      <Search className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-      <Input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder={t("searchPlaceholder")}
-        className="h-7 pl-7 text-xs"
-      />
+    <div className="pt-4 px-4 w-full">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("searchPlaceholder")}
+          className="pl-9"
+        />
+      </div>
     </div>
   );
 
@@ -278,12 +286,10 @@ export function PermissionSelector({
                   aria-label={t("selectAll")}
                 />
               </TableHead>
-              <SortableHead keyName="name" label="name" />
-              <SortableHead
-                keyName="description"
-                label="description"
-                className="hidden lg:table-cell"
-              />
+              <SortableHead keyName="name" label={t("name")} />
+              <TableHead className="lg:table-cell">
+                {t("description")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -311,7 +317,7 @@ export function PermissionSelector({
                       {item.code}
                     </code>
                   </TableCell>
-                  <TableCell className="hidden max-w-[200px] truncate text-muted-foreground lg:table-cell">
+                  <TableCell className="truncate text-muted-foreground lg:table-cell">
                     {item.description || "—"}
                   </TableCell>
                 </TableRow>
