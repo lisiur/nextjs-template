@@ -15,6 +15,9 @@ export const applicationSchema = z
     description: z.string().nullable().optional(),
     logo: z.string().nullable().optional(),
     favicon: z.string().nullable().optional(),
+    copyright: z.string().nullable().optional(),
+    icp: z.string().nullable().optional(),
+    psif: z.string().nullable().optional(),
     sortOrder: z.number().openapi({ example: 0 }),
     createdAt: z.date(),
     updatedAt: z.date(),
@@ -28,6 +31,9 @@ export const currentApplicationSchema = applicationSchema
     description: true,
     logo: true,
     favicon: true,
+    copyright: true,
+    icp: true,
+    psif: true,
   })
   .openapi("CurrentApplication");
 
@@ -43,6 +49,9 @@ export const createApplicationBodySchema = z.object({
   description: z.string().optional(),
   logo: uploadUrlSchema.optional(),
   favicon: uploadUrlSchema.optional(),
+  copyright: z.string().optional(),
+  icp: z.string().optional(),
+  psif: z.string().optional(),
   sortOrder: z.number().int().default(0),
 });
 
@@ -52,6 +61,9 @@ export const updateApplicationBodySchema = z.object({
   description: z.string().nullable().optional(),
   logo: uploadUrlSchema.nullable().optional(),
   favicon: uploadUrlSchema.nullable().optional(),
+  copyright: z.string().nullable().optional(),
+  icp: z.string().nullable().optional(),
+  psif: z.string().nullable().optional(),
   sortOrder: z.number().int().optional(),
 });
 

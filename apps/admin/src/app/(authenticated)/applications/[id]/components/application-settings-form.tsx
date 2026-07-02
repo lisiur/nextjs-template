@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { ApplicationBasicInfoForm } from "./application-basic-info-form";
 import { ApplicationFaviconForm } from "./application-favicon-form";
+import { ApplicationFooterForm } from "./application-footer-form";
 import { ApplicationLogoForm } from "./application-logo-form";
 
 interface ApplicationSettingsFormProps {
@@ -14,6 +15,9 @@ interface ApplicationSettingsFormProps {
     description?: string | null;
     logo?: string | null;
     favicon?: string | null;
+    copyright?: string | null;
+    icp?: string | null;
+    psif?: string | null;
   };
   onSuccess: () => void;
 }
@@ -59,6 +63,19 @@ export function ApplicationSettingsForm({
           </CardHeader>
           <CardContent>
             <ApplicationBasicInfoForm
+              appId={app.id}
+              app={app}
+              onSuccess={onSuccess}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle>{t("footerTitle")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ApplicationFooterForm
               appId={app.id}
               app={app}
               onSuccess={onSuccess}

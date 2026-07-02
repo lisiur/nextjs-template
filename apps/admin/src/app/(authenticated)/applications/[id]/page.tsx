@@ -19,6 +19,9 @@ interface Application {
   description?: string | null;
   logo?: string | null;
   favicon?: string | null;
+  copyright?: string | null;
+  icp?: string | null;
+  psif?: string | null;
   sortOrder: number;
   createdAt: string;
 }

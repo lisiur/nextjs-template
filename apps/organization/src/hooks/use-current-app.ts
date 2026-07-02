@@ -8,6 +8,9 @@ interface Application {
   code: string;
   description?: string | null;
   logo?: string | null;
+  copyright?: string | null;
+  icp?: string | null;
+  psif?: string | null;
 }
 
 export function useCurrentApp() {

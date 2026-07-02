@@ -236,6 +236,9 @@ model Application {
   description String?
   logo        String?
   favicon     String?
+  copyright   String?
+  icp         String?
+  psif        String?
   sortOrder   Int          @default(0)
   deletedAt   DateTime?
   createdAt   DateTime     @default(now())
