@@ -563,7 +563,14 @@
     "backToApps": "返回应用列表",
     "backToSettings": "返回应用设置",
     "requiredPermissions": "所需权限",
-    "requiredPermissionsDescription": "选择查看此菜单所需的权限"
+    "requiredPermissionsDescription": "选择查看此菜单所需的权限",
+    "search": "搜索权限...",
+    "selectAll": "全选",
+    "selected": "已选",
+    "noPermissionsSelected": "未选择权限",
+    "noPermissionsAvailable": "暂无可用权限",
+    "noResults": "没有匹配的权限",
+    "clearAll": "清除全部"
   },
   "RolePermissions": {
     "title": "角色权限分配",
@@ -576,7 +583,13 @@
     "loadError": "加载权限失败，请重试",
     "noPermissions": "暂无权限",
     "expandAll": "展开全部",
-    "collapseAll": "收起全部"
+    "collapseAll": "收起全部",
+    "search": "搜索权限...",
+    "selectAll": "全选",
+    "selected": "已选",
+    "noPermissionsSelected": "未选择权限",
+    "noResults": "没有匹配的权限",
+    "clearAll": "清除全部"
   },
   "Logs": {
     "title": "日志管理",

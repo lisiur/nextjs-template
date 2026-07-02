@@ -563,7 +563,14 @@
     "backToApps": "Back to Applications",
     "backToSettings": "Back to Application Settings",
     "requiredPermissions": "Required Permissions",
-    "requiredPermissionsDescription": "Select the permissions needed to view this menu"
+    "requiredPermissionsDescription": "Select the permissions needed to view this menu",
+    "search": "Search permissions...",
+    "selectAll": "Select all",
+    "selected": "Selected",
+    "noPermissionsSelected": "No permissions selected",
+    "noPermissionsAvailable": "No permissions available",
+    "noResults": "No matching permissions",
+    "clearAll": "Clear all"
   },
   "RolePermissions": {
     "title": "Role Permission Assignment",
@@ -576,7 +583,13 @@
     "loadError": "Failed to load permissions. Please retry.",
     "noPermissions": "No permissions available",
     "expandAll": "Expand All",
-    "collapseAll": "Collapse All"
+    "collapseAll": "Collapse All",
+    "search": "Search permissions...",
+    "selectAll": "Select all",
+    "selected": "Selected",
+    "noPermissionsSelected": "No permissions selected",
+    "noResults": "No matching permissions",
+    "clearAll": "Clear all"
   },
   "Logs": {
     "title": "Log Management",

@@ -263,7 +263,12 @@
     "managePermissions": "管理权限",
     "managePermissionsDescription": "为拥有「{name}」职位的成员分配权限",
     "permissionsUpdated": "权限已更新",
-    "noPermissionsAvailable": "没有可用权限"
+    "noPermissionsAvailable": "没有可用权限",
+    "search": "搜索权限...",
+    "selected": "已选",
+    "noPermissionsSelected": "未选择权限",
+    "noResults": "没有匹配的权限",
+    "clearAll": "清除全部"
   },
   "Settings": {
     "title": "设置",

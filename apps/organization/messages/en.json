@@ -263,7 +263,12 @@
     "managePermissions": "Manage Permissions",
     "managePermissionsDescription": "Assign permissions to members with the \"{name}\" position",
     "permissionsUpdated": "Permissions updated",
-    "noPermissionsAvailable": "No permissions available"
+    "noPermissionsAvailable": "No permissions available",
+    "search": "Search permissions...",
+    "selected": "Selected",
+    "noPermissionsSelected": "No permissions selected",
+    "noResults": "No matching permissions",
+    "clearAll": "Clear all"
   },
   "Settings": {
     "title": "Settings",

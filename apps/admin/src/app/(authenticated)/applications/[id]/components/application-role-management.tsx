@@ -279,7 +279,7 @@ export function ApplicationRoleManagement({
       <Sheet open={permissionDrawerOpen} onOpenChange={setPermissionDrawerOpen}>
         <SheetContent
           side="right"
-          className="w-full data-[side=right]:sm:max-w-2xl data-[side=right]:md:max-w-3xl"
+          className="w-full data-[side=right]:sm:max-w-5xl data-[side=right]:md:max-w-5xl"
         >
           <SheetHeader>
             <SheetTitle>

@@ -1,3 +1,5 @@
+export type { PermissionItem } from "./components/permission-selector";
+export { PermissionSelector } from "./components/permission-selector";
 export { usePaginatedQuery } from "./hooks/use-paginated-query";
 export { withApiFeedback } from "./lib/api-utils";
 export { formatDate, formatDateTime } from "./lib/date";
