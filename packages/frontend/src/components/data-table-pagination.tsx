@@ -16,40 +16,165 @@ interface DataTablePaginationProps {
   page: number;
   total: number;
   pageSize?: number;
+  pageSlots?: number;
   className?: string;
   onPageChange: (page: number) => void;
 }
 
-function getPageNumbers(
-  current: number,
-  totalPages: number,
-): (number | "ellipsis-start" | "ellipsis-end")[] {
-  if (totalPages <= 7) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
+type PageItem =
+  | {
+      type: "fast-backward" | "fast-forward";
+      active: false;
+      key: string;
+      page: number;
+    }
+  | {
+      type: "page";
+      label: number;
+      active: boolean;
+      mayBeFastBackward: boolean;
+      mayBeFastForward: boolean;
+    };
+
+function createPageItemsInfo(
+  currentPage: number,
+  pageCount: number,
+  pageSlot: number,
+): {
+  items: PageItem[];
+} {
+  if (pageCount === 1) {
+    return {
+      items: [
+        {
+          type: "page",
+          label: 1,
+          active: currentPage === 1,
+          mayBeFastBackward: false,
+          mayBeFastForward: false,
+        },
+      ],
+    };
   }
 
-  const pages: (number | "ellipsis-start" | "ellipsis-end")[] = [1];
-
-  if (current <= 4) {
-    for (let i = 2; i <= 5; i++) pages.push(i);
-    pages.push("ellipsis-end");
-  } else if (current >= totalPages - 3) {
-    pages.push("ellipsis-start");
-    for (let i = totalPages - 4; i < totalPages; i++) pages.push(i);
-  } else {
-    pages.push("ellipsis-start");
-    for (let i = current - 1; i <= current + 1; i++) pages.push(i);
-    pages.push("ellipsis-end");
+  if (pageCount === 2) {
+    return {
+      items: [
+        {
+          type: "page",
+          label: 1,
+          active: currentPage === 1,
+          mayBeFastBackward: false,
+          mayBeFastForward: false,
+        },
+        {
+          type: "page",
+          label: 2,
+          active: currentPage === 2,
+          mayBeFastBackward: true,
+          mayBeFastForward: false,
+        },
+      ],
+    };
   }
 
-  pages.push(totalPages);
-  return pages;
+  const firstPage = 1;
+  const lastPage = pageCount;
+
+  let middleStart = currentPage;
+  let middleEnd = currentPage;
+
+  const middleDelta = (pageSlot - 5) / 2;
+  middleEnd += Math.ceil(middleDelta);
+  middleEnd = Math.min(
+    Math.max(middleEnd, firstPage + pageSlot - 3),
+    lastPage - 2,
+  );
+
+  middleStart -= Math.floor(middleDelta);
+  middleStart = Math.max(
+    Math.min(middleStart, lastPage - pageSlot + 3),
+    firstPage + 2,
+  );
+
+  const leftSplit = middleStart > firstPage + 2;
+  const rightSplit = middleEnd < lastPage - 2;
+
+  const items: PageItem[] = [];
+
+  items.push({
+    type: "page",
+    label: 1,
+    active: currentPage === 1,
+    mayBeFastBackward: false,
+    mayBeFastForward: false,
+  });
+
+  if (leftSplit) {
+    items.push({
+      type: "fast-backward",
+      active: false,
+      key: "fast-backward",
+      page: middleStart - 1,
+    });
+  } else if (lastPage >= firstPage + 1) {
+    items.push({
+      type: "page",
+      label: firstPage + 1,
+      mayBeFastBackward: true,
+      mayBeFastForward: false,
+      active: currentPage === firstPage + 1,
+    });
+  }
+
+  for (let i = middleStart; i <= middleEnd; ++i) {
+    items.push({
+      type: "page",
+      label: i,
+      mayBeFastBackward: false,
+      mayBeFastForward: false,
+      active: currentPage === i,
+    });
+  }
+
+  if (rightSplit) {
+    items.push({
+      type: "fast-forward",
+      active: false,
+      key: "fast-forward",
+      page: middleEnd + 1,
+    });
+  } else if (
+    middleEnd === lastPage - 2 &&
+    items[items.length - 1].label !== lastPage - 1
+  ) {
+    items.push({
+      type: "page",
+      mayBeFastForward: true,
+      mayBeFastBackward: false,
+      label: lastPage - 1,
+      active: currentPage === lastPage - 1,
+    });
+  }
+
+  if (items[items.length - 1].label !== lastPage) {
+    items.push({
+      type: "page",
+      mayBeFastForward: false,
+      mayBeFastBackward: false,
+      label: lastPage,
+      active: currentPage === lastPage,
+    });
+  }
+
+  return { items };
 }
 
 export function DataTablePagination({
   page,
   total,
   pageSize = 10,
+  pageSlots = 7,
   className,
   onPageChange,
 }: DataTablePaginationProps) {
@@ -60,7 +185,7 @@ export function DataTablePagination({
 
   if (totalPages <= 1) return null;
 
-  const pages = getPageNumbers(page, totalPages);
+  const { items } = createPageItemsInfo(page, totalPages, pageSlots);
 
   return (
     <div className={cn("flex items-center justify-between py-4", className)}>
@@ -78,22 +203,22 @@ export function DataTablePagination({
               }
             />
           </PaginationItem>
-          {pages.map((p) => {
-            if (p === "ellipsis-start" || p === "ellipsis-end") {
+          {items.map((item) => {
+            if (item.type === "fast-backward" || item.type === "fast-forward") {
               return (
-                <PaginationItem key={p}>
-                  <PaginationEllipsis />
+                <PaginationItem key={item.key}>
+                  <PaginationEllipsis onClick={() => onPageChange(item.page)} />
                 </PaginationItem>
               );
             }
             return (
-              <PaginationItem key={p}>
+              <PaginationItem key={item.label}>
                 <PaginationLink
-                  isActive={p === page}
-                  onClick={() => onPageChange(p)}
+                  isActive={item.active}
+                  onClick={() => onPageChange(item.label as number)}
                   className="cursor-pointer"
                 >
-                  {p}
+                  {item.label}
                 </PaginationLink>
               </PaginationItem>
             );
