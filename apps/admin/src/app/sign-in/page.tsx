@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
+import { AuthFooter } from "@/components/auth/auth-footer";
 import { LoginForm } from "@/components/auth/login-form";
 import { useSession } from "@/lib/api";
 import { getFirstMenuUrl, useMenuStore } from "@/stores/menu-store";
@@ -64,19 +65,22 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">{t("welcomeBack")}</CardTitle>
-          <CardDescription>{t("signInDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <LoginForm
-            onSuccess={handleLoginSuccess}
-            onSwitchToRegister={() => router.push("/register")}
-          />
-        </CardContent>
-      </Card>
+    <div className="flex flex-1 flex-col bg-muted/30">
+      <div className="flex flex-1 items-center justify-center p-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">{t("welcomeBack")}</CardTitle>
+            <CardDescription>{t("signInDescription")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LoginForm
+              onSuccess={handleLoginSuccess}
+              onSwitchToRegister={() => router.push("/register")}
+            />
+          </CardContent>
+        </Card>
+      </div>
+      <AuthFooter />
     </div>
   );
 }
