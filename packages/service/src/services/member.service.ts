@@ -71,27 +71,43 @@ export async function removeMember(organizationId: string, memberId: string) {
 export async function updateMember(
   organizationId: string,
   memberId: string,
-  data: { departmentId: string | null },
+  data: {
+    name?: string;
+    employeeId?: string | null;
+    departmentId?: string | null;
+  },
 ): Promise<Prisma.MemberGetPayload<{ include: typeof memberInclude }>> {
   const member = await prisma.member.findFirst({
     where: { id: memberId, organizationId },
   });
   if (!member) {
-    throw new Error("Member not found");
+    throw new HTTPException(404, { message: "Member not found" });
   }
 
-  if (data.departmentId) {
+  if (data.departmentId !== undefined && data.departmentId) {
     const department = await prisma.department.findFirst({
       where: { id: data.departmentId, organizationId },
     });
     if (!department) {
-      throw new Error("Department not found");
+      throw new HTTPException(400, { message: "Department not found" });
     }
   }
 
+  if (data.name !== undefined) {
+    await prisma.user.update({
+      where: { id: member.userId },
+      data: { name: data.name },
+    });
+  }
+
+  const updateData: Record<string, unknown> = {};
+  if (data.employeeId !== undefined) updateData.employeeId = data.employeeId;
+  if (data.departmentId !== undefined)
+    updateData.departmentId = data.departmentId;
+
   return prisma.member.update({
     where: { id: memberId },
-    data: { departmentId: data.departmentId },
+    data: updateData,
     include: memberInclude,
   });
 }

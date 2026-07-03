@@ -8,6 +8,7 @@ export const memberSchema = z
     id: z.string(),
     userId: z.string(),
     role: z.string(),
+    employeeId: z.string().nullable(),
     departmentId: z.string().nullable(),
     department: z
       .object({
@@ -51,7 +52,9 @@ export const listMembersQuerySchema = paginationQuerySchema.extend({
 });
 
 export const updateMemberBodySchema = z.object({
-  departmentId: z.string().nullable(),
+  name: z.string().min(1).optional(),
+  employeeId: z.string().nullable().optional(),
+  departmentId: z.string().nullable().optional(),
 });
 
 export const listMembersResponseSchema = z

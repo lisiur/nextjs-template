@@ -14,7 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui";
-import { Crown, FolderTree, Trash2 } from "lucide-react";
+import { Crown, FolderTree, Pencil, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import { appClient, useSession } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDate } from "@/utils/date";
 import { MemberDepartmentDialog } from "./member-department-dialog";
+import { MemberEditDialog } from "./member-edit-dialog";
 import { MemberPositionsDialog } from "./member-positions-dialog";
 
 interface MemberUser {
@@ -43,6 +44,7 @@ interface MemberRow {
   id: string;
   userId: string;
   role: string;
+  employeeId?: string | null;
   departmentId?: string | null;
   positions?: MemberPosition[];
   createdAt: string;
@@ -59,6 +61,7 @@ export function MemberTable({ organizationId }: { organizationId: string }) {
     useState<MemberRow | null>(null);
   const [manageDepartmentMember, setManageDepartmentMember] =
     useState<MemberRow | null>(null);
+  const [editMember, setEditMember] = useState<MemberRow | null>(null);
 
   const {
     items: members,
@@ -133,6 +136,7 @@ export function MemberTable({ organizationId }: { organizationId: string }) {
           <TableRow>
             <TableHead>{t("name")}</TableHead>
             <TableHead>{t("email")}</TableHead>
+            <TableHead>{t("employeeId")}</TableHead>
             <TableHead>{t("role")}</TableHead>
             <TableHead>{t("department")}</TableHead>
             <TableHead>{t("positions")}</TableHead>
@@ -158,6 +162,7 @@ export function MemberTable({ organizationId }: { organizationId: string }) {
                   </div>
                 </TableCell>
                 <TableCell>{member.user.email}</TableCell>
+                <TableCell>{member.employeeId ?? "—"}</TableCell>
                 <TableCell>{roleBadge(member.role)}</TableCell>
                 <TableCell>{member.department?.name ?? "—"}</TableCell>
                 <TableCell>
@@ -173,6 +178,21 @@ export function MemberTable({ organizationId }: { organizationId: string }) {
                 <TableCell sticky="right" align="right">
                   {canManage && (
                     <ButtonGroup className="ml-auto">
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("editMember")}
+                              onClick={() => setEditMember(member)}
+                            >
+                              <Pencil />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("editMember")}</TooltipContent>
+                      </Tooltip>
                       <Tooltip>
                         <TooltipTrigger
                           render={
@@ -250,6 +270,16 @@ export function MemberTable({ organizationId }: { organizationId: string }) {
           memberId={manageDepartmentMember.id}
           memberName={manageDepartmentMember.user.name}
           currentDepartmentId={manageDepartmentMember.departmentId ?? null}
+        />
+      )}
+      {editMember && (
+        <MemberEditDialog
+          open={!!editMember}
+          onOpenChange={(open) => !open && setEditMember(null)}
+          orgId={organizationId}
+          memberId={editMember.id}
+          memberName={editMember.user.name}
+          memberEmployeeId={editMember.employeeId ?? null}
         />
       )}
     </>

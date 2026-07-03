@@ -164,7 +164,13 @@
     "save": "保存",
     "saving": "保存中...",
     "selectAll": "全选",
-    "selectNone": "取消全选"
+    "selectNone": "取消全选",
+    "employeeId": "工号",
+    "employeeIdPlaceholder": "工号（可选）",
+    "editMember": "编辑成员",
+    "editMemberDescription": "更新成员姓名和角色",
+    "namePlaceholder": "成员姓名",
+    "updateSuccess": "成员已更新"
   },
   "Departments": {
     "title": "部门",

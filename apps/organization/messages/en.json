@@ -164,7 +164,13 @@
     "save": "Save",
     "saving": "Saving...",
     "selectAll": "Select all",
-    "selectNone": "Deselect all"
+    "selectNone": "Deselect all",
+    "employeeId": "Employee ID",
+    "employeeIdPlaceholder": "Employee ID (optional)",
+    "editMember": "Edit Member",
+    "editMemberDescription": "Update member name and role",
+    "namePlaceholder": "Member name",
+    "updateSuccess": "Member updated"
   },
   "Departments": {
     "title": "Departments",
