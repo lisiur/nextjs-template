@@ -219,3 +219,14 @@ export async function getActiveNotificationChannel(id: string) {
   notificationCache.setChannel(cacheKey, channel);
   return channel;
 }
+
+/** Returns raw channel config including secrets — use only for internal delivery (e.g. mailer). */
+export async function getChannelById(id: string) {
+  const channel = await prisma.notificationChannel.findFirst({
+    where: { id, deletedAt: null },
+  });
+  if (!channel) {
+    throw new HTTPException(404, { message: "Notification channel not found" });
+  }
+  return channel;
+}
