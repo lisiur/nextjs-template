@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("#lib/db", () => ({
   prisma: { notificationChannel: { findFirst: vi.fn() } },
@@ -12,8 +12,8 @@ vi.mock("nodemailer", () => ({
   },
 }));
 
-import { prisma } from "#lib/db";
 import nodemailer from "nodemailer";
+import { prisma } from "#lib/db";
 import { sendSmtpEmail } from "./mailer";
 
 const mockPrisma = prisma as unknown as {
@@ -70,7 +70,12 @@ describe("sendSmtpEmail", () => {
     });
 
     await expect(
-      sendSmtpEmail({ channelId: "ch-inapp", to: "x", subject: "x", body: "x" }),
+      sendSmtpEmail({
+        channelId: "ch-inapp",
+        to: "x",
+        subject: "x",
+        body: "x",
+      }),
     ).rejects.toMatchObject({ status: 400 });
   });
 
@@ -92,34 +97,55 @@ describe("sendSmtpEmail", () => {
     });
 
     await expect(
-      sendSmtpEmail({ channelId: "ch-disabled", to: "x", subject: "x", body: "x" }),
+      sendSmtpEmail({
+        channelId: "ch-disabled",
+        to: "x",
+        subject: "x",
+        body: "x",
+      }),
     ).rejects.toMatchObject({ status: 400 });
   });
 
   it("omits auth when username or password is missing", async () => {
     const sendMailMock = vi.fn().mockResolvedValue({ messageId: "msg-456" });
     const mockTransport = { sendMail: sendMailMock };
-    (nodemailer.createTransport as ReturnType<typeof vi.fn>).mockReturnValue(mockTransport);
+    (nodemailer.createTransport as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockTransport,
+    );
 
     mockPrisma.notificationChannel.findFirst.mockResolvedValue({
       id: "ch-noauth",
       providerKey: "smtp-email",
       enabled: true,
-      config: { host: "smtp.example.com", port: 587, secure: false, from: "from@example.com" },
+      config: {
+        host: "smtp.example.com",
+        port: 587,
+        secure: false,
+        from: "from@example.com",
+      },
       deletedAt: null,
     });
 
-    await sendSmtpEmail({ channelId: "ch-noauth", to: "to@example.com", subject: "Hi", body: "Test" });
+    await sendSmtpEmail({
+      channelId: "ch-noauth",
+      to: "to@example.com",
+      subject: "Hi",
+      body: "Test",
+    });
 
     expect(sendMailMock).toHaveBeenCalledTimes(1);
-    const transportCall = (nodemailer.createTransport as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const transportCall = (
+      nodemailer.createTransport as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
     expect(transportCall.auth).toBeUndefined();
   });
 
   it("omits auth when password is missing but username is present", async () => {
     const sendMailMock = vi.fn().mockResolvedValue({ messageId: "msg-789" });
     const mockTransport = { sendMail: sendMailMock };
-    (nodemailer.createTransport as ReturnType<typeof vi.fn>).mockReturnValue(mockTransport);
+    (nodemailer.createTransport as ReturnType<typeof vi.fn>).mockReturnValue(
+      mockTransport,
+    );
 
     mockPrisma.notificationChannel.findFirst.mockResolvedValue({
       id: "ch-partial",
@@ -135,10 +161,17 @@ describe("sendSmtpEmail", () => {
       deletedAt: null,
     });
 
-    await sendSmtpEmail({ channelId: "ch-partial", to: "to@example.com", subject: "Hi", body: "Test" });
+    await sendSmtpEmail({
+      channelId: "ch-partial",
+      to: "to@example.com",
+      subject: "Hi",
+      body: "Test",
+    });
 
     expect(sendMailMock).toHaveBeenCalledTimes(1);
-    const transportCall = (nodemailer.createTransport as ReturnType<typeof vi.fn>).mock.calls[0][0];
+    const transportCall = (
+      nodemailer.createTransport as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0];
     expect(transportCall.auth).toBeUndefined();
   });
 });

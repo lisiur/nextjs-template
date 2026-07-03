@@ -90,12 +90,15 @@ export async function createNotificationsFromTemplate(params: {
         });
         if (user?.email) {
           try {
-            const result = await mailer!.sendSmtpEmail({
+            const result = await mailer?.sendSmtpEmail({
               channelId: template.channelId,
               to: user.email,
               subject: renderedSubject ?? "",
               body: renderedBody,
             });
+            if (!result) {
+              throw new Error("Failed to send email: mailer unavailable");
+            }
             await prisma.notification.update({
               where: { id: notification.id },
               data: {
