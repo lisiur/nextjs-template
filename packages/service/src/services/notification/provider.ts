@@ -23,7 +23,7 @@ export interface NotificationProviderDefinition {
 
 const inAppConfigSchema = z.object({}).strict().optional().nullable();
 
-const smtpEmailConfigSchema = z.object({
+export const smtpEmailConfigSchema = z.object({
   host: z.string().min(1),
   port: z.coerce.number().int().min(1).max(65_535),
   secure: z.boolean().default(false),
