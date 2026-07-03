@@ -10,8 +10,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
-import { Briefcase, Building2, Trash2 } from "lucide-react";
+import { Crown, FolderTree, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -170,37 +173,57 @@ export function MemberTable({ organizationId }: { organizationId: string }) {
                 <TableCell sticky="right" align="right">
                   {canManage && (
                     <ButtonGroup className="ml-auto">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setManageDepartmentMember(member);
-                        }}
-                      >
-                        <Building2 />
-                        {t("manageDepartment")}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setManagePositionsMember(member);
-                        }}
-                      >
-                        <Briefcase />
-                        {t("managePositions")}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={isSelf}
-                        onClick={() => handleRemove(member)}
-                      >
-                        <Trash2 />
-                        {t("removeMember")}
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("manageDepartment")}
+                              onClick={() => setManageDepartmentMember(member)}
+                            >
+                              <FolderTree />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("manageDepartment")}</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("managePositions")}
+                              onClick={() => setManagePositionsMember(member)}
+                            >
+                              <Crown />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("managePositions")}</TooltipContent>
+                      </Tooltip>
+                      {isSelf ? (
+                        <Button variant="ghost" size="icon-sm" disabled>
+                          <Trash2 />
+                        </Button>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={t("removeMember")}
+                                onClick={() => handleRemove(member)}
+                              >
+                                <Trash2 />
+                              </Button>
+                            }
+                          />
+                          <TooltipContent>{t("removeMember")}</TooltipContent>
+                        </Tooltip>
+                      )}
                     </ButtonGroup>
                   )}
                 </TableCell>

@@ -11,6 +11,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Shield, Trash2, Users } from "lucide-react";
@@ -144,50 +147,68 @@ export function PositionTable({ orgId }: PositionTableProps) {
                 <TableCell>{formatDate(position.createdAt)}</TableCell>
                 <TableCell sticky="right" align="right">
                   <ButtonGroup className="ml-auto">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setManageMembersPosition(position);
-                      }}
-                    >
-                      <Users />
-                      {t("manageMembers")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setManagePermissionsPosition(position);
-                      }}
-                    >
-                      <Shield />
-                      {t("managePermissions")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditPosition(position);
-                      }}
-                    >
-                      <Pencil />
-                      {t("edit")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(position);
-                      }}
-                    >
-                      <Trash2 />
-                      {t("delete")}
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("manageMembers")}
+                            onClick={() => setManageMembersPosition(position)}
+                          >
+                            <Users />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("manageMembers")}</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("managePermissions")}
+                            onClick={() =>
+                              setManagePermissionsPosition(position)
+                            }
+                          >
+                            <Shield />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("managePermissions")}</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("edit")}
+                            onClick={() => setEditPosition(position)}
+                          >
+                            <Pencil />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("edit")}</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("delete")}
+                            onClick={() => handleDelete(position)}
+                          >
+                            <Trash2 />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("delete")}</TooltipContent>
+                    </Tooltip>
                   </ButtonGroup>
                 </TableCell>
               </TableRow>

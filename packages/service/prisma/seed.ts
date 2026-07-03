@@ -641,7 +641,7 @@ const organizationMenus = [
     id: "organization-positions",
     code: "positions",
     name: "Positions",
-    icon: "Briefcase",
+    icon: "Crown",
     linkType: "INTERNAL" as const,
     url: "/organization/positions",
     sortOrder: 2,
