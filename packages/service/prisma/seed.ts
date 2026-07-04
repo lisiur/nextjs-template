@@ -401,6 +401,11 @@ const systemPermissions = [
   { code: "upload::list", group: "upload", name: "List Uploads" },
   { code: "upload::delete", group: "upload", name: "Delete Uploads" },
   { code: "upload::replace", group: "upload", name: "Replace Upload" },
+  { code: "job::list", group: "job", name: "List Jobs" },
+  { code: "job::create", group: "job", name: "Create Job" },
+  { code: "job::view", group: "job", name: "View Job" },
+  { code: "job::retry", group: "job", name: "Retry Job" },
+  { code: "job::cancel", group: "job", name: "Cancel Job" },
 ];
 
 // --- Organization App Permissions ---
