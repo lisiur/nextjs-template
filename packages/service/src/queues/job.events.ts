@@ -1,0 +1,36 @@
+import { Job } from "#generated/prisma";
+
+type JobEvent = {
+  "job:created": Job;
+  "job:completed": Job;
+  "job:failed": Job;
+};
+
+type Listener<T> = (data: T) => void;
+
+class EventEmitter {
+  private listeners: Partial<{
+    [K in keyof JobEvent]: Listener<JobEvent[K]>[];
+  }> = {};
+
+  on<K extends keyof JobEvent>(event: K, listener: Listener<JobEvent[K]>): void {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event]!.push(listener as Listener<JobEvent[keyof JobEvent]>);
+  }
+
+  off<K extends keyof JobEvent>(event: K, listener: Listener<JobEvent[K]>): void {
+    if (!this.listeners[event]) return;
+    this.listeners[event] = this.listeners[event]!.filter(
+      (l) => l !== (listener as Listener<JobEvent[keyof JobEvent]>)
+    );
+  }
+
+  emit<K extends keyof JobEvent>(event: K, data: JobEvent[K]): void {
+    if (!this.listeners[event]) return;
+    this.listeners[event]!.forEach((listener) => listener(data));
+  }
+}
+
+export const jobEvents = new EventEmitter();
