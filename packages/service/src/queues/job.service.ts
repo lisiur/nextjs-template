@@ -1,7 +1,7 @@
-import { jobRepository } from "./job.repository";
-import { jobEvents } from "./job.events";
 import { HTTPException } from "hono/http-exception";
-import { JobStatus, type CreateJobInput, type Job } from "./job.types";
+import { jobEvents } from "./job.events";
+import { jobRepository } from "./job.repository";
+import { type CreateJobInput, type Job, JobStatus } from "./job.types";
 
 export class JobService {
   async createJob(input: CreateJobInput): Promise<Job> {
@@ -40,7 +40,9 @@ export class JobService {
     const job = await this.getJob(id);
 
     if (job.status !== JobStatus.FAILED) {
-      throw new HTTPException(400, { message: "Only failed jobs can be retried" });
+      throw new HTTPException(400, {
+        message: "Only failed jobs can be retried",
+      });
     }
 
     const retriedJob = await jobRepository.updateStatus(id, JobStatus.PENDING, {
@@ -58,7 +60,9 @@ export class JobService {
     const job = await this.getJob(id);
 
     if (job.status !== JobStatus.PENDING) {
-      throw new HTTPException(400, { message: "Only pending jobs can be cancelled" });
+      throw new HTTPException(400, {
+        message: "Only pending jobs can be cancelled",
+      });
     }
 
     await jobRepository.delete(id);

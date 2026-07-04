@@ -1,4 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { jobRoutes } from "../queues/routes";
 import { applicationRoutes } from "./application";
 import { auditLogRoutes } from "./audit-log";
 import { authRoutes } from "./auth";
@@ -17,7 +18,6 @@ import { systemInfoRoutes } from "./system-info";
 import { uploadRoutes } from "./upload";
 import { userRoutes } from "./user";
 import { userRoleRoutes } from "./user-role";
-import { jobRoutes } from "../queues/routes";
 
 const routes = new OpenAPIHono()
   .route("/auth", authRoutes)

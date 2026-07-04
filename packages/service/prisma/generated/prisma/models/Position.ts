@@ -494,14 +494,6 @@ export type PositionUncheckedUpdateManyWithoutOrganizationNestedInput = {
   deleteMany?: Prisma.PositionScalarWhereInput | Prisma.PositionScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type PositionCreateNestedOneWithoutMemberPositionsInput = {
   create?: Prisma.XOR<Prisma.PositionCreateWithoutMemberPositionsInput, Prisma.PositionUncheckedCreateWithoutMemberPositionsInput>
   connectOrCreate?: Prisma.PositionCreateOrConnectWithoutMemberPositionsInput

@@ -9,6 +9,27 @@
 * 🟢 You can import this file directly.
 */
 
+export const JobStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type JobStatus = (typeof JobStatus)[keyof typeof JobStatus]
+
+
+export const JobPriority = {
+  CRITICAL: 'CRITICAL',
+  HIGH: 'HIGH',
+  NORMAL: 'NORMAL',
+  LOW: 'LOW',
+  IDLE: 'IDLE'
+} as const
+
+export type JobPriority = (typeof JobPriority)[keyof typeof JobPriority]
+
+
 export const LinkType = {
   GROUP: 'GROUP',
   INTERNAL: 'INTERNAL',

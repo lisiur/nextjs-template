@@ -1,11 +1,9 @@
-import { jobRepository } from "./job.repository";
-import { jobQueue } from "./job-queue";
-import { jobHandlerRegistry } from "./job-handler-registry";
-import { jobArchiver } from "./job-archive";
 import { jobEvents } from "./job.events";
+import { jobRepository } from "./job.repository";
 import { JobStatus } from "./job.types";
-
-const MAX_ATTEMPTS = parseInt(process.env.JOB_MAX_ATTEMPTS ?? "3", 10);
+import { jobArchiver } from "./job-archive";
+import { jobHandlerRegistry } from "./job-handler-registry";
+import { jobQueue } from "./job-queue";
 
 export class JobWorker {
   async start(): Promise<void> {
@@ -27,10 +25,7 @@ export class JobWorker {
       }
 
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(
-          () => reject(new Error("Job timed out")),
-          job.timeoutMs
-        );
+        setTimeout(() => reject(new Error("Job timed out")), job.timeoutMs);
       });
 
       const result = await Promise.race([handler(job), timeoutPromise]);

@@ -11,25 +11,55 @@ export const jobSchema = z
     id: z.string().openapi({ example: "clx1234567890" }),
     type: z.string().openapi({ example: "send-email" }),
     payload: z.unknown().openapi({ description: "Job payload data" }),
-    status: z.enum(["PENDING", "PROCESSING", "COMPLETED", "FAILED"]).openapi({ example: "PENDING" }),
-    priority: z.enum(["CRITICAL", "HIGH", "NORMAL", "LOW", "IDLE"]).openapi({ example: "NORMAL" }),
-    result: z.unknown().nullable().optional().openapi({ description: "Job result on completion" }),
-    error: z.string().nullable().optional().openapi({ description: "Error message on failure" }),
+    status: z
+      .enum(["PENDING", "PROCESSING", "COMPLETED", "FAILED"])
+      .openapi({ example: "PENDING" }),
+    priority: z
+      .enum(["CRITICAL", "HIGH", "NORMAL", "LOW", "IDLE"])
+      .openapi({ example: "NORMAL" }),
+    result: z
+      .unknown()
+      .nullable()
+      .optional()
+      .openapi({ description: "Job result on completion" }),
+    error: z
+      .string()
+      .nullable()
+      .optional()
+      .openapi({ description: "Error message on failure" }),
     attempts: z.number().openapi({ example: 0 }),
     maxAttempts: z.number().openapi({ example: 3 }),
     timeoutMs: z.number().openapi({ example: 60000 }),
     scheduledAt: z.date().openapi({ example: "2026-07-04T10:00:00Z" }),
-    startedAt: z.date().nullable().optional().openapi({ example: "2026-07-04T10:00:01Z" }),
-    completedAt: z.date().nullable().optional().openapi({ example: "2026-07-04T10:00:05Z" }),
+    startedAt: z
+      .date()
+      .nullable()
+      .optional()
+      .openapi({ example: "2026-07-04T10:00:01Z" }),
+    completedAt: z
+      .date()
+      .nullable()
+      .optional()
+      .openapi({ example: "2026-07-04T10:00:05Z" }),
     createdAt: z.date().openapi({ example: "2026-07-04T08:00:00Z" }),
   })
   .openapi("Job");
 
 export const createJobBodySchema = z.object({
-  type: z.string().min(1).openapi({ example: "send-email", description: "Job type identifier" }),
+  type: z
+    .string()
+    .min(1)
+    .openapi({ example: "send-email", description: "Job type identifier" }),
   payload: z.unknown().openapi({ description: "Job payload data" }),
-  priority: z.enum(["CRITICAL", "HIGH", "NORMAL", "LOW", "IDLE"]).default("NORMAL").openapi({ example: "NORMAL" }),
-  scheduledAt: z.string().datetime().optional().openapi({ description: "ISO 8601 datetime to run job" }),
+  priority: z
+    .enum(["CRITICAL", "HIGH", "NORMAL", "LOW", "IDLE"])
+    .default("NORMAL")
+    .openapi({ example: "NORMAL" }),
+  scheduledAt: z
+    .string()
+    .datetime()
+    .optional()
+    .openapi({ description: "ISO 8601 datetime to run job" }),
   maxAttempts: z.number().int().min(1).default(3).openapi({ example: 3 }),
   timeoutMs: z.number().int().min(1).default(60000).openapi({ example: 60000 }),
 });

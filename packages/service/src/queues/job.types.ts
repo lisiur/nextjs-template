@@ -1,9 +1,14 @@
-import { Job, JobArchive, JobPriority, JobStatus } from "#generated/prisma";
+import type {
+  Job,
+  JobArchive,
+  JobPriority,
+  JobStatus,
+} from "#generated/prisma";
 
 export type { Job, JobArchive, JobPriority, JobStatus };
 
-export type JobHandler<TPayload = unknown, TResult = unknown> = (
-  job: Job
+export type JobHandler<_TPayload = unknown, TResult = unknown> = (
+  job: Job,
 ) => Promise<TResult>;
 
 export interface JobWithParsedPayload extends Job {

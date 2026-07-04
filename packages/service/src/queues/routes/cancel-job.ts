@@ -1,10 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { jobService } from "../job.service";
 import {
-  jobIdParamSchema,
-} from "./schema";
-import { notFoundResponse, unauthorizedResponse, forbiddenResponse } from "#lib/openapi";
-import { deleteSuccessSchema } from "#lib/openapi";
+  deleteSuccessSchema,
+  forbiddenResponse,
+  notFoundResponse,
+  unauthorizedResponse,
+} from "#lib/openapi";
+import { jobService } from "../job.service";
+import { jobIdParamSchema } from "./schema";
 
 export const cancelJob = defineOpenAPIRoute({
   route: createRoute({

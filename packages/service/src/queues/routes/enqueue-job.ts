@@ -1,10 +1,11 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { jobService } from "../job.service";
 import {
-  createJobBodySchema,
-  jobSchema,
-} from "./schema";
-import { createdResponseFn, unauthorizedResponse, forbiddenResponse } from "#lib/openapi";
+  createdResponseFn,
+  forbiddenResponse,
+  unauthorizedResponse,
+} from "#lib/openapi";
+import { jobService } from "../job.service";
+import { createJobBodySchema, jobSchema } from "./schema";
 
 export const enqueueJob = defineOpenAPIRoute({
   route: createRoute({
@@ -31,7 +32,9 @@ export const enqueueJob = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const body = c.req.valid("json");
-    const scheduledAt = body.scheduledAt ? new Date(body.scheduledAt) : undefined;
+    const scheduledAt = body.scheduledAt
+      ? new Date(body.scheduledAt)
+      : undefined;
 
     const job = await jobService.createJob({
       type: body.type,

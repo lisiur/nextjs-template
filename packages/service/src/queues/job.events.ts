@@ -1,4 +1,4 @@
-import { Job } from "#generated/prisma";
+import type { Job } from "#generated/prisma";
 
 type JobEvent = {
   "job:created": Job;
@@ -13,23 +13,31 @@ class EventEmitter {
     [K in keyof JobEvent]: Listener<JobEvent[K]>[];
   }> = {};
 
-  on<K extends keyof JobEvent>(event: K, listener: Listener<JobEvent[K]>): void {
+  on<K extends keyof JobEvent>(
+    event: K,
+    listener: Listener<JobEvent[K]>,
+  ): void {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
-    this.listeners[event]!.push(listener as Listener<JobEvent[keyof JobEvent]>);
+    this.listeners[event]?.push(listener as Listener<JobEvent[keyof JobEvent]>);
   }
 
-  off<K extends keyof JobEvent>(event: K, listener: Listener<JobEvent[K]>): void {
+  off<K extends keyof JobEvent>(
+    event: K,
+    listener: Listener<JobEvent[K]>,
+  ): void {
     if (!this.listeners[event]) return;
-    this.listeners[event] = this.listeners[event]!.filter(
-      (l) => l !== (listener as Listener<JobEvent[keyof JobEvent]>)
+    this.listeners[event] = this.listeners[event]?.filter(
+      (l) => l !== (listener as Listener<JobEvent[keyof JobEvent]>),
     );
   }
 
   emit<K extends keyof JobEvent>(event: K, data: JobEvent[K]): void {
     if (!this.listeners[event]) return;
-    this.listeners[event]!.forEach((listener) => listener(data));
+    this.listeners[event]?.forEach((listener) => {
+      void listener(data);
+    });
   }
 }
 

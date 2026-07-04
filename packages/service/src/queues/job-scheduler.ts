@@ -1,7 +1,7 @@
-import { jobRepository } from "./job.repository";
-import { jobQueue } from "./job-queue";
 import { jobEvents } from "./job.events";
+import { jobRepository } from "./job.repository";
 import type { Job } from "./job.types";
+import { jobQueue } from "./job-queue";
 
 const MAX_TIMER_DURATION_MS = 24 * 60 * 60 * 1000;
 
@@ -76,7 +76,7 @@ export class JobScheduler {
     await this.rescheduleIfNeeded(job);
   }
 
-  private async rescheduleIfNeeded(job: Job): Promise<void> {
+  private async rescheduleIfNeeded(_job: Job): Promise<void> {
     const nextJob = await jobRepository.findNextScheduledJob();
     if (!nextJob) return;
 
