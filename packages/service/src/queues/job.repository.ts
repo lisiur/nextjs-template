@@ -1,4 +1,5 @@
-import type { Job, JobStatus, Prisma } from "#generated/prisma/client";
+import type { Job, Prisma } from "#generated/prisma/client";
+import { JobStatus } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 
 export class JobRepository {
@@ -65,7 +66,11 @@ export class JobRepository {
       where: { id },
       data: {
         status,
-        ...data,
+        startedAt: data?.startedAt,
+        completedAt: data?.completedAt,
+        result: data?.result as Prisma.InputJsonValue | undefined,
+        error: data?.error,
+        attempts: data?.attempts,
       },
     });
   }
@@ -104,7 +109,7 @@ export class JobRepository {
         payload: job.payload as Prisma.InputJsonValue,
         status: job.status,
         priority: job.priority,
-        result: job.result as Prisma.InputJsonValue | null,
+        result: job.result as Prisma.InputJsonValue | undefined,
         error: job.error,
         attempts: job.attempts,
         maxAttempts: job.maxAttempts,
