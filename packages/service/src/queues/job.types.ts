@@ -3,7 +3,7 @@ import type {
   JobArchive,
   JobPriority,
   JobStatus,
-} from "#generated/prisma";
+} from "#generated/prisma/client";
 
 export type { Job, JobArchive, JobPriority, JobStatus };
 

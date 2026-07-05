@@ -1,4 +1,4 @@
-import type { Job } from "#generated/prisma";
+import type { Job } from "#generated/prisma/client";
 
 type JobEvent = {
   "job:created": Job;

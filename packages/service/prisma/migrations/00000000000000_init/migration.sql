@@ -2,6 +2,12 @@
 CREATE SCHEMA IF NOT EXISTS "public";
 
 -- CreateEnum
+CREATE TYPE "JobStatus" AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED');
+
+-- CreateEnum
+CREATE TYPE "JobPriority" AS ENUM ('CRITICAL', 'HIGH', 'NORMAL', 'LOW', 'IDLE');
+
+-- CreateEnum
 CREATE TYPE "LinkType" AS ENUM ('GROUP', 'INTERNAL', 'EXTERNAL');
 
 -- CreateEnum
@@ -70,6 +76,48 @@ CREATE TABLE "verification" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "verification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "job" (
+    "id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "payload" JSONB NOT NULL,
+    "status" "JobStatus" NOT NULL DEFAULT 'PENDING',
+    "priority" "JobPriority" NOT NULL DEFAULT 'NORMAL',
+    "result" JSONB,
+    "error" TEXT,
+    "attempts" INTEGER NOT NULL DEFAULT 0,
+    "maxAttempts" INTEGER NOT NULL DEFAULT 3,
+    "timeoutMs" INTEGER NOT NULL DEFAULT 60000,
+    "scheduledAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "startedAt" TIMESTAMP(3),
+    "completedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "job_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "job_archive" (
+    "id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "payload" JSONB NOT NULL,
+    "status" "JobStatus" NOT NULL,
+    "priority" "JobPriority" NOT NULL,
+    "result" JSONB,
+    "error" TEXT,
+    "attempts" INTEGER NOT NULL,
+    "maxAttempts" INTEGER NOT NULL,
+    "timeoutMs" INTEGER NOT NULL,
+    "scheduledAt" TIMESTAMP(3) NOT NULL,
+    "startedAt" TIMESTAMP(3),
+    "completedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL,
+    "originalJobId" TEXT NOT NULL,
+
+    CONSTRAINT "job_archive_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -405,6 +453,24 @@ CREATE INDEX "account_userId_idx" ON "account"("userId");
 
 -- CreateIndex
 CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
+
+-- CreateIndex
+CREATE INDEX "job_status_scheduledAt_idx" ON "job"("status", "scheduledAt");
+
+-- CreateIndex
+CREATE INDEX "job_status_priority_idx" ON "job"("status", "priority");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "job_archive_originalJobId_key" ON "job_archive"("originalJobId");
+
+-- CreateIndex
+CREATE INDEX "job_archive_status_idx" ON "job_archive"("status");
+
+-- CreateIndex
+CREATE INDEX "job_archive_type_idx" ON "job_archive"("type");
+
+-- CreateIndex
+CREATE INDEX "job_archive_completedAt_idx" ON "job_archive"("completedAt");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "organization_slug_key" ON "organization"("slug");

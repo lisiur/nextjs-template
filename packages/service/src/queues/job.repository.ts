@@ -1,4 +1,4 @@
-import type { Job, JobStatus, Prisma } from "#generated/prisma";
+import type { Job, JobStatus, Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 
 export class JobRepository {
