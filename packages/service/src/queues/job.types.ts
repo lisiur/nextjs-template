@@ -1,11 +1,8 @@
-import type {
-  Job,
-  JobArchive,
-  JobPriority,
-  JobStatus,
-} from "#generated/prisma/client";
+import type { Job, JobArchive, JobPriority } from "#generated/prisma/client";
+import { JobStatus } from "#generated/prisma/client";
 
-export type { Job, JobArchive, JobPriority, JobStatus };
+export type { Job, JobArchive, JobPriority };
+export { JobStatus };
 
 export type JobHandler<_TPayload = unknown, TResult = unknown> = (
   job: Job,
