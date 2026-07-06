@@ -21,12 +21,13 @@ import {
   TooltipTrigger,
 } from "@repo/ui";
 import { Eye } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
+import { JobDetailSheet } from "./job-detail-sheet";
+import type { JobDetail } from "./job-detail-tabs";
 
 interface ArchivedJob {
   id: string;
@@ -60,7 +61,6 @@ function statusVariant(status: string) {
 }
 
 export function ArchivedJobTable() {
-  const router = useRouter();
   const t = useTranslations("Jobs");
   const [jobs, setJobs] = useState<ArchivedJob[]>([]);
   const [total, setTotal] = useState(0);
@@ -68,6 +68,9 @@ export function ArchivedJobTable() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [detailJob, setDetailJob] = useState<JobDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const lastEffectFetchKeyRef = useRef<string>(undefined);
 
   const pageSize = 20;
@@ -126,6 +129,22 @@ export function ArchivedJobTable() {
     setStatusFilter("");
     setTypeFilter("");
     setPage(1);
+  }
+
+  async function handleView(job: ArchivedJob) {
+    setDetailOpen(true);
+    setDetailLoading(true);
+    setDetailJob(null);
+    try {
+      const res = await withApiFeedback(appClient.api.jobs.archive[":id"].$get)(
+        { param: { id: job.id } },
+      );
+      setDetailJob((await res.json()) as JobDetail);
+    } catch {
+      setDetailJob(null);
+    } finally {
+      setDetailLoading(false);
+    }
   }
 
   return (
@@ -241,9 +260,7 @@ export function ArchivedJobTable() {
                             variant="ghost"
                             size="icon-sm"
                             aria-label={t("view")}
-                            onClick={() =>
-                              router.push(`/jobs/archive/${job.id}`)
-                            }
+                            onClick={() => handleView(job)}
                           >
                             <Eye />
                           </Button>
@@ -265,6 +282,13 @@ export function ArchivedJobTable() {
           />
         </div>
       )}
+      <JobDetailSheet
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        job={detailJob}
+        loading={detailLoading}
+        title={t("detail.archivedTitle")}
+      />
     </div>
   );
 }

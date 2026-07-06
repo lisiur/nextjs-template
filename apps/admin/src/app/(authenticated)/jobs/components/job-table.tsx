@@ -22,13 +22,14 @@ import {
   TooltipTrigger,
 } from "@repo/ui";
 import { Eye, Plus, RotateCcw, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
 import { CreateJobDialog } from "./create-job-dialog";
+import { JobDetailSheet } from "./job-detail-sheet";
+import type { JobDetail } from "./job-detail-tabs";
 
 interface Job {
   id: string;
@@ -60,7 +61,6 @@ function statusVariant(status: string) {
 }
 
 export function JobTable() {
-  const router = useRouter();
   const t = useTranslations("Jobs");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [total, setTotal] = useState(0);
@@ -69,6 +69,9 @@ export function JobTable() {
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [typeFilter, setTypeFilter] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
+  const [detailJob, setDetailJob] = useState<JobDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const lastEffectFetchKeyRef = useRef<string>(undefined);
 
   const pageSize = 20;
@@ -140,6 +143,22 @@ export function JobTable() {
       fetchJobs();
     } catch {
       // Error handled by API feedback.
+    }
+  }
+
+  async function handleView(job: Job) {
+    setDetailOpen(true);
+    setDetailLoading(true);
+    setDetailJob(null);
+    try {
+      const res = await withApiFeedback(appClient.api.jobs[":id"].$get)({
+        param: { id: job.id },
+      });
+      setDetailJob((await res.json()) as JobDetail);
+    } catch {
+      setDetailJob(null);
+    } finally {
+      setDetailLoading(false);
     }
   }
 
@@ -266,7 +285,7 @@ export function JobTable() {
                               variant="ghost"
                               size="icon-sm"
                               aria-label={t("view")}
-                              onClick={() => router.push(`/jobs/${job.id}`)}
+                              onClick={() => handleView(job)}
                             >
                               <Eye />
                             </Button>
@@ -327,6 +346,13 @@ export function JobTable() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         onCreated={fetchJobs}
+      />
+      <JobDetailSheet
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        job={detailJob}
+        loading={detailLoading}
+        title={t("detail.title")}
       />
     </div>
   );
