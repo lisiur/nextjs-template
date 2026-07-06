@@ -704,7 +704,8 @@
       "executor": "Executor",
       "queued": "Queued",
       "active": "Active",
-      "concurrency": "Concurrency"
+      "concurrency": "Concurrency",
+      "nextExecution": "Next execution"
     },
     "columns": {
       "id": "ID",

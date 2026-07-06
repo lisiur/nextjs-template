@@ -149,6 +149,11 @@ export const jobExecutorStatsSchema = z
     concurrency: z
       .number()
       .openapi({ example: 5, description: "Configured max concurrency" }),
+    nextScheduledAt: z.date().nullable().openapi({
+      example: "2026-07-04T10:00:00Z",
+      description:
+        "Scheduled time of the earliest pending job, or null if none pending",
+    }),
     byStatus: z
       .object({
         PENDING: z.number().openapi({ example: 4 }),

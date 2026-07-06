@@ -3,20 +3,22 @@
 import { Card, CardContent } from "@repo/ui";
 import {
   Activity,
-  CheckCircle2,
+  CalendarClock,
   Clock,
   Gauge,
   Hourglass,
-  XCircle,
+  Zap,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { appClient } from "@/lib/api";
+import { formatDateTime } from "@/utils/date";
 
 interface ExecutorStats {
   queueSize: number;
   pending: number;
   concurrency: number;
+  nextScheduledAt: string | null;
   byStatus: {
     PENDING: number;
     PROCESSING: number;
@@ -77,18 +79,12 @@ export function JobExecutorStats() {
       <h2 className="mb-3 text-sm font-medium text-muted-foreground">
         {t("stats.executor")}
       </h2>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard
-          icon={<Hourglass className="h-5 w-5" />}
-          label={t("stats.queued")}
-          value={stats?.queueSize ?? "-"}
-          tone="text-amber-500"
-        />
-        <StatCard
-          icon={<Activity className="h-5 w-5" />}
-          label={t("stats.active")}
-          value={stats?.pending ?? "-"}
-          tone="text-blue-500"
+          icon={<Clock className="h-5 w-5" />}
+          label={t("status.PENDING")}
+          value={stats?.byStatus.PENDING ?? "-"}
+          tone="text-muted-foreground"
         />
         <StatCard
           icon={<Gauge className="h-5 w-5" />}
@@ -97,28 +93,30 @@ export function JobExecutorStats() {
           tone="text-muted-foreground"
         />
         <StatCard
-          icon={<Clock className="h-5 w-5" />}
-          label={t("status.PENDING")}
-          value={stats?.byStatus.PENDING ?? "-"}
-          tone="text-muted-foreground"
-        />
-        <StatCard
-          icon={<Activity className="h-5 w-5" />}
+          icon={<Zap className="h-5 w-5" />}
           label={t("status.PROCESSING")}
           value={stats?.byStatus.PROCESSING ?? "-"}
           tone="text-blue-500"
         />
         <StatCard
-          icon={<CheckCircle2 className="h-5 w-5" />}
-          label={t("status.COMPLETED")}
-          value={stats?.byStatus.COMPLETED ?? "-"}
-          tone="text-green-500"
+          icon={<Activity className="h-5 w-5" />}
+          label={t("stats.active")}
+          value={stats?.pending ?? "-"}
+          tone="text-blue-500"
         />
         <StatCard
-          icon={<XCircle className="h-5 w-5" />}
-          label={t("status.FAILED")}
-          value={stats?.byStatus.FAILED ?? "-"}
-          tone="text-red-500"
+          icon={<Hourglass className="h-5 w-5" />}
+          label={t("stats.queued")}
+          value={stats?.queueSize ?? "-"}
+          tone="text-amber-500"
+        />
+        <StatCard
+          icon={<CalendarClock className="h-5 w-5" />}
+          label={t("stats.nextExecution")}
+          value={
+            stats?.nextScheduledAt ? formatDateTime(stats.nextScheduledAt) : "-"
+          }
+          tone="text-muted-foreground"
         />
       </div>
     </div>

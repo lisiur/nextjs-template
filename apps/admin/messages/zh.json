@@ -704,7 +704,8 @@
       "executor": "执行器",
       "queued": "队列中",
       "active": "处理中",
-      "concurrency": "并发数"
+      "concurrency": "并发数",
+      "nextExecution": "下次执行时间"
     },
     "columns": {
       "id": "ID",

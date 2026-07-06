@@ -104,8 +104,11 @@ export class JobService {
 
   async getExecutorStats() {
     const live = jobExecutor.getStats();
-    const byStatus = await jobRepository.countByStatus();
-    return { ...live, byStatus };
+    const [byStatus, nextJob] = await Promise.all([
+      jobRepository.countByStatus(),
+      jobRepository.findNextScheduledJob(),
+    ]);
+    return { ...live, byStatus, nextScheduledAt: nextJob?.scheduledAt ?? null };
   }
 }
 
