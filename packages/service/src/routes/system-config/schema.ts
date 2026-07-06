@@ -11,8 +11,8 @@ const jsonSchemaValueSchema = z.any().nullable();
 export const systemConfigItemSchema = z
   .object({
     id: z.string().openapi({ example: "clx1234567890" }),
-    group: z.string().openapi({ example: "general" }),
-    key: z.string().openapi({ example: "site.name" }),
+    group: z.string().openapi({ example: "auth" }),
+    key: z.string().openapi({ example: "registration.enabled" }),
     value: z.string().openapi({ example: "My Application" }),
     type: z.string().openapi({
       example: "string",
@@ -37,16 +37,16 @@ export const systemConfigItemSchema = z
 // ---- Route-specific schemas ----
 
 export const getConfigsQuerySchema = z.object({
-  group: z.string().optional().openapi({ example: "general" }),
+  group: z.string().optional().openapi({ example: "auth" }),
 });
 
 export const getConfigsByGroupParamSchema = z.object({
-  group: z.string().min(1).openapi({ example: "general" }),
+  group: z.string().min(1).openapi({ example: "auth" }),
 });
 
 export const upsertConfigParamSchema = z.object({
-  group: z.string().min(1).openapi({ example: "general" }),
-  key: z.string().min(1).openapi({ example: "site.name" }),
+  group: z.string().min(1).openapi({ example: "auth" }),
+  key: z.string().min(1).openapi({ example: "registration.enabled" }),
 });
 
 export const upsertConfigBodySchema = z.object({
@@ -63,8 +63,8 @@ export const batchUpsertBodySchema = z.object({
   items: z
     .array(
       z.object({
-        group: z.string().min(1).openapi({ example: "general" }),
-        key: z.string().min(1).openapi({ example: "site.name" }),
+        group: z.string().min(1).openapi({ example: "auth" }),
+        key: z.string().min(1).openapi({ example: "registration.enabled" }),
         value: z.string().openapi({ example: "My Application" }),
         type: configTypeSchema.default("string"),
         schema: jsonSchemaValueSchema.optional(),
@@ -78,8 +78,8 @@ export const batchUpsertBodySchema = z.object({
 });
 
 export const deleteConfigParamSchema = z.object({
-  group: z.string().min(1).openapi({ example: "general" }),
-  key: z.string().min(1).openapi({ example: "site.name" }),
+  group: z.string().min(1).openapi({ example: "auth" }),
+  key: z.string().min(1).openapi({ example: "registration.enabled" }),
 });
 
 // ---- Response schemas ----

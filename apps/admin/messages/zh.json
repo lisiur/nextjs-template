@@ -159,9 +159,7 @@
     "title": "系统设置",
     "description": "管理应用配置",
     "tabs": {
-      "general": "通用",
       "auth": "认证",
-      "smtp": "邮件 (SMTP)",
       "upload": "上传"
     },
     "save": "保存更改",
@@ -487,32 +485,16 @@
   "Remote": {
     "settings": {
       "fields": {
-        "siteName": "站点名称",
-        "siteUrl": "站点 URL",
-        "siteDescription": "站点描述",
         "enableRegistration": "启用注册",
         "sessionMaxAge": "会话最大时长（天）",
-        "smtpHost": "SMTP 主机",
-        "smtpPort": "SMTP 端口",
-        "smtpUser": "SMTP 用户名",
-        "smtpPassword": "SMTP 密码",
-        "fromEmail": "发件人邮箱",
         "uploadHotlink": "上传防盗链",
         "uploadHotlinkEnabled": "启用防盗链",
         "uploadHotlinkAllowedDomains": "允许的域名",
         "uploadHotlinkAllowEmptyReferer": "允许空 Referer"
       },
       "fieldsDesc": {
-        "siteName": "应用的名称",
-        "siteUrl": "应用的基础 URL",
-        "siteDescription": "应用的简要描述",
         "enableRegistration": "允许新用户注册",
         "sessionMaxAge": "会话最长有效期（天）",
-        "smtpHost": "SMTP 服务器主机名",
-        "smtpPort": "SMTP 服务器端口",
-        "smtpUser": "SMTP 认证用户名",
-        "smtpPassword": "SMTP 认证密码",
-        "fromEmail": "用作发件人的邮箱地址",
         "uploadHotlink": "控制上传文件的全局防盗链保护",
         "uploadHotlinkAllowedDomains": "允许引用上传文件的主机名",
         "uploadHotlinkAllowEmptyReferer": "当 Referer 和 Origin 请求头缺失时允许直接访问"

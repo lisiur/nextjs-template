@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 import { ManagementPageShell } from "@/components/management-page-shell";
 import { ConfigGroup } from "./components/config-group";
 
-const tabKeys = ["general", "auth", "smtp", "upload"] as const;
+const tabKeys = ["auth", "upload"] as const;
 
 export default function SettingsPage() {
   const t = useTranslations("Settings");
@@ -24,7 +24,7 @@ export default function SettingsPage() {
   return (
     <ManagementPageShell title={t("title")} description={t("description")}>
       <div className="flex-1 overflow-y-auto">
-        <Tabs defaultValue="general">
+        <Tabs defaultValue="auth">
           <TabsList className="mb-6 w-fit">
             {tabs.map((tab) => (
               <TabsTrigger key={tab.key} value={tab.key}>

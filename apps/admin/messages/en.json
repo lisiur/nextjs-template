@@ -159,9 +159,7 @@
     "title": "System Settings",
     "description": "Manage your application configuration",
     "tabs": {
-      "general": "General",
       "auth": "Authentication",
-      "smtp": "Email (SMTP)",
       "upload": "Upload"
     },
     "save": "Save Changes",
@@ -487,32 +485,16 @@
   "Remote": {
     "settings": {
       "fields": {
-        "siteName": "Site Name",
-        "siteUrl": "Site URL",
-        "siteDescription": "Site Description",
         "enableRegistration": "Enable Registration",
         "sessionMaxAge": "Session Max Age (days)",
-        "smtpHost": "SMTP Host",
-        "smtpPort": "SMTP Port",
-        "smtpUser": "SMTP Username",
-        "smtpPassword": "SMTP Password",
-        "fromEmail": "From Email",
         "uploadHotlink": "Upload Hotlink Protection",
         "uploadHotlinkEnabled": "Enable Hotlink Protection",
         "uploadHotlinkAllowedDomains": "Allowed Domains",
         "uploadHotlinkAllowEmptyReferer": "Allow Empty Referer"
       },
       "fieldsDesc": {
-        "siteName": "The name of your application",
-        "siteUrl": "The base URL of your application",
-        "siteDescription": "A brief description of your application",
         "enableRegistration": "Allow new users to register",
         "sessionMaxAge": "Maximum session duration in days",
-        "smtpHost": "SMTP server hostname",
-        "smtpPort": "SMTP server port",
-        "smtpUser": "SMTP authentication username",
-        "smtpPassword": "SMTP authentication password",
-        "fromEmail": "Email address used as sender",
         "uploadHotlink": "Controls global anti-theft-link protection for uploaded files",
         "uploadHotlinkAllowedDomains": "Hostnames allowed to embed uploaded files",
         "uploadHotlinkAllowEmptyReferer": "Allow direct access when Referer and Origin headers are absent"

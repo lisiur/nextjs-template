@@ -103,16 +103,7 @@ async function enqueueWelcomeNotifications(
   name: string,
   appId: string,
 ) {
-  let siteName = "My Application";
-  try {
-    const config = await systemConfigRepository.findByGroupAndKey(
-      "general",
-      "site.name",
-    );
-    if (config?.value) siteName = config.value;
-  } catch {
-    // fall back to default
-  }
+  const siteName = "My Application";
 
   const basePayload = {
     recipientUserIds: [userId],
