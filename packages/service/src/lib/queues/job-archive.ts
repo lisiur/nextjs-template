@@ -1,10 +1,10 @@
-import { jobRepository } from "#repositories/job.repository";
+import type { JobRepository } from "#repositories/job.repository";
 import type { Job } from "./job.types";
 
 export class JobArchiver {
+  constructor(private readonly repository: JobRepository) {}
+
   async archive(job: Job): Promise<void> {
-    await jobRepository.archiveAndDelete(job);
+    await this.repository.archiveAndDelete(job);
   }
 }
-
-export const jobArchiver = new JobArchiver();

@@ -994,28 +994,40 @@ async function upsertNotificationTemplate(
   data: {
     key: string;
     name: string;
+    description?: string;
     enabled: boolean;
+    subjectTemplate?: string;
+    titleTemplate?: string;
     bodyTemplate: string;
     variablesSchema: object;
+    sampleVariables?: object;
   },
 ) {
   return prisma.notificationTemplate.upsert({
     where: { key: data.key },
     update: {
-      name: data.name,
       channelId,
+      name: data.name,
+      description: data.description ?? null,
       enabled: data.enabled,
+      subjectTemplate: data.subjectTemplate ?? null,
+      titleTemplate: data.titleTemplate ?? null,
       bodyTemplate: data.bodyTemplate,
       variablesSchema: data.variablesSchema,
+      sampleVariables: (data.sampleVariables ?? Prisma.JsonNull) as object,
       deletedAt: null,
     },
     create: {
       key: data.key,
       channelId,
       name: data.name,
+      description: data.description,
       enabled: data.enabled,
+      subjectTemplate: data.subjectTemplate,
+      titleTemplate: data.titleTemplate,
       bodyTemplate: data.bodyTemplate,
       variablesSchema: data.variablesSchema,
+      sampleVariables: (data.sampleVariables ?? Prisma.JsonNull) as object,
     },
   });
 }

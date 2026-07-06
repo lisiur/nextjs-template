@@ -8,7 +8,7 @@ type JobEvent = {
 
 type Listener<T> = (data: T) => void;
 
-class EventEmitter {
+export class JobExecutorContext {
   private listeners: Partial<{
     [K in keyof JobEvent]: Listener<JobEvent[K]>[];
   }> = {};
@@ -40,5 +40,3 @@ class EventEmitter {
     });
   }
 }
-
-export const jobEvents = new EventEmitter();

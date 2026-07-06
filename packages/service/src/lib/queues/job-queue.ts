@@ -1,18 +1,23 @@
 import PQueue from "p-queue";
 import type { Job } from "./job.types";
 
-const CONCURRENCY = parseInt(process.env.JOB_CONCURRENCY ?? "5", 10);
-
 type JobProcessor = (job: Job) => Promise<void>;
 
-class JobQueue {
+interface JobQueueOptions {
+  concurrency?: number;
+  autoStart?: boolean;
+}
+
+export class JobQueue {
   private queue: PQueue;
   private processor: JobProcessor | null = null;
 
-  constructor() {
+  constructor(opts?: JobQueueOptions) {
+    const concurrency =
+      opts?.concurrency ?? parseInt(process.env.JOB_CONCURRENCY ?? "5", 10);
     this.queue = new PQueue({
-      concurrency: CONCURRENCY,
-      autoStart: true,
+      concurrency,
+      autoStart: opts?.autoStart ?? true,
     });
   }
 
@@ -48,5 +53,3 @@ class JobQueue {
     this.queue.clear();
   }
 }
-
-export const jobQueue = new JobQueue();

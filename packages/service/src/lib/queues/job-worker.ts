@@ -1,26 +1,28 @@
 import type { Job } from "#generated/prisma/client";
 import { JobStatus } from "#generated/prisma/client";
-import { jobRepository } from "#repositories/job.repository";
-import { jobEvents } from "./job.events";
-import { jobArchiver } from "./job-archive";
-import { jobHandlerRegistry } from "./job-handler-registry";
-import { jobQueue } from "./job-queue";
+import type { JobRepository } from "#repositories/job.repository";
+import type { JobArchiver } from "./job-archive";
+import type { JobExecutorContext } from "./job-executor-context";
+import type { JobHandlerRegistry } from "./job-handler-registry";
+
+interface JobWorkerDeps {
+  repository: JobRepository;
+  context: JobExecutorContext;
+  archiver: JobArchiver;
+  registry: JobHandlerRegistry;
+}
 
 export class JobWorker {
-  async start(): Promise<void> {
-    jobQueue.onIdle().then(() => {
-      // All jobs processed
-    });
-  }
+  constructor(private readonly deps: JobWorkerDeps) {}
 
   async processJob(job: Job): Promise<void> {
-    await jobRepository.updateStatus(job.id, JobStatus.PROCESSING, {
+    await this.deps.repository.updateStatus(job.id, JobStatus.PROCESSING, {
       startedAt: new Date(),
       attempts: job.attempts + 1,
     });
 
     try {
-      const handler = jobHandlerRegistry.get(job.type);
+      const handler = this.deps.registry.get(job.type);
       if (!handler) {
         throw new Error(`No handler registered for job type: ${job.type}`);
       }
@@ -31,31 +33,29 @@ export class JobWorker {
 
       const result = await Promise.race([handler(job), timeoutPromise]);
 
-      await jobRepository.updateStatus(job.id, JobStatus.COMPLETED, {
+      await this.deps.repository.updateStatus(job.id, JobStatus.COMPLETED, {
         completedAt: new Date(),
         result,
       });
 
-      jobEvents.emit("job:completed", job);
+      this.deps.context.emit("job:completed", job);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
 
       if (job.attempts + 1 >= job.maxAttempts) {
-        await jobRepository.updateStatus(job.id, JobStatus.FAILED, {
+        await this.deps.repository.updateStatus(job.id, JobStatus.FAILED, {
           completedAt: new Date(),
           error: errorMessage,
         });
-        jobEvents.emit("job:failed", job);
+        this.deps.context.emit("job:failed", job);
       } else {
-        await jobRepository.updateStatus(job.id, JobStatus.PENDING, {
+        await this.deps.repository.updateStatus(job.id, JobStatus.PENDING, {
           error: errorMessage,
         });
       }
     }
 
-    await jobArchiver.archive(job);
+    await this.deps.archiver.archive(job);
   }
 }
-
-export const jobWorker = new JobWorker();

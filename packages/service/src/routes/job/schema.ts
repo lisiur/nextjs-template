@@ -9,7 +9,7 @@ export const errorSchema = z.object({
 export const jobSchema = z
   .object({
     id: z.string().openapi({ example: "clx1234567890" }),
-    type: z.string().openapi({ example: "send-email" }),
+    type: z.string().openapi({ example: "send-notification" }),
     payload: z.unknown().openapi({ description: "Job payload data" }),
     status: z
       .enum(["PENDING", "PROCESSING", "COMPLETED", "FAILED"])
@@ -46,10 +46,10 @@ export const jobSchema = z
   .openapi("Job");
 
 export const createJobBodySchema = z.object({
-  type: z
-    .string()
-    .min(1)
-    .openapi({ example: "send-email", description: "Job type identifier" }),
+  type: z.string().min(1).openapi({
+    example: "send-notification",
+    description: "Job type identifier",
+  }),
   payload: z.unknown().openapi({ description: "Job payload data" }),
   priority: z
     .enum(["CRITICAL", "HIGH", "NORMAL", "LOW", "IDLE"])

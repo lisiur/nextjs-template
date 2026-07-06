@@ -2,7 +2,7 @@ import type { Job, JobHandler } from "./job.types";
 
 type JobHandlerMap = Record<string, JobHandler>;
 
-class HandlerRegistry {
+export class JobHandlerRegistry {
   private handlers: JobHandlerMap = {};
 
   register(type: string, handler: JobHandler): void {
@@ -29,5 +29,3 @@ class HandlerRegistry {
     return handler(job);
   }
 }
-
-export const jobHandlerRegistry = new HandlerRegistry();

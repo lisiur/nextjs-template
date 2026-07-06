@@ -1,15 +1,21 @@
-import { jobRepository } from "#repositories/job.repository";
-import { jobEvents } from "./job.events";
+import type { JobRepository } from "#repositories/job.repository";
 import type { Job } from "./job.types";
-import { jobQueue } from "./job-queue";
+import type { JobExecutorContext } from "./job-executor-context";
+import type { JobQueue } from "./job-queue";
 
 const MAX_TIMER_DURATION_MS = 24 * 60 * 60 * 1000;
+
+interface JobSchedulerDeps {
+  repository: JobRepository;
+  queue: JobQueue;
+  context: JobExecutorContext;
+}
 
 export class JobScheduler {
   private timer: NodeJS.Timeout | null = null;
 
-  constructor() {
-    jobEvents.on("job:created", (job) => this.onJobCreated(job));
+  constructor(private readonly deps: JobSchedulerDeps) {
+    this.deps.context.on("job:created", (job) => this.onJobCreated(job));
   }
 
   async start(): Promise<void> {
@@ -20,13 +26,13 @@ export class JobScheduler {
     let nextTimer: Date | null = null;
 
     while (true) {
-      const jobs = await jobRepository.findPendingJobs({ limit: 1000 });
+      const jobs = await this.deps.repository.findPendingJobs({ limit: 1000 });
 
       if (jobs.length === 0) break;
 
       for (const job of jobs) {
         if (job.scheduledAt <= new Date()) {
-          jobQueue.add(job);
+          this.deps.queue.add(job);
         } else if (!nextTimer) {
           nextTimer = job.scheduledAt;
         }
@@ -48,7 +54,7 @@ export class JobScheduler {
       this.timer = null;
     }
 
-    const nextJob = await jobRepository.findNextScheduledJob();
+    const nextJob = await this.deps.repository.findNextScheduledJob();
 
     if (!nextJob) {
       return;
@@ -71,13 +77,13 @@ export class JobScheduler {
 
   private async onJobCreated(job: Job): Promise<void> {
     if (job.scheduledAt <= new Date()) {
-      jobQueue.add(job);
+      this.deps.queue.add(job);
     }
     await this.rescheduleIfNeeded(job);
   }
 
   private async rescheduleIfNeeded(_job: Job): Promise<void> {
-    const nextJob = await jobRepository.findNextScheduledJob();
+    const nextJob = await this.deps.repository.findNextScheduledJob();
     if (!nextJob) return;
 
     const delay = nextJob.scheduledAt.getTime() - Date.now();
@@ -100,5 +106,3 @@ export class JobScheduler {
     }
   }
 }
-
-export const jobScheduler = new JobScheduler();

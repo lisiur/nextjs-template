@@ -1,8 +1,8 @@
 import { HTTPException } from "hono/http-exception";
 import type { Job, JobPriority } from "#generated/prisma/client";
 import { JobStatus } from "#generated/prisma/client";
-import { jobEvents } from "#lib/queues/job.events";
 import { jobRepository } from "#repositories/job.repository";
+import { jobExecutor } from "#states";
 
 export interface CreateJobInput {
   type: string;
@@ -31,7 +31,7 @@ export class JobService {
       timeoutMs: input.timeoutMs,
     });
 
-    jobEvents.emit("job:created", job);
+    jobExecutor.enqueue(job);
 
     return job;
   }
@@ -68,7 +68,7 @@ export class JobService {
       completedAt: undefined,
     });
 
-    jobEvents.emit("job:created", retriedJob);
+    jobExecutor.enqueue(retriedJob);
 
     return retriedJob;
   }

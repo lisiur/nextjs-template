@@ -12,6 +12,7 @@
     "#repositories/*": "./src/repositories/*.ts",
     "#routes/*": "./src/routes/*.ts",
     "#services/*": "./src/services/*.ts",
+    "#states": "./src/states/index.ts",
     "#utils/*": "./src/utils/*.ts"
   },
   "scripts": {

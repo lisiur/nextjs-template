@@ -36,6 +36,6 @@ export const cancelJob = defineOpenAPIRoute({
     const { id } = c.req.valid("param");
     await jobService.cancelJob(id);
 
-    return c.json({ success: true }, 200);
+    return c.json({ success: true } as const, 200);
   },
 });
