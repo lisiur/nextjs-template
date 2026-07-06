@@ -113,6 +113,16 @@ export function NotificationTemplateDialog({
     setVariableRows(parseVariablesSchema(template?.variablesSchema));
   }, [channels, open, template]);
 
+  const selectedProviderKey = channels.find(
+    (item) => item.id === channelId,
+  )?.providerKey;
+  const headlineField =
+    selectedProviderKey === "smtp-email"
+      ? "subject"
+      : selectedProviderKey === "in-app"
+        ? "title"
+        : null;
+
   function getChannelLabel(id: string) {
     const channel = channels.find((item) => item.id === id);
     if (!channel) return t("templates.selectChannel");
@@ -121,7 +131,17 @@ export function NotificationTemplateDialog({
 
   function handleChannelChange(nextChannelId: string | null) {
     if (!nextChannelId) return;
+    const nextProviderKey = channels.find(
+      (item) => item.id === nextChannelId,
+    )?.providerKey;
+    const currentProviderKey = channels.find(
+      (item) => item.id === channelId,
+    )?.providerKey;
     setChannelId(nextChannelId);
+    if (nextProviderKey !== currentProviderKey) {
+      setSubjectTemplate("");
+      setTitleTemplate("");
+    }
   }
 
   function addVariableRow() {
@@ -253,7 +273,7 @@ export function NotificationTemplateDialog({
                   onCheckedChange={setEnabled}
                 />
               </Field>
-              <div className="grid gap-4 md:grid-cols-2">
+              {headlineField === "subject" && (
                 <Field>
                   <FieldLabel htmlFor="template-subject">
                     {t("fields.subjectTemplate")}
@@ -262,8 +282,11 @@ export function NotificationTemplateDialog({
                     id="template-subject"
                     value={subjectTemplate}
                     onChange={(event) => setSubjectTemplate(event.target.value)}
+                    required
                   />
                 </Field>
+              )}
+              {headlineField === "title" && (
                 <Field>
                   <FieldLabel htmlFor="template-title">
                     {t("fields.titleTemplate")}
@@ -272,9 +295,10 @@ export function NotificationTemplateDialog({
                     id="template-title"
                     value={titleTemplate}
                     onChange={(event) => setTitleTemplate(event.target.value)}
+                    required
                   />
                 </Field>
-              </div>
+              )}
               <Field>
                 <FieldLabel htmlFor="template-body">
                   {t("fields.bodyTemplate")}

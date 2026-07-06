@@ -192,7 +192,9 @@ export function NotificationRecordTable() {
               </TableCell>
               <TableCell className="max-w-80">
                 <div className="truncate font-medium">
-                  {record.renderedTitle || record.renderedSubject || "-"}
+                  {record.channel.providerKey === "smtp-email"
+                    ? (record.renderedSubject ?? "-")
+                    : (record.renderedTitle ?? "-")}
                 </div>
                 <div className="text-muted-foreground text-xs">
                   {record.template.name}
@@ -267,14 +269,18 @@ export function NotificationRecordTable() {
                     {t("records.sections.content")}
                   </h3>
                   <dl className="rounded-md border px-3">
-                    <DetailRow
-                      label={t("records.detail.subject")}
-                      value={detailRecord.renderedSubject}
-                    />
-                    <DetailRow
-                      label={t("records.detail.title")}
-                      value={detailRecord.renderedTitle}
-                    />
+                    {detailRecord.channel.providerKey === "smtp-email" && (
+                      <DetailRow
+                        label={t("records.detail.subject")}
+                        value={detailRecord.renderedSubject}
+                      />
+                    )}
+                    {detailRecord.channel.providerKey === "in-app" && (
+                      <DetailRow
+                        label={t("records.detail.title")}
+                        value={detailRecord.renderedTitle}
+                      />
+                    )}
                     <DetailRow
                       label={t("records.detail.body")}
                       value={detailRecord.renderedBody}

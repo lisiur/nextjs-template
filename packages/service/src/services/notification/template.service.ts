@@ -6,10 +6,52 @@ import {
   getActiveNotificationChannel,
   redactNotificationChannel,
 } from "./channel.service";
+import {
+  isNotificationProviderKey,
+  type NotificationProviderKey,
+} from "./provider";
 
 const templateWithChannel = {
   channel: true,
 } as const;
+
+const PROVIDER_HEADLINE: Record<
+  NotificationProviderKey,
+  "subject" | "title" | null
+> = {
+  "in-app": "title",
+  "smtp-email": "subject",
+  sms: null,
+};
+
+function coerceTemplateHeadline(
+  providerKey: string,
+  fields: { subjectTemplate?: string | null; titleTemplate?: string | null },
+): { subjectTemplate: string | null; titleTemplate: string | null } {
+  const required = isNotificationProviderKey(providerKey)
+    ? PROVIDER_HEADLINE[providerKey]
+    : null;
+
+  if (required === "title") {
+    if (!fields.titleTemplate?.trim()) {
+      throw new HTTPException(400, {
+        message: "Title template is required for in-app notifications",
+      });
+    }
+    return { subjectTemplate: null, titleTemplate: fields.titleTemplate };
+  }
+
+  if (required === "subject") {
+    if (!fields.subjectTemplate?.trim()) {
+      throw new HTTPException(400, {
+        message: "Subject template is required for email notifications",
+      });
+    }
+    return { subjectTemplate: fields.subjectTemplate, titleTemplate: null };
+  }
+
+  return { subjectTemplate: null, titleTemplate: null };
+}
 
 type NotificationTemplateWithChannel = Prisma.NotificationTemplateGetPayload<{
   include: typeof templateWithChannel;
@@ -78,7 +120,9 @@ export async function createNotificationTemplate(data: {
     });
   }
 
-  await getActiveNotificationChannel(data.channelId);
+  const channel = await getActiveNotificationChannel(data.channelId);
+
+  const headline = coerceTemplateHeadline(channel.providerKey, data);
 
   const template = await prisma.notificationTemplate.create({
     data: {
@@ -87,8 +131,8 @@ export async function createNotificationTemplate(data: {
       name: data.name,
       description: data.description,
       enabled: data.enabled ?? true,
-      subjectTemplate: data.subjectTemplate,
-      titleTemplate: data.titleTemplate,
+      subjectTemplate: headline.subjectTemplate,
+      titleTemplate: headline.titleTemplate,
       bodyTemplate: data.bodyTemplate,
       variablesSchema: asInputJson(data.variablesSchema),
       sampleVariables: asInputJson(data.sampleVariables),
@@ -117,6 +161,7 @@ export async function updateNotificationTemplate(
 ) {
   const existing = await prisma.notificationTemplate.findFirst({
     where: { id, deletedAt: null },
+    include: templateWithChannel,
   });
   if (!existing) {
     throw new HTTPException(404, {
@@ -135,9 +180,17 @@ export async function updateNotificationTemplate(
     }
   }
 
-  if (data.channelId) {
-    await getActiveNotificationChannel(data.channelId);
-  }
+  const activeChannel = data.channelId
+    ? await getActiveNotificationChannel(data.channelId)
+    : null;
+
+  const providerKey =
+    activeChannel?.providerKey ?? existing.channel.providerKey;
+
+  const headline = coerceTemplateHeadline(providerKey, {
+    subjectTemplate: data.subjectTemplate ?? existing.subjectTemplate,
+    titleTemplate: data.titleTemplate ?? existing.titleTemplate,
+  });
 
   const template = await prisma.notificationTemplate.update({
     where: { id },
@@ -147,8 +200,8 @@ export async function updateNotificationTemplate(
       name: data.name,
       description: data.description,
       enabled: data.enabled,
-      subjectTemplate: data.subjectTemplate,
-      titleTemplate: data.titleTemplate,
+      subjectTemplate: headline.subjectTemplate,
+      titleTemplate: headline.titleTemplate,
       bodyTemplate: data.bodyTemplate,
       variablesSchema: asInputJson(data.variablesSchema),
       sampleVariables: asInputJson(data.sampleVariables),
