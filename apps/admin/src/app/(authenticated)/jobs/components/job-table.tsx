@@ -21,13 +21,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui";
-import { Eye, Plus, RotateCcw, X } from "lucide-react";
+import { Copy, Eye, Plus, RotateCcw, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
-import { CreateJobDialog } from "./create-job-dialog";
+import { CreateJobDialog, type JobInitialValues } from "./create-job-dialog";
 import { JobDetailSheet } from "./job-detail-sheet";
 import type { JobDetail } from "./job-detail-tabs";
 
@@ -72,6 +72,10 @@ export function JobTable() {
   const [detailJob, setDetailJob] = useState<JobDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [duplicateOpen, setDuplicateOpen] = useState(false);
+  const [duplicateInitial, setDuplicateInitial] =
+    useState<JobInitialValues | null>(null);
   const lastEffectFetchKeyRef = useRef<string>(undefined);
 
   const pageSize = 20;
@@ -159,6 +163,28 @@ export function JobTable() {
       setDetailJob(null);
     } finally {
       setDetailLoading(false);
+    }
+  }
+
+  async function handleDuplicate(job: Job) {
+    setDuplicatingId(job.id);
+    try {
+      const res = await withApiFeedback(appClient.api.jobs[":id"].$get)({
+        param: { id: job.id },
+      });
+      const detail = (await res.json()) as JobDetail;
+      setDuplicateInitial({
+        type: detail.type,
+        payload: detail.payload,
+        priority: detail.priority,
+        maxAttempts: detail.maxAttempts,
+        timeoutMs: detail.timeoutMs,
+      });
+      setDuplicateOpen(true);
+    } catch {
+      // Error handled by API feedback.
+    } finally {
+      setDuplicatingId(null);
     }
   }
 
@@ -293,6 +319,26 @@ export function JobTable() {
                         />
                         <TooltipContent>{t("view")}</TooltipContent>
                       </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("duplicate")}
+                              disabled={duplicatingId === job.id}
+                              onClick={() => handleDuplicate(job)}
+                            >
+                              {duplicatingId === job.id ? (
+                                <Spinner />
+                              ) : (
+                                <Copy />
+                              )}
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("duplicate")}</TooltipContent>
+                      </Tooltip>
                       {job.status === "FAILED" && (
                         <Tooltip>
                           <TooltipTrigger
@@ -346,6 +392,12 @@ export function JobTable() {
         open={createOpen}
         onOpenChange={setCreateOpen}
         onCreated={fetchJobs}
+      />
+      <CreateJobDialog
+        open={duplicateOpen}
+        onOpenChange={setDuplicateOpen}
+        onCreated={fetchJobs}
+        initialValues={duplicateInitial ?? undefined}
       />
       <JobDetailSheet
         open={detailOpen}

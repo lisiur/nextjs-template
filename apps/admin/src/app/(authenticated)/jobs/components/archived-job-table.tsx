@@ -4,6 +4,7 @@ import { DataTablePagination } from "@repo/frontend";
 import {
   Badge,
   Button,
+  ButtonGroup,
   Input,
   Select,
   SelectContent,
@@ -20,12 +21,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui";
-import { Eye } from "lucide-react";
+import { Copy, Eye, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { useConfirm } from "@/hooks/use-confirm";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
+import { CreateJobDialog, type JobInitialValues } from "./create-job-dialog";
 import { JobDetailSheet } from "./job-detail-sheet";
 import type { JobDetail } from "./job-detail-tabs";
 
@@ -60,8 +64,13 @@ function statusVariant(status: string) {
   }
 }
 
-export function ArchivedJobTable() {
+export function ArchivedJobTable({
+  onJobCreated,
+}: {
+  onJobCreated?: () => void;
+}) {
   const t = useTranslations("Jobs");
+  const confirm = useConfirm();
   const [jobs, setJobs] = useState<ArchivedJob[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -71,6 +80,10 @@ export function ArchivedJobTable() {
   const [detailJob, setDetailJob] = useState<JobDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [duplicateOpen, setDuplicateOpen] = useState(false);
+  const [duplicateInitial, setDuplicateInitial] =
+    useState<JobInitialValues | null>(null);
   const lastEffectFetchKeyRef = useRef<string>(undefined);
 
   const pageSize = 20;
@@ -147,6 +160,48 @@ export function ArchivedJobTable() {
     }
   }
 
+  async function handleDuplicate(job: ArchivedJob) {
+    setDuplicatingId(job.id);
+    try {
+      const res = await withApiFeedback(appClient.api.jobs.archive[":id"].$get)(
+        { param: { id: job.id } },
+      );
+      const detail = (await res.json()) as JobDetail;
+      setDuplicateInitial({
+        type: detail.type,
+        payload: detail.payload,
+        priority: detail.priority,
+        maxAttempts: detail.maxAttempts,
+        timeoutMs: detail.timeoutMs,
+      });
+      setDuplicateOpen(true);
+    } catch {
+      // Error handled by API feedback.
+    } finally {
+      setDuplicatingId(null);
+    }
+  }
+
+  async function handleRemove(job: ArchivedJob) {
+    const confirmed = await confirm({
+      title: t("remove"),
+      description: t("confirmRemove"),
+      confirmLabel: t("remove"),
+      cancelLabel: t("cancelBtn"),
+    });
+    if (!confirmed) return;
+
+    try {
+      await withApiFeedback(appClient.api.jobs.archive[":id"].$delete)({
+        param: { id: job.id },
+      });
+      toast.success(t("removeSuccess"));
+      fetchJobs();
+    } catch {
+      // Error handled by API feedback.
+    }
+  }
+
   return (
     <div className="flex min-h-0 w-full flex-col">
       <div className="mb-4 flex shrink-0 flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -215,7 +270,7 @@ export function ArchivedJobTable() {
                 </TableHead>
                 <TableHead
                   sticky="right"
-                  className="w-20 bg-background text-right"
+                  className="w-32 bg-background text-right"
                 >
                   {t("actions")}
                 </TableHead>
@@ -253,21 +308,58 @@ export function ArchivedJobTable() {
                     sticky="right"
                     className="bg-background text-right"
                   >
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={t("view")}
-                            onClick={() => handleView(job)}
-                          >
-                            <Eye />
-                          </Button>
-                        }
-                      />
-                      <TooltipContent>{t("view")}</TooltipContent>
-                    </Tooltip>
+                    <ButtonGroup className="ml-auto">
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("view")}
+                              onClick={() => handleView(job)}
+                            >
+                              <Eye />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("view")}</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("duplicate")}
+                              disabled={duplicatingId === job.id}
+                              onClick={() => handleDuplicate(job)}
+                            >
+                              {duplicatingId === job.id ? (
+                                <Spinner />
+                              ) : (
+                                <Copy />
+                              )}
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("duplicate")}</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("remove")}
+                              onClick={() => handleRemove(job)}
+                            >
+                              <Trash2 />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("remove")}</TooltipContent>
+                      </Tooltip>
+                    </ButtonGroup>
                   </TableCell>
                 </TableRow>
               ))}
@@ -282,6 +374,12 @@ export function ArchivedJobTable() {
           />
         </div>
       )}
+      <CreateJobDialog
+        open={duplicateOpen}
+        onOpenChange={setDuplicateOpen}
+        onCreated={() => onJobCreated?.()}
+        initialValues={duplicateInitial ?? undefined}
+      />
       <JobDetailSheet
         open={detailOpen}
         onOpenChange={setDetailOpen}

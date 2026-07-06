@@ -147,6 +147,10 @@ export class JobRepository {
     return prisma.jobArchive.findUnique({ where: { id } });
   }
 
+  async deleteArchived(id: string): Promise<void> {
+    await prisma.jobArchive.delete({ where: { id } });
+  }
+
   async findArchivedByFilter(filter: {
     status?: JobStatus;
     type?: string;

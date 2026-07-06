@@ -70,6 +70,11 @@ export class JobService {
     return jobRepository.findArchivedByFilter(filter);
   }
 
+  async removeArchivedJob(id: string): Promise<void> {
+    await this.getArchivedJob(id);
+    await jobRepository.deleteArchived(id);
+  }
+
   async retryJob(id: string): Promise<Job> {
     const job = await this.getJob(id);
 

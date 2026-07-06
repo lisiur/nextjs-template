@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cancelJob } from "./cancel-job";
+import { deleteJobArchive } from "./delete-job-archive";
 import { enqueueJob } from "./enqueue-job";
 import { getJob } from "./get-job";
 import { getJobArchive } from "./get-job-archive";
@@ -16,6 +17,7 @@ const routes = jobRoutes.openapiRoutes([
   getJobStats,
   listJobArchives,
   getJobArchive,
+  deleteJobArchive,
   getJob,
   retryJob,
   cancelJob,

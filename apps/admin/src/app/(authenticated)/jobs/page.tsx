@@ -28,7 +28,7 @@ export default function JobsPage() {
           <JobTable />
         </TabsContent>
         <TabsContent value="archived" className="flex min-h-0 overflow-hidden">
-          <ArchivedJobTable />
+          <ArchivedJobTable onJobCreated={() => setActiveTab("active")} />
         </TabsContent>
       </Tabs>
     </ManagementPageShell>

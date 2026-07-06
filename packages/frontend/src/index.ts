@@ -12,7 +12,7 @@ export type { WatermarkConfig, WatermarkProps } from "./components/watermark";
 export { Watermark } from "./components/watermark";
 export { usePaginatedQuery } from "./hooks/use-paginated-query";
 export { withApiFeedback } from "./lib/api-utils";
-export { formatDate, formatDateTime } from "./lib/date";
+export { formatDate, formatDateTime, formatTimeUntil } from "./lib/date";
 export { Loader, loading } from "./lib/loading";
 export { toast } from "./lib/toast";
 export { type WithFeedbackConfig, withFeedback } from "./lib/with-feedback";

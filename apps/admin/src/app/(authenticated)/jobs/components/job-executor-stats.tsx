@@ -12,7 +12,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { appClient } from "@/lib/api";
-import { formatDateTime } from "@/utils/date";
+import { formatTimeUntil } from "@/utils/date";
 
 interface ExecutorStats {
   queueSize: number;
@@ -43,7 +43,7 @@ function StatCard({
       <CardContent className="flex items-center gap-3">
         <span className={tone ?? "text-muted-foreground"}>{icon}</span>
         <div className="flex flex-col">
-          <span className="text-2xl leading-none font-semibold tabular-nums">
+          <span className="text-2xl leading-none font-semibold tabular-nums whitespace-nowrap">
             {value}
           </span>
           <span className="text-xs text-muted-foreground">{label}</span>
@@ -56,6 +56,7 @@ function StatCard({
 export function JobExecutorStats() {
   const t = useTranslations("Jobs");
   const [stats, setStats] = useState<ExecutorStats | null>(null);
+  const [now, setNow] = useState(() => Date.now());
 
   const fetchStats = useCallback(async () => {
     try {
@@ -69,10 +70,28 @@ export function JobExecutorStats() {
   }, []);
 
   useEffect(() => {
-    fetchStats();
-    const interval = setInterval(fetchStats, 5000);
+    const update = () => {
+      fetchStats();
+      setNow(Date.now());
+    };
+    update();
+    const interval = setInterval(update, 5000);
     return () => clearInterval(interval);
   }, [fetchStats]);
+
+  const nextScheduledMs = stats?.nextScheduledAt
+    ? new Date(stats.nextScheduledAt).getTime()
+    : null;
+  const needsFastTick =
+    nextScheduledMs !== null &&
+    nextScheduledMs - now > 0 &&
+    nextScheduledMs - now < 3_600_000;
+
+  useEffect(() => {
+    if (!needsFastTick) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [needsFastTick]);
 
   return (
     <div className="mb-6 shrink-0">
@@ -114,7 +133,9 @@ export function JobExecutorStats() {
           icon={<CalendarClock className="h-5 w-5" />}
           label={t("stats.nextExecution")}
           value={
-            stats?.nextScheduledAt ? formatDateTime(stats.nextScheduledAt) : "-"
+            stats?.nextScheduledAt
+              ? formatTimeUntil(stats.nextScheduledAt)
+              : "-"
           }
           tone="text-muted-foreground"
         />

@@ -21,23 +21,33 @@ import {
   Textarea,
 } from "@repo/ui";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 
 const PRIORITY_OPTIONS = ["CRITICAL", "HIGH", "NORMAL", "LOW", "IDLE"] as const;
 
+export interface JobInitialValues {
+  type: string;
+  payload: unknown;
+  priority: string;
+  maxAttempts: number;
+  timeoutMs: number;
+}
+
 interface CreateJobDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCreated: () => void;
+  initialValues?: JobInitialValues;
 }
 
 export function CreateJobDialog({
   open,
   onOpenChange,
   onCreated,
+  initialValues,
 }: CreateJobDialogProps) {
   const t = useTranslations("Jobs");
   const [saving, setSaving] = useState(false);
@@ -58,6 +68,21 @@ export function CreateJobDialog({
     setPayload("");
     setErrors({});
   }
+
+  useEffect(() => {
+    if (open && initialValues) {
+      setType(initialValues.type);
+      setPriority(initialValues.priority);
+      setMaxAttempts(String(initialValues.maxAttempts));
+      setTimeoutMs(String(initialValues.timeoutMs));
+      setPayload(
+        initialValues.payload != null
+          ? JSON.stringify(initialValues.payload, null, 2)
+          : "",
+      );
+      setErrors({});
+    }
+  }, [open, initialValues]);
 
   function handleClose(open: boolean) {
     if (!open) resetForm();
@@ -92,7 +117,7 @@ export function CreateJobDialog({
           ...(scheduledAt ? { scheduledAt: scheduledAt } : {}),
         },
       });
-      toast.success(t("createSuccess"));
+      toast.success(t(initialValues ? "duplicateSuccess" : "createSuccess"));
       handleClose(false);
       onCreated();
     } catch {
@@ -106,7 +131,9 @@ export function CreateJobDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("addJob")}</DialogTitle>
+          <DialogTitle>
+            {initialValues ? t("duplicateJob") : t("addJob")}
+          </DialogTitle>
         </DialogHeader>
         <form id="create-job-form" onSubmit={handleSubmit}>
           <DialogBody>
