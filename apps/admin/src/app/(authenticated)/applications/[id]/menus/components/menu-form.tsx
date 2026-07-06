@@ -198,7 +198,6 @@ export const MenuForm = forwardRef<MenuFormRef, MenuFormProps>(
               onChange={(ids) =>
                 setValue("permissionIds", ids, { shouldDirty: true })
               }
-              height={300}
             />
           </Field>
         )}
