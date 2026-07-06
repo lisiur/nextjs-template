@@ -612,7 +612,7 @@ const adminMenus = [
     id: "jobs",
     code: "jobs",
     name: "Jobs",
-    icon: "Briefcase",
+    icon: "CalendarCheck",
     linkType: "INTERNAL" as const,
     url: "/admin/jobs",
     sortOrder: 9,
