@@ -1,5 +1,6 @@
 import { jobEvents } from "./job.events";
 import { jobRepository } from "./job.repository";
+import type { Job } from "./job.types";
 import { JobStatus } from "./job.types";
 import { jobArchiver } from "./job-archive";
 import { jobHandlerRegistry } from "./job-handler-registry";

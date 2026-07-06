@@ -695,6 +695,101 @@
       "allVisibility": "All Visibility"
     }
   },
+  "Jobs": {
+    "title": "Job Management",
+    "description": "Monitor and manage background jobs",
+    "search": "Search by type...",
+    "noJobs": "No jobs found",
+    "actions": "Actions",
+    "view": "View",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "retrySuccess": "Job retried successfully",
+    "cancelSuccess": "Job cancelled successfully",
+    "addJob": "New Job",
+    "addJobDescription": "Enqueue a new background job",
+    "createSuccess": "Job created successfully",
+    "save": "Create",
+    "creating": "Creating...",
+    "cancelBtn": "Cancel",
+    "columns": {
+      "id": "ID",
+      "type": "Type",
+      "status": "Status",
+      "priority": "Priority",
+      "attempts": "Attempts",
+      "createdAt": "Created At",
+      "scheduledAt": "Scheduled At"
+    },
+    "filters": {
+      "allStatus": "All Status",
+      "status": "Status",
+      "type": "Type"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "PROCESSING": "Processing",
+      "COMPLETED": "Completed",
+      "FAILED": "Failed"
+    },
+    "priority": {
+      "CRITICAL": "Critical",
+      "HIGH": "High",
+      "NORMAL": "Normal",
+      "LOW": "Low",
+      "IDLE": "Idle"
+    },
+    "detail": {
+      "title": "Job Detail",
+      "description": "View job details and metadata",
+      "backToJobs": "Back to Jobs",
+      "notFound": "Job not found",
+      "tabs": {
+        "overview": "Overview",
+        "payload": "Payload",
+        "result": "Result / Error"
+      },
+      "overview": {
+        "id": "ID",
+        "type": "Type",
+        "status": "Status",
+        "priority": "Priority",
+        "attempts": "Attempts",
+        "maxAttempts": "Max Attempts",
+        "timeoutMs": "Timeout (ms)",
+        "createdAt": "Created At",
+        "scheduledAt": "Scheduled At",
+        "startedAt": "Started At",
+        "completedAt": "Completed At"
+      },
+      "payload": {
+        "title": "Payload",
+        "empty": "No payload"
+      },
+      "result": {
+        "title": "Result",
+        "errorTitle": "Error",
+        "empty": "No result yet",
+        "invalidJson": "Unable to display as JSON"
+      }
+    },
+    "form": {
+      "type": "Type",
+      "typePlaceholder": "e.g. send-email",
+      "typeDescription": "The job handler type to execute",
+      "priority": "Priority",
+      "scheduledAt": "Scheduled At",
+      "scheduledAtDescription": "Leave empty to run immediately",
+      "maxAttempts": "Max Attempts",
+      "maxAttemptsDescription": "Number of retry attempts on failure",
+      "timeoutMs": "Timeout (ms)",
+      "timeoutMsDescription": "Maximum execution time per attempt",
+      "payload": "Payload",
+      "payloadPlaceholder": "'{'\"key\": \"value\"'}'",
+      "payloadDescription": "JSON data passed to the job handler",
+      "payloadInvalid": "Payload must be valid JSON"
+    }
+  },
   "Frontend": {
     "permissionSelector": {
       "name": "Name",

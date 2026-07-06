@@ -5,6 +5,8 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { operationLogger } from "#middleware/operation-logger";
 import { traceContext } from "#middleware/trace-context";
+import { registerJobHandlers } from "./queues/handlers";
+import { jobQueue } from "./queues/job-queue";
 import { jobScheduler } from "./queues/job-scheduler";
 import { jobWorker } from "./queues/job-worker";
 import { routes } from "./routes";
@@ -61,6 +63,9 @@ openAPIApp.doc("/openapi.json", {
   },
   servers: [{ url: "/api" }],
 });
+
+registerJobHandlers();
+jobQueue.setProcessor((job) => jobWorker.processJob(job));
 
 jobScheduler.start().catch(console.error);
 jobWorker.start().catch(console.error);

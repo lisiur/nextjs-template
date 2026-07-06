@@ -3,8 +3,11 @@ import type { Job } from "./job.types";
 
 const CONCURRENCY = parseInt(process.env.JOB_CONCURRENCY ?? "5", 10);
 
+type JobProcessor = (job: Job) => Promise<void>;
+
 class JobQueue {
   private queue: PQueue;
+  private processor: JobProcessor | null = null;
 
   constructor() {
     this.queue = new PQueue({
@@ -13,12 +16,20 @@ class JobQueue {
     });
   }
 
+  setProcessor(fn: JobProcessor): void {
+    this.processor = fn;
+  }
+
   add(job: Job): void {
-    this.queue.add(() => Promise.resolve(job));
+    this.queue.add(async () => {
+      if (this.processor) await this.processor(job);
+    });
   }
 
   async addAndWait(job: Job): Promise<void> {
-    await this.queue.add(() => Promise.resolve(job));
+    await this.queue.add(async () => {
+      if (this.processor) await this.processor(job);
+    });
   }
 
   get size(): number {
