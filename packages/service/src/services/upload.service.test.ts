@@ -414,6 +414,7 @@ describe("deleteUploads", () => {
     (
       mockPrisma.upload.deleteMany as ReturnType<typeof vi.fn>
     ).mockResolvedValue({ count: 2 });
+    mockPrisma.upload.count.mockResolvedValue(0);
 
     await deleteUploads(["a", "b"]);
 
@@ -464,6 +465,7 @@ describe("replaceUpload", () => {
     (
       mockPrisma.upload.findUnique as ReturnType<typeof vi.fn>
     ).mockResolvedValue(existing);
+    mockPrisma.upload.count.mockResolvedValue(1);
     const updated = {
       ...existing,
       mimeType: "image/png",

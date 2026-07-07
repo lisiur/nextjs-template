@@ -8,11 +8,13 @@ describe("extensionForMime", () => {
     expect(extensionForMime("image/gif")).toBe(".gif");
     expect(extensionForMime("image/webp")).toBe(".webp");
     expect(extensionForMime("application/pdf")).toBe(".pdf");
+    expect(extensionForMime("image/x-icon")).toBe(".ico");
+    expect(extensionForMime("image/vnd.microsoft.icon")).toBe(".ico");
+    expect(extensionForMime("image/svg+xml")).toBe(".svg");
   });
 
   it("returns null for disallowed mime types", () => {
     expect(extensionForMime("text/html")).toBeNull();
-    expect(extensionForMime("image/svg+xml")).toBeNull();
     expect(extensionForMime("application/octet-stream")).toBeNull();
   });
 });
@@ -24,7 +26,10 @@ describe("allowedMimeTypes", () => {
       "image/gif",
       "image/jpeg",
       "image/png",
+      "image/svg+xml",
+      "image/vnd.microsoft.icon",
       "image/webp",
+      "image/x-icon",
     ]);
   });
 });
