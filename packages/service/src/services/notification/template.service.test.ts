@@ -17,13 +17,20 @@ vi.mock("./channel.service", () => ({
 }));
 
 vi.mock("./cache", () => ({
-  notificationCache: { invalidateTemplates: vi.fn(), invalidateAll: vi.fn() },
+  notificationCache: {
+    getTemplates: vi.fn(),
+    setTemplates: vi.fn(),
+    invalidateTemplates: vi.fn(),
+    invalidateAll: vi.fn(),
+  },
 }));
 
 import { prisma } from "#lib/db";
+import { notificationCache } from "./cache";
 import { getActiveNotificationChannel } from "./channel.service";
 import {
   createNotificationTemplate,
+  findTemplateForDelivery,
   updateNotificationTemplate,
 } from "./template.service";
 
@@ -213,5 +220,97 @@ describe("notification template headline validation", () => {
         }),
       }),
     );
+  });
+});
+
+describe("findTemplateForDelivery", () => {
+  const mockCache = notificationCache as unknown as {
+    getTemplates: ReturnType<typeof vi.fn>;
+    setTemplates: ReturnType<typeof vi.fn>;
+    invalidateTemplates: ReturnType<typeof vi.fn>;
+    invalidateAll: ReturnType<typeof vi.fn>;
+  };
+
+  function templateWith(overrides: Record<string, unknown> = {}) {
+    return {
+      id: "tpl-1",
+      key: "notice",
+      channelId: "ch-1",
+      enabled: true,
+      subjectTemplate: null,
+      titleTemplate: null,
+      bodyTemplate: "Hello",
+      variablesSchema: null,
+      channel: {
+        id: "ch-1",
+        providerKey: "in-app",
+        enabled: true,
+        deletedAt: null,
+      },
+      ...overrides,
+    };
+  }
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockCache.getTemplates.mockReturnValue(null);
+  });
+
+  it("returns null when no template matches the key", async () => {
+    mockPrisma.notificationTemplate.findFirst.mockResolvedValue(null);
+
+    await expect(findTemplateForDelivery("missing")).resolves.toBeNull();
+  });
+
+  it("reports a disabled reason when the template is disabled", async () => {
+    mockPrisma.notificationTemplate.findFirst.mockResolvedValue(
+      templateWith({ key: "welcome", enabled: false }),
+    );
+
+    const result = await findTemplateForDelivery("welcome");
+
+    expect(result?.template.key).toBe("welcome");
+    expect(result?.disabledReason).toContain("disabled");
+    expect(mockCache.setTemplates).not.toHaveBeenCalled();
+  });
+
+  it("reports a disabled reason when the channel is disabled", async () => {
+    mockPrisma.notificationTemplate.findFirst.mockResolvedValue(
+      templateWith({
+        key: "welcome-email",
+        channel: {
+          id: "ch-email",
+          providerKey: "smtp-email",
+          enabled: false,
+          deletedAt: null,
+        },
+      }),
+    );
+
+    const result = await findTemplateForDelivery("welcome-email");
+
+    expect(result?.disabledReason).toContain("disabled");
+    expect(mockCache.setTemplates).not.toHaveBeenCalled();
+  });
+
+  it("caches an enabled template with no disabled reason", async () => {
+    mockPrisma.notificationTemplate.findFirst.mockResolvedValue(templateWith());
+
+    const result = await findTemplateForDelivery("notice");
+
+    expect(result?.disabledReason).toBeNull();
+    expect(mockCache.setTemplates).toHaveBeenCalledWith(
+      "notice",
+      expect.anything(),
+    );
+  });
+
+  it("serves a cached template without querying the database", async () => {
+    mockCache.getTemplates.mockReturnValue(templateWith());
+
+    const result = await findTemplateForDelivery("notice");
+
+    expect(result?.disabledReason).toBeNull();
+    expect(mockPrisma.notificationTemplate.findFirst).not.toHaveBeenCalled();
   });
 });

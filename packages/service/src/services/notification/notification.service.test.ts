@@ -2,261 +2,325 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("#lib/db", () => ({
   prisma: {
-    user: { findMany: vi.fn(), findUnique: vi.fn() },
     notificationTemplate: { findFirst: vi.fn() },
-    notification: { create: vi.fn(), update: vi.fn() },
+    user: { findMany: vi.fn(), findUnique: vi.fn() },
+    notification: { findMany: vi.fn(), create: vi.fn(), update: vi.fn() },
+    $transaction: vi.fn(),
   },
 }));
 
+vi.mock("#repositories/job.repository", () => ({
+  jobRepository: { create: vi.fn() },
+}));
+
+vi.mock("#states", () => ({
+  eventBus: { emit: vi.fn() },
+  jobExecutor: { enqueue: vi.fn() },
+}));
+
+vi.mock("./mailer", () => ({ sendSmtpEmail: vi.fn() }));
+
 import { prisma } from "#lib/db";
+import { jobRepository } from "#repositories/job.repository";
+import { eventBus, jobExecutor } from "#states";
 import { notificationCache } from "./cache";
-import { createNotificationsFromTemplate } from "./notification.service";
+import { sendSmtpEmail } from "./mailer";
+import {
+  createNotificationsFromTemplate,
+  deliverNotifications,
+} from "./notification.service";
 
 const mockPrisma = prisma as unknown as {
+  notificationTemplate: { findFirst: ReturnType<typeof vi.fn> };
   user: {
     findMany: ReturnType<typeof vi.fn>;
     findUnique: ReturnType<typeof vi.fn>;
   };
-  notificationTemplate: { findFirst: ReturnType<typeof vi.fn> };
   notification: {
+    findMany: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
   };
+  $transaction: ReturnType<typeof vi.fn>;
 };
+
+const mockJobRepository = jobRepository as unknown as {
+  create: ReturnType<typeof vi.fn>;
+};
+const mockEventBus = eventBus as unknown as { emit: ReturnType<typeof vi.fn> };
+const mockJobExecutor = jobExecutor as unknown as {
+  enqueue: ReturnType<typeof vi.fn>;
+};
+const mockSendSmtpEmail = sendSmtpEmail as ReturnType<typeof vi.fn>;
+
+function enabledTemplate(overrides: Record<string, unknown> = {}) {
+  return {
+    id: "tpl-1",
+    key: "notice",
+    channelId: "ch-1",
+    enabled: true,
+    subjectTemplate: null,
+    titleTemplate: null,
+    bodyTemplate: "Hello {{userName}}",
+    variablesSchema: null,
+    channel: {
+      id: "ch-1",
+      providerKey: "in-app",
+      enabled: true,
+      deletedAt: null,
+    },
+    ...overrides,
+  };
+}
 
 describe("notification runtime service", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     notificationCache.invalidateAll();
+
+    mockPrisma.$transaction.mockImplementation(
+      async (cb: (tx: unknown) => Promise<unknown>) =>
+        cb({ notification: { create: mockPrisma.notification.create } }),
+    );
+    mockPrisma.notification.create.mockImplementation(({ data }) =>
+      Promise.resolve({ id: `n-${data.recipientUserId}` }),
+    );
   });
 
-  it("creates one notification per recipient from template", async () => {
-    mockPrisma.user.findMany.mockResolvedValue([{ id: "u1" }, { id: "u2" }]);
-    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
-      id: "tpl-email",
-      key: "user-welcome.email",
-      channelId: "ch-email",
-      enabled: true,
-      subjectTemplate: "Welcome {{name}}",
-      titleTemplate: null,
-      bodyTemplate: "Hello {{name}}",
-      variablesSchema: { required: ["name"] },
-      channel: {
-        id: "ch-email",
-        providerKey: "smtp-email",
-        enabled: true,
-        config: { host: "smtp.test", port: 587, from: "test@test.com" },
-        deletedAt: null,
-      },
-    });
-    mockPrisma.notification.create = vi
-      .fn()
-      .mockImplementation(({ data }) =>
-        Promise.resolve({ id: `n-${data.recipientUserId}`, ...data }),
+  describe("createNotificationsFromTemplate", () => {
+    it("creates pending rows and enqueues one batch delivery job", async () => {
+      mockPrisma.notificationTemplate.findFirst.mockResolvedValue(
+        enabledTemplate({
+          channel: {
+            id: "ch-email",
+            providerKey: "smtp-email",
+            enabled: true,
+            deletedAt: null,
+          },
+        }),
       );
-    mockPrisma.notification.update = vi.fn().mockResolvedValue({});
-    mockPrisma.user.findUnique = vi
-      .fn()
-      .mockResolvedValue({ email: "u1@example.com" });
+      mockPrisma.user.findMany.mockResolvedValue([{ id: "u1" }, { id: "u2" }]);
+      mockJobRepository.create.mockResolvedValue({ id: "job-1" });
 
-    const result = await createNotificationsFromTemplate({
-      templateKey: "user-welcome.email",
-      recipientUserIds: ["u1", "u2"],
-      variables: { name: "Alice" },
-      creatorId: "admin",
-      source: "test",
-      metadata: { reason: "signup" },
+      const result = await createNotificationsFromTemplate({
+        templateKey: "notice",
+        recipientUserIds: ["u1", "u2"],
+        variables: { userName: "Alice" },
+      });
+
+      expect(result.pending).toBe(2);
+      expect(result.failed).toBe(0);
+      expect(result.notificationIds).toHaveLength(2);
+      expect(mockPrisma.notification.create).toHaveBeenCalledTimes(2);
+      expect(mockPrisma.$transaction).toHaveBeenCalledOnce();
+      expect(mockJobRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "send-notification",
+          payload: {
+            notificationIds: expect.arrayContaining(["n-u1", "n-u2"]),
+          },
+        }),
+        expect.anything(),
+      );
+      expect(mockJobExecutor.enqueue).toHaveBeenCalledWith({ id: "job-1" });
     });
 
-    expect(result.total).toBe(2);
-    expect(result.provider).toBe("smtp-email");
-    expect(mockPrisma.notification.create).toHaveBeenCalledTimes(2);
-  });
+    it("records failed rows when the channel is disabled and skips delivery", async () => {
+      mockPrisma.notificationTemplate.findFirst.mockResolvedValue(
+        enabledTemplate({
+          key: "welcome-email",
+          channelId: "ch-email",
+          channel: {
+            id: "ch-email",
+            providerKey: "smtp-email",
+            enabled: false,
+            deletedAt: null,
+          },
+        }),
+      );
+      mockPrisma.user.findMany.mockResolvedValue([{ id: "u1" }]);
 
-  it("fails before creating rows when variables are missing", async () => {
-    mockPrisma.user.findMany.mockResolvedValue([{ id: "u1" }]);
-    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
-      id: "tpl-email",
-      key: "user-welcome.email",
-      channelId: "ch-email",
-      enabled: true,
-      subjectTemplate: "Welcome {{name}}",
-      titleTemplate: null,
-      bodyTemplate: "Hello {{name}}",
-      variablesSchema: { required: ["name"] },
-      channel: { providerKey: "smtp-email", enabled: true, deletedAt: null },
-    });
-
-    await expect(
-      createNotificationsFromTemplate({
-        templateKey: "user-welcome.email",
-        recipientUserIds: ["u1"],
-        variables: {},
-      }),
-    ).rejects.toMatchObject({ status: 400 });
-    expect(mockPrisma.notification.create).not.toHaveBeenCalled();
-  });
-
-  it("rejects missing recipients before creating rows", async () => {
-    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
-      id: "tpl-in-app",
-      key: "user-welcome.in-app",
-      channelId: "ch-in-app",
-      enabled: true,
-      bodyTemplate: "Hello",
-      variablesSchema: null,
-      channel: { providerKey: "in-app", enabled: true, deletedAt: null },
-    });
-    mockPrisma.user.findMany.mockResolvedValue([]);
-
-    await expect(
-      createNotificationsFromTemplate({
-        templateKey: "user-welcome.in-app",
-        recipientUserIds: ["missing"],
-      }),
-    ).rejects.toMatchObject({ status: 400 });
-    expect(mockPrisma.notification.create).not.toHaveBeenCalled();
-  });
-
-  it("returns 404 when template is not found", async () => {
-    mockPrisma.notificationTemplate.findFirst.mockResolvedValue(null);
-
-    await expect(
-      createNotificationsFromTemplate({
-        templateKey: "missing",
-        recipientUserIds: ["u1"],
-      }),
-    ).rejects.toMatchObject({ status: 404 });
-  });
-
-  it("returns 409 when the template is disabled", async () => {
-    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
-      id: "tpl-disabled",
-      key: "welcome-email",
-      channelId: "ch-email",
-      enabled: false,
-      bodyTemplate: "Hello",
-      variablesSchema: null,
-      channel: { providerKey: "smtp-email", enabled: true, deletedAt: null },
-    });
-
-    await expect(
-      createNotificationsFromTemplate({
+      const result = await createNotificationsFromTemplate({
         templateKey: "welcome-email",
         recipientUserIds: ["u1"],
-      }),
-    ).rejects.toMatchObject({
-      status: 409,
-      message: "Notification template 'welcome-email' is disabled",
-    });
-    expect(mockPrisma.notification.create).not.toHaveBeenCalled();
-  });
+      });
 
-  it("returns 409 when the template's channel is disabled", async () => {
-    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
-      id: "tpl-email",
-      key: "welcome-email",
-      channelId: "ch-email",
-      enabled: true,
-      subjectTemplate: "Welcome",
-      titleTemplate: null,
-      bodyTemplate: "Hello",
-      variablesSchema: null,
-      channel: { providerKey: "smtp-email", enabled: false, deletedAt: null },
-    });
-
-    await expect(
-      createNotificationsFromTemplate({
-        templateKey: "welcome-email",
-        recipientUserIds: ["u1"],
-      }),
-    ).rejects.toMatchObject({
-      status: 409,
-      message:
-        "Notification channel for template 'welcome-email' is disabled or deleted",
-    });
-    expect(mockPrisma.notification.create).not.toHaveBeenCalled();
-  });
-
-  it("uses a single correlation id for all created rows", async () => {
-    mockPrisma.user.findMany.mockResolvedValue([{ id: "u1" }, { id: "u2" }]);
-    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
-      id: "tpl-in-app",
-      key: "notice",
-      channelId: "ch-in-app",
-      enabled: true,
-      bodyTemplate: "Body",
-      variablesSchema: null,
-      channel: { providerKey: "in-app", enabled: true, deletedAt: null },
-    });
-    mockPrisma.notification.create = vi.fn().mockImplementation(({ data }) =>
-      Promise.resolve({
-        id: `n-${data.recipientUserId}`,
-        correlationId: data.correlationId,
-      }),
-    );
-
-    await createNotificationsFromTemplate({
-      templateKey: "notice",
-      recipientUserIds: ["u1", "u2"],
-    });
-
-    expect(mockPrisma.notification.create).toHaveBeenCalled();
-  });
-
-  it("delivers smtp-email notification and marks it sent", async () => {
-    vi.doMock("./mailer", () => ({
-      sendSmtpEmail: vi
-        .fn()
-        .mockResolvedValue({ messageId: "msg-456", sentAt: new Date() }),
-    }));
-
-    mockPrisma.user.findMany.mockResolvedValue([{ id: "u1" }]);
-    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
-      id: "tpl-email",
-      key: "user-welcome.email",
-      channelId: "ch-email",
-      enabled: true,
-      subjectTemplate: "Welcome",
-      titleTemplate: null,
-      bodyTemplate: "Hello",
-      variablesSchema: null,
-      channel: {
-        id: "ch-email",
-        providerKey: "smtp-email",
-        enabled: true,
-        config: { host: "smtp.test", port: 587, from: "test@test.com" },
-        deletedAt: null,
-      },
-    });
-
-    const mockCreate = vi
-      .fn()
-      .mockImplementation(({ data }) =>
-        Promise.resolve({ id: `n-${data.recipientUserId}`, ...data }),
+      expect(result.failed).toBe(1);
+      expect(result.pending).toBe(0);
+      expect(mockPrisma.notification.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            status: "failed",
+            errorMessage: expect.stringContaining("disabled"),
+          }),
+        }),
       );
-    const mockUpdate = vi.fn().mockResolvedValue({});
-    mockPrisma.notification.create = mockCreate;
-    mockPrisma.notification.update = mockUpdate;
-    mockPrisma.user.findUnique = vi
-      .fn()
-      .mockResolvedValue({ email: "u1@example.com" });
-
-    const { createNotificationsFromTemplate } = await import(
-      "./notification.service"
-    );
-    const result = await createNotificationsFromTemplate({
-      templateKey: "user-welcome.email",
-      recipientUserIds: ["u1"],
+      expect(mockPrisma.$transaction).not.toHaveBeenCalled();
+      expect(mockJobRepository.create).not.toHaveBeenCalled();
+      expect(mockJobExecutor.enqueue).not.toHaveBeenCalled();
     });
 
-    expect(result.provider).toBe("smtp-email");
-    expect(mockUpdate).toHaveBeenCalledWith({
-      where: { id: "n-u1" },
-      data: expect.objectContaining({
-        status: "sent",
-        providerMessageId: "msg-456",
-      }),
+    it("returns 404 when the template key does not exist", async () => {
+      mockPrisma.notificationTemplate.findFirst.mockResolvedValue(null);
+
+      await expect(
+        createNotificationsFromTemplate({
+          templateKey: "missing",
+          recipientUserIds: ["u1"],
+        }),
+      ).rejects.toMatchObject({ status: 404 });
+    });
+
+    it("rejects empty recipients before any database work", async () => {
+      await expect(
+        createNotificationsFromTemplate({
+          templateKey: "notice",
+          recipientUserIds: [],
+        }),
+      ).rejects.toMatchObject({ status: 400 });
+      expect(mockPrisma.notification.create).not.toHaveBeenCalled();
+    });
+
+    it("rejects invalid variables before creating rows", async () => {
+      mockPrisma.notificationTemplate.findFirst.mockResolvedValue(
+        enabledTemplate({ variablesSchema: { required: ["userName"] } }),
+      );
+      mockPrisma.user.findMany.mockResolvedValue([{ id: "u1" }]);
+
+      await expect(
+        createNotificationsFromTemplate({
+          templateKey: "notice",
+          recipientUserIds: ["u1"],
+          variables: {},
+        }),
+      ).rejects.toMatchObject({ status: 400 });
+      expect(mockPrisma.notification.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("deliverNotifications", () => {
+    it("delivers in-app notifications via the event bus and marks sent", async () => {
+      mockPrisma.notification.findMany.mockResolvedValue([
+        {
+          id: "n1",
+          status: "pending",
+          recipientUserId: "u1",
+          appId: null,
+          renderedTitle: "Hi",
+          renderedBody: "Hello",
+          channelId: "ch-in",
+          channel: { providerKey: "in-app" },
+        },
+      ]);
+
+      const result = await deliverNotifications(["n1"]);
+
+      expect(mockEventBus.emit).toHaveBeenCalledWith(
+        "u1",
+        expect.objectContaining({
+          type: "notification.created",
+          notificationId: "n1",
+        }),
+      );
+      expect(mockPrisma.notification.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "n1" },
+          data: expect.objectContaining({ status: "sent" }),
+        }),
+      );
+      expect(result.delivered).toBe(1);
+    });
+
+    it("delivers smtp-email and records the provider message id", async () => {
+      mockSendSmtpEmail.mockResolvedValue({
+        messageId: "msg-1",
+        sentAt: new Date(),
+      });
+      mockPrisma.notification.findMany.mockResolvedValue([
+        {
+          id: "n1",
+          status: "pending",
+          recipientUserId: "u1",
+          renderedSubject: "Welcome",
+          renderedTitle: null,
+          renderedBody: "Hi",
+          channelId: "ch-email",
+          channel: { providerKey: "smtp-email" },
+        },
+      ]);
+      mockPrisma.user.findUnique.mockResolvedValue({ email: "u1@example.com" });
+
+      const result = await deliverNotifications(["n1"]);
+
+      expect(mockSendSmtpEmail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          channelId: "ch-email",
+          to: "u1@example.com",
+          subject: "Welcome",
+          body: "Hi",
+        }),
+      );
+      expect(mockPrisma.notification.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "n1" },
+          data: expect.objectContaining({
+            status: "sent",
+            providerMessageId: "msg-1",
+          }),
+        }),
+      );
+      expect(result.delivered).toBe(1);
+    });
+
+    it("marks smtp-email failed when the recipient has no email", async () => {
+      mockPrisma.notification.findMany.mockResolvedValue([
+        {
+          id: "n1",
+          status: "pending",
+          recipientUserId: "u1",
+          renderedSubject: "Welcome",
+          renderedTitle: null,
+          renderedBody: "Hi",
+          channelId: "ch-email",
+          channel: { providerKey: "smtp-email" },
+        },
+      ]);
+      mockPrisma.user.findUnique.mockResolvedValue(null);
+
+      await deliverNotifications(["n1"]);
+
+      expect(mockSendSmtpEmail).not.toHaveBeenCalled();
+      expect(mockPrisma.notification.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: "n1" },
+          data: expect.objectContaining({
+            status: "failed",
+            errorMessage: "Recipient has no email address",
+          }),
+        }),
+      );
+    });
+
+    it("skips notifications that are no longer pending", async () => {
+      mockPrisma.notification.findMany.mockResolvedValue([
+        {
+          id: "n1",
+          status: "sent",
+          recipientUserId: "u1",
+          appId: null,
+          renderedTitle: null,
+          renderedBody: "Hi",
+          channelId: "ch-in",
+          channel: { providerKey: "in-app" },
+        },
+      ]);
+
+      const result = await deliverNotifications(["n1"]);
+
+      expect(mockEventBus.emit).not.toHaveBeenCalled();
+      expect(mockPrisma.notification.update).not.toHaveBeenCalled();
+      expect(result.delivered).toBe(0);
+      expect(result.skipped).toBe(1);
     });
   });
 });

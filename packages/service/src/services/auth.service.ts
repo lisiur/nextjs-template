@@ -10,7 +10,7 @@ import {
 } from "#lib/session";
 import { code2Session } from "#lib/wechat";
 import { systemConfigRepository } from "#repositories/system-config.repository";
-import { jobService } from "#services/job.service";
+import { createNotificationsFromTemplate } from "#services/notification/notification.service";
 import { eventBus } from "#states";
 
 export type { AuthSession, AuthSessionUser, AuthType };
@@ -106,35 +106,25 @@ async function enqueueWelcomeNotifications(
 ) {
   const siteName = "My Application";
 
-  const basePayload = {
-    recipientUserIds: [userId],
-    appId,
-    source: "auth.signup",
-  };
-
   try {
-    await jobService.createJob({
-      type: "send-notification",
-      description: `Send in-app welcome notification to ${name}`,
-      payload: {
-        ...basePayload,
-        templateKey: "welcome",
-        variables: { userName: name },
-      },
+    await createNotificationsFromTemplate({
+      templateKey: "welcome",
+      recipientUserIds: [userId],
+      appId,
+      source: "auth.signup",
+      variables: { userName: name },
     });
 
-    await jobService.createJob({
-      type: "send-notification",
-      description: `Send welcome email to ${name}`,
-      payload: {
-        ...basePayload,
-        templateKey: "welcome-email",
-        variables: { userName: name, siteName },
-      },
+    await createNotificationsFromTemplate({
+      templateKey: "welcome-email",
+      recipientUserIds: [userId],
+      appId,
+      source: "auth.signup",
+      variables: { userName: name, siteName },
     });
   } catch (err) {
     console.error(
-      `[signup] Failed to enqueue welcome notifications for ${userId}:`,
+      `[signup] Failed to send welcome notifications for ${userId}:`,
       err,
     );
   }

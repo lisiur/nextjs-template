@@ -2,8 +2,9 @@ import { randomUUID } from "node:crypto";
 import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
-import { eventBus } from "#states";
-import { getEnabledTemplateByKey } from "./template.service";
+import { jobRepository } from "#repositories/job.repository";
+import { eventBus, jobExecutor } from "#states";
+import { findTemplateForDelivery } from "./template.service";
 import { renderTemplate, validateTemplateVariables } from "./template-renderer";
 
 type NotificationVariables = Record<string, unknown>;
@@ -33,7 +34,13 @@ export async function createNotificationsFromTemplate(params: {
     });
   }
 
-  const template = await getEnabledTemplateByKey(params.templateKey);
+  const resolved = await findTemplateForDelivery(params.templateKey);
+  if (!resolved) {
+    throw new HTTPException(404, {
+      message: `Notification template not found for key '${params.templateKey}'`,
+    });
+  }
+  const { template, disabledReason } = resolved;
 
   const users = await prisma.user.findMany({
     where: { id: { in: recipientUserIds } },
@@ -49,103 +56,183 @@ export async function createNotificationsFromTemplate(params: {
     });
   }
 
+  const correlationId = randomUUID();
+  const now = new Date();
   const variables = params.variables ?? {};
+
+  const baseData = {
+    correlationId,
+    templateId: template.id,
+    channelId: template.channelId,
+    appId: params.appId,
+    creatorId: params.creatorId,
+    source: params.source,
+    variables: asInputJson(variables),
+    metadata: asInputJson(params.metadata),
+  };
+
+  // Disabled template/channel: record the attempt as a failed row, skip delivery.
+  if (disabledReason) {
+    const failed = await Promise.all(
+      recipientUserIds.map((recipientUserId) =>
+        prisma.notification.create({
+          data: {
+            ...baseData,
+            recipientUserId,
+            renderedSubject: null,
+            renderedTitle: null,
+            renderedBody: "",
+            status: "failed",
+            failedAt: now,
+            errorMessage: disabledReason,
+          },
+        }),
+      ),
+    );
+
+    return {
+      correlationId,
+      total: failed.length,
+      pending: 0,
+      failed: failed.length,
+      notificationIds: failed.map((n) => n.id),
+    };
+  }
+
+  // Enabled: validate variables, render, create pending rows + delivery job atomically.
   validateTemplateVariables(template.variablesSchema, variables);
 
   const renderedSubject = renderTemplate(template.subjectTemplate, variables);
   const renderedTitle = renderTemplate(template.titleTemplate, variables);
   const renderedBody = renderTemplate(template.bodyTemplate, variables) ?? "";
 
-  const correlationId = randomUUID();
-  const now = new Date();
-  const inApp = template.channel.providerKey === "in-app";
-  const isSmtp = template.channel.providerKey === "smtp-email";
-
-  const mailer = isSmtp ? await import("./mailer") : null;
-
-  const results = await Promise.all(
-    recipientUserIds.map(async (recipientUserId) => {
-      const notification = await prisma.notification.create({
+  const { notificationIds, job } = await prisma.$transaction(async (tx) => {
+    const created: string[] = [];
+    for (const recipientUserId of recipientUserIds) {
+      const notification = await tx.notification.create({
         data: {
-          correlationId,
-          templateId: template.id,
-          channelId: template.channelId,
+          ...baseData,
           recipientUserId,
-          appId: params.appId,
-          creatorId: params.creatorId,
-          source: params.source,
-          variables: asInputJson(variables),
           renderedSubject,
           renderedTitle,
           renderedBody,
-          status: inApp ? "sent" : "pending",
-          sentAt: inApp ? now : undefined,
-          metadata: asInputJson(params.metadata),
+          status: "pending",
         },
+        select: { id: true },
       });
+      created.push(notification.id);
+    }
 
-      if (inApp) {
-        eventBus.emit(recipientUserId, {
-          type: "notification.created",
-          notificationId: notification.id,
-          userId: recipientUserId,
-          appId: params.appId ?? null,
-          renderedTitle,
-          renderedBody,
-        });
-      }
+    const createdJob = await jobRepository.create(
+      {
+        type: "send-notification",
+        description: `Deliver ${created.length} notification(s) for template '${params.templateKey}'`,
+        payload: { notificationIds: created },
+      },
+      tx,
+    );
 
-      if (isSmtp) {
-        const user = await prisma.user.findUnique({
-          where: { id: recipientUserId },
-          select: { email: true },
-        });
-        if (user?.email) {
-          try {
-            const result = await mailer?.sendSmtpEmail({
-              channelId: template.channelId,
-              to: user.email,
-              subject: renderedSubject ?? "",
-              body: renderedBody,
-            });
-            if (!result) {
-              throw new Error("Failed to send email: mailer unavailable");
-            }
-            await prisma.notification.update({
-              where: { id: notification.id },
-              data: {
-                status: "sent",
-                sentAt: result.sentAt,
-                providerMessageId: result.messageId,
-              },
-            });
-          } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            await prisma.notification.update({
-              where: { id: notification.id },
-              data: { status: "failed", failedAt: now, errorMessage: msg },
-            });
-          }
-        } else {
-          await prisma.notification.update({
-            where: { id: notification.id },
-            data: {
-              status: "failed",
-              failedAt: now,
-              errorMessage: "Recipient has no email address",
-            },
-          });
-        }
-      }
+    return { notificationIds: created, job: createdJob };
+  });
 
-      return notification;
-    }),
-  );
+  jobExecutor.enqueue(job);
 
   return {
     correlationId,
-    total: results.length,
-    recipients: recipientUserIds.length,
-    provider: template.channel.providerKey,
+    total: notificationIds.length,
+    pending: notificationIds.length,
+    failed: 0,
+    notificationIds,
   };
+}
+
+export async function deliverNotifications(notificationIds: string[]) {
+  if (notificationIds.length === 0) return { delivered: 0, skipped: 0 };
+
+  const notifications = await prisma.notification.findMany({
+    where: { id: { in: notificationIds } },
+    include: { channel: true },
+  });
+
+  const now = new Date();
+  let delivered = 0;
+  let skipped = 0;
+
+  for (const notification of notifications) {
+    if (notification.status !== "pending") {
+      skipped++;
+      continue;
+    }
+
+    const providerKey = notification.channel.providerKey;
+
+    if (providerKey === "in-app") {
+      eventBus.emit(notification.recipientUserId, {
+        type: "notification.created",
+        notificationId: notification.id,
+        userId: notification.recipientUserId,
+        appId: notification.appId ?? null,
+        renderedTitle: notification.renderedTitle,
+        renderedBody: notification.renderedBody,
+      });
+      await prisma.notification.update({
+        where: { id: notification.id },
+        data: { status: "sent", sentAt: now },
+      });
+      delivered++;
+      continue;
+    }
+
+    if (providerKey === "smtp-email") {
+      const user = await prisma.user.findUnique({
+        where: { id: notification.recipientUserId },
+        select: { email: true },
+      });
+      if (!user?.email) {
+        await prisma.notification.update({
+          where: { id: notification.id },
+          data: {
+            status: "failed",
+            failedAt: now,
+            errorMessage: "Recipient has no email address",
+          },
+        });
+        continue;
+      }
+
+      try {
+        const mailer = await import("./mailer");
+        const result = await mailer.sendSmtpEmail({
+          channelId: notification.channelId,
+          to: user.email,
+          subject: notification.renderedSubject ?? "",
+          body: notification.renderedBody,
+        });
+        if (!result) {
+          throw new Error("Failed to send email: mailer unavailable");
+        }
+        await prisma.notification.update({
+          where: { id: notification.id },
+          data: {
+            status: "sent",
+            sentAt: result.sentAt,
+            providerMessageId: result.messageId,
+          },
+        });
+        delivered++;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        await prisma.notification.update({
+          where: { id: notification.id },
+          data: { status: "failed", failedAt: now, errorMessage: msg },
+        });
+      }
+      continue;
+    }
+
+    // Unsupported provider (e.g. sms): leave as pending.
+    skipped++;
+  }
+
+  return { delivered, skipped };
 }

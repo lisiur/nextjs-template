@@ -232,34 +232,31 @@ export async function deleteNotificationTemplate(id: string) {
   return { success: true as const };
 }
 
-export async function getEnabledTemplateByKey(key: string) {
+export async function findTemplateForDelivery(key: string): Promise<{
+  template: NotificationTemplateWithChannel;
+  disabledReason: string | null;
+} | null> {
   const cached =
     notificationCache.getTemplates<NotificationTemplateWithChannel>(key);
-  if (cached) return cached;
+  if (cached) return { template: cached, disabledReason: null };
 
   const template = await prisma.notificationTemplate.findFirst({
     where: { key, deletedAt: null },
     include: templateWithChannel,
   });
 
-  if (!template) {
-    throw new HTTPException(404, {
-      message: `Notification template not found for key '${key}'`,
-    });
-  }
+  if (!template) return null;
 
+  let disabledReason: string | null = null;
   if (!template.enabled) {
-    throw new HTTPException(409, {
-      message: `Notification template '${key}' is disabled`,
-    });
+    disabledReason = `Notification template '${key}' is disabled`;
+  } else if (!template.channel.enabled || template.channel.deletedAt) {
+    disabledReason = `Notification channel for template '${key}' is disabled or deleted`;
   }
 
-  if (!template.channel.enabled || template.channel.deletedAt) {
-    throw new HTTPException(409, {
-      message: `Notification channel for template '${key}' is disabled or deleted`,
-    });
+  if (!disabledReason) {
+    notificationCache.setTemplates(key, template);
   }
 
-  notificationCache.setTemplates(key, template);
-  return template;
+  return { template, disabledReason };
 }

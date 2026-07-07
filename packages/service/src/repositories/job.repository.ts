@@ -3,16 +3,19 @@ import { JobStatus } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 
 export class JobRepository {
-  async create(data: {
-    type: string;
-    description?: string;
-    payload: unknown;
-    priority?: string;
-    scheduledAt?: Date;
-    maxAttempts?: number;
-    timeoutMs?: number;
-  }): Promise<Job> {
-    return prisma.job.create({
+  async create(
+    data: {
+      type: string;
+      description?: string;
+      payload: unknown;
+      priority?: string;
+      scheduledAt?: Date;
+      maxAttempts?: number;
+      timeoutMs?: number;
+    },
+    tx: Prisma.TransactionClient = prisma,
+  ): Promise<Job> {
+    return tx.job.create({
       data: {
         type: data.type,
         description: data.description,
