@@ -648,7 +648,8 @@ const notificationTemplates = [
     key: "welcome",
     name: "Welcome",
     enabled: true,
-    bodyTemplate: "Welcome, {{userName}}!",
+    titleTemplate: "Welcome, {{userName}}!",
+    bodyTemplate: "Your account has been created successfully.",
     variablesSchema: {
       properties: {
         userName: { type: "string", description: "The user's name" },
