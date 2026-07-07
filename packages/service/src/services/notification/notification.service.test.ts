@@ -36,6 +36,7 @@ describe("notification runtime service", () => {
       id: "tpl-email",
       key: "user-welcome.email",
       channelId: "ch-email",
+      enabled: true,
       subjectTemplate: "Welcome {{name}}",
       titleTemplate: null,
       bodyTemplate: "Hello {{name}}",
@@ -78,11 +79,12 @@ describe("notification runtime service", () => {
       id: "tpl-email",
       key: "user-welcome.email",
       channelId: "ch-email",
+      enabled: true,
       subjectTemplate: "Welcome {{name}}",
       titleTemplate: null,
       bodyTemplate: "Hello {{name}}",
       variablesSchema: { required: ["name"] },
-      channel: { providerKey: "smtp-email" },
+      channel: { providerKey: "smtp-email", enabled: true, deletedAt: null },
     });
 
     await expect(
@@ -100,9 +102,10 @@ describe("notification runtime service", () => {
       id: "tpl-in-app",
       key: "user-welcome.in-app",
       channelId: "ch-in-app",
+      enabled: true,
       bodyTemplate: "Hello",
       variablesSchema: null,
-      channel: { providerKey: "in-app" },
+      channel: { providerKey: "in-app", enabled: true, deletedAt: null },
     });
     mockPrisma.user.findMany.mockResolvedValue([]);
 
@@ -126,15 +129,65 @@ describe("notification runtime service", () => {
     ).rejects.toMatchObject({ status: 404 });
   });
 
+  it("returns 409 when the template is disabled", async () => {
+    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
+      id: "tpl-disabled",
+      key: "welcome-email",
+      channelId: "ch-email",
+      enabled: false,
+      bodyTemplate: "Hello",
+      variablesSchema: null,
+      channel: { providerKey: "smtp-email", enabled: true, deletedAt: null },
+    });
+
+    await expect(
+      createNotificationsFromTemplate({
+        templateKey: "welcome-email",
+        recipientUserIds: ["u1"],
+      }),
+    ).rejects.toMatchObject({
+      status: 409,
+      message: "Notification template 'welcome-email' is disabled",
+    });
+    expect(mockPrisma.notification.create).not.toHaveBeenCalled();
+  });
+
+  it("returns 409 when the template's channel is disabled", async () => {
+    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
+      id: "tpl-email",
+      key: "welcome-email",
+      channelId: "ch-email",
+      enabled: true,
+      subjectTemplate: "Welcome",
+      titleTemplate: null,
+      bodyTemplate: "Hello",
+      variablesSchema: null,
+      channel: { providerKey: "smtp-email", enabled: false, deletedAt: null },
+    });
+
+    await expect(
+      createNotificationsFromTemplate({
+        templateKey: "welcome-email",
+        recipientUserIds: ["u1"],
+      }),
+    ).rejects.toMatchObject({
+      status: 409,
+      message:
+        "Notification channel for template 'welcome-email' is disabled or deleted",
+    });
+    expect(mockPrisma.notification.create).not.toHaveBeenCalled();
+  });
+
   it("uses a single correlation id for all created rows", async () => {
     mockPrisma.user.findMany.mockResolvedValue([{ id: "u1" }, { id: "u2" }]);
     mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
       id: "tpl-in-app",
       key: "notice",
       channelId: "ch-in-app",
+      enabled: true,
       bodyTemplate: "Body",
       variablesSchema: null,
-      channel: { providerKey: "in-app" },
+      channel: { providerKey: "in-app", enabled: true, deletedAt: null },
     });
     mockPrisma.notification.create = vi.fn().mockImplementation(({ data }) =>
       Promise.resolve({
@@ -163,6 +216,7 @@ describe("notification runtime service", () => {
       id: "tpl-email",
       key: "user-welcome.email",
       channelId: "ch-email",
+      enabled: true,
       subjectTemplate: "Welcome",
       titleTemplate: null,
       bodyTemplate: "Hello",

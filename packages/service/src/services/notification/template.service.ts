@@ -238,21 +238,25 @@ export async function getEnabledTemplateByKey(key: string) {
   if (cached) return cached;
 
   const template = await prisma.notificationTemplate.findFirst({
-    where: {
-      key,
-      enabled: true,
-      deletedAt: null,
-      channel: {
-        enabled: true,
-        deletedAt: null,
-      },
-    },
+    where: { key, deletedAt: null },
     include: templateWithChannel,
   });
 
   if (!template) {
     throw new HTTPException(404, {
-      message: "Notification template not found",
+      message: `Notification template not found for key '${key}'`,
+    });
+  }
+
+  if (!template.enabled) {
+    throw new HTTPException(409, {
+      message: `Notification template '${key}' is disabled`,
+    });
+  }
+
+  if (!template.channel.enabled || template.channel.deletedAt) {
+    throw new HTTPException(409, {
+      message: `Notification channel for template '${key}' is disabled or deleted`,
     });
   }
 
