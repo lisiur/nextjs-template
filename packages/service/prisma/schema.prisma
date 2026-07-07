@@ -100,6 +100,7 @@ enum JobPriority {
 model Job {
   id          String      @id @default(cuid())
   type        String
+  description String?
   payload     Json
   status      JobStatus   @default(PENDING)
   priority    JobPriority @default(NORMAL)
@@ -122,6 +123,7 @@ model Job {
 model JobArchive {
   id            String      @id @default(cuid())
   type          String
+  description   String?
   payload       Json
   status        JobStatus
   priority      JobPriority

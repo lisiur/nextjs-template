@@ -34,6 +34,7 @@ import type { JobDetail } from "./job-detail-tabs";
 interface Job {
   id: string;
   type: string;
+  description?: string | null;
   status: string;
   priority: string;
   attempts: number;
@@ -175,6 +176,7 @@ export function JobTable() {
       const detail = (await res.json()) as JobDetail;
       setDuplicateInitial({
         type: detail.type,
+        description: detail.description ?? undefined,
         payload: detail.payload,
         priority: detail.priority,
         maxAttempts: detail.maxAttempts,
@@ -249,13 +251,16 @@ export function JobTable() {
       ) : (
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <Table
-            className="w-[1024px] min-w-[1024px]"
+            className="w-[1280px] min-w-[1280px]"
             containerClassName="min-h-0 min-w-0 flex-1 overflow-auto rounded-md border"
           >
             <TableHeader sticky>
               <TableRow>
                 <TableHead className="w-32">{t("columns.id")}</TableHead>
                 <TableHead className="w-40">{t("columns.type")}</TableHead>
+                <TableHead className="w-64">
+                  {t("columns.description")}
+                </TableHead>
                 <TableHead className="w-28">{t("columns.status")}</TableHead>
                 <TableHead className="w-24">{t("columns.priority")}</TableHead>
                 <TableHead className="w-28">{t("columns.attempts")}</TableHead>
@@ -279,6 +284,12 @@ export function JobTable() {
                   </TableCell>
                   <TableCell className="font-mono text-sm">
                     {job.type}
+                  </TableCell>
+                  <TableCell
+                    className="max-w-64 truncate text-xs text-muted-foreground"
+                    title={job.description ?? ""}
+                  >
+                    {job.description ?? "-"}
                   </TableCell>
                   <TableCell>
                     <Badge variant={statusVariant(job.status)}>

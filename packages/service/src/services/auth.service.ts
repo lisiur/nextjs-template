@@ -115,6 +115,7 @@ async function enqueueWelcomeNotifications(
   try {
     await jobService.createJob({
       type: "send-notification",
+      description: `Send in-app welcome notification to ${name}`,
       payload: {
         ...basePayload,
         templateKey: "welcome",
@@ -124,6 +125,7 @@ async function enqueueWelcomeNotifications(
 
     await jobService.createJob({
       type: "send-notification",
+      description: `Send welcome email to ${name}`,
       payload: {
         ...basePayload,
         templateKey: "welcome-email",

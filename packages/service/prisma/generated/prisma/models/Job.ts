@@ -41,6 +41,7 @@ export type JobSumAggregateOutputType = {
 export type JobMinAggregateOutputType = {
   id: string | null
   type: string | null
+  description: string | null
   status: $Enums.JobStatus | null
   priority: $Enums.JobPriority | null
   error: string | null
@@ -57,6 +58,7 @@ export type JobMinAggregateOutputType = {
 export type JobMaxAggregateOutputType = {
   id: string | null
   type: string | null
+  description: string | null
   status: $Enums.JobStatus | null
   priority: $Enums.JobPriority | null
   error: string | null
@@ -73,6 +75,7 @@ export type JobMaxAggregateOutputType = {
 export type JobCountAggregateOutputType = {
   id: number
   type: number
+  description: number
   payload: number
   status: number
   priority: number
@@ -105,6 +108,7 @@ export type JobSumAggregateInputType = {
 export type JobMinAggregateInputType = {
   id?: true
   type?: true
+  description?: true
   status?: true
   priority?: true
   error?: true
@@ -121,6 +125,7 @@ export type JobMinAggregateInputType = {
 export type JobMaxAggregateInputType = {
   id?: true
   type?: true
+  description?: true
   status?: true
   priority?: true
   error?: true
@@ -137,6 +142,7 @@ export type JobMaxAggregateInputType = {
 export type JobCountAggregateInputType = {
   id?: true
   type?: true
+  description?: true
   payload?: true
   status?: true
   priority?: true
@@ -242,6 +248,7 @@ export type JobGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type JobGroupByOutputType = {
   id: string
   type: string
+  description: string | null
   payload: runtime.JsonValue
   status: $Enums.JobStatus
   priority: $Enums.JobPriority
@@ -283,6 +290,7 @@ export type JobWhereInput = {
   NOT?: Prisma.JobWhereInput | Prisma.JobWhereInput[]
   id?: Prisma.StringFilter<"Job"> | string
   type?: Prisma.StringFilter<"Job"> | string
+  description?: Prisma.StringNullableFilter<"Job"> | string | null
   payload?: Prisma.JsonFilter<"Job">
   status?: Prisma.EnumJobStatusFilter<"Job"> | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFilter<"Job"> | $Enums.JobPriority
@@ -301,6 +309,7 @@ export type JobWhereInput = {
 export type JobOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   payload?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
@@ -322,6 +331,7 @@ export type JobWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.JobWhereInput[]
   NOT?: Prisma.JobWhereInput | Prisma.JobWhereInput[]
   type?: Prisma.StringFilter<"Job"> | string
+  description?: Prisma.StringNullableFilter<"Job"> | string | null
   payload?: Prisma.JsonFilter<"Job">
   status?: Prisma.EnumJobStatusFilter<"Job"> | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFilter<"Job"> | $Enums.JobPriority
@@ -340,6 +350,7 @@ export type JobWhereUniqueInput = Prisma.AtLeast<{
 export type JobOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   payload?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
@@ -366,6 +377,7 @@ export type JobScalarWhereWithAggregatesInput = {
   NOT?: Prisma.JobScalarWhereWithAggregatesInput | Prisma.JobScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Job"> | string
   type?: Prisma.StringWithAggregatesFilter<"Job"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"Job"> | string | null
   payload?: Prisma.JsonWithAggregatesFilter<"Job">
   status?: Prisma.EnumJobStatusWithAggregatesFilter<"Job"> | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityWithAggregatesFilter<"Job"> | $Enums.JobPriority
@@ -384,6 +396,7 @@ export type JobScalarWhereWithAggregatesInput = {
 export type JobCreateInput = {
   id?: string
   type: string
+  description?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.JobStatus
   priority?: $Enums.JobPriority
@@ -402,6 +415,7 @@ export type JobCreateInput = {
 export type JobUncheckedCreateInput = {
   id?: string
   type: string
+  description?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.JobStatus
   priority?: $Enums.JobPriority
@@ -420,6 +434,7 @@ export type JobUncheckedCreateInput = {
 export type JobUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFieldUpdateOperationsInput | $Enums.JobPriority
@@ -438,6 +453,7 @@ export type JobUpdateInput = {
 export type JobUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFieldUpdateOperationsInput | $Enums.JobPriority
@@ -456,6 +472,7 @@ export type JobUncheckedUpdateInput = {
 export type JobCreateManyInput = {
   id?: string
   type: string
+  description?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: $Enums.JobStatus
   priority?: $Enums.JobPriority
@@ -474,6 +491,7 @@ export type JobCreateManyInput = {
 export type JobUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFieldUpdateOperationsInput | $Enums.JobPriority
@@ -492,6 +510,7 @@ export type JobUpdateManyMutationInput = {
 export type JobUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFieldUpdateOperationsInput | $Enums.JobPriority
@@ -510,6 +529,7 @@ export type JobUncheckedUpdateManyInput = {
 export type JobCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   payload?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
@@ -534,6 +554,7 @@ export type JobAvgOrderByAggregateInput = {
 export type JobMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   error?: Prisma.SortOrder
@@ -550,6 +571,7 @@ export type JobMaxOrderByAggregateInput = {
 export type JobMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   error?: Prisma.SortOrder
@@ -590,6 +612,7 @@ export type IntFieldUpdateOperationsInput = {
 export type JobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   type?: boolean
+  description?: boolean
   payload?: boolean
   status?: boolean
   priority?: boolean
@@ -608,6 +631,7 @@ export type JobSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
 export type JobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   type?: boolean
+  description?: boolean
   payload?: boolean
   status?: boolean
   priority?: boolean
@@ -626,6 +650,7 @@ export type JobSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extension
 export type JobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   type?: boolean
+  description?: boolean
   payload?: boolean
   status?: boolean
   priority?: boolean
@@ -644,6 +669,7 @@ export type JobSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extension
 export type JobSelectScalar = {
   id?: boolean
   type?: boolean
+  description?: boolean
   payload?: boolean
   status?: boolean
   priority?: boolean
@@ -659,7 +685,7 @@ export type JobSelectScalar = {
   updatedAt?: boolean
 }
 
-export type JobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "payload" | "status" | "priority" | "result" | "error" | "attempts" | "maxAttempts" | "timeoutMs" | "scheduledAt" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["job"]>
+export type JobOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "description" | "payload" | "status" | "priority" | "result" | "error" | "attempts" | "maxAttempts" | "timeoutMs" | "scheduledAt" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["job"]>
 
 export type $JobPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Job"
@@ -667,6 +693,7 @@ export type $JobPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     type: string
+    description: string | null
     payload: runtime.JsonValue
     status: $Enums.JobStatus
     priority: $Enums.JobPriority
@@ -1105,6 +1132,7 @@ export interface Prisma__JobClient<T, Null = never, ExtArgs extends runtime.Type
 export interface JobFieldRefs {
   readonly id: Prisma.FieldRef<"Job", 'String'>
   readonly type: Prisma.FieldRef<"Job", 'String'>
+  readonly description: Prisma.FieldRef<"Job", 'String'>
   readonly payload: Prisma.FieldRef<"Job", 'Json'>
   readonly status: Prisma.FieldRef<"Job", 'JobStatus'>
   readonly priority: Prisma.FieldRef<"Job", 'JobPriority'>

@@ -5,6 +5,7 @@ import { prisma } from "#lib/db";
 export class JobRepository {
   async create(data: {
     type: string;
+    description?: string;
     payload: unknown;
     priority?: string;
     scheduledAt?: Date;
@@ -14,6 +15,7 @@ export class JobRepository {
     return prisma.job.create({
       data: {
         type: data.type,
+        description: data.description,
         payload: data.payload as Prisma.InputJsonValue,
         priority: (data.priority as Job["priority"]) ?? "NORMAL",
         scheduledAt: data.scheduledAt ?? new Date(),
@@ -125,6 +127,7 @@ export class JobRepository {
     await prisma.jobArchive.create({
       data: {
         type: job.type,
+        description: job.description,
         payload: job.payload as Prisma.InputJsonValue,
         status: job.status,
         priority: job.priority,

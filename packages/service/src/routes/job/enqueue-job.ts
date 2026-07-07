@@ -38,6 +38,7 @@ export const enqueueJob = defineOpenAPIRoute({
 
     const job = await jobService.createJob({
       type: body.type,
+      description: body.description,
       payload: body.payload,
       priority: body.priority,
       scheduledAt,

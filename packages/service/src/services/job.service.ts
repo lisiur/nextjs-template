@@ -6,6 +6,7 @@ import { jobExecutor } from "#states";
 
 export interface CreateJobInput {
   type: string;
+  description?: string;
   payload: unknown;
   priority?: JobPriority;
   scheduledAt?: Date;
@@ -24,6 +25,7 @@ export class JobService {
   async createJob(input: CreateJobInput): Promise<Job> {
     const job = await jobRepository.create({
       type: input.type,
+      description: input.description,
       payload: input.payload,
       priority: input.priority,
       scheduledAt: input.scheduledAt,

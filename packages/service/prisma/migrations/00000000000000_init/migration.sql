@@ -82,6 +82,7 @@ CREATE TABLE "verification" (
 CREATE TABLE "job" (
     "id" TEXT NOT NULL,
     "type" TEXT NOT NULL,
+    "description" TEXT,
     "payload" JSONB NOT NULL,
     "status" "JobStatus" NOT NULL DEFAULT 'PENDING',
     "priority" "JobPriority" NOT NULL DEFAULT 'NORMAL',
@@ -103,6 +104,7 @@ CREATE TABLE "job" (
 CREATE TABLE "job_archive" (
     "id" TEXT NOT NULL,
     "type" TEXT NOT NULL,
+    "description" TEXT,
     "payload" JSONB NOT NULL,
     "status" "JobStatus" NOT NULL,
     "priority" "JobPriority" NOT NULL,

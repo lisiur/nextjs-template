@@ -37,6 +37,7 @@ interface ArchivedJob {
   id: string;
   originalJobId: string;
   type: string;
+  description?: string | null;
   status: string;
   priority: string;
   attempts: number;
@@ -252,7 +253,7 @@ export function ArchivedJobTable({
       ) : (
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <Table
-            className="w-[1100px] min-w-[1100px]"
+            className="w-[1360px] min-w-[1360px]"
             containerClassName="min-h-0 min-w-0 flex-1 overflow-auto rounded-md border"
           >
             <TableHeader sticky>
@@ -261,6 +262,9 @@ export function ArchivedJobTable({
                   {t("columns.originalJobId")}
                 </TableHead>
                 <TableHead className="w-40">{t("columns.type")}</TableHead>
+                <TableHead className="w-64">
+                  {t("columns.description")}
+                </TableHead>
                 <TableHead className="w-28">{t("columns.status")}</TableHead>
                 <TableHead className="w-24">{t("columns.priority")}</TableHead>
                 <TableHead className="w-28">{t("columns.attempts")}</TableHead>
@@ -284,6 +288,12 @@ export function ArchivedJobTable({
                   </TableCell>
                   <TableCell className="font-mono text-sm">
                     {job.type}
+                  </TableCell>
+                  <TableCell
+                    className="max-w-64 truncate text-xs text-muted-foreground"
+                    title={job.description ?? ""}
+                  >
+                    {job.description ?? "-"}
                   </TableCell>
                   <TableCell>
                     <Badge variant={statusVariant(job.status)}>

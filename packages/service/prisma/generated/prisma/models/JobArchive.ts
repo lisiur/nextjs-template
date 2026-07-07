@@ -41,6 +41,7 @@ export type JobArchiveSumAggregateOutputType = {
 export type JobArchiveMinAggregateOutputType = {
   id: string | null
   type: string | null
+  description: string | null
   status: $Enums.JobStatus | null
   priority: $Enums.JobPriority | null
   error: string | null
@@ -57,6 +58,7 @@ export type JobArchiveMinAggregateOutputType = {
 export type JobArchiveMaxAggregateOutputType = {
   id: string | null
   type: string | null
+  description: string | null
   status: $Enums.JobStatus | null
   priority: $Enums.JobPriority | null
   error: string | null
@@ -73,6 +75,7 @@ export type JobArchiveMaxAggregateOutputType = {
 export type JobArchiveCountAggregateOutputType = {
   id: number
   type: number
+  description: number
   payload: number
   status: number
   priority: number
@@ -105,6 +108,7 @@ export type JobArchiveSumAggregateInputType = {
 export type JobArchiveMinAggregateInputType = {
   id?: true
   type?: true
+  description?: true
   status?: true
   priority?: true
   error?: true
@@ -121,6 +125,7 @@ export type JobArchiveMinAggregateInputType = {
 export type JobArchiveMaxAggregateInputType = {
   id?: true
   type?: true
+  description?: true
   status?: true
   priority?: true
   error?: true
@@ -137,6 +142,7 @@ export type JobArchiveMaxAggregateInputType = {
 export type JobArchiveCountAggregateInputType = {
   id?: true
   type?: true
+  description?: true
   payload?: true
   status?: true
   priority?: true
@@ -242,6 +248,7 @@ export type JobArchiveGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 export type JobArchiveGroupByOutputType = {
   id: string
   type: string
+  description: string | null
   payload: runtime.JsonValue
   status: $Enums.JobStatus
   priority: $Enums.JobPriority
@@ -283,6 +290,7 @@ export type JobArchiveWhereInput = {
   NOT?: Prisma.JobArchiveWhereInput | Prisma.JobArchiveWhereInput[]
   id?: Prisma.StringFilter<"JobArchive"> | string
   type?: Prisma.StringFilter<"JobArchive"> | string
+  description?: Prisma.StringNullableFilter<"JobArchive"> | string | null
   payload?: Prisma.JsonFilter<"JobArchive">
   status?: Prisma.EnumJobStatusFilter<"JobArchive"> | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFilter<"JobArchive"> | $Enums.JobPriority
@@ -301,6 +309,7 @@ export type JobArchiveWhereInput = {
 export type JobArchiveOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   payload?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
@@ -323,6 +332,7 @@ export type JobArchiveWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.JobArchiveWhereInput[]
   NOT?: Prisma.JobArchiveWhereInput | Prisma.JobArchiveWhereInput[]
   type?: Prisma.StringFilter<"JobArchive"> | string
+  description?: Prisma.StringNullableFilter<"JobArchive"> | string | null
   payload?: Prisma.JsonFilter<"JobArchive">
   status?: Prisma.EnumJobStatusFilter<"JobArchive"> | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFilter<"JobArchive"> | $Enums.JobPriority
@@ -340,6 +350,7 @@ export type JobArchiveWhereUniqueInput = Prisma.AtLeast<{
 export type JobArchiveOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   payload?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
@@ -366,6 +377,7 @@ export type JobArchiveScalarWhereWithAggregatesInput = {
   NOT?: Prisma.JobArchiveScalarWhereWithAggregatesInput | Prisma.JobArchiveScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"JobArchive"> | string
   type?: Prisma.StringWithAggregatesFilter<"JobArchive"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"JobArchive"> | string | null
   payload?: Prisma.JsonWithAggregatesFilter<"JobArchive">
   status?: Prisma.EnumJobStatusWithAggregatesFilter<"JobArchive"> | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityWithAggregatesFilter<"JobArchive"> | $Enums.JobPriority
@@ -384,6 +396,7 @@ export type JobArchiveScalarWhereWithAggregatesInput = {
 export type JobArchiveCreateInput = {
   id?: string
   type: string
+  description?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status: $Enums.JobStatus
   priority: $Enums.JobPriority
@@ -402,6 +415,7 @@ export type JobArchiveCreateInput = {
 export type JobArchiveUncheckedCreateInput = {
   id?: string
   type: string
+  description?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status: $Enums.JobStatus
   priority: $Enums.JobPriority
@@ -420,6 +434,7 @@ export type JobArchiveUncheckedCreateInput = {
 export type JobArchiveUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFieldUpdateOperationsInput | $Enums.JobPriority
@@ -438,6 +453,7 @@ export type JobArchiveUpdateInput = {
 export type JobArchiveUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFieldUpdateOperationsInput | $Enums.JobPriority
@@ -456,6 +472,7 @@ export type JobArchiveUncheckedUpdateInput = {
 export type JobArchiveCreateManyInput = {
   id?: string
   type: string
+  description?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status: $Enums.JobStatus
   priority: $Enums.JobPriority
@@ -474,6 +491,7 @@ export type JobArchiveCreateManyInput = {
 export type JobArchiveUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFieldUpdateOperationsInput | $Enums.JobPriority
@@ -492,6 +510,7 @@ export type JobArchiveUpdateManyMutationInput = {
 export type JobArchiveUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.EnumJobStatusFieldUpdateOperationsInput | $Enums.JobStatus
   priority?: Prisma.EnumJobPriorityFieldUpdateOperationsInput | $Enums.JobPriority
@@ -510,6 +529,7 @@ export type JobArchiveUncheckedUpdateManyInput = {
 export type JobArchiveCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   payload?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
@@ -534,6 +554,7 @@ export type JobArchiveAvgOrderByAggregateInput = {
 export type JobArchiveMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   error?: Prisma.SortOrder
@@ -550,6 +571,7 @@ export type JobArchiveMaxOrderByAggregateInput = {
 export type JobArchiveMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   status?: Prisma.SortOrder
   priority?: Prisma.SortOrder
   error?: Prisma.SortOrder
@@ -574,6 +596,7 @@ export type JobArchiveSumOrderByAggregateInput = {
 export type JobArchiveSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   type?: boolean
+  description?: boolean
   payload?: boolean
   status?: boolean
   priority?: boolean
@@ -592,6 +615,7 @@ export type JobArchiveSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type JobArchiveSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   type?: boolean
+  description?: boolean
   payload?: boolean
   status?: boolean
   priority?: boolean
@@ -610,6 +634,7 @@ export type JobArchiveSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type JobArchiveSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   type?: boolean
+  description?: boolean
   payload?: boolean
   status?: boolean
   priority?: boolean
@@ -628,6 +653,7 @@ export type JobArchiveSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type JobArchiveSelectScalar = {
   id?: boolean
   type?: boolean
+  description?: boolean
   payload?: boolean
   status?: boolean
   priority?: boolean
@@ -643,7 +669,7 @@ export type JobArchiveSelectScalar = {
   originalJobId?: boolean
 }
 
-export type JobArchiveOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "payload" | "status" | "priority" | "result" | "error" | "attempts" | "maxAttempts" | "timeoutMs" | "scheduledAt" | "startedAt" | "completedAt" | "createdAt" | "originalJobId", ExtArgs["result"]["jobArchive"]>
+export type JobArchiveOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "description" | "payload" | "status" | "priority" | "result" | "error" | "attempts" | "maxAttempts" | "timeoutMs" | "scheduledAt" | "startedAt" | "completedAt" | "createdAt" | "originalJobId", ExtArgs["result"]["jobArchive"]>
 
 export type $JobArchivePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "JobArchive"
@@ -651,6 +677,7 @@ export type $JobArchivePayload<ExtArgs extends runtime.Types.Extensions.Internal
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     type: string
+    description: string | null
     payload: runtime.JsonValue
     status: $Enums.JobStatus
     priority: $Enums.JobPriority
@@ -1089,6 +1116,7 @@ export interface Prisma__JobArchiveClient<T, Null = never, ExtArgs extends runti
 export interface JobArchiveFieldRefs {
   readonly id: Prisma.FieldRef<"JobArchive", 'String'>
   readonly type: Prisma.FieldRef<"JobArchive", 'String'>
+  readonly description: Prisma.FieldRef<"JobArchive", 'String'>
   readonly payload: Prisma.FieldRef<"JobArchive", 'Json'>
   readonly status: Prisma.FieldRef<"JobArchive", 'JobStatus'>
   readonly priority: Prisma.FieldRef<"JobArchive", 'JobPriority'>

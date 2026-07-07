@@ -2460,6 +2460,7 @@ export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[k
 export const JobScalarFieldEnum = {
   id: 'id',
   type: 'type',
+  description: 'description',
   payload: 'payload',
   status: 'status',
   priority: 'priority',
@@ -2481,6 +2482,7 @@ export type JobScalarFieldEnum = (typeof JobScalarFieldEnum)[keyof typeof JobSca
 export const JobArchiveScalarFieldEnum = {
   id: 'id',
   type: 'type',
+  description: 'description',
   payload: 'payload',
   status: 'status',
   priority: 'priority',

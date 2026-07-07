@@ -6,6 +6,7 @@ import { formatDateTime } from "@/utils/date";
 export interface JobDetail {
   id: string;
   type: string;
+  description?: string | null;
   payload: unknown;
   status: string;
   priority: string;
@@ -77,6 +78,9 @@ export function JobDetailOverview({ job }: { job: JobDetail }) {
       )}
       <OverviewField label={o.type}>
         <span className="font-mono">{job.type}</span>
+      </OverviewField>
+      <OverviewField label={o.description}>
+        {job.description ?? "-"}
       </OverviewField>
       <OverviewField label={o.status}>
         {t(`status.${job.status}`)}

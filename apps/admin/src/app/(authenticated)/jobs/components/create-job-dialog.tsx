@@ -30,6 +30,7 @@ const PRIORITY_OPTIONS = ["CRITICAL", "HIGH", "NORMAL", "LOW", "IDLE"] as const;
 
 export interface JobInitialValues {
   type: string;
+  description?: string;
   payload: unknown;
   priority: string;
   maxAttempts: number;
@@ -52,6 +53,7 @@ export function CreateJobDialog({
   const t = useTranslations("Jobs");
   const [saving, setSaving] = useState(false);
   const [type, setType] = useState("");
+  const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<string>("NORMAL");
   const [scheduledAt, setScheduledAt] = useState("");
   const [maxAttempts, setMaxAttempts] = useState("3");
@@ -61,6 +63,7 @@ export function CreateJobDialog({
 
   function resetForm() {
     setType("");
+    setDescription("");
     setPriority("NORMAL");
     setScheduledAt("");
     setMaxAttempts("3");
@@ -72,6 +75,7 @@ export function CreateJobDialog({
   useEffect(() => {
     if (open && initialValues) {
       setType(initialValues.type);
+      setDescription(initialValues.description ?? "");
       setPriority(initialValues.priority);
       setMaxAttempts(String(initialValues.maxAttempts));
       setTimeoutMs(String(initialValues.timeoutMs));
@@ -110,6 +114,7 @@ export function CreateJobDialog({
       await withApiFeedback(appClient.api.jobs.$post)({
         json: {
           type: type.trim(),
+          description: description.trim() || undefined,
           payload: parsedPayload,
           priority: priority as "CRITICAL" | "HIGH" | "NORMAL" | "LOW" | "IDLE",
           maxAttempts: Number(maxAttempts),
@@ -148,6 +153,22 @@ export function CreateJobDialog({
               />
               <FieldDescription>{t("form.typeDescription")}</FieldDescription>
               {errors.type && <FieldError>{errors.type}</FieldError>}
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="job-description">
+                {t("form.description")}
+              </FieldLabel>
+              <Textarea
+                id="job-description"
+                placeholder={t("form.descriptionPlaceholder")}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="min-h-16 text-sm"
+              />
+              <FieldDescription>
+                {t("form.descriptionDescription")}
+              </FieldDescription>
             </Field>
 
             <Field>

@@ -10,6 +10,10 @@ export const jobSchema = z
   .object({
     id: z.string().openapi({ example: "clx1234567890" }),
     type: z.string().openapi({ example: "send-notification" }),
+    description: z.string().nullable().optional().openapi({
+      description: "Human-readable summary of what the job does",
+      example: "Send welcome email to new users",
+    }),
     payload: z.unknown().openapi({ description: "Job payload data" }),
     status: z
       .enum(["PENDING", "PROCESSING", "COMPLETED", "FAILED"])
@@ -50,6 +54,10 @@ export const createJobBodySchema = z.object({
     example: "send-notification",
     description: "Job type identifier",
   }),
+  description: z.string().optional().openapi({
+    description: "Optional human-readable summary of what the job does",
+    example: "Send welcome email to new users",
+  }),
   payload: z.unknown().openapi({ description: "Job payload data" }),
   priority: z
     .enum(["CRITICAL", "HIGH", "NORMAL", "LOW", "IDLE"])
@@ -89,6 +97,10 @@ export const jobArchiveSchema = z
   .object({
     id: z.string().openapi({ example: "clx1234567890" }),
     type: z.string().openapi({ example: "send-notification" }),
+    description: z.string().nullable().optional().openapi({
+      description: "Human-readable summary of what the job does",
+      example: "Send welcome email to new users",
+    }),
     payload: z.unknown().openapi({ description: "Job payload data" }),
     status: z
       .enum(["PENDING", "PROCESSING", "COMPLETED", "FAILED"])
