@@ -9,6 +9,7 @@
     "./styles.css": "./src/styles.css"
   },
   "dependencies": {
+    "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.100.14",
     "hono": "^4.0.0",

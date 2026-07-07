@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
+import { eventBus } from "#states";
 import { getEnabledTemplateByKey } from "./template.service";
 import { renderTemplate, validateTemplateVariables } from "./template-renderer";
 
@@ -82,6 +83,17 @@ export async function createNotificationsFromTemplate(params: {
           metadata: asInputJson(params.metadata),
         },
       });
+
+      if (inApp) {
+        eventBus.emit(recipientUserId, {
+          type: "notification.created",
+          notificationId: notification.id,
+          userId: recipientUserId,
+          appId: params.appId ?? null,
+          renderedTitle,
+          renderedBody,
+        });
+      }
 
       if (isSmtp) {
         const user = await prisma.user.findUnique({

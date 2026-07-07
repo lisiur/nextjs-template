@@ -1,7 +1,8 @@
 "use client";
 
+import { useEventStream } from "@repo/frontend";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { appClient, useSession } from "@/lib/api";
+import { API_ORIGIN, APP_CODE, appClient, useSession } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 
 export interface UserNotification {
@@ -22,6 +23,16 @@ function invalidateNotifications(qc: ReturnType<typeof useQueryClient>) {
 
 export function useUnreadNotificationCount() {
   const { data: session } = useSession();
+  const qc = useQueryClient();
+
+  useEventStream({
+    origin: API_ORIGIN,
+    appCode: APP_CODE,
+    event: "notification.created",
+    enabled: !!session?.user,
+    handler: () => invalidateNotifications(qc),
+  });
+
   return useQuery({
     queryKey: [...NOTIFICATION_KEY, "unread-count"] as const,
     queryFn: async () => {

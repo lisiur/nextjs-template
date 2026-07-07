@@ -11,6 +11,7 @@ import {
 import { code2Session } from "#lib/wechat";
 import { systemConfigRepository } from "#repositories/system-config.repository";
 import { jobService } from "#services/job.service";
+import { eventBus } from "#states";
 
 export type { AuthSession, AuthSessionUser, AuthType };
 
@@ -177,6 +178,7 @@ export async function signUpWithEmail(params: {
 export async function signOut(token: string | null, traceId?: string) {
   const session = await deleteSessionByToken(token);
   if (session) {
+    if (token) eventBus.disconnectByToken(token);
     await logAudit({
       traceId,
       userId: session.userId,

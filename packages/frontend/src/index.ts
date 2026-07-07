@@ -10,6 +10,12 @@ export type {
 export { PermissionSelector } from "./components/permission-selector";
 export type { WatermarkConfig, WatermarkProps } from "./components/watermark";
 export { Watermark } from "./components/watermark";
+export type {
+  EventStreamOptions,
+  SseEventHandler,
+  UseEventStreamOptions,
+} from "./hooks/use-event-stream";
+export { useEventStream } from "./hooks/use-event-stream";
 export { usePaginatedQuery } from "./hooks/use-paginated-query";
 export { withApiFeedback } from "./lib/api-utils";
 export { formatDate, formatDateTime, formatTimeUntil } from "./lib/date";

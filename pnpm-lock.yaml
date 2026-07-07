@@ -206,6 +206,9 @@ importers:
 
   packages/frontend:
     dependencies:
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@repo/ui':
         specifier: workspace:*
         version: link:../ui
