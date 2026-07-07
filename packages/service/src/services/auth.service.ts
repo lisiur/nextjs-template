@@ -130,6 +130,14 @@ async function enqueueWelcomeNotifications(
   }
 }
 
+export async function getRegistrationEnabled(): Promise<boolean> {
+  const config = await systemConfigRepository.findByGroupAndKey(
+    "auth",
+    "registration.enabled",
+  );
+  return config?.value === "true";
+}
+
 export async function signUpWithEmail(params: {
   name: string;
   email: string;
@@ -139,6 +147,10 @@ export async function signUpWithEmail(params: {
   traceId?: string;
   userAgent?: string | null;
 }) {
+  if (!(await getRegistrationEnabled())) {
+    throw new HTTPException(403, { message: "Registration is disabled" });
+  }
+
   const email = params.email.toLowerCase();
 
   const existingUser = await prisma.user.findUnique({

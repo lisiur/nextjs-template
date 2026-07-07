@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRegistrationEnabled } from "@repo/frontend";
 import {
   Button,
   Field,
@@ -23,6 +24,10 @@ export function LoginForm({
 }) {
   const t = useTranslations("Auth");
   const tc = useTranslations("Common");
+  const { registrationEnabled } = useRegistrationEnabled(async () => {
+    const res = await appClient.api.auth["registration-status"].$get();
+    return (await res.json()).registrationEnabled;
+  });
 
   const loginSchema = z.object({
     email: z.string().min(1, tc("required", { field: tc("email") })),
@@ -80,16 +85,18 @@ export function LoginForm({
         {t("signIn")}
       </Button>
 
-      <p className="text-center text-sm text-muted-foreground">
-        {t("noAccount")}{" "}
-        <button
-          type="button"
-          onClick={onSwitchToRegister}
-          className="text-primary underline-offset-4 hover:underline"
-        >
-          {t("createOne")}
-        </button>
-      </p>
+      {registrationEnabled && (
+        <p className="text-center text-sm text-muted-foreground">
+          {t("noAccount")}{" "}
+          <button
+            type="button"
+            onClick={onSwitchToRegister}
+            className="text-primary underline-offset-4 hover:underline"
+          >
+            {t("createOne")}
+          </button>
+        </p>
+      )}
     </form>
   );
 }

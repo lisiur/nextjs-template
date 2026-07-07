@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { changePassword } from "./changePassword";
+import { getRegistrationStatus } from "./getRegistrationStatus";
 import { getSession } from "./getSession";
 import { signInEmail } from "./signInEmail";
 import { signInWechat } from "./signInWechat";
@@ -15,6 +16,7 @@ const routes = authRoutes.openapiRoutes([
   signUpEmail,
   signOut,
   getSession,
+  getRegistrationStatus,
   updateUser,
   changePassword,
 ] as const);

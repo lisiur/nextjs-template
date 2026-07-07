@@ -71,6 +71,12 @@ export const signInWechatBodySchema = z.object({
   code: z.string().min(1),
 });
 
+export const registrationStatusSchema = z
+  .object({
+    registrationEnabled: z.boolean(),
+  })
+  .openapi("RegistrationStatus");
+
 export const authMutationResponseSchema = z
   .object({
     data: z.unknown().optional(),

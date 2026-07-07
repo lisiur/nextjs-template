@@ -1,6 +1,10 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requireAppId } from "#extractors/app-id";
-import { badRequestResponse, createdResponseFn } from "#lib/openapi";
+import {
+  badRequestResponse,
+  createdResponseFn,
+  forbiddenResponse,
+} from "#lib/openapi";
 import { setSessionCookie } from "#lib/session";
 import { signUpWithEmail } from "#services/auth.service";
 import { authMutationResponseSchema, signUpEmailBodySchema } from "./schema";
@@ -19,6 +23,7 @@ export const signUpEmail = defineOpenAPIRoute({
     },
     responses: {
       ...badRequestResponse,
+      ...forbiddenResponse,
       ...createdResponseFn(authMutationResponseSchema, "Signed up"),
     },
   }),

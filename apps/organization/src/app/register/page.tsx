@@ -1,5 +1,6 @@
 "use client";
 
+import { useRegistrationEnabled } from "@repo/frontend";
 import {
   Card,
   CardContent,
@@ -12,13 +13,18 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
 import { AuthFooter } from "@/components/auth/auth-footer";
 import { RegisterForm } from "@/components/auth/register-form";
-import { useSession } from "@/lib/api";
+import { appClient, useSession } from "@/lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
   const t = useTranslations("Auth");
   const { data: session, isPending, refetch } = useSession();
   const handledValidSessionRef = useRef(false);
+  const { registrationEnabled, isLoading: isRegistrationLoading } =
+    useRegistrationEnabled(async () => {
+      const res = await appClient.api.auth["registration-status"].$get();
+      return (await res.json()).registrationEnabled;
+    });
 
   async function handleRegisterSuccess() {
     await refetch();
@@ -31,7 +37,12 @@ export default function RegisterPage() {
     router.push("/register-organization");
   }, [session, router]);
 
-  if (isPending || session) {
+  useEffect(() => {
+    if (!isRegistrationLoading && !registrationEnabled)
+      router.replace("/sign-in");
+  }, [isRegistrationLoading, registrationEnabled, router]);
+
+  if (isPending || session || isRegistrationLoading || !registrationEnabled) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />

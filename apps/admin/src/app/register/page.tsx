@@ -1,5 +1,6 @@
 "use client";
 
+import { useRegistrationEnabled } from "@repo/frontend";
 import {
   Card,
   CardContent,
@@ -9,12 +10,32 @@ import {
 } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 import { AuthFooter } from "@/components/auth/auth-footer";
 import { RegisterForm } from "@/components/auth/register-form";
+import { appClient } from "@/lib/api";
 
 export default function RegisterPage() {
   const router = useRouter();
   const t = useTranslations("Auth");
+  const { registrationEnabled, isLoading } = useRegistrationEnabled(
+    async () => {
+      const res = await appClient.api.auth["registration-status"].$get();
+      return (await res.json()).registrationEnabled;
+    },
+  );
+
+  useEffect(() => {
+    if (!isLoading && !registrationEnabled) router.replace("/sign-in");
+  }, [isLoading, registrationEnabled, router]);
+
+  if (isLoading || !registrationEnabled) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-1 flex-col bg-muted/30">
