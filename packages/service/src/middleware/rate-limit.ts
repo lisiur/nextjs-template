@@ -3,6 +3,7 @@ import { createMiddleware } from "hono/factory";
 import { rateLimitRegistry } from "#lib/rate-limit-registry";
 import { RateLimitStore } from "#lib/rate-limit-store";
 import { getSessionFromHeaders } from "#lib/session";
+import { eventBus } from "#states/event-bus";
 
 export type RateLimiterOptions = {
   name: string;
@@ -51,6 +52,9 @@ export function createRateLimiter(options: RateLimiterOptions) {
     c.header("X-RateLimit-Reset", String(resetSeconds));
 
     if (count > policy.max) {
+      if (count - 1 <= policy.max) {
+        eventBus.broadcast({ type: "rate_limit.updated", appId: "admin" });
+      }
       c.header("Retry-After", String(resetSeconds));
       return c.json({ code: 429, message: "Too Many Requests" }, 429);
     }

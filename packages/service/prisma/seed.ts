@@ -557,7 +557,7 @@ const adminMenus = [
     id: "rate-limit",
     code: "rate-limit",
     name: "Rate Limit",
-    icon: "Gauge",
+    icon: "Timer",
     linkType: "INTERNAL" as const,
     url: "/admin/rate-limit",
     sortOrder: 11,

@@ -1,6 +1,7 @@
 import type { OverrideRecord } from "#lib/rate-limit-registry";
 import { rateLimitRegistry } from "#lib/rate-limit-registry";
 import { rateLimitRepository } from "#repositories/rate-limit.repository";
+import { eventBus } from "#states/event-bus";
 
 export type RateLimitStatusQuery = {
   limiter?: string;
@@ -73,6 +74,7 @@ export async function upsertOverride(subject: string, data: OverrideInput) {
   });
 
   rateLimitRegistry.setOverride(toOverrideRecord(row));
+  eventBus.broadcast({ type: "rate_limit.updated", appId: "admin" });
   return serializeOverride(row);
 }
 
@@ -83,6 +85,7 @@ export async function deleteOverride(subject: string) {
     return false;
   }
   rateLimitRegistry.removeOverride(subject);
+  eventBus.broadcast({ type: "rate_limit.updated", appId: "admin" });
   return true;
 }
 
@@ -109,8 +112,14 @@ export function getRateLimitStatus(query: RateLimitStatusQuery) {
 export function releaseRateLimit(opts: { limiter?: string; subject: string }) {
   if (opts.limiter) {
     const ok = rateLimitRegistry.releaseKey(opts.limiter, opts.subject);
+    if (ok) {
+      eventBus.broadcast({ type: "rate_limit.updated", appId: "admin" });
+    }
     return { released: ok ? [opts.limiter] : [], subject: opts.subject };
   }
   const released = rateLimitRegistry.releaseSubject(opts.subject);
+  if (released.length > 0) {
+    eventBus.broadcast({ type: "rate_limit.updated", appId: "admin" });
+  }
   return { released, subject: opts.subject };
 }

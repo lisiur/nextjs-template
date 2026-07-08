@@ -1,5 +1,6 @@
 "use client";
 
+import { useEventStream } from "@repo/frontend";
 import {
   Badge,
   Button,
@@ -11,13 +12,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@repo/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { RefreshCw, Unlock } from "lucide-react";
+import { RefreshCw, TimerReset } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { appClient } from "@/lib/api";
+import { API_ORIGIN, APP_CODE, appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
 
@@ -55,7 +59,15 @@ export function RateLimitStatus() {
       });
       return (await res.json()) as StatusResponse;
     },
-    refetchInterval: 5000,
+  });
+
+  useEventStream({
+    origin: API_ORIGIN,
+    appCode: APP_CODE,
+    event: "rate_limit.updated",
+    handler: () => {
+      void queryClient.invalidateQueries({ queryKey: ["rate-limit-status"] });
+    },
   });
 
   const releaseMutation = useMutation({
@@ -170,15 +182,22 @@ export function RateLimitStatus() {
                     {formatDateTime(bucket.resetAt)}
                   </TableCell>
                   <TableCell sticky="right" align="right">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={t("release")}
-                      disabled={releaseMutation.isPending}
-                      onClick={() => releaseMutation.mutate(bucket)}
-                    >
-                      <Unlock className="h-4 w-4" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("release")}
+                            disabled={releaseMutation.isPending}
+                            onClick={() => releaseMutation.mutate(bucket)}
+                          >
+                            <TimerReset className="h-4 w-4" />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("release")}</TooltipContent>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               ))

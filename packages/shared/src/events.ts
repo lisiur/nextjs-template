@@ -12,4 +12,12 @@ export interface JobStatsUpdatedEvent {
   appId: "admin";
 }
 
-export type ServerEvent = NotificationCreatedEvent | JobStatsUpdatedEvent;
+export interface RateLimitUpdatedEvent {
+  type: "rate_limit.updated";
+  appId: "admin";
+}
+
+export type ServerEvent =
+  | NotificationCreatedEvent
+  | JobStatsUpdatedEvent
+  | RateLimitUpdatedEvent;

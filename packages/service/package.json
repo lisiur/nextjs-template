@@ -13,6 +13,7 @@
     "#routes/*": "./src/routes/*.ts",
     "#services/*": "./src/services/*.ts",
     "#states": "./src/states/index.ts",
+    "#states/*": "./src/states/*.ts",
     "#utils/*": "./src/utils/*.ts"
   },
   "scripts": {
