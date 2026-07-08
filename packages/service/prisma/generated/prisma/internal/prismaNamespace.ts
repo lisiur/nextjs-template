@@ -409,7 +409,8 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   NotificationChannel: 'NotificationChannel',
   NotificationTemplate: 'NotificationTemplate',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  RateLimitOverride: 'RateLimitOverride'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "job" | "jobArchive" | "organization" | "department" | "position" | "memberPosition" | "member" | "invitation" | "systemConfig" | "upload" | "application" | "menu" | "menuPermission" | "permission" | "rolePermission" | "roleAssignment" | "role" | "operationLog" | "auditLog" | "notificationChannel" | "notificationTemplate" | "notification"
+    modelProps: "user" | "session" | "account" | "verification" | "job" | "jobArchive" | "organization" | "department" | "position" | "memberPosition" | "member" | "invitation" | "systemConfig" | "upload" | "application" | "menu" | "menuPermission" | "permission" | "rolePermission" | "roleAssignment" | "role" | "operationLog" | "auditLog" | "notificationChannel" | "notificationTemplate" | "notification" | "rateLimitOverride"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2353,6 +2354,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RateLimitOverride: {
+      payload: Prisma.$RateLimitOverridePayload<ExtArgs>
+      fields: Prisma.RateLimitOverrideFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RateLimitOverrideFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RateLimitOverrideFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>
+        }
+        findFirst: {
+          args: Prisma.RateLimitOverrideFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RateLimitOverrideFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>
+        }
+        findMany: {
+          args: Prisma.RateLimitOverrideFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>[]
+        }
+        create: {
+          args: Prisma.RateLimitOverrideCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>
+        }
+        createMany: {
+          args: Prisma.RateLimitOverrideCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RateLimitOverrideCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>[]
+        }
+        delete: {
+          args: Prisma.RateLimitOverrideDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>
+        }
+        update: {
+          args: Prisma.RateLimitOverrideUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>
+        }
+        deleteMany: {
+          args: Prisma.RateLimitOverrideDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RateLimitOverrideUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RateLimitOverrideUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>[]
+        }
+        upsert: {
+          args: Prisma.RateLimitOverrideUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RateLimitOverridePayload>
+        }
+        aggregate: {
+          args: Prisma.RateLimitOverrideAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRateLimitOverride>
+        }
+        groupBy: {
+          args: Prisma.RateLimitOverrideGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RateLimitOverrideGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RateLimitOverrideCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RateLimitOverrideCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2820,6 +2895,23 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const RateLimitOverrideScalarFieldEnum = {
+  id: 'id',
+  subject: 'subject',
+  type: 'type',
+  max: 'max',
+  windowMs: 'windowMs',
+  bypass: 'bypass',
+  note: 'note',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RateLimitOverrideScalarFieldEnum = (typeof RateLimitOverrideScalarFieldEnum)[keyof typeof RateLimitOverrideScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -3142,6 +3234,7 @@ export type GlobalOmitConfig = {
   notificationChannel?: Prisma.NotificationChannelOmit
   notificationTemplate?: Prisma.NotificationTemplateOmit
   notification?: Prisma.NotificationOmit
+  rateLimitOverride?: Prisma.RateLimitOverrideOmit
 }
 
 /* Types for Logging */

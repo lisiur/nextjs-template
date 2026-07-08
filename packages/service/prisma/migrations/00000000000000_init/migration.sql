@@ -441,6 +441,23 @@ CREATE TABLE "notification" (
     CONSTRAINT "notification_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "rate_limit_override" (
+    "id" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "max" INTEGER,
+    "windowMs" INTEGER,
+    "bypass" BOOLEAN NOT NULL DEFAULT false,
+    "note" TEXT,
+    "startAt" TIMESTAMP(3),
+    "endAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "rate_limit_override_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
@@ -677,6 +694,12 @@ CREATE INDEX "notification_status_idx" ON "notification"("status");
 
 -- CreateIndex
 CREATE INDEX "notification_createdAt_idx" ON "notification"("createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "rate_limit_override_subject_key" ON "rate_limit_override"("subject");
+
+-- CreateIndex
+CREATE INDEX "rate_limit_override_type_idx" ON "rate_limit_override"("type");
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

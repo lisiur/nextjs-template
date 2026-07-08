@@ -4,7 +4,9 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { operationLogger } from "#middleware/operation-logger";
+import { createRateLimiter } from "#middleware/rate-limit";
 import { traceContext } from "#middleware/trace-context";
+import { initRateLimitOverrides } from "#services/rate-limit.service";
 import { jobExecutor } from "#states";
 import { routes } from "./routes";
 
@@ -41,6 +43,26 @@ openAPIApp.use(
 openAPIApp.use("*", traceContext);
 openAPIApp.use("*", operationLogger);
 
+const rateLimitEnabled = process.env.RATE_LIMIT_ENABLED !== "false";
+const globalLimiter = createRateLimiter({
+  name: "global",
+  max: Number(process.env.RATE_LIMIT_GLOBAL_MAX ?? 300),
+  windowMs: Number(process.env.RATE_LIMIT_GLOBAL_WINDOW_MS ?? 60_000),
+  enabled: rateLimitEnabled,
+});
+const authLimiter = createRateLimiter({
+  name: "auth",
+  max: Number(process.env.RATE_LIMIT_AUTH_MAX ?? 10),
+  windowMs: Number(process.env.RATE_LIMIT_AUTH_WINDOW_MS ?? 60_000),
+  enabled: rateLimitEnabled,
+});
+
+openAPIApp.use("*", globalLimiter);
+openAPIApp.use("/auth/sign-in/email", authLimiter);
+openAPIApp.use("/auth/sign-up/email", authLimiter);
+openAPIApp.use("/auth/sign-in/wechat", authLimiter);
+openAPIApp.use("/auth/change-password", authLimiter);
+
 const app = openAPIApp
   .route("/", routes)
   .get("/", (c) => c.json({ message: "Hello world!" }))
@@ -62,5 +84,8 @@ openAPIApp.doc("/openapi.json", {
 });
 
 jobExecutor.start();
+initRateLimitOverrides().catch((e) =>
+  console.error("Failed to load rate-limit overrides:", e),
+);
 
 export { app };

@@ -1,0 +1,116 @@
+import type { OverrideRecord } from "#lib/rate-limit-registry";
+import { rateLimitRegistry } from "#lib/rate-limit-registry";
+import { rateLimitRepository } from "#repositories/rate-limit.repository";
+
+export type RateLimitStatusQuery = {
+  limiter?: string;
+  blockedOnly?: boolean;
+};
+
+export type OverrideInput = {
+  type: string;
+  max?: number | null;
+  windowMs?: number | null;
+  bypass?: boolean;
+  note?: string | null;
+  startAt?: Date | null;
+  endAt?: Date | null;
+};
+
+type OverrideRow = Awaited<
+  ReturnType<typeof rateLimitRepository.findAll>
+>[number];
+
+function serializeOverride(row: OverrideRow) {
+  return {
+    id: row.id,
+    subject: row.subject,
+    type: row.type as "ip" | "user",
+    max: row.max,
+    windowMs: row.windowMs,
+    bypass: row.bypass,
+    note: row.note,
+    startAt: row.startAt ? row.startAt.toISOString() : null,
+    endAt: row.endAt ? row.endAt.toISOString() : null,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+function toOverrideRecord(
+  row: OverrideRow,
+): { subject: string } & OverrideRecord {
+  return {
+    subject: row.subject,
+    max: row.max,
+    windowMs: row.windowMs,
+    bypass: row.bypass,
+    startAt: row.startAt,
+    endAt: row.endAt,
+  };
+}
+
+export async function initRateLimitOverrides() {
+  const rows = await rateLimitRepository.findAll();
+  rateLimitRegistry.loadOverrides(rows.map(toOverrideRecord));
+}
+
+export async function listOverrides() {
+  const rows = await rateLimitRepository.findAll();
+  return rows.map(serializeOverride);
+}
+
+export async function upsertOverride(subject: string, data: OverrideInput) {
+  const type = data.type ?? subject.split(":")[0];
+  const row = await rateLimitRepository.upsert(subject, {
+    type,
+    max: data.max ?? null,
+    windowMs: data.windowMs ?? null,
+    bypass: data.bypass ?? false,
+    note: data.note ?? null,
+    startAt: data.startAt ?? null,
+    endAt: data.endAt ?? null,
+  });
+
+  rateLimitRegistry.setOverride(toOverrideRecord(row));
+  return serializeOverride(row);
+}
+
+export async function deleteOverride(subject: string) {
+  try {
+    await rateLimitRepository.delete(subject);
+  } catch {
+    return false;
+  }
+  rateLimitRegistry.removeOverride(subject);
+  return true;
+}
+
+export function getRateLimitStatus(query: RateLimitStatusQuery) {
+  const snapshot = rateLimitRegistry.snapshot(query.limiter);
+  let buckets = snapshot.flatMap((l) => l.buckets);
+  if (query.blockedOnly) {
+    buckets = buckets.filter((b) => b.blocked);
+  }
+  return {
+    limiters: snapshot.map((l) => ({
+      name: l.name,
+      max: l.max,
+      windowMs: l.windowMs,
+    })),
+    blockedCount: buckets.filter((b) => b.blocked).length,
+    buckets: buckets.map((b) => ({
+      ...b,
+      resetAt: new Date(b.resetAt).toISOString(),
+    })),
+  };
+}
+
+export function releaseRateLimit(opts: { limiter?: string; subject: string }) {
+  if (opts.limiter) {
+    const ok = rateLimitRegistry.releaseKey(opts.limiter, opts.subject);
+    return { released: ok ? [opts.limiter] : [], subject: opts.subject };
+  }
+  const released = rateLimitRegistry.releaseSubject(opts.subject);
+  return { released, subject: opts.subject };
+}

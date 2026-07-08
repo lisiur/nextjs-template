@@ -147,3 +147,8 @@ export type NotificationTemplate = Prisma.NotificationTemplateModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model RateLimitOverride
+ * 
+ */
+export type RateLimitOverride = Prisma.RateLimitOverrideModel

@@ -76,7 +76,8 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   NotificationChannel: 'NotificationChannel',
   NotificationTemplate: 'NotificationTemplate',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  RateLimitOverride: 'RateLimitOverride'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -521,6 +522,23 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const RateLimitOverrideScalarFieldEnum = {
+  id: 'id',
+  subject: 'subject',
+  type: 'type',
+  max: 'max',
+  windowMs: 'windowMs',
+  bypass: 'bypass',
+  note: 'note',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RateLimitOverrideScalarFieldEnum = (typeof RateLimitOverrideScalarFieldEnum)[keyof typeof RateLimitOverrideScalarFieldEnum]
 
 
 export const SortOrder = {

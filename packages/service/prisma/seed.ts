@@ -153,6 +153,11 @@ const systemPermissions = [
     name: "Delete System Config",
   },
   { code: "system-info::view", group: "system-info", name: "View System Info" },
+  {
+    code: "rate-limit::manage",
+    group: "rate-limit",
+    name: "Manage Rate Limits",
+  },
   { code: "user::list", group: "user", name: "List Users" },
   { code: "user::create", group: "user", name: "Create User" },
   { code: "user::update", group: "user", name: "Update User" },
@@ -547,6 +552,16 @@ const adminMenus = [
     url: "/admin/settings",
     sortOrder: 10,
     permissions: ["system-config::list"],
+  },
+  {
+    id: "rate-limit",
+    code: "rate-limit",
+    name: "Rate Limit",
+    icon: "Gauge",
+    linkType: "INTERNAL" as const,
+    url: "/admin/rate-limit",
+    sortOrder: 11,
+    permissions: ["rate-limit::manage"],
   },
 ];
 

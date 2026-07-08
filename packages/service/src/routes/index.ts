@@ -12,6 +12,7 @@ import { notificationTemplateRoutes } from "./notification-template";
 import { operationLogRoutes } from "./operation-log";
 import { organizationRoutes } from "./organization";
 import { permissionRoutes } from "./permission";
+import { rateLimitRoutes } from "./rate-limit";
 import { roleRoutes } from "./role";
 import { rolePermissionRoutes } from "./role-permission";
 import { systemConfigRoutes } from "./system-config";
@@ -40,6 +41,7 @@ const routes = new OpenAPIHono()
   .route("/audit-logs", auditLogRoutes)
   .route("/events", eventsRoutes)
   .route("/users", userRoutes)
-  .route("/jobs", jobRoutes);
+  .route("/jobs", jobRoutes)
+  .route("/rate-limit", rateLimitRoutes);
 
 export { routes };
