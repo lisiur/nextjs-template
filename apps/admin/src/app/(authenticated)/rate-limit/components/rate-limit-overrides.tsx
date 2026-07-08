@@ -24,6 +24,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
+import { formatDuration } from "@/utils/format";
 import { OverrideDialog, type OverrideRow } from "./override-dialog";
 
 type OverrideStatus = "active" | "scheduled" | "expired";
@@ -138,7 +139,7 @@ export function RateLimitOverrides() {
                         <span className="text-sm">
                           {o.max != null ? `${o.max}` : "∞"} /{" "}
                           {o.windowMs != null
-                            ? `${o.windowMs}ms`
+                            ? formatDuration(o.windowMs)
                             : t("overrides.always")}
                         </span>
                       )}

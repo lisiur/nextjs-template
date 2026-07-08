@@ -64,6 +64,14 @@ describe("RateLimitStore", () => {
     expect(store.hit("k", 1000).count).toBe(1);
     vi.useRealTimers();
   });
+
+  it("reports whether a bucket actually existed on reset", () => {
+    const store = new RateLimitStore(0);
+    store.hit("k", 1000);
+    expect(store.reset("k")).toBe(true);
+    // No bucket present anymore -> reset is a no-op
+    expect(store.reset("k")).toBe(false);
+  });
 });
 
 describe("createRateLimiter middleware", () => {
@@ -253,5 +261,65 @@ describe("rateLimitRegistry overrides", () => {
     const bucket = status.buckets.find((b) => b.subject === "ip:9.9.9.9");
     expect(bucket?.blocked).toBe(true);
     expect(bucket?.count).toBe(3);
+  });
+});
+
+describe("rateLimitRegistry release", () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ now: new Date(0) });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("releaseKey only reports true when a bucket existed", () => {
+    const store = new RateLimitStore(0);
+    rateLimitRegistry.registerLimiter({
+      name: "rl-release-key",
+      max: 2,
+      windowMs: 1000,
+      store,
+    });
+    store.hit("ip:1.1.1.1", 1000);
+
+    expect(rateLimitRegistry.releaseKey("rl-release-key", "ip:1.1.1.1")).toBe(
+      true,
+    );
+    // Second release: bucket is gone, nothing to release
+    expect(rateLimitRegistry.releaseKey("rl-release-key", "ip:1.1.1.1")).toBe(
+      false,
+    );
+  });
+
+  it("releaseKey returns false for an unknown limiter", () => {
+    expect(rateLimitRegistry.releaseKey("nope", "ip:1.1.1.1")).toBe(false);
+  });
+
+  it("releaseSubject only lists limiters that had a bucket", () => {
+    const storeA = new RateLimitStore(0);
+    const storeB = new RateLimitStore(0);
+    rateLimitRegistry.registerLimiter({
+      name: "rl-release-a",
+      max: 2,
+      windowMs: 1000,
+      store: storeA,
+    });
+    rateLimitRegistry.registerLimiter({
+      name: "rl-release-b",
+      max: 2,
+      windowMs: 1000,
+      store: storeB,
+    });
+
+    // Only limiter A has a bucket for this subject
+    storeA.hit("ip:7.7.7.7", 1000);
+
+    expect(rateLimitRegistry.releaseSubject("ip:7.7.7.7").sort()).toStrictEqual(
+      ["rl-release-a"],
+    );
+
+    // After release, releasing again yields nothing
+    expect(rateLimitRegistry.releaseSubject("ip:7.7.7.7")).toStrictEqual([]);
   });
 });

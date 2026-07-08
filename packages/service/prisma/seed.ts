@@ -524,13 +524,23 @@ const adminMenus = [
     permissions: ["system-info::view"],
   },
   {
+    id: "rate-limit",
+    code: "rate-limit",
+    name: "Rate Limit",
+    icon: "Timer",
+    linkType: "INTERNAL" as const,
+    url: "/admin/rate-limit",
+    sortOrder: 8,
+    permissions: ["rate-limit::manage"],
+  },
+  {
     id: "uploads",
     code: "uploads",
     name: "Uploads",
     icon: "Upload",
     linkType: "INTERNAL" as const,
     url: "/admin/uploads",
-    sortOrder: 8,
+    sortOrder: 9,
     permissions: ["upload::list"],
   },
   {
@@ -540,7 +550,7 @@ const adminMenus = [
     icon: "CalendarCheck",
     linkType: "INTERNAL" as const,
     url: "/admin/jobs",
-    sortOrder: 9,
+    sortOrder: 10,
     permissions: ["job::list"],
   },
   {
@@ -550,18 +560,8 @@ const adminMenus = [
     icon: "Settings",
     linkType: "INTERNAL" as const,
     url: "/admin/settings",
-    sortOrder: 10,
-    permissions: ["system-config::list"],
-  },
-  {
-    id: "rate-limit",
-    code: "rate-limit",
-    name: "Rate Limit",
-    icon: "Timer",
-    linkType: "INTERNAL" as const,
-    url: "/admin/rate-limit",
     sortOrder: 11,
-    permissions: ["rate-limit::manage"],
+    permissions: ["system-config::list"],
   },
 ];
 

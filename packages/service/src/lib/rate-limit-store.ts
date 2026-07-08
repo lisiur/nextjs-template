@@ -27,8 +27,8 @@ export class RateLimitStore {
     return { count: bucket.count, resetAt: bucket.resetAt };
   }
 
-  reset(key: string): void {
-    this.buckets.delete(key);
+  reset(key: string): boolean {
+    return this.buckets.delete(key);
   }
 
   clear(): void {

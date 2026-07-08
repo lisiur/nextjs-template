@@ -4,6 +4,8 @@ import { useEventStream } from "@repo/frontend";
 import {
   Badge,
   Button,
+  Card,
+  CardContent,
   Skeleton,
   Switch,
   Table,
@@ -24,6 +26,7 @@ import { toast } from "sonner";
 import { API_ORIGIN, APP_CODE, appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
+import { formatDuration } from "@/utils/format";
 
 interface Bucket {
   limiter: string;
@@ -125,6 +128,35 @@ export function RateLimitStatus() {
           </Badge>
         )}
       </div>
+
+      {data?.limiters && data.limiters.length > 0 && (
+        <div className="flex flex-wrap gap-3">
+          {data.limiters.map((l) => (
+            <Card key={l.name} size="sm" className="basis-48 flex-1">
+              <CardContent>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                      {t("limiter")}
+                    </div>
+                    <div className="truncate text-sm font-semibold">
+                      {l.name}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-muted-foreground text-xs">
+                      {t("policy")}
+                    </div>
+                    <div className="font-mono text-sm">
+                      {l.max} / {formatDuration(l.windowMs)}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <div className="flex-1 overflow-auto rounded-lg border">
         <Table>

@@ -161,15 +161,15 @@ class RateLimitRegistry {
   releaseKey(name: string, subject: string): boolean {
     const entry = this.limiters.get(name);
     if (!entry) return false;
-    entry.store.reset(subject);
-    return true;
+    return entry.store.reset(subject);
   }
 
   releaseSubject(subject: string): string[] {
     const released: string[] = [];
     for (const entry of this.limiters.values()) {
-      entry.store.reset(subject);
-      released.push(entry.name);
+      if (entry.store.reset(subject)) {
+        released.push(entry.name);
+      }
     }
     return released;
   }

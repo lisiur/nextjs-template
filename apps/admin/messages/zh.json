@@ -833,6 +833,7 @@
       "blockedOnly": "仅显示被封禁",
       "allLimiters": "全部限流器",
       "refresh": "刷新",
+      "policy": "策略",
       "subject": "对象",
       "limiter": "限流器",
       "count": "计数",

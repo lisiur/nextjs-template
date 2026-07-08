@@ -833,6 +833,7 @@
       "blockedOnly": "Blocked only",
       "allLimiters": "All limiters",
       "refresh": "Refresh",
+      "policy": "Policy",
       "subject": "Subject",
       "limiter": "Limiter",
       "count": "Count",
