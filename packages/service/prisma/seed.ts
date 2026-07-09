@@ -710,14 +710,20 @@ const notificationChannels = [
     providerKey: "smtp-email",
     enabled: false,
   },
+  {
+    key: "sms",
+    name: "SMS",
+    providerKey: "sms",
+    enabled: false,
+  },
 ];
 
 // --- Notification Templates (keyed by channel key) ---
 const notificationTemplates = [
   {
     channelKey: "in-app",
-    key: "welcome",
-    name: "Welcome",
+    key: "welcome-in-app",
+    name: "Welcome In-App",
     enabled: true,
     titleTemplate: "Welcome, {{userName}}!",
     bodyTemplate: "Your account has been created successfully.",
@@ -732,10 +738,25 @@ const notificationTemplates = [
     channelKey: "smtp-email",
     key: "welcome-email",
     name: "Welcome Email",
-    enabled: true,
+    enabled: false,
     subjectTemplate: "Welcome to {{siteName}}!",
     bodyTemplate:
       "Hi {{userName}},\n\nWelcome to {{siteName}}! Your account has been created successfully.\n\nWe're glad to have you on board.\n\n— The {{siteName}} Team",
+    variablesSchema: {
+      properties: {
+        userName: { type: "string", description: "The user's name" },
+        siteName: { type: "string", description: "The site name" },
+      },
+      required: ["userName", "siteName"],
+    },
+  },
+  {
+    channelKey: "sms",
+    key: "welcome-sms",
+    name: "Welcome SMS",
+    enabled: false,
+    bodyTemplate:
+      "Hi {{userName}}, your {{siteName}} account is ready. Welcome aboard!",
     variablesSchema: {
       properties: {
         userName: { type: "string", description: "The user's name" },
