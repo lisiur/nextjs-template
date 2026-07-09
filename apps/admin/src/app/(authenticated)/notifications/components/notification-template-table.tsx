@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { FlaskConical, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDate } from "@/utils/date";
 import { NotificationTemplateDialog } from "./notification-template-dialog";
+import { NotificationTestDialog } from "./notification-test-dialog";
 import type { NotificationChannel, NotificationTemplate } from "./types";
 
 export function NotificationTemplateTable() {
@@ -33,6 +34,9 @@ export function NotificationTemplateTable() {
   const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [editTemplate, setEditTemplate] = useState<NotificationTemplate | null>(
+    null,
+  );
+  const [testTemplate, setTestTemplate] = useState<NotificationTemplate | null>(
     null,
   );
 
@@ -188,6 +192,21 @@ export function NotificationTemplateTable() {
                           <Button
                             variant="ghost"
                             size="icon-sm"
+                            aria-label={t("actions.test")}
+                            onClick={() => setTestTemplate(template)}
+                          >
+                            <FlaskConical />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("actions.test")}</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
                             aria-label={t("actions.delete")}
                             onClick={() => handleDelete(template)}
                           >
@@ -220,6 +239,13 @@ export function NotificationTemplateTable() {
           open={!!editTemplate}
           onOpenChange={(open) => !open && setEditTemplate(null)}
           onSuccess={handleEditSuccess}
+        />
+      )}
+      {testTemplate && (
+        <NotificationTestDialog
+          template={testTemplate}
+          open={!!testTemplate}
+          onOpenChange={(open) => !open && setTestTemplate(null)}
         />
       )}
     </div>

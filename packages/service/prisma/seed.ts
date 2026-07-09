@@ -353,6 +353,11 @@ const systemPermissions = [
     name: "Delete Notification Template",
   },
   {
+    code: "notification-template::test",
+    group: "notification-template",
+    name: "Test Notification Template",
+  },
+  {
     code: "notification::list",
     group: "notification",
     name: "List Notifications",

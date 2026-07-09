@@ -197,7 +197,9 @@
       "variableName": "名称",
       "variableDescription": "描述",
       "variableRequired": "必填",
-      "addVariable": "添加变量"
+      "addVariable": "添加变量",
+      "recipient": "接收人",
+      "testVariables": "模板变量"
     },
     "status": {
       "enabled": "已启用",
@@ -208,7 +210,9 @@
       "saving": "保存中...",
       "cancel": "取消",
       "delete": "删除",
-      "edit": "编辑"
+      "edit": "编辑",
+      "test": "测试",
+      "send": "发送"
     },
     "channels": {
       "create": "新增渠道",
@@ -242,7 +246,13 @@
       "confirmDelete": "确定要删除",
       "createSuccess": "通知模板已创建",
       "updateSuccess": "通知模板已更新",
-      "deleteSuccess": "通知模板已删除"
+      "deleteSuccess": "通知模板已删除",
+      "test": "测试模板",
+      "testDescription": "填写所需变量并选择目标用户以发送测试通知。",
+      "testSuccess": "测试通知已发送",
+      "selectRecipient": "选择接收人",
+      "loadingUsers": "加载用户中...",
+      "noVariables": "此模板没有变量。"
     },
     "records": {
       "empty": "暂无通知记录",

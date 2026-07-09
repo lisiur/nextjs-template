@@ -197,7 +197,9 @@
       "variableName": "Name",
       "variableDescription": "Description",
       "variableRequired": "Required",
-      "addVariable": "Add Variable"
+      "addVariable": "Add Variable",
+      "recipient": "Recipient",
+      "testVariables": "Template Variables"
     },
     "status": {
       "enabled": "Enabled",
@@ -208,7 +210,9 @@
       "saving": "Saving...",
       "cancel": "Cancel",
       "delete": "Delete",
-      "edit": "Edit"
+      "edit": "Edit",
+      "test": "Test",
+      "send": "Send"
     },
     "channels": {
       "create": "Add Channel",
@@ -242,7 +246,13 @@
       "confirmDelete": "Are you sure you want to delete",
       "createSuccess": "Notification template created",
       "updateSuccess": "Notification template updated",
-      "deleteSuccess": "Notification template deleted"
+      "deleteSuccess": "Notification template deleted",
+      "test": "Test Template",
+      "testDescription": "Fill in the required variables and select a target user to send a test notification.",
+      "testSuccess": "Test notification sent",
+      "selectRecipient": "Select recipient",
+      "loadingUsers": "Loading users...",
+      "noVariables": "This template has no variables."
     },
     "records": {
       "empty": "No notification records found",

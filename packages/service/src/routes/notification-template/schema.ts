@@ -63,3 +63,18 @@ export const updateNotificationTemplateBodySchema = z.object({
 export const listNotificationTemplatesResponseSchema = z
   .object({ templates: z.array(notificationTemplateSchema) })
   .openapi("ListNotificationTemplatesResponse");
+
+export const sendTestNotificationBodySchema = z.object({
+  recipientUserId: z.string().min(1),
+  variables: z.record(z.string(), z.unknown()).optional(),
+});
+
+export const sendTestNotificationResponseSchema = z
+  .object({
+    correlationId: z.string(),
+    total: z.number(),
+    pending: z.number(),
+    failed: z.number(),
+    notificationIds: z.array(z.string()),
+  })
+  .openapi("SendTestNotificationResponse");
