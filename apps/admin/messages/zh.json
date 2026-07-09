@@ -229,7 +229,10 @@
       "confirmDelete": "确定要删除",
       "createSuccess": "通知渠道已创建",
       "updateSuccess": "通知渠道已更新",
-      "deleteSuccess": "通知渠道已删除"
+      "deleteSuccess": "通知渠道已删除",
+      "protected": "内置",
+      "protectedActionDisabled": "内置渠道不可删除，且其标识/提供方不可更改",
+      "protectedDescription": "内置渠道可以编辑，但标识和提供方已锁定。"
     },
     "templates": {
       "create": "新增模板",
@@ -252,7 +255,10 @@
       "testSuccess": "测试通知已发送",
       "selectRecipient": "选择接收人",
       "loadingUsers": "加载用户中...",
-      "noVariables": "此模板没有变量。"
+      "noVariables": "此模板没有变量。",
+      "protected": "内置",
+      "protectedActionDisabled": "内置模板不可删除，且其标识/渠道不可更改",
+      "protectedDescription": "内置模板可以编辑，但标识和渠道已锁定。"
     },
     "records": {
       "empty": "暂无通知记录",

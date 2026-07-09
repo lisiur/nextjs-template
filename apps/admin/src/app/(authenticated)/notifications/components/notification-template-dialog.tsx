@@ -1,5 +1,6 @@
 "use client";
 
+import { isBuiltinNotification } from "@repo/shared";
 import {
   Button,
   Dialog,
@@ -90,6 +91,7 @@ export function NotificationTemplateDialog({
 }: NotificationTemplateDialogProps) {
   const t = useTranslations("Notifications");
   const isEdit = !!template;
+  const builtin = isBuiltinNotification(template?.flags);
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
   const [channelId, setChannelId] = useState("");
@@ -237,6 +239,7 @@ export function NotificationTemplateDialog({
                     id="template-key"
                     value={key}
                     onChange={(event) => setKey(event.target.value)}
+                    disabled={builtin}
                     required
                   />
                 </Field>
@@ -244,7 +247,11 @@ export function NotificationTemplateDialog({
               <div className="grid gap-4 md:grid-cols-2">
                 <Field>
                   <FieldLabel>{t("fields.channel")}</FieldLabel>
-                  <Select value={channelId} onValueChange={handleChannelChange}>
+                  <Select
+                    value={channelId}
+                    onValueChange={handleChannelChange}
+                    disabled={builtin}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue>{getChannelLabel(channelId)}</SelectValue>
                     </SelectTrigger>

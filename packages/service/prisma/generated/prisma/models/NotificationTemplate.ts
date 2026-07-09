@@ -66,6 +66,7 @@ export type NotificationTemplateCountAggregateOutputType = {
   bodyTemplate: number
   variablesSchema: number
   sampleVariables: number
+  flags: number
   createdAt: number
   updatedAt: number
   deletedAt: number
@@ -115,6 +116,7 @@ export type NotificationTemplateCountAggregateInputType = {
   bodyTemplate?: true
   variablesSchema?: true
   sampleVariables?: true
+  flags?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -205,6 +207,7 @@ export type NotificationTemplateGroupByOutputType = {
   bodyTemplate: string
   variablesSchema: runtime.JsonValue | null
   sampleVariables: runtime.JsonValue | null
+  flags: string[]
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
@@ -243,6 +246,7 @@ export type NotificationTemplateWhereInput = {
   bodyTemplate?: Prisma.StringFilter<"NotificationTemplate"> | string
   variablesSchema?: Prisma.JsonNullableFilter<"NotificationTemplate">
   sampleVariables?: Prisma.JsonNullableFilter<"NotificationTemplate">
+  flags?: Prisma.StringNullableListFilter<"NotificationTemplate">
   createdAt?: Prisma.DateTimeFilter<"NotificationTemplate"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"NotificationTemplate"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"NotificationTemplate"> | Date | string | null
@@ -262,6 +266,7 @@ export type NotificationTemplateOrderByWithRelationInput = {
   bodyTemplate?: Prisma.SortOrder
   variablesSchema?: Prisma.SortOrderInput | Prisma.SortOrder
   sampleVariables?: Prisma.SortOrderInput | Prisma.SortOrder
+  flags?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -284,6 +289,7 @@ export type NotificationTemplateWhereUniqueInput = Prisma.AtLeast<{
   bodyTemplate?: Prisma.StringFilter<"NotificationTemplate"> | string
   variablesSchema?: Prisma.JsonNullableFilter<"NotificationTemplate">
   sampleVariables?: Prisma.JsonNullableFilter<"NotificationTemplate">
+  flags?: Prisma.StringNullableListFilter<"NotificationTemplate">
   createdAt?: Prisma.DateTimeFilter<"NotificationTemplate"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"NotificationTemplate"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"NotificationTemplate"> | Date | string | null
@@ -303,6 +309,7 @@ export type NotificationTemplateOrderByWithAggregationInput = {
   bodyTemplate?: Prisma.SortOrder
   variablesSchema?: Prisma.SortOrderInput | Prisma.SortOrder
   sampleVariables?: Prisma.SortOrderInput | Prisma.SortOrder
+  flags?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,6 +333,7 @@ export type NotificationTemplateScalarWhereWithAggregatesInput = {
   bodyTemplate?: Prisma.StringWithAggregatesFilter<"NotificationTemplate"> | string
   variablesSchema?: Prisma.JsonNullableWithAggregatesFilter<"NotificationTemplate">
   sampleVariables?: Prisma.JsonNullableWithAggregatesFilter<"NotificationTemplate">
+  flags?: Prisma.StringNullableListFilter<"NotificationTemplate">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"NotificationTemplate"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"NotificationTemplate"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"NotificationTemplate"> | Date | string | null
@@ -342,6 +350,7 @@ export type NotificationTemplateCreateInput = {
   bodyTemplate: string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateCreateflagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -361,6 +370,7 @@ export type NotificationTemplateUncheckedCreateInput = {
   bodyTemplate: string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateCreateflagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -378,6 +388,7 @@ export type NotificationTemplateUpdateInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -397,6 +408,7 @@ export type NotificationTemplateUncheckedUpdateInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -415,6 +427,7 @@ export type NotificationTemplateCreateManyInput = {
   bodyTemplate: string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateCreateflagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -431,6 +444,7 @@ export type NotificationTemplateUpdateManyMutationInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -448,6 +462,7 @@ export type NotificationTemplateUncheckedUpdateManyInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -475,6 +490,7 @@ export type NotificationTemplateCountOrderByAggregateInput = {
   bodyTemplate?: Prisma.SortOrder
   variablesSchema?: Prisma.SortOrder
   sampleVariables?: Prisma.SortOrder
+  flags?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -557,6 +573,15 @@ export type NotificationTemplateUncheckedUpdateManyWithoutChannelNestedInput = {
   deleteMany?: Prisma.NotificationTemplateScalarWhereInput | Prisma.NotificationTemplateScalarWhereInput[]
 }
 
+export type NotificationTemplateCreateflagsInput = {
+  set: string[]
+}
+
+export type NotificationTemplateUpdateflagsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type NotificationTemplateCreateNestedOneWithoutNotificationsInput = {
   create?: Prisma.XOR<Prisma.NotificationTemplateCreateWithoutNotificationsInput, Prisma.NotificationTemplateUncheckedCreateWithoutNotificationsInput>
   connectOrCreate?: Prisma.NotificationTemplateCreateOrConnectWithoutNotificationsInput
@@ -582,6 +607,7 @@ export type NotificationTemplateCreateWithoutChannelInput = {
   bodyTemplate: string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateCreateflagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -599,6 +625,7 @@ export type NotificationTemplateUncheckedCreateWithoutChannelInput = {
   bodyTemplate: string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateCreateflagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -646,6 +673,7 @@ export type NotificationTemplateScalarWhereInput = {
   bodyTemplate?: Prisma.StringFilter<"NotificationTemplate"> | string
   variablesSchema?: Prisma.JsonNullableFilter<"NotificationTemplate">
   sampleVariables?: Prisma.JsonNullableFilter<"NotificationTemplate">
+  flags?: Prisma.StringNullableListFilter<"NotificationTemplate">
   createdAt?: Prisma.DateTimeFilter<"NotificationTemplate"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"NotificationTemplate"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"NotificationTemplate"> | Date | string | null
@@ -662,6 +690,7 @@ export type NotificationTemplateCreateWithoutNotificationsInput = {
   bodyTemplate: string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateCreateflagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -680,6 +709,7 @@ export type NotificationTemplateUncheckedCreateWithoutNotificationsInput = {
   bodyTemplate: string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateCreateflagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -712,6 +742,7 @@ export type NotificationTemplateUpdateWithoutNotificationsInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -730,6 +761,7 @@ export type NotificationTemplateUncheckedUpdateWithoutNotificationsInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -746,6 +778,7 @@ export type NotificationTemplateCreateManyChannelInput = {
   bodyTemplate: string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateCreateflagsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -762,6 +795,7 @@ export type NotificationTemplateUpdateWithoutChannelInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -779,6 +813,7 @@ export type NotificationTemplateUncheckedUpdateWithoutChannelInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -796,6 +831,7 @@ export type NotificationTemplateUncheckedUpdateManyWithoutChannelInput = {
   bodyTemplate?: Prisma.StringFieldUpdateOperationsInput | string
   variablesSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sampleVariables?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  flags?: Prisma.NotificationTemplateUpdateflagsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -844,6 +880,7 @@ export type NotificationTemplateSelect<ExtArgs extends runtime.Types.Extensions.
   bodyTemplate?: boolean
   variablesSchema?: boolean
   sampleVariables?: boolean
+  flags?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -864,6 +901,7 @@ export type NotificationTemplateSelectCreateManyAndReturn<ExtArgs extends runtim
   bodyTemplate?: boolean
   variablesSchema?: boolean
   sampleVariables?: boolean
+  flags?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -882,6 +920,7 @@ export type NotificationTemplateSelectUpdateManyAndReturn<ExtArgs extends runtim
   bodyTemplate?: boolean
   variablesSchema?: boolean
   sampleVariables?: boolean
+  flags?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
@@ -900,12 +939,13 @@ export type NotificationTemplateSelectScalar = {
   bodyTemplate?: boolean
   variablesSchema?: boolean
   sampleVariables?: boolean
+  flags?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type NotificationTemplateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "key" | "channelId" | "name" | "description" | "enabled" | "subjectTemplate" | "titleTemplate" | "bodyTemplate" | "variablesSchema" | "sampleVariables" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["notificationTemplate"]>
+export type NotificationTemplateOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "key" | "channelId" | "name" | "description" | "enabled" | "subjectTemplate" | "titleTemplate" | "bodyTemplate" | "variablesSchema" | "sampleVariables" | "flags" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["notificationTemplate"]>
 export type NotificationTemplateInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   channel?: boolean | Prisma.NotificationChannelDefaultArgs<ExtArgs>
   notifications?: boolean | Prisma.NotificationTemplate$notificationsArgs<ExtArgs>
@@ -936,6 +976,7 @@ export type $NotificationTemplatePayload<ExtArgs extends runtime.Types.Extension
     bodyTemplate: string
     variablesSchema: runtime.JsonValue | null
     sampleVariables: runtime.JsonValue | null
+    flags: string[]
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -1375,6 +1416,7 @@ export interface NotificationTemplateFieldRefs {
   readonly bodyTemplate: Prisma.FieldRef<"NotificationTemplate", 'String'>
   readonly variablesSchema: Prisma.FieldRef<"NotificationTemplate", 'Json'>
   readonly sampleVariables: Prisma.FieldRef<"NotificationTemplate", 'Json'>
+  readonly flags: Prisma.FieldRef<"NotificationTemplate", 'String[]'>
   readonly createdAt: Prisma.FieldRef<"NotificationTemplate", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"NotificationTemplate", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"NotificationTemplate", 'DateTime'>

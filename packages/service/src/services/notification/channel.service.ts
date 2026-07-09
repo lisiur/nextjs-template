@@ -1,3 +1,4 @@
+import { isBuiltinNotification } from "@repo/shared";
 import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
@@ -131,6 +132,22 @@ export async function updateNotificationChannel(
     throw new HTTPException(404, { message: "Notification channel not found" });
   }
 
+  if (isBuiltinNotification(existing.flags)) {
+    if (data.key !== undefined && data.key !== existing.key) {
+      throw new HTTPException(403, {
+        message: "Key of built-in notification channel cannot be changed",
+      });
+    }
+    if (
+      data.providerKey !== undefined &&
+      data.providerKey !== existing.providerKey
+    ) {
+      throw new HTTPException(403, {
+        message: "Provider of built-in notification channel cannot be changed",
+      });
+    }
+  }
+
   if (data.key && data.key !== existing.key) {
     const conflicting = await prisma.notificationChannel.findUnique({
       where: { key: data.key },
@@ -188,6 +205,12 @@ export async function deleteNotificationChannel(id: string) {
   });
   if (!existing) {
     throw new HTTPException(404, { message: "Notification channel not found" });
+  }
+
+  if (isBuiltinNotification(existing.flags)) {
+    throw new HTTPException(403, {
+      message: "Built-in notification channel cannot be deleted",
+    });
   }
 
   await prisma.notificationChannel.update({

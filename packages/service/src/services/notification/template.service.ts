@@ -1,3 +1,4 @@
+import { isBuiltinNotification } from "@repo/shared";
 import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
@@ -169,6 +170,19 @@ export async function updateNotificationTemplate(
     });
   }
 
+  if (isBuiltinNotification(existing.flags)) {
+    if (data.key !== undefined && data.key !== existing.key) {
+      throw new HTTPException(403, {
+        message: "Key of built-in notification template cannot be changed",
+      });
+    }
+    if (data.channelId !== undefined && data.channelId !== existing.channelId) {
+      throw new HTTPException(403, {
+        message: "Channel of built-in notification template cannot be changed",
+      });
+    }
+  }
+
   if (data.key && data.key !== existing.key) {
     const conflicting = await prisma.notificationTemplate.findUnique({
       where: { key: data.key },
@@ -220,6 +234,12 @@ export async function deleteNotificationTemplate(id: string) {
   if (!existing) {
     throw new HTTPException(404, {
       message: "Notification template not found",
+    });
+  }
+
+  if (isBuiltinNotification(existing.flags)) {
+    throw new HTTPException(403, {
+      message: "Built-in notification template cannot be deleted",
     });
   }
 

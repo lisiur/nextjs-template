@@ -493,6 +493,7 @@ model NotificationChannel {
   providerKey String
   enabled     Boolean   @default(true)
   config      Json?
+  flags       String[] @default([])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
@@ -520,6 +521,7 @@ model NotificationTemplate {
   bodyTemplate    String
   variablesSchema Json?
   sampleVariables Json?
+  flags           String[]           @default([])
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
   deletedAt       DateTime?

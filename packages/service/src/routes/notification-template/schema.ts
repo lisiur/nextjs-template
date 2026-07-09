@@ -19,6 +19,7 @@ export const notificationTemplateSchema = z
     bodyTemplate: z.string(),
     variablesSchema: z.unknown().nullable().optional(),
     sampleVariables: z.unknown().nullable().optional(),
+    flags: z.array(z.string()).default([]),
     createdAt: z.date(),
     updatedAt: z.date(),
     deletedAt: z.date().nullable().optional(),

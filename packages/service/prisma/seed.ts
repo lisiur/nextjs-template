@@ -27,6 +27,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import {
   ADMIN_APP_CODE,
   ADMIN_ROLE_CODE,
+  BUILTIN_NOTIFICATION_FLAG,
   BUILTIN_ROLE_FLAG,
   BUILTIN_USER_FLAG,
   ORG_MEMBER_ROLE_CODE,
@@ -974,9 +975,10 @@ async function upsertNotificationChannel(data: {
       providerKey: data.providerKey,
       enabled: data.enabled,
       config: Prisma.JsonNull,
+      flags: { set: [BUILTIN_NOTIFICATION_FLAG] },
       deletedAt: null,
     },
-    create: data,
+    create: { ...data, flags: [BUILTIN_NOTIFICATION_FLAG] },
   });
 }
 
@@ -1006,6 +1008,7 @@ async function upsertNotificationTemplate(
       bodyTemplate: data.bodyTemplate,
       variablesSchema: data.variablesSchema,
       sampleVariables: (data.sampleVariables ?? Prisma.JsonNull) as object,
+      flags: { set: [BUILTIN_NOTIFICATION_FLAG] },
       deletedAt: null,
     },
     create: {
@@ -1019,6 +1022,7 @@ async function upsertNotificationTemplate(
       bodyTemplate: data.bodyTemplate,
       variablesSchema: data.variablesSchema,
       sampleVariables: (data.sampleVariables ?? Prisma.JsonNull) as object,
+      flags: [BUILTIN_NOTIFICATION_FLAG],
     },
   });
 }

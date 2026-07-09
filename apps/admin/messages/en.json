@@ -229,7 +229,10 @@
       "confirmDelete": "Are you sure you want to delete",
       "createSuccess": "Notification channel created",
       "updateSuccess": "Notification channel updated",
-      "deleteSuccess": "Notification channel deleted"
+      "deleteSuccess": "Notification channel deleted",
+      "protected": "Built-in",
+      "protectedActionDisabled": "Built-in channels cannot be deleted and their key/provider cannot be changed",
+      "protectedDescription": "Built-in channels can be edited, but their key and provider are locked."
     },
     "templates": {
       "create": "Add Template",
@@ -252,7 +255,10 @@
       "testSuccess": "Test notification sent",
       "selectRecipient": "Select recipient",
       "loadingUsers": "Loading users...",
-      "noVariables": "This template has no variables."
+      "noVariables": "This template has no variables.",
+      "protected": "Built-in",
+      "protectedActionDisabled": "Built-in templates cannot be deleted and their key/channel cannot be changed",
+      "protectedDescription": "Built-in templates can be edited, but their key and channel are locked."
     },
     "records": {
       "empty": "No notification records found",

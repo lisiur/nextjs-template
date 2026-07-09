@@ -466,6 +466,7 @@ export const NotificationChannelScalarFieldEnum = {
   providerKey: 'providerKey',
   enabled: 'enabled',
   config: 'config',
+  flags: 'flags',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
@@ -486,6 +487,7 @@ export const NotificationTemplateScalarFieldEnum = {
   bodyTemplate: 'bodyTemplate',
   variablesSchema: 'variablesSchema',
   sampleVariables: 'sampleVariables',
+  flags: 'flags',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'

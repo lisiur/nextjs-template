@@ -1,5 +1,6 @@
 "use client";
 
+import { isBuiltinNotification } from "@repo/shared";
 import {
   Badge,
   Button,
@@ -16,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, ShieldUser, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -148,62 +149,87 @@ export function NotificationChannelTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {channels.map((channel) => (
-              <TableRow key={channel.id}>
-                <TableCell>
-                  <span className="inline-flex items-center gap-2">
-                    {getChannelIcon(channel.providerKey)}
-                    {channel.name}
-                  </span>
-                </TableCell>
-                <TableCell className="font-mono text-xs">
-                  {channel.key}
-                </TableCell>
-                <TableCell>{getProviderName(channel.providerKey)}</TableCell>
-                <TableCell>
-                  <Badge variant={channel.enabled ? "secondary" : "outline"}>
-                    {channel.enabled
-                      ? t("status.enabled")
-                      : t("status.disabled")}
-                  </Badge>
-                </TableCell>
-                <TableCell>{formatDate(channel.createdAt)}</TableCell>
-                <TableCell sticky="right" align="right">
-                  <ButtonGroup className="ml-auto">
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={t("actions.edit")}
-                            onClick={() => setEditChannel(channel)}
-                          >
-                            <Pencil />
-                          </Button>
-                        }
-                      />
-                      <TooltipContent>{t("actions.edit")}</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={t("actions.delete")}
-                            onClick={() => handleDelete(channel)}
-                          >
-                            <Trash2 />
-                          </Button>
-                        }
-                      />
-                      <TooltipContent>{t("actions.delete")}</TooltipContent>
-                    </Tooltip>
-                  </ButtonGroup>
-                </TableCell>
-              </TableRow>
-            ))}
+            {channels.map((channel) => {
+              const builtin = isBuiltinNotification(channel.flags);
+              return (
+                <TableRow key={channel.id}>
+                  <TableCell>
+                    <span className="inline-flex items-center gap-2">
+                      {getChannelIcon(channel.providerKey)}
+                      {channel.name}
+                      {builtin && (
+                        <Badge
+                          variant="secondary"
+                          className="px-1.5"
+                          title={t("channels.protectedActionDisabled")}
+                          aria-label={t("channels.protected")}
+                        >
+                          <ShieldUser className="h-3 w-3" />
+                        </Badge>
+                      )}
+                    </span>
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {channel.key}
+                  </TableCell>
+                  <TableCell>{getProviderName(channel.providerKey)}</TableCell>
+                  <TableCell>
+                    <Badge variant={channel.enabled ? "secondary" : "outline"}>
+                      {channel.enabled
+                        ? t("status.enabled")
+                        : t("status.disabled")}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatDate(channel.createdAt)}</TableCell>
+                  <TableCell sticky="right" align="right">
+                    <ButtonGroup className="ml-auto">
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("actions.edit")}
+                              onClick={() => setEditChannel(channel)}
+                            >
+                              <Pencil />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("actions.edit")}</TooltipContent>
+                      </Tooltip>
+                      {builtin ? (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          disabled
+                          title={t("channels.protectedActionDisabled")}
+                          aria-label={t("actions.delete")}
+                        >
+                          <Trash2 />
+                        </Button>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={t("actions.delete")}
+                                onClick={() => handleDelete(channel)}
+                              >
+                                <Trash2 />
+                              </Button>
+                            }
+                          />
+                          <TooltipContent>{t("actions.delete")}</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </ButtonGroup>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       )}

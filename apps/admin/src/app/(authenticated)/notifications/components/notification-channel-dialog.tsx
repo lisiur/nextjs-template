@@ -1,5 +1,6 @@
 "use client";
 
+import { isBuiltinNotification } from "@repo/shared";
 import {
   Button,
   Dialog,
@@ -45,6 +46,7 @@ export function NotificationChannelDialog({
 }: NotificationChannelDialogProps) {
   const t = useTranslations("Notifications");
   const isEdit = !!channel;
+  const builtin = isBuiltinNotification(channel?.flags);
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
   const [providerKey, setProviderKey] = useState("in-app");
@@ -139,12 +141,17 @@ export function NotificationChannelDialog({
                 id="channel-key"
                 value={key}
                 onChange={(event) => setKey(event.target.value)}
+                disabled={builtin}
                 required
               />
             </Field>
             <Field>
               <FieldLabel>{t("fields.provider")}</FieldLabel>
-              <Select value={providerKey} onValueChange={handleProviderChange}>
+              <Select
+                value={providerKey}
+                onValueChange={handleProviderChange}
+                disabled={builtin}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue>
                     {selectedProvider?.name ?? t("channels.selectProvider")}

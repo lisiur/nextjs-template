@@ -13,6 +13,7 @@ export interface NotificationChannel {
   providerKey: string;
   enabled: boolean;
   config?: unknown;
+  flags: string[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;
@@ -31,6 +32,7 @@ export interface NotificationTemplate {
   bodyTemplate: string;
   variablesSchema?: unknown;
   sampleVariables?: unknown;
+  flags: string[];
   createdAt: string;
   updatedAt: string;
   deletedAt?: string | null;

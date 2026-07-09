@@ -22,6 +22,7 @@ export const notificationChannelSchema = z
     providerKey: z.string().openapi({ example: "smtp-email" }),
     enabled: z.boolean(),
     config: z.unknown().nullable().optional(),
+    flags: z.array(z.string()).default([]),
     createdAt: z.date(),
     updatedAt: z.date(),
     deletedAt: z.date().nullable().optional(),

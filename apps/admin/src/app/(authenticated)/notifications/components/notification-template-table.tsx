@@ -1,5 +1,6 @@
 "use client";
 
+import { isBuiltinNotification } from "@repo/shared";
 import {
   Badge,
   Button,
@@ -16,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { FlaskConical, Pencil, Plus, Trash2 } from "lucide-react";
+import { FlaskConical, Pencil, Plus, ShieldUser, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -150,82 +151,107 @@ export function NotificationTemplateTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {templates.map((template) => (
-              <TableRow key={template.id}>
-                <TableCell>
-                  <span className="inline-flex items-center gap-2">
-                    {getChannelIcon(template.channel?.providerKey)}
-                    {template.name}
-                  </span>
-                </TableCell>
-                <TableCell className="font-mono text-xs">
-                  {template.key}
-                </TableCell>
-                <TableCell>
-                  {template.channel?.name ?? template.channelId}
-                  <span className="ml-1 text-muted-foreground text-xs">
-                    ({template.channel?.providerKey})
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={template.enabled ? "secondary" : "outline"}>
-                    {template.enabled
-                      ? t("status.enabled")
-                      : t("status.disabled")}
-                  </Badge>
-                </TableCell>
-                <TableCell>{formatDate(template.createdAt)}</TableCell>
-                <TableCell sticky="right" align="right">
-                  <ButtonGroup className="ml-auto">
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={t("actions.edit")}
-                            onClick={() => setEditTemplate(template)}
-                          >
-                            <Pencil />
-                          </Button>
-                        }
-                      />
-                      <TooltipContent>{t("actions.edit")}</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={t("actions.test")}
-                            onClick={() => setTestTemplate(template)}
-                          >
-                            <FlaskConical />
-                          </Button>
-                        }
-                      />
-                      <TooltipContent>{t("actions.test")}</TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={t("actions.delete")}
-                            onClick={() => handleDelete(template)}
-                          >
-                            <Trash2 />
-                          </Button>
-                        }
-                      />
-                      <TooltipContent>{t("actions.delete")}</TooltipContent>
-                    </Tooltip>
-                  </ButtonGroup>
-                </TableCell>
-              </TableRow>
-            ))}
+            {templates.map((template) => {
+              const builtin = isBuiltinNotification(template.flags);
+              return (
+                <TableRow key={template.id}>
+                  <TableCell>
+                    <span className="inline-flex items-center gap-2">
+                      {getChannelIcon(template.channel?.providerKey)}
+                      {template.name}
+                      {builtin && (
+                        <Badge
+                          variant="secondary"
+                          className="px-1.5"
+                          title={t("templates.protectedActionDisabled")}
+                          aria-label={t("templates.protected")}
+                        >
+                          <ShieldUser className="h-3 w-3" />
+                        </Badge>
+                      )}
+                    </span>
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {template.key}
+                  </TableCell>
+                  <TableCell>
+                    {template.channel?.name ?? template.channelId}
+                    <span className="ml-1 text-muted-foreground text-xs">
+                      ({template.channel?.providerKey})
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={template.enabled ? "secondary" : "outline"}>
+                      {template.enabled
+                        ? t("status.enabled")
+                        : t("status.disabled")}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatDate(template.createdAt)}</TableCell>
+                  <TableCell sticky="right" align="right">
+                    <ButtonGroup className="ml-auto">
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("actions.edit")}
+                              onClick={() => setEditTemplate(template)}
+                            >
+                              <Pencil />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("actions.edit")}</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label={t("actions.test")}
+                              onClick={() => setTestTemplate(template)}
+                            >
+                              <FlaskConical />
+                            </Button>
+                          }
+                        />
+                        <TooltipContent>{t("actions.test")}</TooltipContent>
+                      </Tooltip>
+                      {builtin ? (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          disabled
+                          title={t("templates.protectedActionDisabled")}
+                          aria-label={t("actions.delete")}
+                        >
+                          <Trash2 />
+                        </Button>
+                      ) : (
+                        <Tooltip>
+                          <TooltipTrigger
+                            render={
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                aria-label={t("actions.delete")}
+                                onClick={() => handleDelete(template)}
+                              >
+                                <Trash2 />
+                              </Button>
+                            }
+                          />
+                          <TooltipContent>{t("actions.delete")}</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </ButtonGroup>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       )}
