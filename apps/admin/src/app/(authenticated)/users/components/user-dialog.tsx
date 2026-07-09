@@ -40,9 +40,11 @@ interface Role {
   code: string;
 }
 
-interface UserRole {
+interface RoleAssignment {
   id: string;
   roleId: string;
+  scopeType?: string;
+  scopeId?: string;
   role: Role;
 }
 
@@ -53,7 +55,7 @@ interface UserDialogProps {
     email: string;
     role?: string | null;
     flags?: string[] | null;
-    userRoles?: UserRole[];
+    roleAssignments?: RoleAssignment[];
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -120,7 +122,7 @@ export function UserDialog({
       name: user?.name ?? "",
       email: user?.email ?? "",
       password: "",
-      roleIds: user?.userRoles?.map((ur) => ur.roleId) ?? [],
+      roleIds: user?.roleAssignments?.map((ur) => ur.roleId) ?? [],
     },
   });
 
@@ -131,7 +133,7 @@ export function UserDialog({
         name: user?.name ?? "",
         email: user?.email ?? "",
         password: "",
-        roleIds: user?.userRoles?.map((ur) => ur.roleId) ?? [],
+        roleIds: user?.roleAssignments?.map((ur) => ur.roleId) ?? [],
       });
     }
   }, [open, user, reset]);

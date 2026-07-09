@@ -33,9 +33,11 @@ interface Role {
   code: string;
 }
 
-interface UserRole {
+interface RoleAssignment {
   id: string;
   roleId: string;
+  scopeType?: string;
+  scopeId?: string;
   role: Role;
 }
 
@@ -48,7 +50,7 @@ interface UserRow {
   flags?: string[] | null;
   createdAt: string;
   updatedAt: string;
-  userRoles?: UserRole[];
+  roleAssignments?: RoleAssignment[];
 }
 
 export function UserTable() {
@@ -167,8 +169,8 @@ export function UserTable() {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    {user.userRoles && user.userRoles.length > 0 ? (
-                      user.userRoles.map((ur) => (
+                    {user.roleAssignments && user.roleAssignments.length > 0 ? (
+                      user.roleAssignments.map((ur) => (
                         <Badge key={ur.id} variant="secondary">
                           {ur.role.name}
                         </Badge>
