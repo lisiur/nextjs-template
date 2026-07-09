@@ -332,7 +332,8 @@
     "logs": "Logs",
     "menus": "Menus",
     "uploads": "Uploads",
-    "jobs": "Jobs"
+    "jobs": "Jobs",
+    "rate-limit": "Rate Limit"
   },
   "Organizations": {
     "title": "Organization Management",
