@@ -144,20 +144,27 @@ describe("getMenusForUser", () => {
     expect(mockPrisma.menu.findMany).toHaveBeenCalledWith({
       where: {
         appId: "organization",
-        menuPermissions: {
-          some: {
-            permission: {
-              rolePermissions: {
-                some: {
-                  role: {
-                    roleAssignments: {
-                      some: {
-                        userId: "user1",
-                        OR: [
-                          { scopeType: "PLATFORM", scopeId: "" },
-                          { scopeType: "ORGANIZATION", scopeId: "org1" },
-                          { scopeType: "APPLICATION", scopeId: "organization" },
-                        ],
+        OR: [
+          {
+            menuPermissions: {
+              some: {
+                permission: {
+                  rolePermissions: {
+                    some: {
+                      role: {
+                        roleAssignments: {
+                          some: {
+                            userId: "user1",
+                            OR: [
+                              { scopeType: "PLATFORM", scopeId: "" },
+                              { scopeType: "ORGANIZATION", scopeId: "org1" },
+                              {
+                                scopeType: "APPLICATION",
+                                scopeId: "organization",
+                              },
+                            ],
+                          },
+                        },
                       },
                     },
                   },
@@ -165,7 +172,13 @@ describe("getMenusForUser", () => {
               },
             },
           },
-        },
+          {
+            AND: [
+              { linkType: { not: "GROUP" } },
+              { menuPermissions: { none: {} } },
+            ],
+          },
+        ],
       },
       orderBy: { sortOrder: "asc" },
       include: {
@@ -178,6 +191,212 @@ describe("getMenusForUser", () => {
         },
       },
     });
+  });
+
+  it("includes parent GROUP menus that have no own permissions but accessible children", async () => {
+    const accessibleMenus = [
+      {
+        id: "child-menu",
+        appId: "organization",
+        parentId: "parent-folder",
+        code: "child",
+        name: "Child",
+        icon: null,
+        linkType: "INTERNAL",
+        url: "/child",
+        sortOrder: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        menuPermissions: [
+          {
+            permission: {
+              id: "p1",
+              code: "organization-member::list",
+              name: "List Members",
+              group: "organization-member",
+            },
+          },
+        ],
+      },
+    ];
+
+    const allMenus = [
+      { id: "parent-folder", parentId: null },
+      { id: "child-menu", parentId: "parent-folder" },
+    ];
+
+    const ancestorMenus = [
+      {
+        id: "parent-folder",
+        appId: "organization",
+        parentId: null,
+        code: "folder",
+        name: "Folder",
+        icon: null,
+        linkType: "GROUP",
+        url: null,
+        sortOrder: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        menuPermissions: [],
+      },
+    ];
+
+    mockPrisma.menu.findMany.mockImplementation(
+      (args: Record<string, unknown>) => {
+        if (args.select) {
+          return Promise.resolve(allMenus);
+        }
+        if (
+          args.where &&
+          typeof args.where === "object" &&
+          "id" in args.where
+        ) {
+          return Promise.resolve(ancestorMenus);
+        }
+        return Promise.resolve(accessibleMenus);
+      },
+    );
+
+    const result = await getMenusForUser("user1", "organization", {
+      appId: "organization",
+      organizationId: "org1",
+    });
+
+    expect(result).toHaveLength(2);
+    expect(result[0].id).toBe("parent-folder");
+    expect(result[0].permissions).toEqual([]);
+    expect(result[1].id).toBe("child-menu");
+    expect(result[1].permissions).toHaveLength(1);
+  });
+
+  it("includes grandparent GROUP menus at any depth", async () => {
+    const accessibleMenus = [
+      {
+        id: "leaf-menu",
+        appId: "organization",
+        parentId: "mid-folder",
+        code: "leaf",
+        name: "Leaf",
+        icon: null,
+        linkType: "INTERNAL",
+        url: "/leaf",
+        sortOrder: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        menuPermissions: [
+          {
+            permission: {
+              id: "p1",
+              code: "organization-member::list",
+              name: "List Members",
+              group: "organization-member",
+            },
+          },
+        ],
+      },
+    ];
+
+    const allMenus = [
+      { id: "root-folder", parentId: null },
+      { id: "mid-folder", parentId: "root-folder" },
+      { id: "leaf-menu", parentId: "mid-folder" },
+    ];
+
+    const ancestorMenus = [
+      {
+        id: "root-folder",
+        appId: "organization",
+        parentId: null,
+        code: "root",
+        name: "Root",
+        icon: null,
+        linkType: "GROUP",
+        url: null,
+        sortOrder: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        menuPermissions: [],
+      },
+      {
+        id: "mid-folder",
+        appId: "organization",
+        parentId: "root-folder",
+        code: "mid",
+        name: "Mid",
+        icon: null,
+        linkType: "GROUP",
+        url: null,
+        sortOrder: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        menuPermissions: [],
+      },
+    ];
+
+    mockPrisma.menu.findMany.mockImplementation(
+      (args: Record<string, unknown>) => {
+        if (args.select) {
+          return Promise.resolve(allMenus);
+        }
+        if (
+          args.where &&
+          typeof args.where === "object" &&
+          "id" in args.where
+        ) {
+          return Promise.resolve(ancestorMenus);
+        }
+        return Promise.resolve(accessibleMenus);
+      },
+    );
+
+    const result = await getMenusForUser("user1", "organization", {
+      appId: "organization",
+      organizationId: "org1",
+    });
+
+    expect(result).toHaveLength(3);
+    const ids = result.map((m: { id: string }) => m.id);
+    expect(ids).toContain("root-folder");
+    expect(ids).toContain("mid-folder");
+    expect(ids).toContain("leaf-menu");
+  });
+
+  it("includes leaf menus with no permission requirements", async () => {
+    const accessibleMenus = [
+      {
+        id: "public-page",
+        appId: "organization",
+        parentId: null,
+        code: "public",
+        name: "Public",
+        icon: null,
+        linkType: "INTERNAL",
+        url: "/public",
+        sortOrder: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        menuPermissions: [],
+      },
+    ];
+
+    mockPrisma.menu.findMany.mockImplementation(
+      (args: Record<string, unknown>) => {
+        if (args.select) {
+          return Promise.resolve([{ id: "public-page", parentId: null }]);
+        }
+        return Promise.resolve(accessibleMenus);
+      },
+    );
+
+    const result = await getMenusForUser("user1", "organization", {
+      appId: "organization",
+      organizationId: "org1",
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("public-page");
+    expect(result[0].permissions).toEqual([]);
   });
 });
 

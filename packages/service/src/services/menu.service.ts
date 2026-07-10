@@ -36,6 +36,49 @@ export function serializeMenu(menu: MenuWithPermissions) {
   return { ...rest, permissions: menuPermissions.map((mp) => mp.permission) };
 }
 
+export async function fillAncestorGroups(
+  menus: MenuWithPermissions[],
+  appId?: string,
+): Promise<MenuWithPermissions[]> {
+  const accessibleIds = new Set(menus.map((m) => m.id));
+
+  const allMenus = await prisma.menu.findMany({
+    ...(appId ? { where: { appId } } : {}),
+    select: { id: true, parentId: true },
+  });
+  const parentMap = new Map(allMenus.map((m) => [m.id, m.parentId]));
+
+  const ancestorIds = new Set<string>();
+  for (const menu of menus) {
+    let currentId = menu.parentId;
+    while (currentId && !ancestorIds.has(currentId)) {
+      ancestorIds.add(currentId);
+      currentId = parentMap.get(currentId) ?? null;
+    }
+  }
+
+  const missingAncestorIds = [...ancestorIds].filter(
+    (id) => !accessibleIds.has(id),
+  );
+  const ancestorMenus =
+    missingAncestorIds.length > 0
+      ? await prisma.menu.findMany({
+          where: { id: { in: missingAncestorIds } },
+          include: menuPermissionsInclude,
+        })
+      : [];
+
+  const seen = new Set<string>();
+  const unique = [...menus, ...ancestorMenus].filter((m) => {
+    if (seen.has(m.id)) return false;
+    seen.add(m.id);
+    return true;
+  });
+  unique.sort((a, b) => a.sortOrder - b.sortOrder);
+
+  return unique;
+}
+
 async function assertPermissionsInApp(appId: string, permissionIds: string[]) {
   if (permissionIds.length === 0) return;
   const valid = await prisma.permission.findMany({

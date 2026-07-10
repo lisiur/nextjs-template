@@ -1,6 +1,10 @@
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
-import { menuPermissionsInclude, serializeMenu } from "#services/menu.service";
+import {
+  fillAncestorGroups,
+  menuPermissionsInclude,
+  serializeMenu,
+} from "#services/menu.service";
 
 type RoleScopeType = "PLATFORM" | "ORGANIZATION" | "APPLICATION";
 
@@ -97,26 +101,37 @@ export const userRoleRepository = {
   async getMenusForUser(userId: string) {
     const menus = await prisma.menu.findMany({
       where: {
-        menuPermissions: {
-          some: {
-            permission: {
-              rolePermissions: {
-                some: {
-                  role: {
-                    roleAssignments: {
-                      some: { userId, scopeType: "PLATFORM", scopeId: "" },
+        OR: [
+          {
+            menuPermissions: {
+              some: {
+                permission: {
+                  rolePermissions: {
+                    some: {
+                      role: {
+                        roleAssignments: {
+                          some: { userId, scopeType: "PLATFORM", scopeId: "" },
+                        },
+                      },
                     },
                   },
                 },
               },
             },
           },
-        },
+          {
+            AND: [
+              { linkType: { not: "GROUP" } },
+              { menuPermissions: { none: {} } },
+            ],
+          },
+        ],
       },
       orderBy: { sortOrder: "asc" },
       include: menuPermissionsInclude,
     });
 
-    return menus.map(serializeMenu);
+    const withAncestors = await fillAncestorGroups(menus);
+    return withAncestors.map(serializeMenu);
   },
 };
