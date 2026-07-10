@@ -15,6 +15,14 @@ export const organizationSchema = z
     logo: z.string().nullable().optional(),
     metadata: z.string().nullable().optional(),
     createdAt: z.date(),
+    owner: z
+      .object({
+        id: z.string(),
+        name: z.string(),
+        email: z.string(),
+      })
+      .nullable()
+      .optional(),
   })
   .openapi("Organization");
 

@@ -140,6 +140,13 @@ export async function listOrganizations(params: {
 
   const [organizations, total] = await Promise.all([
     prisma.organization.findMany({
+      include: {
+        members: {
+          where: { role: "owner" },
+          include: { user: { select: { id: true, name: true, email: true } } },
+          take: 1,
+        },
+      },
       orderBy: { createdAt: "desc" },
       take: limit,
       skip: offset,
@@ -147,7 +154,13 @@ export async function listOrganizations(params: {
     prisma.organization.count(),
   ]);
 
-  return { organizations, total };
+  return {
+    organizations: organizations.map((org) => ({
+      ...org,
+      owner: org.members[0]?.user ?? null,
+    })),
+    total,
+  };
 }
 
 export async function listOrganizationsForUser(userId: string) {

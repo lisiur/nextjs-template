@@ -32,6 +32,7 @@ interface Organization {
   logo?: string | null;
   metadata?: string | null;
   createdAt: string;
+  owner?: { id: string; name: string; email: string } | null;
 }
 
 export function OrganizationTable() {
@@ -119,6 +120,7 @@ export function OrganizationTable() {
             <TableHead>{t("name")}</TableHead>
             <TableHead>{t("slug")}</TableHead>
             <TableHead>{t("logo")}</TableHead>
+            <TableHead>{t("owner")}</TableHead>
             <TableHead>{t("createdAt")}</TableHead>
             <TableHead sticky="right" align="right">
               {t("actions")}
@@ -144,6 +146,7 @@ export function OrganizationTable() {
                   <span className="text-muted-foreground">-</span>
                 )}
               </TableCell>
+              <TableCell>{org.owner?.email ?? "-"}</TableCell>
               <TableCell>{formatDate(org.createdAt)}</TableCell>
               <TableCell sticky="right" align="right">
                 <ButtonGroup className="ml-auto">
