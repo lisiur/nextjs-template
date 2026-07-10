@@ -86,7 +86,7 @@ export function ApplicationMenuManagement({
   }, [selectedMenu, handleMenuSaved]);
 
   return (
-    <div className="flex min-h-0 flex-1 gap-6">
+    <div className="flex min-h-0 flex-1 overflow-hidden gap-6">
       <div className="h-full w-80 overflow-auto rounded-md border p-2">
         <MenuTree
           appId={appId}
@@ -97,25 +97,27 @@ export function ApplicationMenuManagement({
           refreshKey={refreshKey}
         />
       </div>
-      <div className="min-w-0 flex-1 overflow-auto">
+      <div className="min-w-0 flex-1 h-full overflow-hidden">
         {selectedMenu ? (
-          <div className="space-y-6">
+          <div className="space-y-6 h-full flex flex-col">
             <h3 className="text-lg font-medium">{t("editMenu")}</h3>
             <Separator />
-            <MenuForm
-              key={selectedMenu.id}
-              ref={formRef}
-              appId={appId}
-              selectedItems={selectedMenu.permissions}
-              defaultValues={{
-                name: selectedMenu.name,
-                code: selectedMenu.code,
-                icon: selectedMenu.icon ?? "",
-                linkType: selectedMenu.linkType,
-                url: selectedMenu.url ?? "",
-                permissionIds: selectedMenu.permissions.map((p) => p.id),
-              }}
-            />
+            <div className="flex-1 overflow-auto">
+              <MenuForm
+                key={selectedMenu.id}
+                ref={formRef}
+                appId={appId}
+                selectedItems={selectedMenu.permissions}
+                defaultValues={{
+                  name: selectedMenu.name,
+                  code: selectedMenu.code,
+                  icon: selectedMenu.icon ?? "",
+                  linkType: selectedMenu.linkType,
+                  url: selectedMenu.url ?? "",
+                  permissionIds: selectedMenu.permissions.map((p) => p.id),
+                }}
+              />
+            </div>
             <Separator />
             <Button onClick={handleSave} disabled={saving}>
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}

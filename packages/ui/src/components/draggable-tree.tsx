@@ -241,7 +241,7 @@ function SortableNode<T extends DraggableTreeNode>({
             level,
             attributes,
             listeners,
-            expandToggle: renderExpandToggle({ placeholder: true }),
+            expandToggle: renderExpandToggle({ placeholder: false }),
           })}
         </div>
       ) : (

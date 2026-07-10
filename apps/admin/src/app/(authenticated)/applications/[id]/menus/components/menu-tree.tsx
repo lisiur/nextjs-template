@@ -422,7 +422,7 @@ export function MenuTree({
           }
         }}
       >
-        <DialogContent>
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>
               {addChildTarget ? t("addChildTitle") : t("createMenu")}
