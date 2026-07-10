@@ -3,15 +3,24 @@
 import {
   Badge,
   Button,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Input,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronRight, Database, RefreshCw, Search } from "lucide-react";
+import {
+  ChevronRight,
+  Database,
+  Eraser,
+  RefreshCw,
+  Search,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
@@ -112,21 +121,8 @@ export function CacheTree({
 }: CacheTreeProps) {
   const t = useTranslations("Cache.tree");
   const queryClient = useQueryClient();
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const tree = useMemo(() => buildTree(keys), [keys]);
-
-  const toggleExpand = (path: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(path)) {
-        next.delete(path);
-      } else {
-        next.add(path);
-      }
-      return next;
-    });
-  };
 
   const clearNamespaceMutation = useMutation({
     mutationFn: async (namespace: string) => {
@@ -142,86 +138,95 @@ export function CacheTree({
   });
 
   const renderGroup = (group: TreeGroup, depth: number) => {
-    const isExpanded = expanded.has(group.fullPath);
     const hasChildren = group.children.size > 0;
     const hasKeys = group.keys.length > 0;
+    const hasContent = hasChildren || hasKeys;
     const totalItems = countKeys(group);
 
     return (
-      <div key={group.fullPath || group.name}>
-        <div
-          className={`flex items-center gap-1 rounded-md py-1 ${depth === 0 ? "mt-1" : ""}`}
-          style={{ paddingLeft: `${depth * 12 + 8}px` }}
+      <Collapsible key={group.fullPath || group.name}>
+        <CollapsibleTrigger
+          render={
+            <Button
+              type="button"
+              variant="ghost"
+              className={`group flex h-auto w-full items-center gap-1 justify-start rounded-md py-1 px-2 font-normal hover:bg-accent ${depth === 0 ? "mt-1" : ""}`}
+            />
+          }
         >
-          <Button
-            type="button"
-            variant="ghost"
-            className="flex h-auto flex-1 items-center gap-1 justify-start px-2 py-1 font-normal hover:bg-accent"
-            onClick={() => hasChildren && toggleExpand(group.fullPath)}
-          >
-            {hasChildren ? (
-              <ChevronRight
-                className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${isExpanded ? "rotate-90" : ""}`}
-              />
-            ) : (
-              <span className="w-3.5 shrink-0" />
-            )}
-            <Database className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-            <span className="flex-1 truncate text-left text-sm font-medium">
-              {group.name}
-            </span>
-          </Button>
+          <span className="shrink-0" style={{ width: `${depth * 12}px` }} />
+          {hasContent ? (
+            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-data-[panel-open]:rotate-90" />
+          ) : (
+            <span className="w-3.5 shrink-0" />
+          )}
+          <Database className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <span className="flex-1 truncate text-left text-sm font-medium">
+            {group.name}
+          </span>
           <Badge variant="secondary" className="shrink-0 text-xs">
             {totalItems}
           </Badge>
           <Tooltip>
             <TooltipTrigger
               render={
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  disabled={clearNamespaceMutation.isPending}
+                // biome-ignore lint/a11y/useSemanticElements: cannot nest <button> inside CollapsibleTrigger's <button>
+                <span
+                  role="button"
+                  tabIndex={clearNamespaceMutation.isPending ? -1 : 0}
+                  aria-disabled={clearNamespaceMutation.isPending}
+                  className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground ${clearNamespaceMutation.isPending ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
                   onClick={(e) => {
                     e.stopPropagation();
                     clearNamespaceMutation.mutate(group.fullPath);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      clearNamespaceMutation.mutate(group.fullPath);
+                    }
+                  }}
                 />
               }
-            />
+            >
+              <Eraser className="h-3.5 w-3.5" />
+            </TooltipTrigger>
             <TooltipContent>{t("clearNamespace")}</TooltipContent>
           </Tooltip>
-        </div>
+        </CollapsibleTrigger>
 
-        {(isExpanded || !hasChildren) && hasKeys && (
-          <div>
-            {group.keys.map((k) => (
-              <button
-                type="button"
-                key={k.fullKey}
-                className={`flex w-full items-center gap-1 rounded-md py-1 pr-2 cursor-pointer hover:bg-accent ${
-                  selectedKey === k.fullKey
-                    ? "border-primary border-l-2 bg-primary/10"
-                    : ""
-                }`}
-                style={{ paddingLeft: `${(depth + 1) * 12 + 20}px` }}
-                onClick={() => onSelectKey(k.fullKey)}
-              >
-                <span className="flex-1 truncate text-left font-mono text-xs text-muted-foreground">
-                  {k.key}
-                </span>
-                <Badge variant="outline" className="shrink-0 text-[10px]">
-                  {k.valueType}
-                </Badge>
-              </button>
-            ))}
-          </div>
-        )}
+        <CollapsibleContent>
+          {hasKeys && (
+            <div>
+              {group.keys.map((k) => (
+                <button
+                  type="button"
+                  key={k.fullKey}
+                  className={`flex w-full items-center gap-1 rounded-md py-2 pr-2 cursor-pointer hover:bg-accent ${
+                    selectedKey === k.fullKey
+                      ? "bg-primary/10"
+                      : ""
+                  }`}
+                  style={{ paddingLeft: `${(depth + 1) * 12 + 20}px` }}
+                  onClick={() => onSelectKey(k.fullKey)}
+                >
+                  <span className="flex-1 truncate text-left font-mono text-xs text-muted-foreground">
+                    {k.key}
+                  </span>
+                  <Badge variant="outline" className="shrink-0 text-[10px]">
+                    {k.valueType}
+                  </Badge>
+                </button>
+              ))}
+            </div>
+          )}
 
-        {isExpanded &&
-          [...group.children.values()]
+          {[...group.children.values()]
             .sort((a, b) => a.fullPath.localeCompare(b.fullPath))
             .map((child) => renderGroup(child, depth + 1))}
-      </div>
+        </CollapsibleContent>
+      </Collapsible>
     );
   };
 
@@ -248,7 +253,7 @@ export function CacheTree({
           />
         </Button>
       </div>
-      <div className="flex-1 overflow-auto py-1">
+      <div className="flex-1 overflow-auto p-1">
         {isLoading ? (
           <div className="text-muted-foreground p-4 text-center text-sm">
             {t("loading")}
