@@ -1,26 +1,22 @@
 "use client";
 
 import {
-  cn,
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   Skeleton,
 } from "@repo/ui";
-import {
-  ChevronRight,
-  Folder,
-  FolderOpen,
-  icons,
-  type LucideIcon,
-} from "lucide-react";
+import { Folder, icons, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useMenuStore } from "@/stores/menu-store";
 import { UserMenu } from "./user-menu";
 
@@ -51,20 +47,13 @@ interface SidebarTreeNode {
 
 function SidebarMenuNode({
   node,
-  level,
   pathname,
-  expandedIds,
-  onToggle,
 }: {
   node: SidebarTreeNode;
-  level: number;
   pathname: string;
-  expandedIds: Set<string>;
-  onToggle: (id: string) => void;
 }) {
   const t = useTranslations("Sidebar");
   const hasChildren = node.children.length > 0;
-  const isExpanded = expandedIds.has(node.id);
   const href = node.linkType === "GROUP" ? undefined : toAppHref(node.url);
   const isActive =
     href && node.linkType === "INTERNAL"
@@ -73,47 +62,36 @@ function SidebarMenuNode({
 
   const label = t.has(node.code) ? t(node.code) : node.name;
 
+  if (node.linkType === "GROUP") {
+    if (!hasChildren) {
+      return (
+        <SidebarGroup>
+          <SidebarGroupLabel>{label}</SidebarGroupLabel>
+        </SidebarGroup>
+      );
+    }
+
+    return (
+      <SidebarGroup>
+        <SidebarGroupLabel>{label}</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {node.children.map((child) => (
+              <SidebarMenuNode
+                key={child.id}
+                node={child}
+                pathname={pathname}
+              />
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    );
+  }
+
   return (
     <SidebarMenuItem>
-      {hasChildren ? (
-        <>
-          <SidebarMenuButton
-            isActive={isActive}
-            onClick={() => onToggle(node.id)}
-          >
-            <span className="shrink-0">
-              {node.icon ? (
-                getIcon(node.icon)
-              ) : isExpanded ? (
-                <FolderOpen className="h-4 w-4" />
-              ) : (
-                <Folder className="h-4 w-4" />
-              )}
-            </span>
-            <span className="truncate">{label}</span>
-            <ChevronRight
-              className={cn(
-                "ml-auto h-4 w-4 transition-transform",
-                isExpanded && "rotate-90",
-              )}
-            />
-          </SidebarMenuButton>
-          {isExpanded && (
-            <SidebarMenu className="ml-2 group-data-[collapsible=icon]:hidden">
-              {node.children.map((child) => (
-                <SidebarMenuNode
-                  key={child.id}
-                  node={child}
-                  level={level + 1}
-                  pathname={pathname}
-                  expandedIds={expandedIds}
-                  onToggle={onToggle}
-                />
-              ))}
-            </SidebarMenu>
-          )}
-        </>
-      ) : node.linkType === "EXTERNAL" ? (
+      {node.linkType === "EXTERNAL" ? (
         <SidebarMenuButton
           isActive={isActive}
           render={
@@ -149,7 +127,6 @@ export function AppSidebar() {
   const pathname = usePathname();
   const t = useTranslations("Sidebar");
   const { treeMenus, loading, fetched, fetchMenus } = useMenuStore();
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const skeletonIds = useRef(
     Array.from({ length: 4 }, () => crypto.randomUUID()),
@@ -158,34 +135,6 @@ export function AppSidebar() {
   useEffect(() => {
     fetchMenus();
   }, [fetchMenus]);
-
-  useEffect(() => {
-    if (fetched) {
-      const allIds = new Set<string>();
-      function collect(nodes: SidebarTreeNode[]) {
-        for (const node of nodes) {
-          if (node.children.length > 0) {
-            allIds.add(node.id);
-            collect(node.children);
-          }
-        }
-      }
-      collect(treeMenus);
-      setExpandedIds(allIds);
-    }
-  }, [fetched, treeMenus]);
-
-  const handleToggle = (id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
 
   return (
     <Sidebar collapsible="icon">
@@ -203,14 +152,7 @@ export function AppSidebar() {
             </SidebarMenuItem>
           ) : (
             treeMenus.map((node) => (
-              <SidebarMenuNode
-                key={node.id}
-                node={node}
-                level={0}
-                pathname={pathname}
-                expandedIds={expandedIds}
-                onToggle={handleToggle}
-              />
+              <SidebarMenuNode key={node.id} node={node} pathname={pathname} />
             ))
           )}
         </SidebarMenu>
