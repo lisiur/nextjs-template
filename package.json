@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS='--max-old-space-size=8192' pnpm --filter './apps/*' dev",
     "build": "pnpm --filter './apps/*' build",
+    "build:server": "NODE_OPTIONS=\"--max-old-space-size=512\" UV_THREADPOOL_SIZE=1 pnpm --filter './apps/*' --workspace-concurrency=1 build",
     "lint": "biome check .",
     "lint:fix": "biome check --write --unsafe .",
     "format": "biome format --write .",

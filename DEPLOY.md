@@ -41,7 +41,7 @@ pnpm db:generate                          # generate Prisma client (before build
 pnpm db:migrate:deploy                    # apply schema (or `pnpm db:push`)
 pnpm db:seed                              # first deploy only
 
-NODE_OPTIONS='--max-old-space-size=8192' pnpm build
+NODE_OPTIONS="--max-old-space-size=1024" taskset -c 0 pnpm build
 
 pm2 start ecosystem.config.cjs
 pm2 save                                  # persist the process list
@@ -57,7 +57,7 @@ git pull
 pnpm install
 pnpm db:generate
 pnpm db:migrate:deploy                    # only if there are new migrations
-NODE_OPTIONS='--max-old-space-size=8192' pnpm build
+NODE_OPTIONS="--max-old-space-size=1024" taskset -c 0 pnpm build
 pm2 reload ecosystem.config.cjs
 ```
 
@@ -102,8 +102,9 @@ separate auth secret to manage.
   organization. Don't split them onto subdomains.
 - **Firewall 3000–3002.** Block external access to the app ports (e.g.
   `ufw deny 3000:3002`) so only nginx can reach them.
-- **Build memory.** Building three apps can need ~8 GB; the `NODE_OPTIONS` flag
-  in the commands above covers it. Add swap on smaller servers.
+- **Build memory.** The build is pinned to a single core (`taskset -c 0`) with
+  a 1 GB Node heap cap (`--max-old-space-size=1024`) to fit a small server. If
+  the build is killed (OOM), add swap.
 
 ## Useful PM2 commands
 
