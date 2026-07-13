@@ -1,8 +1,9 @@
 name: build
 
 # Builds the next101 monorepo on a native linux/amd64 runner and packages the
-# Next.js standalone artifacts into a tarball ready to deploy under PM2
-# (ecosystem.standalone.cjs). Native deps (argon2, Prisma engines, ...) install
+# Next.js standalone artifacts into a self-contained tarball ready to deploy
+# under PM2 (ecosystem.standalone.cjs + .env.production.example bundled in).
+# Native deps (argon2, Prisma engines, ...) install
 # for the target arch on the runner.
 #
 # Outputs:
@@ -11,9 +12,7 @@ name: build
 
 on:
   push:
-    branches: [main]
     tags: ['v*']
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -58,23 +57,19 @@ jobs:
           NEXT_PUBLIC_API_ORIGIN: ${{ vars.NEXT_PUBLIC_API_ORIGIN }}
         run: pnpm build
 
-      - name: Assemble deploy artifacts
+      - name: Assemble and pack deploy tarball
+        id: assemble
         env:
           SRC_ROOT: ${{ github.workspace }}
           OUT: ${{ github.workspace }}/deploy
-        run: sh scripts/assemble.sh
-
-      - name: Pack tarball
-        id: pack
         run: |
-          sha=$(git rev-parse --short HEAD)
-          tar -czf "next101-deploy-${sha}.tar.gz" -C deploy gateway admin organization
-          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+          sh scripts/assemble.sh
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: next101-deploy-${{ steps.pack.outputs.sha }}
+          name: next101-deploy-${{ steps.assemble.outputs.sha }}
           path: next101-deploy-*.tar.gz
           if-no-files-found: error
           retention-days: 30

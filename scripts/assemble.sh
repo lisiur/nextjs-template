@@ -1,11 +1,14 @@
 #!/usr/bin/env sh
-# Assembles Next.js standalone deploy artifacts under $OUT.
-# Run after `pnpm build`. Used by .github/workflows/build.yml.
+# Assembles Next.js standalone deploy artifacts under $OUT and packs them into
+# a deployable tarball next101-deploy-<sha>.tar.gz. Run after `pnpm build`.
+# Used by .github/workflows/build.yml, but works standalone locally too.
 set -eu
 
 APPS="gateway admin organization"
-SRC_ROOT="${SRC_ROOT:-/app}"
-OUT="${OUT:-/deploy}"
+# Default to the repo root (one level above this script) so `sh scripts/assemble.sh`
+# works locally; CI overrides SRC_ROOT/OUT explicitly.
+SRC_ROOT="${SRC_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+OUT="${OUT:-$SRC_ROOT/deploy}"
 
 rm -rf "$OUT"
 mkdir -p "$OUT"
@@ -53,6 +56,21 @@ for app in $APPS; do
   fi
 done
 
+# Ship the PM2 config and the env template alongside the app bundles so the
+# tarball is self-contained. The real .env.production (with secrets) is never
+# baked in — it stays on the server; the deployer fills it from the template.
+cp "$SRC_ROOT/ecosystem.standalone.cjs" "$OUT/"
+if [ -f "$SRC_ROOT/.env.production.example" ]; then
+  cp "$SRC_ROOT/.env.production.example" "$OUT/"
+fi
+
 echo "==> Artifact tree (depth 3):"
 find "$OUT" -maxdepth 3 -type d | sort | head -80
-echo "==> Assembly complete"
+
+# Pack the staged dir into a deployable tarball named by the git short SHA,
+# written next to the deploy dir. Produces the same artifact locally that the
+# GitHub Actions workflow ships.
+sha=$(git -C "$SRC_ROOT" rev-parse --short HEAD 2>/dev/null || echo local)
+tarball="$SRC_ROOT/next101-deploy-${sha}.tar.gz"
+tar -czf "$tarball" -C "$OUT" .
+echo "==> Packed $tarball"
