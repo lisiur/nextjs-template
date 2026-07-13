@@ -22,7 +22,7 @@
  * ============================================================
  */
 
-import "dotenv/config";
+import "./load-env.ts";
 import { PrismaPg } from "@prisma/adapter-pg";
 import {
   ADMIN_APP_CODE,
