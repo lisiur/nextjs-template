@@ -335,8 +335,8 @@
     "jobs": "任务",
     "rate-limit": "限流",
     "platform": "平台",
-    "system": "系统",
     "infrastructure": "基础设施",
+    "developer": "开发者",
     "cache": "缓存"
   },
   "Organizations": {

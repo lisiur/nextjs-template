@@ -335,8 +335,8 @@
     "jobs": "Jobs",
     "rate-limit": "Rate Limit",
     "platform": "Platform",
-    "system": "System",
     "infrastructure": "Infrastructure",
+    "developer": "Developer",
     "cache": "Cache"
   },
   "Organizations": {
