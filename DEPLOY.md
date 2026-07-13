@@ -38,7 +38,7 @@ cp .env.production.example .env.production
 nano .env.production                      # fill in DATABASE_URL, secrets, CORS
 
 pnpm db:generate                          # generate Prisma client (before build!)
-pnpm db:migrate deploy                    # apply schema (or `pnpm db:push`)
+pnpm db:migrate:deploy                    # apply schema (or `pnpm db:push`)
 pnpm db:seed                              # first deploy only
 
 NODE_OPTIONS='--max-old-space-size=8192' pnpm build
@@ -56,7 +56,7 @@ Then point nginx at it (see below) and reload.
 git pull
 pnpm install
 pnpm db:generate
-pnpm db:migrate deploy                    # only if there are new migrations
+pnpm db:migrate:deploy                    # only if there are new migrations
 NODE_OPTIONS='--max-old-space-size=8192' pnpm build
 pm2 reload ecosystem.config.cjs
 ```

@@ -11,7 +11,7 @@
 - Install/run with pnpm. Root `pnpm dev` runs only apps (`pnpm --filter './apps/*' dev`) with `NODE_OPTIONS='--max-old-space-size=8192'`; the service is consumed by Next under `/api`.
 - Build apps: `pnpm build`.
 - Lint/format: `pnpm lint` (`biome check .`), `pnpm lint:fix` (`biome check --write --unsafe .`), `pnpm format`.
-- Prisma: `pnpm db:generate`, `pnpm db:push`, `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:reset` all forward to `@repo/service`.
+- Prisma: `pnpm db:generate`, `pnpm db:push`, `pnpm db:migrate` (dev), `pnpm db:migrate:deploy` (prod), `pnpm db:seed`, `pnpm db:reset` all forward to `@repo/service`.
 
 ## Tooling
 - Biome is the linter/formatter, not ESLint. 2-space indentation, recommended Next/React domains.

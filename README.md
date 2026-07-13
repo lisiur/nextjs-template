@@ -46,7 +46,8 @@ pnpm dev
 | `pnpm format`              | Format with Biome.                                        |
 | `pnpm db:generate`         | Generate the Prisma client (forwards to `@repo/service`). |
 | `pnpm db:push`             | Push the Prisma schema to the database.                   |
-| `pnpm db:migrate`          | Run Prisma migrations.                                    |
+| `pnpm db:migrate`          | Run Prisma migrations (dev; interactive).                 |
+| `pnpm db:migrate:deploy`   | Apply pending migrations in production (non-interactive).  |
 | `pnpm db:seed`             | Seed the database.                                        |
 | `pnpm db:reset:danger`     | Reset the database (destructive).                         |
 
