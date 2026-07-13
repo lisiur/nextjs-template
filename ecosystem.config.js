@@ -8,8 +8,8 @@
 //   ./admin/apps/admin/server.js
 //   ./organization/apps/organization/server.js
 //
-//   pm2 start ecosystem.standalone.cjs
-//   pm2 reload ecosystem.standalone.cjs   # zero-downtime after redeploy
+//   pm2 start ecosystem.config.js
+//   pm2 reload ecosystem.config.js   # zero-downtime after redeploy
 //
 //   Deploy / migrate flow (one-time, then per-release):
 //     npm install                       # installs prisma + dotenv (engines)
@@ -45,6 +45,7 @@ module.exports = {
     autorestart: true,
     max_memory_restart: "1G",
     env: {
+      ...process.env,
       NODE_ENV: "production",
       PORT: String(port),
     },
