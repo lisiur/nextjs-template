@@ -40,7 +40,7 @@ done
 # Ship the PM2 config and the env template alongside the app bundles so the
 # tarball is self-contained. The real .env.production (with secrets) is never
 # baked in — it stays on the server; the deployer fills it from the template.
-cp "$SRC_ROOT/ecosystem.standalone.cjs" "$OUT/"
+cp "$SRC_ROOT/ecosystem.config.js" "$OUT/"
 if [ -f "$SRC_ROOT/.env.production.example" ]; then
   cp "$SRC_ROOT/.env.production.example" "$OUT/"
 fi
@@ -57,7 +57,7 @@ cp -a "$SRC_ROOT/packages/service/prisma/schema.prisma" "$OUT/prisma/schema.pris
 cp -a "$SRC_ROOT/packages/service/prisma/load-env.ts" "$OUT/prisma/load-env.ts"
 cp -a "$SRC_ROOT/packages/service/prisma.config.ts" "$OUT/prisma.config.ts"
 
-# Record the seed.ts source fingerprint. ecosystem.standalone.cjs reads this
+# Record the seed.ts source fingerprint. ecosystem.config.js reads this
 # file at boot and injects it as SEED_FINGERPRINT into each app's env so the
 # service self-seeds once per seed.ts revision.
 node "$SRC_ROOT/scripts/seed-fingerprint.mjs" > "$OUT/seed.fingerprint"
@@ -74,8 +74,8 @@ cat >"$OUT/package.json" <<EOF
   "private": true,
   "scripts": {
     "migrate": "prisma migrate deploy",
-    "start": "pm2 start ecosystem.standalone.cjs",
-    "reload": "pm2 reload ecosystem.standalone.cjs"
+    "start": "pm2 start ecosystem.config.js",
+    "reload": "pm2 reload ecosystem.config.js"
   },
   "devDependencies": {
     "prisma": "${prisma_ver}",
