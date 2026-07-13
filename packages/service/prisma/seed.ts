@@ -22,8 +22,6 @@
  * ============================================================
  */
 
-import "./load-env.ts";
-import { PrismaPg } from "@prisma/adapter-pg";
 import {
   ADMIN_APP_CODE,
   ADMIN_ROLE_CODE,
@@ -36,7 +34,7 @@ import {
   USER_ROLE_CODE,
 } from "@repo/shared";
 import { hashPassword } from "../src/lib/password";
-import { Prisma, PrismaClient } from "./generated/prisma/client";
+import { Prisma, type PrismaClient } from "./generated/prisma/client";
 
 // ============================================================
 // 1. REFERENCE DATA DEFINITIONS
@@ -851,12 +849,9 @@ const builtInUsers = [
 // 2. DATABASE CLIENT
 // ============================================================
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("DATABASE_URL environment variable is not set");
-}
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+// Assigned from the parameter passed to seed(). Kept at module scope so the
+// upsert helpers below can reference it without each needing a parameter.
+let prisma: PrismaClient;
 
 // ============================================================
 // 3. GENERIC UPSERT HELPERS (idempotent)
@@ -1197,7 +1192,9 @@ async function upsertRoleAssignment(params: {
 // 4. MAIN SEED (orchestrates desired state)
 // ============================================================
 
-async function seed() {
+export async function seed(client: PrismaClient) {
+  prisma = client;
+
   console.log("=== Seeding desired state ===\n");
 
   // 1. System Configs
@@ -1399,16 +1396,3 @@ async function seed() {
 
   console.log("=== Seed complete ===");
 }
-
-// ============================================================
-// 5. RUN
-// ============================================================
-
-seed()
-  .catch((e) => {
-    console.error("Seed failed:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });

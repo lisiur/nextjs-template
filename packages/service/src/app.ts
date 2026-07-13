@@ -11,6 +11,8 @@ import {
   initRateLimitOverrides,
 } from "#services/rate-limit.service";
 import { jobExecutor } from "#states";
+import { seed } from "../prisma/seed";
+import { prisma } from "./lib/db";
 import { routes } from "./routes";
 
 const openAPIApp = new OpenAPIHono().basePath("/api");
@@ -102,5 +104,8 @@ initRateLimitDefaults().catch((e) =>
 initRateLimitOverrides().catch((e) =>
   console.error("Failed to load rate-limit overrides:", e),
 );
+if (process.env.SEED_ON_BOOT !== "false") {
+  seed(prisma).catch((e) => console.error("Seed on boot failed:", e));
+}
 
 export { app };

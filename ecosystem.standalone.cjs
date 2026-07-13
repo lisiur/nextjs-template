@@ -10,6 +10,13 @@
 //
 //   pm2 start ecosystem.standalone.cjs
 //   pm2 reload ecosystem.standalone.cjs   # zero-downtime after redeploy
+//
+//   Deploy / migrate flow (one-time, then per-release):
+//     npm install                       # installs prisma + dotenv (engines)
+//     npm run migrate && npm run reload # migrate fails → reload skipped
+//
+//   Seeding is automatic: the service self-seeds on boot from app.ts
+//   (SEED_ON_BOOT=false to opt out).
 
 const fs = require("node:fs");
 

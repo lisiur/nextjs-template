@@ -35,25 +35,6 @@ for app in $APPS; do
   if [ -d "$app_dir/public" ]; then
     cp -a "$app_dir/public" "$OUT/$app/$rel/public"
   fi
-
-  # Sanity: native addons (.node) or the Prisma query engine must be present.
-  if ! find "$OUT/$app" \( -name '*.node' -o -name 'libquery_engine*' \) -print -quit | grep -q .; then
-    echo "ERROR: no native binaries (.node / prisma engine) found in $app" >&2
-    exit 1
-  fi
-done
-
-# Belt-and-suspenders: ensure the Prisma generated client is on disk for any app
-# whose standalone kept packages/service/ (skip apps where it was bundled).
-gen_src="$SRC_ROOT/packages/service/prisma/generated"
-for app in $APPS; do
-  svc_dir="$OUT/$app/packages/service"
-  [ -d "$svc_dir" ] || continue
-  dest="$svc_dir/prisma/generated"
-  if [ ! -d "$dest" ] && [ -d "$gen_src" ]; then
-    mkdir -p "$(dirname "$dest")"
-    cp -a "$gen_src" "$dest"
-  fi
 done
 
 # Ship the PM2 config and the env template alongside the app bundles so the
@@ -63,6 +44,38 @@ cp "$SRC_ROOT/ecosystem.standalone.cjs" "$OUT/"
 if [ -f "$SRC_ROOT/.env.production.example" ]; then
   cp "$SRC_ROOT/.env.production.example" "$OUT/"
 fi
+
+# Ship Prisma schema + migrations + config so `npm run migrate` works on the
+# server after `npm install`. The prisma CLI is a devDependency (pinned to
+# match the generated client baked into each standalone server.js); the CLI
+# itself is NOT traced into Next.js standalone output. Seeding is handled
+# separately — the gateway self-seeds on boot via instrumentation.ts.
+mkdir -p "$OUT/prisma"
+cp -a "$SRC_ROOT/packages/service/prisma/migrations" "$OUT/prisma/migrations"
+cp -a "$SRC_ROOT/packages/service/prisma/schema.prisma" "$OUT/prisma/schema.prisma"
+cp -a "$SRC_ROOT/packages/service/prisma/load-env.ts" "$OUT/prisma/load-env.ts"
+cp -a "$SRC_ROOT/packages/service/prisma.config.ts" "$OUT/prisma.config.ts"
+
+# Generate a minimal deploy package.json. The prisma/dotenv versions are read
+# from the service package so they never drift from the generated client.
+# `npm install` on the server fetches the matching prisma engines.
+prisma_ver=$(node -p "require('$SRC_ROOT/packages/service/package.json').devDependencies.prisma")
+dotenv_ver=$(node -p "require('$SRC_ROOT/packages/service/package.json').devDependencies.dotenv")
+cat >"$OUT/package.json" <<EOF
+{
+  "name": "next101-deploy",
+  "private": true,
+  "scripts": {
+    "migrate": "prisma migrate deploy",
+    "start": "pm2 start ecosystem.standalone.cjs",
+    "reload": "pm2 reload ecosystem.standalone.cjs"
+  },
+  "devDependencies": {
+    "prisma": "${prisma_ver}",
+    "dotenv": "${dotenv_ver}"
+  }
+}
+EOF
 
 echo "==> Artifact tree (depth 3):"
 find "$OUT" -maxdepth 3 -type d | sort | head -80
