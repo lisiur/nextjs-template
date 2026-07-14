@@ -16,49 +16,60 @@ under PM2 on a localhost port, and nginx reverse-proxies one domain to them.
 
 - Node.js (current LTS), pnpm
 - PM2 (`npm i -g pm2`)
-- nginx (you already have it)
+- nginx
 - PostgreSQL (reachable via `DATABASE_URL`)
-
-## Why the source lives on the server
-
-There is no standalone "dist" to ship. `next start` loads runtime code from
-`node_modules` and `.next/`, and the native modules (`argon2`, Prisma engines,
-`sharp`) are compiled for the server's OS/arch during `pnpm install`. A build
-from macOS/Windows will not run on Linux, so **install + build must happen on
-the server**. The repo is already in git, so keeping a clone on your own server
-adds no extra exposure — just keep `.env.production` (secrets) out of git.
 
 ## First-time deploy
 
+The "build" GitHub Actions workflow ([`.github/workflows/build.yml`](.github/workflows/build.yml),
+triggered on `v*` tags) compiles the apps on a Linux runner and packs a
+self-contained `next101-deploy-<sha>.tar.gz` — standalone server bundles, static
+assets, `ecosystem.config.js`, Prisma schema/migrations, and a minimal
+`package.json`. It is attached to the GitHub release, so the server needs only
+the Node runtime: **no git, pnpm, or build toolchain** on the host.
+
 ```bash
-git clone <repo-url> next101 && cd next101
-pnpm install                              # builds native deps for this OS
+mkdir next101 && cd next101
+
+# Download the tarball from the GitHub release for the tag you're deploying.
+wget -O deploy.tar.gz \
+  https://github.com/<org>/<repo>/releases/download/v1.0.0/next101-deploy-<sha>.tar.gz
+tar -xzf deploy.tar.gz && rm deploy.tar.gz
 
 cp .env.production.example .env.production
-nano .env.production                      # fill in DATABASE_URL, secrets, CORS
+vim .env.production                      # fill in DATABASE_URL, secrets, CORS
 
-pnpm db:generate                          # generate Prisma client (before build!)
-pnpm db:migrate:deploy                    # apply schema (or `pnpm db:push`)
-pnpm db:seed                              # first deploy only
+npm install                               # prisma CLI + dotenv (engines) only
+npm run migrate                           # prisma migrate deploy
 
-NODE_OPTIONS="--max-old-space-size=1024" taskset -c 0 pnpm build
-
-pm2 start ecosystem.config.cjs
+pm2 start ecosystem.config.js
 pm2 save                                  # persist the process list
 pm2 startup                               # follow the printed command to enable boot
 ```
+
+The gateway self-seeds on boot: the service checks for the `admin` application
+row and runs `seed` automatically when it's missing, so a fresh database needs
+no manual `db:seed`.
 
 Then point nginx at it (see below) and reload.
 
 ## Update an existing deploy
 
 ```bash
-git pull
-pnpm install
-pnpm db:generate
-pnpm db:migrate:deploy                    # only if there are new migrations
-NODE_OPTIONS="--max-old-space-size=1024" taskset -c 0 pnpm build
-pm2 reload ecosystem.config.cjs
+cd next101
+
+# Download the tarball for the new release tag.
+wget -O deploy.tar.gz \
+  https://github.com/<org>/<repo>/releases/download/v1.1.0/next101-deploy-<sha>.tar.gz
+
+# Extract over the current deploy dir — your .env.production is preserved
+# (the tarball ships only .env.production.example).
+tar -xzf deploy.tar.gz && rm deploy.tar.gz
+
+npm install                               # prisma CLI + dotenv (engines) only
+npm run migrate                           # only if there are new migrations
+
+pm2 reload ecosystem.config.js            # zero-downtime restart
 ```
 
 `pm2 reload` does a zero-downtime rolling restart. Use `pm2 restart` instead
@@ -90,9 +101,6 @@ Required:
   cross-origin) in production when unset.
 - `UPLOAD_SIGN_SECRET` — required for private file operations.
 
-Sessions are DB-backed (opaque token in the `session` table), so there is no
-separate auth secret to manage.
-
 ## Important notes
 
 - **HTTPS is required.** The session cookie is `secure` in production, so it is
@@ -102,9 +110,6 @@ separate auth secret to manage.
   organization. Don't split them onto subdomains.
 - **Firewall 3000–3002.** Block external access to the app ports (e.g.
   `ufw deny 3000:3002`) so only nginx can reach them.
-- **Build memory.** The build is pinned to a single core (`taskset -c 0`) with
-  a 1 GB Node heap cap (`--max-old-space-size=1024`) to fit a small server. If
-  the build is killed (OOM), add swap.
 
 ## Useful PM2 commands
 
