@@ -136,7 +136,7 @@ export function AppSidebar() {
                   ))}
                 </SidebarMenuItem>
               ) : fetched && treeMenus.length === 0 ? (
-                <SidebarMenuItem className="py-4 text-center text-sm text-muted-foreground">
+                <SidebarMenuItem className="group-data-[collapsible=icon]:hidden py-4 text-center text-sm text-muted-foreground">
                   {t("noMenus")}
                 </SidebarMenuItem>
               ) : (
