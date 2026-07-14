@@ -23,7 +23,7 @@ under PM2 on a localhost port, and nginx reverse-proxies one domain to them.
 
 The "build" GitHub Actions workflow ([`.github/workflows/build.yml`](.github/workflows/build.yml),
 triggered on `v*` tags) compiles the apps on a Linux runner and packs a
-self-contained `platform-deploy-<sha>.tar.gz` — standalone server bundles, static
+self-contained `platform-deploy-<version>.tar.gz` — standalone server bundles, static
 assets, `ecosystem.config.js`, Prisma schema/migrations, and a minimal
 `package.json`. It is attached to the GitHub release, so the server needs only
 the Node runtime: **no git, pnpm, or build toolchain** on the host.
@@ -33,7 +33,7 @@ mkdir platform && cd platform
 
 # Download the tarball from the GitHub release for the tag you're deploying.
 wget -O deploy.tar.gz \
-  https://github.com/<org>/<repo>/releases/download/v1.0.0/platform-deploy-<sha>.tar.gz
+  https://github.com/lisiur/platform/releases/download/v1.0.0/platform-deploy-<version>.tar.gz
 tar -xzf deploy.tar.gz && rm deploy.tar.gz
 
 cp .env.production.example .env.production
@@ -60,7 +60,7 @@ cd platform
 
 # Download the tarball for the new release tag.
 wget -O deploy.tar.gz \
-  https://github.com/<org>/<repo>/releases/download/v1.1.0/platform-deploy-<sha>.tar.gz
+  https://github.com/lisiur/platform/releases/download/v1.1.0/platform-deploy-<version>.tar.gz
 
 # Extract over the current deploy dir — your .env.production is preserved
 # (the tarball ships only .env.production.example).
@@ -91,7 +91,7 @@ pm2 delete all                              # stop & remove running processes
 # the current dir — .env.production is preserved (the tarball ships only the
 # .example).
 wget -O deploy.tar.gz \
-  https://github.com/<org>/<repo>/releases/download/v2.0.0/platform-deploy-<sha>.tar.gz
+  https://github.com/lisiur/platform/releases/download/v2.0.0/platform-deploy-<version>.tar.gz
 tar -xzf deploy.tar.gz && rm deploy.tar.gz
 
 npm install                                 # prisma CLI + dotenv (engines)
