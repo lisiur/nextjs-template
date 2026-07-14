@@ -51,6 +51,10 @@ fi
 # comments in scripts/nginx.conf).
 cp -a "$SRC_ROOT/scripts/nginx.conf" "$OUT/nginx_template.conf"
 
+# Ship the deploy runbook so the operator has the first-time / update / wipe
+# procedures, env-var reference, and nginx routing notes on the host.
+cp -a "$SRC_ROOT/DEPLOY.md" "$OUT/DEPLOY.md"
+
 # Ship Prisma schema + migrations + config so `npm run migrate` works on the
 # server after `npm install`. The prisma CLI is a devDependency (pinned to
 # match the generated client baked into each standalone server.js); the CLI
