@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # Assembles Next.js standalone deploy artifacts under $OUT and packs them into
-# a deployable tarball next101-deploy-<sha>.tar.gz. Run after `pnpm build`.
+# a deployable tarball platform-deploy-<sha>.tar.gz. Run after `pnpm build`.
 # Used by .github/workflows/build.yml, but works standalone locally too.
 set -eu
 
@@ -76,7 +76,7 @@ prisma_ver=$(node -p "require('$SRC_ROOT/packages/service/package.json').devDepe
 dotenv_ver=$(node -p "require('$SRC_ROOT/packages/service/package.json').devDependencies.dotenv")
 cat >"$OUT/package.json" <<EOF
 {
-  "name": "next101-deploy",
+  "name": "platform-deploy",
   "private": true,
   "scripts": {
     "migrate": "prisma migrate deploy",
@@ -97,6 +97,6 @@ find "$OUT" -maxdepth 3 -type d | sort | head -80
 # written next to the deploy dir. Produces the same artifact locally that the
 # GitHub Actions workflow ships.
 sha=$(git -C "$SRC_ROOT" rev-parse --short HEAD 2>/dev/null || echo local)
-tarball="$SRC_ROOT/next101-deploy-${sha}.tar.gz"
+tarball="$SRC_ROOT/platform-deploy-${sha}.tar.gz"
 tar -czf "$tarball" -C "$OUT" .
 echo "==> Packed $tarball"

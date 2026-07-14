@@ -1,4 +1,4 @@
-# next101
+# platform
 
 A multi-tenant admin and organization platform built as a pnpm monorepo: a typed Hono REST API, two Next.js frontends, and shared packages for UI, frontend utilities, and permissions.
 

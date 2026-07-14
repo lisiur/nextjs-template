@@ -109,7 +109,7 @@ const app = openAPIApp
 openAPIApp.doc("/openapi.json", {
   openapi: "3.0.0",
   info: {
-    title: "Next101 API",
+    title: "Platform API",
     version: "1.0.0",
     description: "Hono REST API with OpenAPI support",
   },

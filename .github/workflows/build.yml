@@ -1,13 +1,13 @@
 name: build
 
-# Builds the next101 monorepo on a native linux/amd64 runner and packages the
+# Builds the platform monorepo on a native linux/amd64 runner and packages the
 # Next.js standalone artifacts into a self-contained tarball ready to deploy
 # under PM2 (ecosystem.standalone.cjs + .env.production.example bundled in).
 # Native deps (argon2, Prisma engines, ...) install
 # for the target arch on the runner.
 #
 # Outputs:
-#   - Workflow artifact: next101-deploy-<sha>.tar.gz  (every run)
+#   - Workflow artifact: platform-deploy-<sha>.tar.gz  (every run)
 #   - Release asset:       attached to v* tags
 
 on:
@@ -69,8 +69,8 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: next101-deploy-${{ steps.assemble.outputs.sha }}
-          path: next101-deploy-*.tar.gz
+          name: platform-deploy-${{ steps.assemble.outputs.sha }}
+          path: platform-deploy-*.tar.gz
           if-no-files-found: error
           retention-days: 30
 
@@ -78,4 +78,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: next101-deploy-*.tar.gz
+          files: platform-deploy-*.tar.gz
