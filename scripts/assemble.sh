@@ -59,19 +59,13 @@ cp -a "$SRC_ROOT/DEPLOY.md" "$OUT/DEPLOY.md"
 # server after `npm install`. The prisma CLI is a devDependency (pinned to
 # match the generated client baked into each standalone server.js); the CLI
 # itself is NOT traced into Next.js standalone output. Seeding is handled
-# separately — the gateway self-seeds on boot from app.ts, gated by the seed
-# fingerprint so it runs once per seed.ts revision.
+# separately — the gateway self-seeds on boot from app.ts, gated by the
+# presence of the admin Application row (one-shot bootstrap).
 mkdir -p "$OUT/prisma"
 cp -a "$SRC_ROOT/packages/service/prisma/migrations" "$OUT/prisma/migrations"
 cp -a "$SRC_ROOT/packages/service/prisma/schema.prisma" "$OUT/prisma/schema.prisma"
 cp -a "$SRC_ROOT/packages/service/prisma/load-env.ts" "$OUT/prisma/load-env.ts"
 cp -a "$SRC_ROOT/packages/service/prisma.config.ts" "$OUT/prisma.config.ts"
-
-# Record the seed.ts source fingerprint. ecosystem.config.js reads this
-# file at boot and injects it as SEED_FINGERPRINT into each app's env so the
-# service self-seeds once per seed.ts revision.
-node "$SRC_ROOT/scripts/seed-fingerprint.mjs" > "$OUT/seed.fingerprint"
-echo "==> Seed fingerprint: $(cat "$OUT/seed.fingerprint")"
 
 # Generate a minimal deploy package.json. The prisma/dotenv versions are read
 # from the service package so they never drift from the generated client.

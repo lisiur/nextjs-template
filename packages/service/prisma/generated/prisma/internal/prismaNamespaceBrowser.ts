@@ -77,8 +77,7 @@ export const ModelName = {
   NotificationChannel: 'NotificationChannel',
   NotificationTemplate: 'NotificationTemplate',
   Notification: 'Notification',
-  RateLimitOverride: 'RateLimitOverride',
-  SeedMigration: 'SeedMigration'
+  RateLimitOverride: 'RateLimitOverride'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -542,14 +541,6 @@ export const RateLimitOverrideScalarFieldEnum = {
 } as const
 
 export type RateLimitOverrideScalarFieldEnum = (typeof RateLimitOverrideScalarFieldEnum)[keyof typeof RateLimitOverrideScalarFieldEnum]
-
-
-export const SeedMigrationScalarFieldEnum = {
-  fingerprint: 'fingerprint',
-  appliedAt: 'appliedAt'
-} as const
-
-export type SeedMigrationScalarFieldEnum = (typeof SeedMigrationScalarFieldEnum)[keyof typeof SeedMigrationScalarFieldEnum]
 
 
 export const SortOrder = {
