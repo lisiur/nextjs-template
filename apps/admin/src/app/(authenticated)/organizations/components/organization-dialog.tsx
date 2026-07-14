@@ -14,6 +14,8 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  ImageCropper,
+  type ImageCropperRef,
   Input,
   Textarea,
 } from "@repo/ui";
@@ -69,12 +71,15 @@ export function OrganizationDialog({
   const t = useTranslations("Organizations");
   const isEdit = !!organization;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cropperRef = useRef<ImageCropperRef>(null);
   const logoObjectUrlRef = useRef<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>(
     organization?.logo ?? "",
   );
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
   const [logoRemoved, setLogoRemoved] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
 
   const {
     register,
@@ -111,6 +116,21 @@ export function OrganizationDialog({
       toast.error(t("logoTooLarge"));
       return;
     }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropSrc(reader.result as string);
+      setCropOpen(true);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function handleCropConfirm() {
+    const file = await cropperRef.current?.getCroppedFile(
+      { width: 128, height: 128, type: "image/png" },
+      "logo.png",
+    );
+    if (!file) return;
+
     clearLogoObjectUrl();
     const previewUrl = URL.createObjectURL(file);
     logoObjectUrlRef.current = previewUrl;
@@ -118,6 +138,18 @@ export function OrganizationDialog({
     setLogoRemoved(false);
     setLogoPreview(previewUrl);
     setValue("logo", previewUrl, { shouldValidate: true });
+    setCropOpen(false);
+  }
+
+  function handleCropOpenChange(open: boolean) {
+    setCropOpen(open);
+    if (!open) {
+      setCropSrc(null);
+      cropperRef.current?.reset();
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
   }
 
   function handleRemoveLogo() {
@@ -187,99 +219,150 @@ export function OrganizationDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? t("editOrg") : t("addOrg")}</DialogTitle>
-          <DialogDescription>
-            {isEdit ? t("editOrgDescription") : t("addOrgDescription")}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogBody>
-          <form
-            id="organization-dialog-form"
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-4"
-          >
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="name">{t("name")}</FieldLabel>
-                <Input id="name" {...register("name")} />
-                <FieldError errors={errors.name ? [errors.name] : undefined} />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="slug">{t("slug")}</FieldLabel>
-                <Input id="slug" {...register("slug")} />
-                <FieldError errors={errors.slug ? [errors.slug] : undefined} />
-              </Field>
-              <Field>
-                <FieldLabel>{t("logo")}</FieldLabel>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-                {logoPreview ? (
-                  <div className="relative inline-block">
-                    <Image
-                      src={logoPreview}
-                      alt="Logo preview"
-                      width={80}
-                      height={80}
-                      className="rounded-lg border object-cover"
-                      unoptimized
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      className="absolute -top-2 -right-2 h-6 w-6"
-                      onClick={handleRemoveLogo}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{isEdit ? t("editOrg") : t("addOrg")}</DialogTitle>
+            <DialogDescription>
+              {isEdit ? t("editOrgDescription") : t("addOrgDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogBody>
+            <form
+              id="organization-dialog-form"
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
+              <FieldGroup>
+                <Field>
+                  <FieldLabel htmlFor="name">{t("name")}</FieldLabel>
+                  <Input id="name" {...register("name")} />
+                  <FieldError
+                    errors={errors.name ? [errors.name] : undefined}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="slug">{t("slug")}</FieldLabel>
+                  <Input id="slug" {...register("slug")} />
+                  <FieldError
+                    errors={errors.slug ? [errors.slug] : undefined}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>{t("logo")}</FieldLabel>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                  <div className="flex items-center gap-6">
+                    <div className="h-20 w-20 shrink-0">
+                      {logoPreview ? (
+                        <Image
+                          src={logoPreview}
+                          alt="Logo preview"
+                          width={80}
+                          height={80}
+                          className="rounded-lg border object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="flex h-20 w-20 items-center justify-center rounded-lg border bg-muted">
+                          <ImagePlus className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          {t("chooseFile")}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {t("logoHint")}
+                      </p>
+                    </div>
                   </div>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <ImagePlus className="h-4 w-4" />
-                    {t("uploadLogo")}
-                  </Button>
-                )}
-                <FieldError errors={errors.logo ? [errors.logo] : undefined} />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="metadata">{t("metadata")}</FieldLabel>
-                <Textarea id="metadata" {...register("metadata")} rows={3} />
-                <FieldError
-                  errors={errors.metadata ? [errors.metadata] : undefined}
-                />
-              </Field>
-            </FieldGroup>
-          </form>
-        </DialogBody>
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleOpenChange(false)}
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form="organization-dialog-form"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? t("saving") : t("save")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+                  <FieldError
+                    errors={errors.logo ? [errors.logo] : undefined}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="metadata">{t("metadata")}</FieldLabel>
+                  <Textarea id="metadata" {...register("metadata")} rows={3} />
+                  <FieldError
+                    errors={errors.metadata ? [errors.metadata] : undefined}
+                  />
+                </Field>
+              </FieldGroup>
+            </form>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleOpenChange(false)}
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              type="submit"
+              form="organization-dialog-form"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? t("saving") : t("save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={cropOpen} onOpenChange={handleCropOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("cropLogo")}</DialogTitle>
+            <DialogDescription>{t("cropLogoDescription")}</DialogDescription>
+          </DialogHeader>
+          <DialogBody>
+            {cropSrc && (
+              <ImageCropper
+                ref={cropperRef}
+                src={cropSrc}
+                aspect={1}
+                keepSelection
+              />
+            )}
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => cropperRef.current?.reset()}
+            >
+              {t("resetCrop")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleCropOpenChange(false)}
+            >
+              {t("cancel")}
+            </Button>
+            <Button type="button" size="sm" onClick={handleCropConfirm}>
+              {t("save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
