@@ -94,6 +94,14 @@ class RateLimitRegistry {
     return [...this.limiters.keys()];
   }
 
+  listLimiterConfigs(): { name: string; max: number; windowMs: number }[] {
+    return [...this.limiters.values()].map((entry) => ({
+      name: entry.name,
+      max: entry.max,
+      windowMs: entry.windowMs,
+    }));
+  }
+
   resolvePolicy(name: string, subject: string): RateLimitPolicy {
     const entry = this.limiters.get(name);
     if (!entry) {

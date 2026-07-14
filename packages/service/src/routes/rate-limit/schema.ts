@@ -68,19 +68,22 @@ export const bucketStatusSchema = z
 
 export const rateLimitStatusSchema = z
   .object({
-    limiters: z
-      .array(
-        z.object({
-          name: z.string(),
-          max: z.number().int(),
-          windowMs: z.number().int(),
-        }),
-      )
-      .openapi("Configured rate limiters"),
     blockedCount: z.number().int().openapi({ example: 2 }),
     buckets: z.array(bucketStatusSchema),
   })
   .openapi("RateLimitStatus");
+
+export const rateLimitSettingsSchema = z
+  .array(
+    z
+      .object({
+        name: z.string().openapi({ example: "auth" }),
+        max: z.number().int().openapi({ example: 10 }),
+        windowMs: z.number().int().openapi({ example: 60000 }),
+      })
+      .openapi("RateLimitLimiterConfig"),
+  )
+  .openapi("RateLimitSettings");
 
 export const releaseBodySchema = z.object({
   limiter: z.string().optional().openapi({ example: "auth" }),

@@ -136,6 +136,10 @@ export async function deleteOverride(subject: string) {
   return true;
 }
 
+export function getRateLimitSettings() {
+  return rateLimitRegistry.listLimiterConfigs();
+}
+
 export function getRateLimitStatus(query: RateLimitStatusQuery) {
   const snapshot = rateLimitRegistry.snapshot(query.limiter);
   let buckets = snapshot.flatMap((l) => l.buckets);
@@ -143,11 +147,6 @@ export function getRateLimitStatus(query: RateLimitStatusQuery) {
     buckets = buckets.filter((b) => b.blocked);
   }
   return {
-    limiters: snapshot.map((l) => ({
-      name: l.name,
-      max: l.max,
-      windowMs: l.windowMs,
-    })),
     blockedCount: buckets.filter((b) => b.blocked).length,
     buckets: buckets.map((b) => ({
       ...b,

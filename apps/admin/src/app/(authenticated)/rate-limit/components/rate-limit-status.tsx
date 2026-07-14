@@ -40,9 +40,14 @@ interface Bucket {
 }
 
 interface StatusResponse {
-  limiters: { name: string; max: number; windowMs: number }[];
   blockedCount: number;
   buckets: Bucket[];
+}
+
+interface LimiterConfig {
+  name: string;
+  max: number;
+  windowMs: number;
 }
 
 const LIMITER_OPTIONS = ["all", "global", "auth"] as const;
@@ -63,6 +68,14 @@ export function RateLimitStatus() {
         },
       });
       return (await res.json()) as StatusResponse;
+    },
+  });
+
+  const { data: limiters } = useQuery({
+    queryKey: ["rate-limit-settings"],
+    queryFn: async () => {
+      const res = await appClient.api["rate-limit"].settings.$get();
+      return (await res.json()) as LimiterConfig[];
     },
   });
 
@@ -126,9 +139,9 @@ export function RateLimitStatus() {
         )}
       </div>
 
-      {data?.limiters && data.limiters.length > 0 && (
+      {limiters && limiters.length > 0 && (
         <div className="flex flex-wrap gap-3">
-          {data.limiters.map((l) => (
+          {limiters.map((l) => (
             <Card key={l.name} size="sm" className="basis-48 flex-1">
               <CardContent>
                 <div className="flex items-center justify-between gap-3">
