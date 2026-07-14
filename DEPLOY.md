@@ -77,9 +77,9 @@ only if a native module was recompiled.
 
 ## nginx
 
-Merge the `location` blocks from [`scripts/nginx.conf`](scripts/nginx.conf) into
-the existing `server { }` block that terminates TLS for your domain, changing
-`server_name` to match. Then:
+The tarball ships `nginx_template.conf` (source: [`scripts/nginx.conf`](scripts/nginx.conf)).
+Merge its `location` blocks into the existing `server { }` block that terminates
+TLS for your domain, changing `server_name` to match. Then:
 
 ```bash
 sudo nginx -t && sudo nginx -s reload
