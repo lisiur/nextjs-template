@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { template: `%s | ${name}`, default: name },
     description: "Organization portal",
-    ...(favicon ? { icons: { icon: [{ url: favicon }] } } : {}),
+    icons: { icon: [{ url: favicon ?? "favicon.svg" }] },
   };
 }
 

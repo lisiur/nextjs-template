@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { name, favicon } = await getAppMeta();
   return {
     title: { template: `%s | ${name}`, default: name },
-    ...(favicon ? { icons: { icon: [{ url: favicon }] } } : {}),
+    icons: { icon: [{ url: favicon ?? "favicon.svg" }] },
   };
 }
 
