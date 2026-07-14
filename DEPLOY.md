@@ -31,9 +31,11 @@ the Node runtime: **no git, pnpm, or build toolchain** on the host.
 ```bash
 mkdir platform && cd platform
 
-# Download the tarball from the GitHub release for the tag you're deploying.
+# Download the latest release tarball. To pin a specific tag, replace
+# `latest/download/platform-deploy-latest.tar.gz` with
+# `download/<tag>/platform-deploy-<tag>.tar.gz`.
 wget -O deploy.tar.gz \
-  https://github.com/lisiur/platform/releases/download/v1.0.0/platform-deploy-<version>.tar.gz
+  https://github.com/lisiur/platform/releases/latest/download/platform-deploy-latest.tar.gz
 tar -xzf deploy.tar.gz && rm deploy.tar.gz
 
 cp .env.production.example .env.production
@@ -58,9 +60,9 @@ Then point nginx at it (see below) and reload.
 ```bash
 cd platform
 
-# Download the tarball for the new release tag.
+# Download the latest release tarball.
 wget -O deploy.tar.gz \
-  https://github.com/lisiur/platform/releases/download/v1.1.0/platform-deploy-<version>.tar.gz
+  https://github.com/lisiur/platform/releases/latest/download/platform-deploy-latest.tar.gz
 
 # Extract over the current deploy dir — your .env.production is preserved
 # (the tarball ships only .env.production.example).
@@ -87,11 +89,10 @@ cd platform
 
 pm2 delete all                              # stop & remove running processes
 
-# Download the tarball for the release tag you're deploying and extract it over
-# the current dir — .env.production is preserved (the tarball ships only the
-# .example).
+# Download the latest release tarball and extract it over the current dir —
+# .env.production is preserved (the tarball ships only the .example).
 wget -O deploy.tar.gz \
-  https://github.com/lisiur/platform/releases/download/v2.0.0/platform-deploy-<version>.tar.gz
+  https://github.com/lisiur/platform/releases/latest/download/platform-deploy-latest.tar.gz
 tar -xzf deploy.tar.gz && rm deploy.tar.gz
 
 npm install                                 # prisma CLI + dotenv (engines)
