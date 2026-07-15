@@ -1,8 +1,11 @@
+import { getConnInfo } from "@hono/node-server/conninfo";
 import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
+import { resolveClientIp } from "#lib/client-ip";
 import { rateLimitRegistry } from "#lib/rate-limit-registry";
 import { RateLimitStore } from "#lib/rate-limit-store";
 import { getSessionFromHeaders } from "#lib/session";
+import { getTrustSpecSync } from "#services/rate-limit.service";
 import { eventBus } from "#states/event-bus";
 
 export type RateLimiterOptions = {
@@ -13,12 +16,20 @@ export type RateLimiterOptions = {
   enabled?: boolean;
 };
 
-function getClientIp(c: Context): string {
-  const forwarded = c.req.header("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
+function getPeerIp(c: Context): string | null {
+  try {
+    return getConnInfo(c).remote.address ?? null;
+  } catch {
+    return null;
   }
-  return c.req.header("x-real-ip") ?? "unknown";
+}
+
+function getClientIp(c: Context): string {
+  const peerIp = getPeerIp(c);
+  const xff = c.req.header("x-forwarded-for");
+  const xRealIp = c.req.header("x-real-ip");
+  const trust = getTrustSpecSync();
+  return resolveClientIp({ peerIp, xForwardedFor: xff, xRealIp, trust });
 }
 
 export function createRateLimiter(options: RateLimiterOptions) {

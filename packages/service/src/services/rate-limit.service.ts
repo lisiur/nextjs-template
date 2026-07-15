@@ -1,7 +1,10 @@
+import type { TrustSpec } from "#lib/client-ip";
+import { DEFAULT_TRUST, parseTrust } from "#lib/client-ip";
 import type { OverrideRecord } from "#lib/rate-limit-registry";
 import { rateLimitRegistry } from "#lib/rate-limit-registry";
 import { rateLimitRepository } from "#repositories/rate-limit.repository";
 import { systemConfigRepository } from "#repositories/system-config.repository";
+import { rateLimitCache } from "#states/cache";
 import { eventBus } from "#states/event-bus";
 
 export type RateLimitStatusQuery = {
@@ -84,6 +87,10 @@ async function loadRateLimitDefaults(): Promise<RateLimitDefaults> {
     }
   }
 
+  const trustProxy = map.get("trustProxy");
+  const trustSpec = parseTrust(trustProxy ?? DEFAULT_TRUST);
+  rateLimitCache.set("trustProxy", trustSpec);
+
   return { enabled, limiters };
 }
 
@@ -101,6 +108,17 @@ export async function initRateLimitDefaults() {
 
 export async function reloadRateLimitDefaults() {
   applyRateLimitDefaults(await loadRateLimitDefaults());
+}
+
+export async function reloadRateLimitDefaultsAndBroadcast() {
+  await reloadRateLimitDefaults();
+  eventBus.broadcast({ type: "rate_limit.updated", appId: "admin" });
+}
+
+export function getTrustSpecSync(): TrustSpec {
+  return (
+    rateLimitCache.get<TrustSpec>("trustProxy") ?? parseTrust(DEFAULT_TRUST)
+  );
 }
 
 export async function listOverrides() {

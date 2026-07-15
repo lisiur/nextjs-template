@@ -7,10 +7,9 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { reloadRateLimitDefaults } from "#services/rate-limit.service";
+import { reloadRateLimitDefaultsAndBroadcast } from "#services/rate-limit.service";
 import { assertAccess } from "#services/role-permission.service";
 import { batchUpsertConfigs } from "#services/system-config.service";
-import { eventBus } from "#states/event-bus";
 import { batchUpsertBodySchema, systemConfigItemSchema } from "./schema";
 
 export const batchUpsertConfigsRoute = defineOpenAPIRoute({
@@ -49,8 +48,7 @@ export const batchUpsertConfigsRoute = defineOpenAPIRoute({
     const configs = await batchUpsertConfigs(items);
 
     if (items.some((i: { group: string }) => i.group === "rate-limit")) {
-      await reloadRateLimitDefaults();
-      eventBus.broadcast({ type: "rate_limit.updated", appId: "admin" });
+      await reloadRateLimitDefaultsAndBroadcast();
     }
 
     await logAudit({

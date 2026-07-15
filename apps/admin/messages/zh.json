@@ -582,7 +582,8 @@
         "rateLimitGlobalMax": "全局 — 最大请求数",
         "rateLimitGlobalWindowMs": "全局 — 时间窗口（毫秒）",
         "rateLimitAuthMax": "认证 — 最大请求数",
-        "rateLimitAuthWindowMs": "认证 — 时间窗口（毫秒）"
+        "rateLimitAuthWindowMs": "认证 — 时间窗口（毫秒）",
+        "rateLimitTrustProxy": "可信代理链"
       },
       "fieldsDesc": {
         "enableRegistration": "允许新用户注册",
@@ -594,7 +595,8 @@
         "rateLimitGlobalMax": "全局所有限流器每个时间窗口的最大请求数",
         "rateLimitGlobalWindowMs": "全局限流器的时间窗口大小（毫秒）",
         "rateLimitAuthMax": "认证相关接口（登录、注册等）每个时间窗口的最大请求数",
-        "rateLimitAuthWindowMs": "认证限流器的时间窗口大小（毫秒）"
+        "rateLimitAuthWindowMs": "认证限流器的时间窗口大小（毫秒）",
+        "rateLimitTrustProxy": "可信代理列表，用于 X-Forwarded-For 解析。支持 IP、CIDR（如 10.0.0.0/8）及关键字：loopback、uniquelocal、linklocal、private、all。空/none = 不信任任何代理。"
       }
     }
   },

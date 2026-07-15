@@ -5,12 +5,21 @@ vi.mock("#lib/session", () => ({
   getSessionFromHeaders: vi.fn(),
 }));
 
+vi.mock("#services/rate-limit.service", () => ({
+  getTrustSpecSync: vi.fn(),
+}));
+
+import { DEFAULT_TRUST, parseTrust } from "#lib/client-ip";
 import { rateLimitRegistry } from "#lib/rate-limit-registry";
 import { RateLimitStore } from "#lib/rate-limit-store";
 import { getSessionFromHeaders } from "#lib/session";
 import { createRateLimiter } from "#middleware/rate-limit";
+import { getTrustSpecSync } from "#services/rate-limit.service";
 
 const mockGetSession = vi.mocked(getSessionFromHeaders);
+const mockGetTrustSpec = vi.mocked(getTrustSpecSync);
+
+const defaultTrust = parseTrust(DEFAULT_TRUST);
 
 let nameSeq = 0;
 function createApp(opts: {
@@ -78,6 +87,7 @@ describe("createRateLimiter middleware", () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mockGetSession.mockResolvedValue(null);
+    mockGetTrustSpec.mockReturnValue(defaultTrust);
   });
 
   afterEach(() => {
@@ -108,7 +118,7 @@ describe("createRateLimiter middleware", () => {
     });
   });
 
-  it("keys by ip for anonymous requests", async () => {
+  it("keys by resolved ip for anonymous requests", async () => {
     const app = createApp({ max: 1 });
     const a = await app.request("/ping", {
       headers: { "x-forwarded-for": "1.1.1.1" },
@@ -119,6 +129,36 @@ describe("createRateLimiter middleware", () => {
 
     expect(a.status).toBe(200);
     expect(b.status).toBe(200);
+  });
+
+  it("spoofed XFF with 'none' trust uses XFF as-is for different buckets", async () => {
+    const app = createApp({ max: 1 });
+    mockGetTrustSpec.mockReturnValue(parseTrust("none"));
+
+    const a = await app.request("/ping", {
+      headers: { "x-forwarded-for": "1.2.3.4" },
+    });
+    const b = await app.request("/ping", {
+      headers: { "x-forwarded-for": "5.6.7.8" },
+    });
+
+    expect(a.status).toBe(200);
+    expect(b.status).toBe(200);
+  });
+
+  it("repeated spoofed XFF gets blocked after first request", async () => {
+    const app = createApp({ max: 1 });
+    mockGetTrustSpec.mockReturnValue(parseTrust("all"));
+
+    const a = await app.request("/ping", {
+      headers: { "x-forwarded-for": "1.2.3.4" },
+    });
+    expect(a.status).toBe(200);
+
+    const b = await app.request("/ping", {
+      headers: { "x-forwarded-for": "1.2.3.4" },
+    });
+    expect(b.status).toBe(429);
   });
 
   it("keys by user id when authenticated", async () => {

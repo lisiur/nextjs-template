@@ -8,3 +8,4 @@ export const notificationChannelCache = globalCache.namespace(
 export const notificationTemplateCache = globalCache.namespace(
   "notification:template",
 );
+export const rateLimitCache = globalCache.namespace("rate-limit");

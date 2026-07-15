@@ -582,7 +582,8 @@
         "rateLimitGlobalMax": "Global — Max Requests",
         "rateLimitGlobalWindowMs": "Global — Window (ms)",
         "rateLimitAuthMax": "Auth — Max Requests",
-        "rateLimitAuthWindowMs": "Auth — Window (ms)"
+        "rateLimitAuthWindowMs": "Auth — Window (ms)",
+        "rateLimitTrustProxy": "Trust Proxy Chain"
       },
       "fieldsDesc": {
         "enableRegistration": "Allow new users to register",
@@ -594,7 +595,8 @@
         "rateLimitGlobalMax": "Maximum requests per window across all endpoints",
         "rateLimitGlobalWindowMs": "Window size in milliseconds for the global limiter",
         "rateLimitAuthMax": "Maximum requests per window for auth endpoints (login, signup, etc.)",
-        "rateLimitAuthWindowMs": "Window size in milliseconds for the auth limiter"
+        "rateLimitAuthWindowMs": "Window size in milliseconds for the auth limiter",
+        "rateLimitTrustProxy": "Comma-separated list of trusted proxies for X-Forwarded-For resolution. Supports IPs, CIDRs (e.g. 10.0.0.0/8), and keywords: loopback, uniquelocal, linklocal, private, all. Empty/none = trust no proxy."
       }
     }
   },

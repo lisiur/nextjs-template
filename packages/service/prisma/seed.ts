@@ -172,6 +172,16 @@ const systemConfigs = [
     isSecret: false,
     sortOrder: 4,
   },
+  {
+    group: "rate-limit",
+    key: "trustProxy",
+    value: "uniquelocal,loopback,linklocal",
+    type: "string",
+    label: "settings.fields.rateLimitTrustProxy",
+    description: "settings.fieldsDesc.rateLimitTrustProxy",
+    isSecret: false,
+    sortOrder: 5,
+  },
 ];
 
 // --- System Permissions (appId: null) ---

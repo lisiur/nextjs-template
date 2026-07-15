@@ -7,6 +7,7 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
+import { reloadRateLimitDefaultsAndBroadcast } from "#services/rate-limit.service";
 import { assertAccess } from "#services/role-permission.service";
 import { upsertConfig } from "#services/system-config.service";
 import {
@@ -47,6 +48,10 @@ export const upsertConfigRoute = defineOpenAPIRoute({
     const body = c.req.valid("json");
 
     const config = await upsertConfig(group, key, body);
+
+    if (group === "rate-limit") {
+      await reloadRateLimitDefaultsAndBroadcast();
+    }
 
     await logAudit({
       event: "system_config.updated",
