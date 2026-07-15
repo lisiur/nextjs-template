@@ -1,5 +1,6 @@
 "use client";
 
+import type { Application } from "@repo/frontend";
 import { PaginatedTableFrame } from "@repo/frontend";
 import {
   Button,
@@ -23,17 +24,6 @@ import { usePaginatedQuery } from "@/hooks/use-paginated-query";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDate } from "@/utils/date";
-
-interface Application {
-  id: string;
-  name: string;
-  code: string;
-  description?: string | null;
-  logo?: string | null;
-  favicon?: string | null;
-  sortOrder: number;
-  createdAt: string;
-}
 
 export function AppTable() {
   const router = useRouter();

@@ -1,5 +1,6 @@
 "use client";
 
+import type { Application } from "@repo/frontend";
 import { Spinner, Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -11,22 +12,6 @@ import { withApiFeedback } from "@/lib/api/utils";
 import { ApplicationMenuManagement } from "./components/application-menu-management";
 import { ApplicationRoleManagement } from "./components/application-role-management";
 import { ApplicationSettingsForm } from "./components/application-settings-form";
-
-interface Application {
-  id: string;
-  name: string;
-  code: string;
-  description?: string | null;
-  logo?: string | null;
-  favicon?: string | null;
-  copyright?: string | null;
-  icp?: string | null;
-  psif?: string | null;
-  watermarkEnabled: boolean;
-  watermarkConfig?: string | null;
-  sortOrder: number;
-  createdAt: string;
-}
 
 interface ApplicationDetailPageProps {
   params: Promise<{ id: string }>;

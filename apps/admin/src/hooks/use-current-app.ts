@@ -1,20 +1,9 @@
 "use client";
 
+import type { CurrentApplication } from "@repo/frontend";
 import { useQuery } from "@tanstack/react-query";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
-
-interface Application {
-  name: string;
-  code: string;
-  description?: string | null;
-  logo?: string | null;
-  copyright?: string | null;
-  icp?: string | null;
-  psif?: string | null;
-  watermarkEnabled: boolean;
-  watermarkConfig?: string | null;
-}
 
 export function useCurrentApp() {
   const query = useQuery({
@@ -23,7 +12,7 @@ export function useCurrentApp() {
       const res = await withApiFeedback(
         appClient.api.applications.current.$get,
       )();
-      return (await res.json()) as Application;
+      return (await res.json()) as CurrentApplication;
     },
   });
 

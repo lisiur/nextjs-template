@@ -1,19 +1,8 @@
 "use client";
 
+import type { CurrentApplication } from "@repo/frontend";
 import { useQuery } from "@tanstack/react-query";
 import { appClient, useSession } from "@/lib/api";
-
-interface Application {
-  name: string;
-  code: string;
-  description?: string | null;
-  logo?: string | null;
-  copyright?: string | null;
-  icp?: string | null;
-  psif?: string | null;
-  watermarkEnabled: boolean;
-  watermarkConfig?: string | null;
-}
 
 export function useCurrentApp() {
   const session = useSession();
@@ -23,7 +12,7 @@ export function useCurrentApp() {
     queryFn: async () => {
       const res = await appClient.api.applications.current.$get();
       if (!res.ok) throw new Error("Failed to load current application");
-      return (await res.json()) as Application;
+      return (await res.json()) as CurrentApplication;
     },
     enabled: !session.isPending && !!session.data,
   });

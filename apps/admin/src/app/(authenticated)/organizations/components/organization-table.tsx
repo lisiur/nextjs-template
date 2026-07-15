@@ -1,5 +1,6 @@
 "use client";
 
+import type { Organization } from "@repo/frontend";
 import { PaginatedTableFrame } from "@repo/frontend";
 import {
   Button,
@@ -24,16 +25,6 @@ import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDate } from "@/utils/date";
 import { OrganizationDialog } from "./organization-dialog";
-
-interface Organization {
-  id: string;
-  name: string;
-  slug: string;
-  logo?: string | null;
-  metadata?: string | null;
-  createdAt: string;
-  owner?: { id: string; name: string; email: string } | null;
-}
 
 export function OrganizationTable() {
   const t = useTranslations("Organizations");

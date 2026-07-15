@@ -15,8 +15,6 @@
 
 ## Medium Priority
 
-- [ ] **Duplicated `Organization`/`Application` interfaces** redefined in 4+ files
-      (admin table, org hooks, chooser). Extract to shared type.
 - [ ] **`app-client.ts` duplicated** between admin and organization apps — only `APP_CODE`
       + port differ. Move to `packages/frontend`.
 - [ ] **Redundant extractors** — `tryAppId`/`requireAppId` and `tryCurrentApp`/

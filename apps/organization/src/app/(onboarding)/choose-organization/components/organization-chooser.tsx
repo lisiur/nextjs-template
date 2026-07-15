@@ -1,5 +1,6 @@
 "use client";
 
+import type { Organization } from "@repo/frontend";
 import {
   Button,
   Card,
@@ -15,15 +16,6 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSwitchOrganization } from "@/hooks/use-switch-organization";
 import { appClient } from "@/lib/api";
-
-interface Organization {
-  id: string;
-  name: string;
-  slug: string;
-  logo?: string | null;
-  metadata?: string | null;
-  createdAt: string;
-}
 
 export function OrganizationChooser() {
   const router = useRouter();

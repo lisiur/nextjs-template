@@ -43,3 +43,47 @@ export interface MenuTreeNode {
   url: string | null;
   children: MenuTreeNode[];
 }
+
+export interface OrganizationOwner {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  slug: string;
+  logo?: string | null;
+  metadata?: string | null;
+  createdAt: string;
+  owner?: OrganizationOwner | null;
+}
+
+export interface Application {
+  id: string;
+  name: string;
+  code: string;
+  description?: string | null;
+  logo?: string | null;
+  favicon?: string | null;
+  copyright?: string | null;
+  icp?: string | null;
+  psif?: string | null;
+  watermarkEnabled: boolean;
+  watermarkConfig?: string | null;
+  sortOrder: number;
+  createdAt: string;
+}
+
+export interface CurrentApplication {
+  name: string;
+  code: string;
+  description?: string | null;
+  logo?: string | null;
+  copyright?: string | null;
+  icp?: string | null;
+  psif?: string | null;
+  watermarkEnabled: boolean;
+  watermarkConfig?: string | null;
+}

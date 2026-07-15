@@ -1,16 +1,8 @@
 "use client";
 
+import type { Organization } from "@repo/frontend";
 import { useQuery } from "@tanstack/react-query";
 import { appClient, useSession } from "@/lib/api";
-
-interface Organization {
-  id: string;
-  name: string;
-  slug: string;
-  logo?: string | null;
-  metadata?: string | null;
-  createdAt: string;
-}
 
 export function useCurrentOrganization() {
   const { data: session } = useSession();
