@@ -1,0 +1,74 @@
+# Codebase Review — TODO
+
+## High Priority
+
+- [ ] **Response envelope inconsistency** — `signInEmail` returns `{ data, error: null }`
+      (`packages/service/src/routes/auth/signInEmail.ts:39`) while `createOrganization`
+      returns the bare object (`routes/organization/createOrganization.ts:60`). Adopt one
+      contract across all routes.
+- [ ] **WeChat signup bypasses registration gate** — `signUpWithEmail` checks
+      `getRegistrationEnabled()` (`services/auth.service.ts:150`) but `signInWithWechat`
+      creates users unconditionally (`auth.service.ts:329`).
+- [ ] **Boot-time side effects** — `seed()` + `jobExecutor.start()` run at module boot
+      (`src/app.ts:18-35`). Anti-pattern for serverless/standalone Next.js; risks cold-start
+      races. Move to deploy/migration step.
+- [ ] **No email verification** — `emailVerified` set false, never enforced; no verify
+      endpoint in `routes/auth/`. Enforce ownership beyond uniqueness.
+- [ ] **Job queue: no row-level claim / not multi-instance safe** — the scheduler re-queues
+      every due `PENDING` job and there is no atomic "claim" when moving to `PROCESSING`
+      (`lib/queues/job-worker.ts:22`). Multiple API instances will **duplicate-execute**.
+      Add `SELECT … FOR UPDATE SKIP LOCKED` or a conditional `updateMany` on
+      `status = 'PENDING'` before processing. See `ARCHITECTURE.md` §8.
+- [ ] **Rate limit trusts `X-Forwarded-For` blindly** — the subject IP is taken as the first
+      `x-forwarded-for` entry with no validation (`middleware/rate-limit.ts:17`). A client
+      not behind a normalising proxy can **spoof its IP** to evade limits. Validate the
+      header chain / trust only a configured proxy.
+
+## Medium Priority
+
+- [ ] **Duplicated `Organization`/`Application` interfaces** redefined in 4+ files
+      (admin table, org hooks, chooser). Extract to shared type.
+- [ ] **`app-client.ts` duplicated** between admin and organization apps — only `APP_CODE`
+      + port differ. Move to `packages/frontend`.
+- [ ] **Redundant extractors** — `tryAppId`/`requireAppId` and `tryCurrentApp`/
+      `requireCurrentApp` do the same `X-App-Code` lookup. Consolidate.
+- [ ] **Duplicated scope logic** — `PLATFORM_SCOPE_ID` + `RoleScopeType` redefined in both
+      `role.repository.ts` and `role-permission.service.ts`. Centralize.
+- [ ] **`member.role` String** (`schema.prisma:223`) separate from `RoleAssignment` RBAC —
+      two sources of truth for a member's role.
+- [ ] **Rate-limit SSE broadcast hardcodes `appId: "admin"`** (`middleware/rate-limit.ts:57`)
+      — leaks cross-app, ignores request's actual app.
+- [ ] **Client loses RPC type safety** — manual `as` casts (`use-current-organization.ts:24`)
+      instead of inferred types; use `withApiFeedback` consistently.
+- [ ] **Job `retryJob` targets archived jobs** — `POST /api/jobs/:id/retry` looks up the live
+      `Job` table (`services/job.service.ts:81`), but `FAILED` jobs are archived+deleted
+      immediately (`lib/queues/job-worker.ts:78`), so manual retry 404s. Target `JobArchive`
+      and re-create, or skip auto-archive for failed jobs.
+- [ ] **Job archive is non-atomic** — `archiveAndDelete` does `jobArchive.create` then
+      `job.delete` as two separate writes (`repositories/job.repository.ts:129`). A crash
+      between them duplicates the row. Wrap both in `prisma.$transaction`.
+- [ ] **Cache has no TTL** — the LRU is configured with `max` only (`lib/cache.ts:19`);
+      entries never expire by time and live until evicted or manually cleared. Add a
+      `ttl` option (and consider per-namespace TTLs) so stale data can't linger.
+- [ ] **Cache invalidation is coarse (whole-namespace)** — channel/template mutations call
+      `notificationChannelCache.clear()` / `notificationTemplateCache.clear()`, flushing
+      *all* entries instead of the affected key (`services/notification/channel.service.ts:221`).
+      Switch to targeted `delete(key)` to cut redundant DB refetches.
+- [ ] **Rate limit counters are in-memory / not multi-instance safe** — each instance counts
+      independently, so behind a load balancer the effective per-subject limit is ~`N × max`
+      (`lib/rate-limit-store.ts`). Same single-process constraint as Jobs/Cache; an external
+      store (Redis) or shared Postgres counter is needed before scaling horizontally.
+
+## Low Priority
+
+- [ ] **`impersonatedBy`** field on Session (`schema.prisma:43`) appears unused —
+      implement or remove.
+- [ ] **Job `priority` is informational only** — stored and surfaced in the API but does not
+      affect execution order (`p-queue` runs FIFO). Either wire priority into queue ordering
+      or drop the field/docs claiming it.
+- [ ] **Cache `getOrSet` is unused and not stampede-safe** — the cache-aside helper exists
+      (`lib/cache.ts:73`) but has no callers; concurrent misses each fetch independently.
+      Either adopt it (with in-flight promise de-dup) or remove it.
+- [ ] **Cache `get<T>()` is an unchecked cast** — `set(key, unknown)` stores untyped and
+      `get<T>()` blindly casts (`lib/cache.ts:40-48`). A wrong `T` at the read site compiles
+      but returns garbage; keep read/write types aligned or add a typed wrapper.
