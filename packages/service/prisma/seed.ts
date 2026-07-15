@@ -175,7 +175,7 @@ const systemConfigs = [
   {
     group: "rate-limit",
     key: "trustProxy",
-    value: "uniquelocal,loopback,linklocal",
+    value: "uniqueLocal,loopback,linkLocal",
     type: "string",
     label: "settings.fields.rateLimitTrustProxy",
     description: "settings.fieldsDesc.rateLimitTrustProxy",

@@ -1,13 +1,13 @@
 import ipaddr from "ipaddr.js";
 
-export const DEFAULT_TRUST = "uniquelocal,loopback,linklocal";
+export const DEFAULT_TRUST = "uniqueLocal,loopback,linkLocal";
 
 export type TrustRule =
   | { kind: "ip"; ip: ipaddr.IPv4 | ipaddr.IPv6 }
   | { kind: "cidr"; ip: ipaddr.IPv4 | ipaddr.IPv6; prefixLength: number }
   | {
       kind: "keyword";
-      name: "loopback" | "uniquelocal" | "linklocal" | "private" | "all";
+      name: "loopback" | "uniqueLocal" | "linkLocal" | "private" | "all";
     };
 
 export type TrustSpec = {
@@ -22,12 +22,7 @@ function isBuiltinTrusted(
     return true;
   return spec.rules.some((r) => {
     if (r.kind === "keyword") {
-      const range = ip.range();
-      if (r.name === "loopback" && range === "loopback") return true;
-      if (r.name === "uniquelocal" && range === "uniqueLocal") return true;
-      if (r.name === "linklocal" && range === "linkLocal") return true;
-      if (r.name === "private" && range === "private") return true;
-      return false;
+      return ip.range() === r.name;
     }
     if (r.kind === "ip") {
       if (ip.kind() !== r.ip.kind()) return false;
@@ -57,8 +52,8 @@ export function parseTrust(raw?: string): TrustSpec {
   for (const token of tokens) {
     if (
       token === "loopback" ||
-      token === "uniquelocal" ||
-      token === "linklocal" ||
+      token === "uniqueLocal" ||
+      token === "linkLocal" ||
       token === "private" ||
       token === "all"
     ) {

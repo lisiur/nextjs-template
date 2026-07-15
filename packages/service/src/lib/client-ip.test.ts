@@ -25,10 +25,10 @@ describe("parseTrust", () => {
   });
 
   it("parses keywords", () => {
-    const t = parseTrust("loopback,uniquelocal,linklocal");
+    const t = parseTrust("loopback,uniqueLocal,linkLocal");
     expect(t.rules).toContainEqual({ kind: "keyword", name: "loopback" });
-    expect(t.rules).toContainEqual({ kind: "keyword", name: "uniquelocal" });
-    expect(t.rules).toContainEqual({ kind: "keyword", name: "linklocal" });
+    expect(t.rules).toContainEqual({ kind: "keyword", name: "uniqueLocal" });
+    expect(t.rules).toContainEqual({ kind: "keyword", name: "linkLocal" });
   });
 
   it("parses explicit CIDR", () => {
@@ -103,7 +103,7 @@ describe("resolveClientIp", () => {
       peerIp: "fd00::1",
       xForwardedFor: "8.8.8.8",
       xRealIp: undefined,
-      trust: makeTrust("uniquelocal"),
+      trust: makeTrust("uniqueLocal"),
     });
     expect(result).toBe("8.8.8.8");
   });
@@ -113,7 +113,7 @@ describe("resolveClientIp", () => {
       peerIp: "169.254.1.1",
       xForwardedFor: "8.8.8.8",
       xRealIp: undefined,
-      trust: makeTrust("linklocal"),
+      trust: makeTrust("linkLocal"),
     });
     expect(result).toBe("8.8.8.8");
   });
@@ -123,7 +123,7 @@ describe("resolveClientIp", () => {
       peerIp: "240.0.0.1",
       xForwardedFor: "8.8.8.8",
       xRealIp: undefined,
-      trust: makeTrust("linklocal"),
+      trust: makeTrust("linkLocal"),
     });
     expect(result).toBe("240.0.0.1");
   });
