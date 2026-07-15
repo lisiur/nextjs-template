@@ -1,4 +1,5 @@
 import { HTTPException } from "hono/http-exception";
+import type { Principal } from "#extractors/session";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 import {
@@ -186,6 +187,51 @@ export async function getUserPermissions(
   return permissions.map((p) => p.code);
 }
 
+export async function getAllUserPermissionCodes(
+  userId: string,
+): Promise<string[]> {
+  const permissions = await prisma.permission.findMany({
+    where: {
+      rolePermissions: {
+        some: {
+          role: {
+            roleAssignments: {
+              some: { userId },
+            },
+          },
+        },
+      },
+    },
+    select: { code: true },
+  });
+
+  return permissions.map((p) => p.code);
+}
+
+export async function getUserPermissionCatalog(userId: string) {
+  return prisma.permission.findMany({
+    where: {
+      rolePermissions: {
+        some: {
+          role: {
+            roleAssignments: {
+              some: { userId },
+            },
+          },
+        },
+      },
+    },
+    select: {
+      id: true,
+      code: true,
+      name: true,
+      group: true,
+      description: true,
+    },
+    orderBy: [{ group: "asc" }, { name: "asc" }],
+  });
+}
+
 function matchSinglePermission(pattern: string, permission: string): boolean {
   if (pattern === "*") return true;
   if (pattern.endsWith("::*")) {
@@ -241,6 +287,38 @@ export async function assertPermission(
 ) {
   const allowed = await checkPermission(userId, permission, scope);
   if (!allowed) {
+    throw new HTTPException(403, { message: "Permission denied" });
+  }
+}
+
+function enforceTokenBinding(
+  token: { organizationId: string | null; appId: string | null },
+  scope?: PermissionScope,
+) {
+  if (token.organizationId && token.organizationId !== scope?.organizationId) {
+    throw new HTTPException(403, { message: "Permission denied" });
+  }
+  if (token.appId && token.appId !== scope?.appId) {
+    throw new HTTPException(403, { message: "Permission denied" });
+  }
+}
+
+export async function assertAccess(
+  principal: Principal,
+  permission: string,
+  scope?: PermissionScope,
+) {
+  if (principal.kind === "user") {
+    return assertPermission(principal.user.id, permission, scope);
+  }
+
+  enforceTokenBinding(principal.token, scope);
+
+  if (!matchPermission(principal.scopes, permission)) {
+    throw new HTTPException(403, { message: "Permission denied" });
+  }
+
+  if (!(await checkPermission(principal.ownerId, permission, scope))) {
     throw new HTTPException(403, { message: "Permission denied" });
   }
 }

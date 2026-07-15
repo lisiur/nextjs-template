@@ -116,6 +116,50 @@
       "passwordsMismatch": "Passwords do not match"
     }
   },
+  "Tokens": {
+    "title": "API Tokens",
+    "description": "Manage your personal access tokens",
+    "create": "Create Token",
+    "createDescription": "Create a new personal API token. The token string will only be shown once.",
+    "creating": "Creating...",
+    "revealTitle": "Token Created",
+    "revealDescription": "Copy your token now. For security reasons, it will not be shown again.",
+    "revealWarning": "Store this token securely. You will not be able to see it again.",
+    "tokenLabel": "Access Token",
+    "copy": "Copy",
+    "copied": "Copied to clipboard",
+    "done": "Done",
+    "cancel": "Cancel",
+    "revoke": "Revoke",
+    "confirmRevoke": "Are you sure you want to revoke",
+    "revoked": "Token revoked",
+    "enabled": "Token enabled",
+    "disabled": "Token disabled",
+    "active": "Active",
+    "inactive": "Inactive",
+    "enable": "Enable",
+    "disable": "Disable",
+    "allScopes": "All Scopes",
+    "allScopesDescription": "All permission scopes for {name}",
+    "exampleCurl": "cURL",
+    "exampleNu": "Nushell",
+    "exampleJs": "JavaScript",
+    "examplePython": "Python",
+    "copyExample": "Copy",
+    "exampleCopied": "Copied to clipboard",
+    "empty": "No API tokens yet. Create one to get started.",
+    "fields": {
+      "name": "Name",
+      "prefix": "Prefix",
+      "scopes": "Scopes",
+      "status": "Status",
+      "expires": "Expires",
+      "lastUsed": "Last Used",
+      "actions": "Actions",
+      "expiry": "Expires At",
+      "expiryHint": "Leave empty for a token that never expires."
+    }
+  },
   "Header": {
     "appearance": "Appearance",
     "language": "Language"
@@ -310,6 +354,7 @@
     "departments": "Departments",
     "settings": "Settings",
     "profile": "Profile",
+    "tokens": "API Tokens",
     "switchOrganization": "Switch Organization",
     "switchSuccess": "Organization switched",
     "registerOrganization": "Register Organization",
@@ -326,7 +371,10 @@
       "selected": "Selected",
       "noSelected": "No permissions selected",
       "clearAll": "Clear all",
-      "remove": "Remove {name}"
+      "remove": "Remove {name}",
+      "addPermissions": "Add Permissions",
+      "selectPermissionsTitle": "Select Permissions",
+      "done": "Done"
     },
     "dataTablePagination": {
       "showing": "Showing",

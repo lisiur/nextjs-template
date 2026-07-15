@@ -300,6 +300,7 @@ export type ApplicationWhereInput = {
   roles?: Prisma.RoleListRelationFilter
   permissions?: Prisma.PermissionListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  apiTokens?: Prisma.ApiTokenListRelationFilter
 }
 
 export type ApplicationOrderByWithRelationInput = {
@@ -322,6 +323,7 @@ export type ApplicationOrderByWithRelationInput = {
   roles?: Prisma.RoleOrderByRelationAggregateInput
   permissions?: Prisma.PermissionOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  apiTokens?: Prisma.ApiTokenOrderByRelationAggregateInput
 }
 
 export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
@@ -347,6 +349,7 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   roles?: Prisma.RoleListRelationFilter
   permissions?: Prisma.PermissionListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
+  apiTokens?: Prisma.ApiTokenListRelationFilter
 }, "id" | "code">
 
 export type ApplicationOrderByWithAggregationInput = {
@@ -413,6 +416,7 @@ export type ApplicationCreateInput = {
   roles?: Prisma.RoleCreateNestedManyWithoutAppInput
   permissions?: Prisma.PermissionCreateNestedManyWithoutAppInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUncheckedCreateInput = {
@@ -435,6 +439,7 @@ export type ApplicationUncheckedCreateInput = {
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutAppInput
   permissions?: Prisma.PermissionUncheckedCreateNestedManyWithoutAppInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenUncheckedCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUpdateInput = {
@@ -457,6 +462,7 @@ export type ApplicationUpdateInput = {
   roles?: Prisma.RoleUpdateManyWithoutAppNestedInput
   permissions?: Prisma.PermissionUpdateManyWithoutAppNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationUncheckedUpdateInput = {
@@ -479,6 +485,7 @@ export type ApplicationUncheckedUpdateInput = {
   roles?: Prisma.RoleUncheckedUpdateManyWithoutAppNestedInput
   permissions?: Prisma.PermissionUncheckedUpdateManyWithoutAppNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUncheckedUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationCreateManyInput = {
@@ -667,6 +674,22 @@ export type ApplicationUpdateOneWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutNotificationsInput, Prisma.ApplicationUpdateWithoutNotificationsInput>, Prisma.ApplicationUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type ApplicationCreateNestedOneWithoutApiTokensInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutApiTokensInput, Prisma.ApplicationUncheckedCreateWithoutApiTokensInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutApiTokensInput
+  connect?: Prisma.ApplicationWhereUniqueInput
+}
+
+export type ApplicationUpdateOneWithoutApiTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutApiTokensInput, Prisma.ApplicationUncheckedCreateWithoutApiTokensInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutApiTokensInput
+  upsert?: Prisma.ApplicationUpsertWithoutApiTokensInput
+  disconnect?: Prisma.ApplicationWhereInput | boolean
+  delete?: Prisma.ApplicationWhereInput | boolean
+  connect?: Prisma.ApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutApiTokensInput, Prisma.ApplicationUpdateWithoutApiTokensInput>, Prisma.ApplicationUncheckedUpdateWithoutApiTokensInput>
+}
+
 export type ApplicationCreateWithoutMenusInput = {
   id?: string
   name: string
@@ -686,6 +709,7 @@ export type ApplicationCreateWithoutMenusInput = {
   roles?: Prisma.RoleCreateNestedManyWithoutAppInput
   permissions?: Prisma.PermissionCreateNestedManyWithoutAppInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUncheckedCreateWithoutMenusInput = {
@@ -707,6 +731,7 @@ export type ApplicationUncheckedCreateWithoutMenusInput = {
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutAppInput
   permissions?: Prisma.PermissionUncheckedCreateNestedManyWithoutAppInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenUncheckedCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationCreateOrConnectWithoutMenusInput = {
@@ -744,6 +769,7 @@ export type ApplicationUpdateWithoutMenusInput = {
   roles?: Prisma.RoleUpdateManyWithoutAppNestedInput
   permissions?: Prisma.PermissionUpdateManyWithoutAppNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutMenusInput = {
@@ -765,6 +791,7 @@ export type ApplicationUncheckedUpdateWithoutMenusInput = {
   roles?: Prisma.RoleUncheckedUpdateManyWithoutAppNestedInput
   permissions?: Prisma.PermissionUncheckedUpdateManyWithoutAppNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUncheckedUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationCreateWithoutPermissionsInput = {
@@ -786,6 +813,7 @@ export type ApplicationCreateWithoutPermissionsInput = {
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
   roles?: Prisma.RoleCreateNestedManyWithoutAppInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUncheckedCreateWithoutPermissionsInput = {
@@ -807,6 +835,7 @@ export type ApplicationUncheckedCreateWithoutPermissionsInput = {
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutAppInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenUncheckedCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationCreateOrConnectWithoutPermissionsInput = {
@@ -844,6 +873,7 @@ export type ApplicationUpdateWithoutPermissionsInput = {
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
   roles?: Prisma.RoleUpdateManyWithoutAppNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutPermissionsInput = {
@@ -865,6 +895,7 @@ export type ApplicationUncheckedUpdateWithoutPermissionsInput = {
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutAppNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUncheckedUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationCreateWithoutRolesInput = {
@@ -886,6 +917,7 @@ export type ApplicationCreateWithoutRolesInput = {
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
   permissions?: Prisma.PermissionCreateNestedManyWithoutAppInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUncheckedCreateWithoutRolesInput = {
@@ -907,6 +939,7 @@ export type ApplicationUncheckedCreateWithoutRolesInput = {
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
   permissions?: Prisma.PermissionUncheckedCreateNestedManyWithoutAppInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenUncheckedCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationCreateOrConnectWithoutRolesInput = {
@@ -944,6 +977,7 @@ export type ApplicationUpdateWithoutRolesInput = {
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
   permissions?: Prisma.PermissionUpdateManyWithoutAppNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutRolesInput = {
@@ -965,6 +999,7 @@ export type ApplicationUncheckedUpdateWithoutRolesInput = {
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
   permissions?: Prisma.PermissionUncheckedUpdateManyWithoutAppNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUncheckedUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationCreateWithoutNotificationsInput = {
@@ -986,6 +1021,7 @@ export type ApplicationCreateWithoutNotificationsInput = {
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
   roles?: Prisma.RoleCreateNestedManyWithoutAppInput
   permissions?: Prisma.PermissionCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationUncheckedCreateWithoutNotificationsInput = {
@@ -1007,6 +1043,7 @@ export type ApplicationUncheckedCreateWithoutNotificationsInput = {
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutAppInput
   permissions?: Prisma.PermissionUncheckedCreateNestedManyWithoutAppInput
+  apiTokens?: Prisma.ApiTokenUncheckedCreateNestedManyWithoutAppInput
 }
 
 export type ApplicationCreateOrConnectWithoutNotificationsInput = {
@@ -1044,6 +1081,7 @@ export type ApplicationUpdateWithoutNotificationsInput = {
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
   roles?: Prisma.RoleUpdateManyWithoutAppNestedInput
   permissions?: Prisma.PermissionUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUpdateManyWithoutAppNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutNotificationsInput = {
@@ -1065,6 +1103,111 @@ export type ApplicationUncheckedUpdateWithoutNotificationsInput = {
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
   roles?: Prisma.RoleUncheckedUpdateManyWithoutAppNestedInput
   permissions?: Prisma.PermissionUncheckedUpdateManyWithoutAppNestedInput
+  apiTokens?: Prisma.ApiTokenUncheckedUpdateManyWithoutAppNestedInput
+}
+
+export type ApplicationCreateWithoutApiTokensInput = {
+  id?: string
+  name: string
+  code: string
+  description?: string | null
+  logo?: string | null
+  favicon?: string | null
+  copyright?: string | null
+  icp?: string | null
+  psif?: string | null
+  watermarkEnabled?: boolean
+  watermarkConfig?: string | null
+  sortOrder?: number
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  menus?: Prisma.MenuCreateNestedManyWithoutAppInput
+  roles?: Prisma.RoleCreateNestedManyWithoutAppInput
+  permissions?: Prisma.PermissionCreateNestedManyWithoutAppInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutAppInput
+}
+
+export type ApplicationUncheckedCreateWithoutApiTokensInput = {
+  id?: string
+  name: string
+  code: string
+  description?: string | null
+  logo?: string | null
+  favicon?: string | null
+  copyright?: string | null
+  icp?: string | null
+  psif?: string | null
+  watermarkEnabled?: boolean
+  watermarkConfig?: string | null
+  sortOrder?: number
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
+  roles?: Prisma.RoleUncheckedCreateNestedManyWithoutAppInput
+  permissions?: Prisma.PermissionUncheckedCreateNestedManyWithoutAppInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutAppInput
+}
+
+export type ApplicationCreateOrConnectWithoutApiTokensInput = {
+  where: Prisma.ApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutApiTokensInput, Prisma.ApplicationUncheckedCreateWithoutApiTokensInput>
+}
+
+export type ApplicationUpsertWithoutApiTokensInput = {
+  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutApiTokensInput, Prisma.ApplicationUncheckedUpdateWithoutApiTokensInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutApiTokensInput, Prisma.ApplicationUncheckedCreateWithoutApiTokensInput>
+  where?: Prisma.ApplicationWhereInput
+}
+
+export type ApplicationUpdateToOneWithWhereWithoutApiTokensInput = {
+  where?: Prisma.ApplicationWhereInput
+  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutApiTokensInput, Prisma.ApplicationUncheckedUpdateWithoutApiTokensInput>
+}
+
+export type ApplicationUpdateWithoutApiTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
+  roles?: Prisma.RoleUpdateManyWithoutAppNestedInput
+  permissions?: Prisma.PermissionUpdateManyWithoutAppNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutAppNestedInput
+}
+
+export type ApplicationUncheckedUpdateWithoutApiTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
+  roles?: Prisma.RoleUncheckedUpdateManyWithoutAppNestedInput
+  permissions?: Prisma.PermissionUncheckedUpdateManyWithoutAppNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutAppNestedInput
 }
 
 
@@ -1077,6 +1220,7 @@ export type ApplicationCountOutputType = {
   roles: number
   permissions: number
   notifications: number
+  apiTokens: number
 }
 
 export type ApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1084,6 +1228,7 @@ export type ApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   roles?: boolean | ApplicationCountOutputTypeCountRolesArgs
   permissions?: boolean | ApplicationCountOutputTypeCountPermissionsArgs
   notifications?: boolean | ApplicationCountOutputTypeCountNotificationsArgs
+  apiTokens?: boolean | ApplicationCountOutputTypeCountApiTokensArgs
 }
 
 /**
@@ -1124,6 +1269,13 @@ export type ApplicationCountOutputTypeCountNotificationsArgs<ExtArgs extends run
   where?: Prisma.NotificationWhereInput
 }
 
+/**
+ * ApplicationCountOutputType without action
+ */
+export type ApplicationCountOutputTypeCountApiTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApiTokenWhereInput
+}
+
 
 export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1145,6 +1297,7 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   roles?: boolean | Prisma.Application$rolesArgs<ExtArgs>
   permissions?: boolean | Prisma.Application$permissionsArgs<ExtArgs>
   notifications?: boolean | Prisma.Application$notificationsArgs<ExtArgs>
+  apiTokens?: boolean | Prisma.Application$apiTokensArgs<ExtArgs>
   _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
@@ -1208,6 +1361,7 @@ export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.Internal
   roles?: boolean | Prisma.Application$rolesArgs<ExtArgs>
   permissions?: boolean | Prisma.Application$permissionsArgs<ExtArgs>
   notifications?: boolean | Prisma.Application$notificationsArgs<ExtArgs>
+  apiTokens?: boolean | Prisma.Application$apiTokensArgs<ExtArgs>
   _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1220,6 +1374,7 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     roles: Prisma.$RolePayload<ExtArgs>[]
     permissions: Prisma.$PermissionPayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    apiTokens: Prisma.$ApiTokenPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1635,6 +1790,7 @@ export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runt
   roles<T extends Prisma.Application$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   permissions<T extends Prisma.Application$permissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$permissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.Application$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  apiTokens<T extends Prisma.Application$apiTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$apiTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2165,6 +2321,30 @@ export type Application$notificationsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * Application.apiTokens
+ */
+export type Application$apiTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApiToken
+   */
+  select?: Prisma.ApiTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApiToken
+   */
+  omit?: Prisma.ApiTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApiTokenInclude<ExtArgs> | null
+  where?: Prisma.ApiTokenWhereInput
+  orderBy?: Prisma.ApiTokenOrderByWithRelationInput | Prisma.ApiTokenOrderByWithRelationInput[]
+  cursor?: Prisma.ApiTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApiTokenScalarFieldEnum | Prisma.ApiTokenScalarFieldEnum[]
 }
 
 /**

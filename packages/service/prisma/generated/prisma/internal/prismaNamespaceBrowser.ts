@@ -77,7 +77,8 @@ export const ModelName = {
   NotificationChannel: 'NotificationChannel',
   NotificationTemplate: 'NotificationTemplate',
   Notification: 'Notification',
-  RateLimitOverride: 'RateLimitOverride'
+  RateLimitOverride: 'RateLimitOverride',
+  ApiToken: 'ApiToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -541,6 +542,27 @@ export const RateLimitOverrideScalarFieldEnum = {
 } as const
 
 export type RateLimitOverrideScalarFieldEnum = (typeof RateLimitOverrideScalarFieldEnum)[keyof typeof RateLimitOverrideScalarFieldEnum]
+
+
+export const ApiTokenScalarFieldEnum = {
+  id: 'id',
+  tokenHash: 'tokenHash',
+  tokenPrefix: 'tokenPrefix',
+  tokenSuffix: 'tokenSuffix',
+  name: 'name',
+  ownerId: 'ownerId',
+  scopes: 'scopes',
+  organizationId: 'organizationId',
+  appId: 'appId',
+  enabled: 'enabled',
+  expiresAt: 'expiresAt',
+  lastUsedAt: 'lastUsedAt',
+  lastUsedIp: 'lastUsedIp',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ApiTokenScalarFieldEnum = (typeof ApiTokenScalarFieldEnum)[keyof typeof ApiTokenScalarFieldEnum]
 
 
 export const SortOrder = {

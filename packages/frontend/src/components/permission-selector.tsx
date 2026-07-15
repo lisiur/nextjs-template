@@ -4,6 +4,12 @@ import {
   Button,
   Checkbox,
   cn,
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Input,
   TableBody,
   TableCell,
@@ -11,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui";
-import { ArrowDown, ArrowUp, ArrowUpDown, Search, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Plus, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PaginatedTableFrame } from "./paginated-table-frame";
@@ -64,6 +70,8 @@ interface PermissionSelectorProps {
   className?: string;
 }
 
+const COMPACT_THRESHOLD = 480;
+
 export function PermissionSelector({
   fetchPage,
   value,
@@ -82,6 +90,10 @@ export function PermissionSelector({
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [seenItems, setSeenItems] = useState<PermissionItem[]>(selectedItems);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isCompact, setIsCompact] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const fetchPageRef = useRef(fetchPage);
   fetchPageRef.current = fetchPage;
@@ -108,6 +120,18 @@ export function PermissionSelector({
 
   useEffect(() => {
     setPage(1);
+  }, []);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setIsCompact(entry.contentRect.width < COMPACT_THRESHOLD);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -249,85 +273,100 @@ export function PermissionSelector({
 
   const isEmpty = !loading && pageData.length === 0;
 
-  return (
+  const availablePanel = (
     <div
-      className={cn("grid h-full grid-cols-1 gap-4 md:grid-cols-2", className)}
+      className={cn(
+        "flex min-h-0 flex-col overflow-hidden rounded-md border",
+        isCompact ? "h-full" : undefined,
+      )}
     >
-      {/* Left: available table */}
-      <div className="flex min-h-0 flex-col overflow-hidden rounded-md border">
-        <PaginatedTableFrame
-          loading={loading}
-          empty={isEmpty}
-          emptyMessage={
-            total === 0 && !debouncedQuery ? t("empty") : t("noResults")
-          }
-          page={currentPage}
-          total={total}
-          pageSize={pageSize}
-          onPageChange={setPage}
-          pageSlots={5}
-          showCount={false}
-          toolbar={toolbar}
-          tableContainerClassName="min-h-0 min-w-0 flex-1 overflow-auto"
-        >
-          <TableHeader sticky>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-8 [&:has([role=checkbox])]:pr-0">
-                <Checkbox
-                  checked={headerChecked}
-                  indeterminate={headerIndeterminate}
-                  onCheckedChange={(checked) => togglePageAll(!!checked)}
-                  disabled={total === 0}
-                  aria-label={t("selectAll")}
-                />
-              </TableHead>
-              <SortableHead keyName="name" label={t("name")} />
-              <TableHead className="lg:table-cell">
-                {t("description")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pageData.map((item) => {
-              const checked = selectedSet.has(item.id);
-              return (
-                <TableRow
-                  key={item.id}
-                  data-state={checked ? "selected" : undefined}
-                  className="cursor-pointer"
-                  onClick={() => toggle(item.id, !checked)}
+      <PaginatedTableFrame
+        loading={loading}
+        empty={isEmpty}
+        emptyMessage={
+          total === 0 && !debouncedQuery ? t("empty") : t("noResults")
+        }
+        page={currentPage}
+        total={total}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        pageSlots={5}
+        showCount={false}
+        toolbar={toolbar}
+        tableContainerClassName="min-h-0 min-w-0 flex-1 overflow-auto"
+      >
+        <TableHeader sticky>
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="w-8 [&:has([role=checkbox])]:pr-0">
+              <Checkbox
+                checked={headerChecked}
+                indeterminate={headerIndeterminate}
+                onCheckedChange={(checked) => togglePageAll(!!checked)}
+                disabled={total === 0}
+                aria-label={t("selectAll")}
+              />
+            </TableHead>
+            <SortableHead keyName="name" label={t("name")} />
+            <TableHead className="lg:table-cell">{t("description")}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {pageData.map((item) => {
+            const checked = selectedSet.has(item.id);
+            return (
+              <TableRow
+                key={item.id}
+                data-state={checked ? "selected" : undefined}
+                className="cursor-pointer"
+                onClick={() => toggle(item.id, !checked)}
+              >
+                <TableCell
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-8 align-top [&:has([role=checkbox])]:pr-0"
                 >
-                  <TableCell
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-8 align-top [&:has([role=checkbox])]:pr-0"
-                  >
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={(c) => toggle(item.id, !!c)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{item.name}</div>
-                    <code className="text-xs text-muted-foreground">
-                      {item.code}
-                    </code>
-                  </TableCell>
-                  <TableCell className="truncate text-muted-foreground lg:table-cell">
-                    {item.description || "—"}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </PaginatedTableFrame>
-      </div>
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={(c) => toggle(item.id, !!c)}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="font-medium">{item.name}</div>
+                  <code className="text-xs text-muted-foreground">
+                    {item.code}
+                  </code>
+                </TableCell>
+                <TableCell className="truncate text-muted-foreground lg:table-cell">
+                  {item.description || "—"}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </PaginatedTableFrame>
+    </div>
+  );
 
-      {/* Right: selected list */}
-      <div className="flex min-h-0 flex-col overflow-hidden rounded-md border">
-        <div className="flex shrink-0 items-center justify-between border-b px-3 py-2">
-          <span className="text-sm font-medium">
-            {t("selected")} ({selectedList.length})
-          </span>
+  const selectedPanel = (
+    <div
+      className={cn(
+        "flex min-h-0 flex-col overflow-hidden rounded-md border",
+        isCompact ? "flex-1" : undefined,
+      )}
+    >
+      <div className="flex shrink-0 items-center justify-between border-b px-3 py-2">
+        <span className="text-sm font-medium">
+          {t("selected")} ({selectedList.length})
+        </span>
+        {isCompact ? (
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={() => setPickerOpen(true)}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            {t("addPermissions")}
+          </Button>
+        ) : (
           <Button
             variant="ghost"
             size="xs"
@@ -336,41 +375,68 @@ export function PermissionSelector({
           >
             {t("clearAll")}
           </Button>
-        </div>
-        <div className="min-h-0 flex-1 overflow-auto">
-          {selectedList.length === 0 ? (
-            <div className="p-4 text-center text-sm text-muted-foreground">
-              {t("noSelected")}
-            </div>
-          ) : (
-            <ul className="divide-y">
-              {selectedList.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex items-center gap-2 px-3 py-1.5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium">
-                      {item.name}
-                    </div>
-                    <code className="text-[10px] text-muted-foreground">
-                      {item.code}
-                    </code>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    onClick={() => toggle(item.id, false)}
-                    aria-label={t("remove", { name: item.name })}
-                  >
-                    <X />
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        )}
       </div>
+      <div className="min-h-0 flex-1 overflow-auto">
+        {selectedList.length === 0 ? (
+          <div className="p-4 text-center text-sm text-muted-foreground">
+            {t("noSelected")}
+          </div>
+        ) : (
+          <ul className="divide-y">
+            {selectedList.map((item) => (
+              <li key={item.id} className="flex items-center gap-2 px-3 py-1.5">
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-medium">
+                    {item.name}
+                  </div>
+                  <code className="text-[10px] text-muted-foreground">
+                    {item.code}
+                  </code>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={() => toggle(item.id, false)}
+                  aria-label={t("remove", { name: item.name })}
+                >
+                  <X />
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div
+      ref={containerRef}
+      className={cn(
+        "h-full gap-4",
+        isCompact ? "flex flex-col" : "grid grid-cols-2",
+        className,
+      )}
+    >
+      {!isCompact && availablePanel}
+      {selectedPanel}
+
+      {isCompact && (
+        <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>{t("selectPermissionsTitle")}</DialogTitle>
+            </DialogHeader>
+            <DialogBody className="h-[450px] p-0">{availablePanel}</DialogBody>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setPickerOpen(false)}>
+                {t("done")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

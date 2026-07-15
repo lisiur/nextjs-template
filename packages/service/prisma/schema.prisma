@@ -25,7 +25,8 @@ model User {
   invitations   Invitation[]
   uploads       Upload[]
   roleAssignments RoleAssignment[]
-  notifications Notification[]
+  notifications   Notification[]
+  apiTokens       ApiToken[]
 
   @@unique([email])
   @@map("user")
@@ -155,6 +156,7 @@ model Organization {
   invitations Invitation[]
   departments Department[]
   positions   Position[]
+  apiTokens   ApiToken[]
 
   @@unique([slug])
   @@map("organization")
@@ -313,6 +315,7 @@ model Application {
   roles        Role[]
   permissions  Permission[]
   notifications Notification[]
+  apiTokens    ApiToken[]
 
   @@unique([code])
   @@index([deletedAt])
@@ -590,5 +593,30 @@ model RateLimitOverride {
 
   @@index([type])
   @@map("rate_limit_override")
+}
+
+model ApiToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  tokenPrefix String
+  tokenSuffix String @default("")
+  name      String
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  scopes    String[] @default([])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  appId      String?
+  app        Application? @relation(fields: [appId], references: [id], onDelete: Cascade)
+  enabled    Boolean  @default(true)
+  expiresAt  DateTime?
+  lastUsedAt DateTime?
+  lastUsedIp String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([organizationId])
+  @@map("api_token")
 }
 
