@@ -7,7 +7,7 @@ import {
 } from "#lib/openapi";
 import { setSessionCookie } from "#lib/session";
 import { signUpWithEmail } from "#services/auth.service";
-import { authMutationResponseSchema, signUpEmailBodySchema } from "./schema";
+import { signInResponseSchema, signUpEmailBodySchema } from "./schema";
 
 export const signUpEmail = defineOpenAPIRoute({
   route: createRoute({
@@ -24,7 +24,7 @@ export const signUpEmail = defineOpenAPIRoute({
     responses: {
       ...badRequestResponse,
       ...forbiddenResponse,
-      ...createdResponseFn(authMutationResponseSchema, "Signed up"),
+      ...createdResponseFn(signInResponseSchema, "Signed up"),
     },
   }),
   handler: async (c) => {
@@ -42,6 +42,6 @@ export const signUpEmail = defineOpenAPIRoute({
     });
 
     setSessionCookie(c, session.token);
-    return c.json({ data: { user, session }, error: null }, 201);
+    return c.json({ user, session }, 201);
   },
 });

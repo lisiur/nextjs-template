@@ -77,14 +77,15 @@ export const registrationStatusSchema = z
   })
   .openapi("RegistrationStatus");
 
-export const authMutationResponseSchema = z
+export const signInResponseSchema = z
   .object({
-    data: z.unknown().optional(),
-    error: z
-      .object({
-        message: z.string(),
-      })
-      .nullable()
-      .optional(),
+    user: authUserSchema,
+    session: authSessionSchema,
   })
-  .openapi("AuthMutationResponse");
+  .openapi("SignInResponse");
+
+export const userMutationResponseSchema = z
+  .object({
+    user: authUserSchema,
+  })
+  .openapi("UserMutationResponse");

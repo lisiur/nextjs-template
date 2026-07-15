@@ -2,7 +2,7 @@ import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { setSessionCookie } from "#lib/session";
 import { signInWithEmail } from "#services/auth.service";
-import { authMutationResponseSchema, signInEmailBodySchema } from "./schema";
+import { signInEmailBodySchema, signInResponseSchema } from "./schema";
 
 export const signInEmail = defineOpenAPIRoute({
   route: createRoute({
@@ -18,7 +18,7 @@ export const signInEmail = defineOpenAPIRoute({
     },
     responses: {
       ...unauthorizedResponse,
-      ...okResponseFn(authMutationResponseSchema, "Signed in"),
+      ...okResponseFn(signInResponseSchema, "Signed in"),
     },
   }),
   handler: async (c) => {
@@ -36,6 +36,6 @@ export const signInEmail = defineOpenAPIRoute({
 
     setSessionCookie(c, session.token);
 
-    return c.json({ data: { user, session }, error: null }, 200);
+    return c.json({ user, session }, 200);
   },
 });

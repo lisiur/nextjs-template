@@ -2,7 +2,7 @@ import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { setSessionCookie } from "#lib/session";
 import { signInWithWechat } from "#services/auth.service";
-import { authMutationResponseSchema, signInWechatBodySchema } from "./schema";
+import { signInResponseSchema, signInWechatBodySchema } from "./schema";
 
 export const signInWechat = defineOpenAPIRoute({
   route: createRoute({
@@ -18,7 +18,7 @@ export const signInWechat = defineOpenAPIRoute({
     },
     responses: {
       ...unauthorizedResponse,
-      ...okResponseFn(authMutationResponseSchema, "Signed in"),
+      ...okResponseFn(signInResponseSchema, "Signed in"),
     },
   }),
   handler: async (c) => {
@@ -35,6 +35,6 @@ export const signInWechat = defineOpenAPIRoute({
 
     setSessionCookie(c, session.token);
 
-    return c.json({ data: { user, session }, error: null }, 200);
+    return c.json({ user, session }, 200);
   },
 });

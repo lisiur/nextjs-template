@@ -6,7 +6,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { changePassword as changePasswordService } from "#services/auth.service";
-import { authMutationResponseSchema, changePasswordBodySchema } from "./schema";
+import { changePasswordBodySchema, userMutationResponseSchema } from "./schema";
 
 export const changePassword = defineOpenAPIRoute({
   route: createRoute({
@@ -23,7 +23,7 @@ export const changePassword = defineOpenAPIRoute({
     responses: {
       ...unauthorizedResponse,
       ...badRequestResponse,
-      ...okResponseFn(authMutationResponseSchema, "Password changed"),
+      ...okResponseFn(userMutationResponseSchema, "Password changed"),
     },
   }),
   handler: async (c) => {
@@ -35,6 +35,6 @@ export const changePassword = defineOpenAPIRoute({
       newPassword: body.newPassword,
     });
 
-    return c.json({ data: { user }, error: null }, 200);
+    return c.json({ user }, 200);
   },
 });
