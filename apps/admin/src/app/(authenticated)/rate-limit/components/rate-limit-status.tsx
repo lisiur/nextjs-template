@@ -19,7 +19,7 @@ import {
   TooltipTrigger,
 } from "@repo/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { RefreshCw, TimerReset } from "lucide-react";
+import { Network, RefreshCw, TimerReset, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -51,6 +51,26 @@ interface LimiterConfig {
 }
 
 const LIMITER_OPTIONS = ["all", "global", "auth"] as const;
+
+function SubjectCell({ subject }: { subject: string }) {
+  if (subject.startsWith("ip:")) {
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <Network className="h-3.5 w-3.5 text-muted-foreground" />
+        {subject.slice(3)}
+      </span>
+    );
+  }
+  if (subject.startsWith("user:")) {
+    return (
+      <span className="inline-flex items-center gap-1.5">
+        <User className="h-3.5 w-3.5 text-muted-foreground" />
+        {subject.slice(5)}
+      </span>
+    );
+  }
+  return <>{subject}</>;
+}
 
 export function RateLimitStatus() {
   const t = useTranslations("RateLimit.status");
@@ -195,7 +215,7 @@ export function RateLimitStatus() {
               data.buckets.map((bucket) => (
                 <TableRow key={`${bucket.limiter}:${bucket.subject}`}>
                   <TableCell className="font-mono text-sm">
-                    {bucket.subject}
+                    <SubjectCell subject={bucket.subject} />
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{bucket.limiter}</Badge>
