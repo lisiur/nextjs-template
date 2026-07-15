@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -8,7 +8,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { createRole as createRoleService } from "#services/role.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { createRoleBodySchema, roleSchema } from "./schema";
 
 export const createRole = defineOpenAPIRoute({
@@ -33,8 +33,8 @@ export const createRole = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "role::create");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "role::create");
     const data = c.req.valid("json");
     const role = await createRoleService(data);
 

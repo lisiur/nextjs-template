@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import {
@@ -10,7 +10,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import {
-  assertPermission,
+  assertAccess,
   assignPermissions,
   getPermissionsForRole,
 } from "#services/role-permission.service";
@@ -47,8 +47,8 @@ export const batchAssignRolePermissions = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "role::update");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "role::update");
     const { roleId, permissionIds } = c.req.valid("json");
 
     const role = await prisma.role.findUnique({ where: { id: roleId } });

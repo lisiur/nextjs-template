@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -8,7 +8,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { releaseRateLimit } from "#services/rate-limit.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { releaseBodySchema, releaseResultSchema } from "./schema";
 
 export const releaseRoute = defineOpenAPIRoute({
@@ -37,8 +37,8 @@ export const releaseRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "rate-limit::manage");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "rate-limit::manage");
     const body = c.req.valid("json");
 
     const result = releaseRateLimit({

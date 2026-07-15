@@ -1,14 +1,15 @@
 import type { Context } from "hono";
 import { streamSSE } from "hono/streaming";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { eventBus } from "#states";
 
 const HEARTBEAT_INTERVAL_MS = 20_000;
 
 export async function streamEventsHandler(c: Context) {
-  const session = await requireSession(c);
-  const userId = session.user.id;
-  const token = session.session.token;
+  const principal = await requirePrincipal(c);
+  const userId = getPrincipalUserId(principal);
+  const token =
+    principal.kind === "user" ? principal.session.token : principal.token.id;
   const appFilter = c.req.query("app") ?? undefined;
 
   return streamSSE(

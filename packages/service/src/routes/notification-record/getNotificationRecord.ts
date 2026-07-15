@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   notFoundResponse,
@@ -7,7 +7,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { getNotificationRecordById } from "#services/notification-record.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { idParamSchema, notificationRecordSchema } from "./schema";
 
 export const getNotificationRecordRoute = defineOpenAPIRoute({
@@ -26,8 +26,8 @@ export const getNotificationRecordRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "notification-record::view");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "notification-record::view");
     const { id } = c.req.valid("param");
     const record = await getNotificationRecordById(id);
     return c.json(record, 200);

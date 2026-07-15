@@ -1,13 +1,13 @@
 import fs from "node:fs";
 import os from "node:os";
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { systemInfoSchema } from "./schema";
 
 function sampleCpuTimes(): { idle: number; total: number } {
@@ -173,8 +173,8 @@ export const getSystemInfo = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "system-info::view");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "system-info::view");
     const cpuUsage = await getCpuUsage();
     const cpus = os.cpus();
     const memory = getMemoryInfo();

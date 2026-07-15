@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   deleteSuccessSchema,
@@ -8,7 +8,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { deleteDepartment } from "#services/department.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { departmentIdParamSchema, orgIdParamSchema } from "./schema";
 
 export const deleteDepartmentRoute = defineOpenAPIRoute({
@@ -31,10 +31,10 @@ export const deleteDepartmentRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const { orgId, id } = c.req.valid("param");
 
-    await assertPermission(session.user.id, "department::delete", {
+    await assertAccess(principal, "department::delete", {
       appId: "organization",
       organizationId: orgId,
     });

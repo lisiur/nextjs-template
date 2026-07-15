@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import {
   badRequestResponse,
   okResponseFn,
@@ -24,10 +24,7 @@ export const uploadFile = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    if (!session?.user) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    const principal = await requirePrincipal(c);
 
     const contentType = c.req.raw.headers.get("content-type") ?? "";
     if (!contentType.includes("multipart/form-data")) {
@@ -52,7 +49,7 @@ export const uploadFile = defineOpenAPIRoute({
     const result = await uploadFileToStorage({
       file,
       visibility: rawVisibility,
-      uploaderId: session.user.id,
+      uploaderId: getPrincipalUserId(principal),
     });
 
     return c.json(result, 200);

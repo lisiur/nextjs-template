@@ -1,11 +1,11 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { listUserRoles as listUserRolesSvc } from "#services/user-role.service";
 import { listRoleAssignmentsQuerySchema, roleAssignmentSchema } from "./schema";
 
@@ -25,8 +25,8 @@ export const listRoleAssignments = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "user-role::list");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "user-role::list");
     const { scopeId, scopeType, userId } = c.req.valid("query");
     const roleAssignments = await listUserRolesSvc(userId, {
       scopeId,

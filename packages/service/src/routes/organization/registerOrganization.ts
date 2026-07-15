@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import { createdResponseFn, unauthorizedResponse } from "#lib/openapi";
@@ -40,12 +40,18 @@ export const registerOrganization = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const body = c.req.valid("json");
-    const org = await registerOrganizationForUser(session.user.id, body);
+    const org = await registerOrganizationForUser(
+      getPrincipalUserId(principal),
+      body,
+    );
 
     await prisma.session.update({
-      where: { id: session.session.id },
+      where: {
+        id: (principal as Extract<typeof principal, { kind: "user" }>).session
+          .id,
+      },
       data: { activeOrganizationId: org.id },
     });
 

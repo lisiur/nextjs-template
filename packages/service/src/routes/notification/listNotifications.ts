@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requireAppId } from "#extractors/app-id";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { listUserNotifications } from "#services/notification/notification-query.service";
 import {
@@ -21,11 +21,11 @@ export const listNotificationsRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const appId = await requireAppId(c);
     const query = c.req.valid("query");
     const result = await listUserNotifications({
-      userId: session.user.id,
+      userId: getPrincipalUserId(principal),
       appId,
       limit: query.limit,
       offset: query.offset,

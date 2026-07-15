@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -42,11 +42,15 @@ export const updateApiToken = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const { id } = c.req.valid("param");
     const body = c.req.valid("json");
 
-    const token = await updateApiTokenForUser(session.user.id, id, body);
+    const token = await updateApiTokenForUser(
+      getPrincipalUserId(principal),
+      id,
+      body,
+    );
 
     logAudit({
       event: "api_token.updated",

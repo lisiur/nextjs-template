@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
 import { getCacheStats } from "#services/cache.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { cacheStatsSchema } from "./schema";
 
 export const getStatsRoute = defineOpenAPIRoute({
@@ -24,8 +24,8 @@ export const getStatsRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "cache::view");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "cache::view");
     const stats = getCacheStats();
     return c.json(stats, 200);
   },

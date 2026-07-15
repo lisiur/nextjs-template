@@ -1,11 +1,11 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { listConfigsByGroup } from "#services/system-config.service";
 import { getConfigsByGroupParamSchema, systemConfigItemSchema } from "./schema";
 
@@ -29,8 +29,8 @@ export const listConfigsByGroupRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "system-config::listByGroup");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "system-config::listByGroup");
     const { group } = c.req.valid("param");
     const configs = await listConfigsByGroup(group);
     return c.json(configs, 200);

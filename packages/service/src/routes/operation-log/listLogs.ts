@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
 import { listLogs } from "#services/operation-log.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { listLogsQuerySchema, listLogsResponseSchema } from "./schema";
 
 export const listLogsRoute = defineOpenAPIRoute({
@@ -27,8 +27,8 @@ export const listLogsRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "operation-log::list");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "operation-log::list");
     const query = c.req.valid("query");
     const result = await listLogs(query);
     return c.json(result, 200);

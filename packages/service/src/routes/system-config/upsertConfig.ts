@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -7,7 +7,7 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { upsertConfig } from "#services/system-config.service";
 import {
   systemConfigItemSchema,
@@ -41,8 +41,8 @@ export const upsertConfigRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "system-config::upsert");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "system-config::upsert");
     const { group, key } = c.req.valid("param");
     const body = c.req.valid("json");
 

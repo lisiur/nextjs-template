@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -9,7 +9,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { updatePosition } from "#services/position.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import {
   errorSchema,
   orgIdParamSchema,
@@ -51,11 +51,11 @@ export const updatePositionRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const { orgId, id } = c.req.valid("param");
     const body = c.req.valid("json");
 
-    await assertPermission(session.user.id, "position::update", {
+    await assertAccess(principal, "position::update", {
       appId: "organization",
       organizationId: orgId,
     });

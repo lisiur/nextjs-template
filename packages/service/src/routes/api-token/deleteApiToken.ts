@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   notFoundResponse,
@@ -27,10 +27,13 @@ export const deleteApiToken = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const { id } = c.req.valid("param");
 
-    const token = await deleteApiTokenForUser(session.user.id, id);
+    const token = await deleteApiTokenForUser(
+      getPrincipalUserId(principal),
+      id,
+    );
 
     logAudit({
       event: "api_token.revoked",

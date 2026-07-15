@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   badRequestResponse,
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { createUser as createUserSvc } from "#services/user.service";
 import { adminUserSchema, createUserBodySchema, errorSchema } from "./schema";
 
@@ -36,8 +36,8 @@ export const createUser = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "user::create");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "user::create");
     const { name, email, password, roleIds } = c.req.valid("json");
     const user = await createUserSvc({ name, email, password, roleIds });
     return c.json(user, 200);

@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
 import { listOverrides } from "#services/rate-limit.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { rateLimitOverrideItemSchema } from "./schema";
 
 export const listOverridesRoute = defineOpenAPIRoute({
@@ -27,8 +27,8 @@ export const listOverridesRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "rate-limit::manage");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "rate-limit::manage");
     const overrides = await listOverrides();
     return c.json(overrides, 200);
   },

@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   notFoundResponse,
@@ -28,8 +28,8 @@ export const signFile = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    if (!session?.user) {
+    const principal = await requirePrincipal(c);
+    if (!getPrincipalUserId(principal)) {
       throw new HTTPException(401, { message: "Unauthorized" });
     }
 
@@ -37,7 +37,7 @@ export const signFile = defineOpenAPIRoute({
 
     const result = await generateSignedUrl({
       id,
-      userId: session.user.id,
+      userId: getPrincipalUserId(principal),
     });
 
     return c.json(result, 200);

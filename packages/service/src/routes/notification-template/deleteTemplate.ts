@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   deleteSuccessSchema,
   forbiddenResponse,
@@ -8,7 +8,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { deleteNotificationTemplate } from "#services/notification/template.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { notificationTemplateIdParamSchema } from "./schema";
 
 export const deleteNotificationTemplateRoute = defineOpenAPIRoute({
@@ -26,8 +26,8 @@ export const deleteNotificationTemplateRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "notification-template::delete");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "notification-template::delete");
     const { id } = c.req.valid("param");
     const result = await deleteNotificationTemplate(id);
     return c.json(result, 200);

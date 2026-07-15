@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { listOrganizationsForUser } from "#services/organization.service";
 import { mineOrganizationsResponseSchema } from "./schema";
@@ -21,8 +21,10 @@ export const listMyOrganizations = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    const result = await listOrganizationsForUser(session.user.id);
+    const principal = await requirePrincipal(c);
+    const result = await listOrganizationsForUser(
+      getPrincipalUserId(principal),
+    );
     return c.json(result, 200);
   },
 });

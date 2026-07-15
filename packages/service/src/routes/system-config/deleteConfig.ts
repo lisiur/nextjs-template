@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { deleteConfig } from "#services/system-config.service";
 import {
   deleteConfigParamSchema,
@@ -39,8 +39,8 @@ export const deleteConfigRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "system-config::delete");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "system-config::delete");
     const { group, key } = c.req.valid("param");
 
     await deleteConfig(group, key);

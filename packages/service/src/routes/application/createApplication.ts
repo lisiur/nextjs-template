@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   createdResponseFn,
@@ -7,7 +7,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { createApplication as createApplicationService } from "#services/application.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import {
   applicationSchema,
   createApplicationBodySchema,
@@ -45,8 +45,8 @@ export const createApplication = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "application::create");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "application::create");
     const body = c.req.valid("json");
     const app = await createApplicationService(body);
 

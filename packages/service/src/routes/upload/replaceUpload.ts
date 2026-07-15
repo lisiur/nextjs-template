@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -9,7 +9,7 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { replaceUpload as replaceUploadFile } from "#services/upload.service";
 import { replaceUploadParamSchema, uploadListItemSchema } from "./schema";
 
@@ -33,8 +33,8 @@ export const replaceUploadRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "upload::replace");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "upload::replace");
 
     const { id } = c.req.valid("param");
 

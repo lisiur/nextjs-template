@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
 import { listMembers } from "#services/member.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import {
   listMembersQuerySchema,
   listMembersResponseSchema,
@@ -30,11 +30,11 @@ export const listOrganizationMembers = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const { orgId } = c.req.valid("param");
     const query = c.req.valid("query");
 
-    await assertPermission(session.user.id, "organization-member::list", {
+    await assertAccess(principal, "organization-member::list", {
       appId: "organization",
       organizationId: orgId,
     });

@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { getUserPermissionCatalog } from "#services/role-permission.service";
 import { listAvailableScopesResponseSchema } from "./schema";
@@ -21,8 +21,10 @@ export const listAvailableScopes = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    const scopes = await getUserPermissionCatalog(session.user.id);
+    const principal = await requirePrincipal(c);
+    const scopes = await getUserPermissionCatalog(
+      getPrincipalUserId(principal),
+    );
     return c.json({ scopes }, 200);
   },
 });

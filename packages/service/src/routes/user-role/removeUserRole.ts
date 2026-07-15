@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { removeUserRole as removeUserRoleSvc } from "#services/user-role.service";
 import {
   removeRoleAssignmentParamSchema,
@@ -34,8 +34,8 @@ export const removeRoleAssignment = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "user-role::remove");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "user-role::remove");
     const { roleId, scopeId, scopeType, userId } = c.req.valid("json");
     await removeUserRoleSvc(userId, roleId, { scopeId, scopeType });
 

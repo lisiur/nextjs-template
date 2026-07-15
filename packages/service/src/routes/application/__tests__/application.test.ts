@@ -20,17 +20,25 @@ vi.mock("../../../lib/db", () => ({
 // Mock session extraction
 vi.mock("../../../lib/session", () => ({
   getSessionFromHeaders: vi.fn(),
+  getBearerToken: vi.fn(),
+}));
+
+vi.mock("../../../lib/api-token", () => ({
+  getApiTokenByBearer: vi.fn(),
 }));
 
 // Mock role-permission
 vi.mock("../../../services/role-permission.service", () => ({
+  assertAccess: vi.fn(),
   assertPermission: vi.fn(),
   getUserPermissions: vi.fn(),
 }));
 
+import { getApiTokenByBearer } from "../../../lib/api-token";
 import { prisma } from "../../../lib/db";
 import { getSessionFromHeaders } from "../../../lib/session";
 import {
+  assertAccess,
   assertPermission,
   getUserPermissions,
 } from "../../../services/role-permission.service";
@@ -48,7 +56,9 @@ const mockPrisma = prisma as unknown as {
   };
 };
 const mockGetSession = vi.mocked(getSessionFromHeaders);
-const mockAssertPermission = vi.mocked(assertPermission);
+const mockGetApiTokenByBearer = vi.mocked(getApiTokenByBearer);
+const mockAssertAccess = vi.mocked(assertAccess);
+const _mockAssertPermission = vi.mocked(assertPermission);
 const mockGetUserPermissions = vi.mocked(getUserPermissions);
 
 // Helper to create a mock Hono app for a route
@@ -62,9 +72,8 @@ async function testRoute(
     params?: Record<string, string>;
     headers?: Record<string, string>;
   },
-  { withAuth = true } = {},
 ) {
-  mockAssertPermission.mockResolvedValue(undefined);
+  mockAssertAccess.mockResolvedValue(undefined);
 
   // Create a minimal Hono app with the route
   const { OpenAPIHono } = await import("@hono/zod-openapi");
@@ -80,24 +89,6 @@ async function testRoute(
     }
     return c.json({ code: 500, message: "Internal Server Error" }, 500);
   });
-
-  // Permission middleware
-  if (withAuth) {
-    app.use("*", async (c, next) => {
-      const session = await mockGetSession(c.req.raw.headers);
-      if (!session?.user) {
-        throw new HTTPException(401, { message: "Unauthorized" });
-      }
-      const permissions = await mockGetUserPermissions(session.user.id);
-      if (
-        !permissions.includes("*") &&
-        !permissions.includes("application::list")
-      ) {
-        throw new HTTPException(403, { message: "Permission denied" });
-      }
-      return next();
-    });
-  }
 
   app.openapi(route.route, route.handler);
 
@@ -127,6 +118,7 @@ describe("GET /current - Current Application", () => {
       user: { id: "u1" },
       session: { id: "s1" },
     } as any);
+    mockGetApiTokenByBearer.mockResolvedValue(null);
     mockGetUserPermissions.mockResolvedValue([]);
   });
 
@@ -145,15 +137,11 @@ describe("GET /current - Current Application", () => {
     });
 
     const { getCurrentApplication } = await import("../getCurrentApplication");
-    const res = await testRoute(
-      getCurrentApplication,
-      {
-        method: "GET",
-        path: "/current",
-        headers: { "X-App-Code": "organization" },
-      },
-      { withAuth: false },
-    );
+    const res = await testRoute(getCurrentApplication, {
+      method: "GET",
+      path: "/current",
+      headers: { "X-App-Code": "organization" },
+    });
 
     expect(res.status).toBe(200);
     expect(mockGetUserPermissions).not.toHaveBeenCalled();
@@ -184,15 +172,11 @@ describe("GET /current - Current Application", () => {
     });
 
     const { getCurrentApplication } = await import("../getCurrentApplication");
-    const res = await testRoute(
-      getCurrentApplication,
-      {
-        method: "GET",
-        path: "/current",
-        headers: { "X-App-Code": "organization", cookie: "" },
-      },
-      { withAuth: false },
-    );
+    const res = await testRoute(getCurrentApplication, {
+      method: "GET",
+      path: "/current",
+      headers: { "X-App-Code": "organization", cookie: "" },
+    });
 
     expect(res.status).toBe(200);
     expect(mockPrisma.application.findFirst).toHaveBeenCalledWith({
@@ -208,14 +192,10 @@ describe("GET /current - Current Application", () => {
 
   it("returns 400 without X-App-Code", async () => {
     const { getCurrentApplication } = await import("../getCurrentApplication");
-    const res = await testRoute(
-      getCurrentApplication,
-      {
-        method: "GET",
-        path: "/current",
-      },
-      { withAuth: false },
-    );
+    const res = await testRoute(getCurrentApplication, {
+      method: "GET",
+      path: "/current",
+    });
 
     expect(res.status).toBe(400);
     await expect(res.json()).resolves.toMatchObject({
@@ -228,15 +208,11 @@ describe("GET /current - Current Application", () => {
     mockPrisma.application.findFirst.mockResolvedValue(null);
 
     const { getCurrentApplication } = await import("../getCurrentApplication");
-    const res = await testRoute(
-      getCurrentApplication,
-      {
-        method: "GET",
-        path: "/current",
-        headers: { "X-App-Code": "missing" },
-      },
-      { withAuth: false },
-    );
+    const res = await testRoute(getCurrentApplication, {
+      method: "GET",
+      path: "/current",
+      headers: { "X-App-Code": "missing" },
+    });
 
     expect(res.status).toBe(404);
     await expect(res.json()).resolves.toMatchObject({

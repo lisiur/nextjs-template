@@ -1,12 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   forbiddenResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
 import { listNotificationChannels } from "#services/notification/channel.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import {
   listNotificationChannelsQuerySchema,
   listNotificationChannelsResponseSchema,
@@ -29,8 +29,8 @@ export const listNotificationChannelsRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "notification-channel::list");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "notification-channel::list");
     const query = c.req.valid("query");
     const channels = await listNotificationChannels(query);
     return c.json({ channels }, 200);

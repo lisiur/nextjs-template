@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import {
   badRequestResponse,
   forbiddenResponse,
@@ -7,7 +7,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { reorderMenus as reorderMenusService } from "#services/menu.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { reorderMenusBodySchema, reorderMenusResponseSchema } from "./schema";
 
 export const reorderMenus = defineOpenAPIRoute({
@@ -39,8 +39,8 @@ export const reorderMenus = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "menu::reorder");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "menu::reorder");
     const body = c.req.valid("json");
 
     const result = await reorderMenusService(body.items);

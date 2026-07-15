@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import {
   okResponseFn,
   successSchema,
@@ -21,9 +21,9 @@ export const markReadRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const { id } = c.req.valid("param");
-    await markNotificationRead(id, session.user.id);
+    await markNotificationRead(id, getPrincipalUserId(principal));
     return c.json({ success: true }, 200);
   },
 });

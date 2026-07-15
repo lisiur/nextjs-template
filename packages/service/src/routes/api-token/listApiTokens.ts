@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { listApiTokensForUser } from "#services/api-token.service";
 import { listApiTokensResponseSchema } from "./schema";
@@ -17,8 +17,8 @@ export const listApiTokens = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    const tokens = await listApiTokensForUser(session.user.id);
+    const principal = await requirePrincipal(c);
+    const tokens = await listApiTokensForUser(getPrincipalUserId(principal));
     return c.json({ tokens }, 200);
   },
 });

@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requireAppId } from "#extractors/app-id";
-import { requireSession } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import {
   badRequestResponse,
   forbiddenResponse,
@@ -10,7 +10,7 @@ import {
 } from "#lib/openapi";
 import { createNotificationsFromTemplate } from "#services/notification/notification.service";
 import { getNotificationTemplate } from "#services/notification/template.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import {
   notificationTemplateIdParamSchema,
   sendTestNotificationBodySchema,
@@ -44,8 +44,8 @@ export const sendTestNotificationRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "notification-template::test");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "notification-template::test");
     const appId = await requireAppId(c);
     const { id } = c.req.valid("param");
     const { recipientUserId, variables } = c.req.valid("json");
@@ -57,7 +57,7 @@ export const sendTestNotificationRoute = defineOpenAPIRoute({
       recipientUserIds: [recipientUserId],
       appId,
       variables,
-      creatorId: session.user.id,
+      creatorId: getPrincipalUserId(principal),
       source: "admin.test",
     });
 

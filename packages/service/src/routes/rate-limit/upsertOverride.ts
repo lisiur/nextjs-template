@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -8,7 +8,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { upsertOverride } from "#services/rate-limit.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import {
   rateLimitOverrideItemSchema,
   upsertOverrideBodySchema,
@@ -42,8 +42,8 @@ export const upsertOverrideRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "rate-limit::manage");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "rate-limit::manage");
     const { subject } = c.req.valid("param");
     const body = c.req.valid("json");
 

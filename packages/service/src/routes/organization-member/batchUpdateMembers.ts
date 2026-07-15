@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import {
@@ -9,7 +9,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { batchUpdateMembers } from "#services/member.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import {
   batchUpdateMembersBodySchema,
   memberSchema,
@@ -44,11 +44,11 @@ export const batchUpdateOrganizationMembers = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
+    const principal = await requirePrincipal(c);
     const { orgId } = c.req.valid("param");
     const { memberIds, departmentId } = c.req.valid("json");
 
-    await assertPermission(session.user.id, "organization-member::update", {
+    await assertAccess(principal, "organization-member::update", {
       appId: "organization",
       organizationId: orgId,
     });

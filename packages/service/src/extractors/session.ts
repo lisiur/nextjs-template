@@ -64,3 +64,10 @@ export async function requirePrincipal(c: Context): Promise<Principal> {
   }
   return principal;
 }
+
+export function getPrincipalUserId(principal: Principal): string {
+  if (principal.kind === "user") {
+    return principal.user.id;
+  }
+  return principal.ownerId;
+}

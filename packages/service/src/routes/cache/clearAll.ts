@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireSession } from "#extractors/session";
+import { requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   forbiddenResponse,
@@ -7,7 +7,7 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { clearAll } from "#services/cache.service";
-import { assertPermission } from "#services/role-permission.service";
+import { assertAccess } from "#services/role-permission.service";
 import { clearResultSchema } from "./schema";
 
 export const clearAllRoute = defineOpenAPIRoute({
@@ -24,8 +24,8 @@ export const clearAllRoute = defineOpenAPIRoute({
     },
   }),
   handler: async (c) => {
-    const session = await requireSession(c);
-    await assertPermission(session.user.id, "cache::manage");
+    const principal = await requirePrincipal(c);
+    await assertAccess(principal, "cache::manage");
 
     const cleared = clearAll();
 
