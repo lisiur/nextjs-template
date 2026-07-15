@@ -19,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Building2,
   ChevronsUpDown,
+  KeyRound,
   LanguagesIcon,
   LogOut,
   Moon,
@@ -39,6 +40,7 @@ import { useSession } from "@/lib/api/use-session";
 type UserMenuItem =
   | "userInfo"
   | "profile"
+  | "tokens"
   | "switchOrganization"
   | "theme"
   | "locale"
@@ -69,6 +71,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
     items ?? [
       "userInfo",
       "profile",
+      "tokens",
       "switchOrganization",
       "theme",
       "locale",
@@ -104,6 +107,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
 
   const showLabel = visible.has("userInfo");
   const showProfile = visible.has("profile");
+  const showTokens = visible.has("tokens");
   const showSwitch = visible.has("switchOrganization");
   const showRegisterOrg = visible.has("registerOrganization");
   const showUtilities = visible.has("theme") || visible.has("locale");
@@ -210,6 +214,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
         )}
         {showLabel &&
           (showProfile ||
+            showTokens ||
             canSwitch ||
             showRegisterOrg ||
             showUtilities ||
@@ -218,6 +223,12 @@ export function UserMenu({ full, items }: UserMenuProps) {
           <DropdownMenuItem render={<Link href="/profile" />}>
             <UserIcon />
             {t("profile")}
+          </DropdownMenuItem>
+        )}
+        {showTokens && (
+          <DropdownMenuItem render={<Link href="/tokens" />}>
+            <KeyRound />
+            {t("tokens")}
           </DropdownMenuItem>
         )}
         {canSwitch && (
@@ -256,7 +267,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
             </DropdownMenuSubContent>
           </DropdownMenuSub>
         )}
-        {(showProfile || canSwitch) && showRegisterOrg && (
+        {(showProfile || showTokens || canSwitch) && showRegisterOrg && (
           <DropdownMenuSeparator />
         )}
         {showRegisterOrg && (
@@ -265,9 +276,8 @@ export function UserMenu({ full, items }: UserMenuProps) {
             {t("registerOrganization")}
           </DropdownMenuItem>
         )}
-        {(showProfile || canSwitch || showRegisterOrg) && showUtilities && (
-          <DropdownMenuSeparator />
-        )}
+        {(showProfile || showTokens || canSwitch || showRegisterOrg) &&
+          showUtilities && <DropdownMenuSeparator />}
         {showUtilities && (
           <Fragment>
             {visible.has("theme") && (
@@ -313,6 +323,7 @@ export function UserMenu({ full, items }: UserMenuProps) {
         )}
         {(showLabel ||
           showProfile ||
+          showTokens ||
           canSwitch ||
           showRegisterOrg ||
           showUtilities) &&

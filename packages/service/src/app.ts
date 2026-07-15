@@ -113,7 +113,7 @@ openAPIApp.doc("/openapi.json", {
     version: "1.0.0",
     description: "Hono REST API with OpenAPI support",
   },
-  servers: [{ url: "/api" }],
+  servers: [{ url: "/" }],
 });
 
 export { app };

@@ -19,7 +19,7 @@ import {
   Input,
   Textarea,
 } from "@repo/ui";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -152,7 +152,7 @@ export function OrganizationDialog({
     }
   }
 
-  function handleRemoveLogo() {
+  function _handleRemoveLogo() {
     clearLogoObjectUrl();
     setSelectedLogoFile(null);
     setLogoRemoved(true);

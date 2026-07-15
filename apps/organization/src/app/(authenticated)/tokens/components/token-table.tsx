@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import { useConfirm } from "@/hooks/use-confirm";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
-import { formatDate } from "@/utils/date";
+import { formatDateTime } from "@/utils/date";
 import { CreateTokenDialog } from "./create-token-dialog";
 
 export interface ApiTokenRow {
@@ -175,10 +175,10 @@ export function TokenTable() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
-                  {token.expiresAt ? formatDate(token.expiresAt) : "—"}
+                  {token.expiresAt ? formatDateTime(token.expiresAt) : "—"}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-sm">
-                  {token.lastUsedAt ? formatDate(token.lastUsedAt) : "—"}
+                  {token.lastUsedAt ? formatDateTime(token.lastUsedAt) : "—"}
                 </TableCell>
                 <TableCell sticky="right" align="right">
                   <ButtonGroup className="ml-auto">

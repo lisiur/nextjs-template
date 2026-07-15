@@ -16,6 +16,3 @@
 ## Tooling
 - Biome is the linter/formatter, not ESLint. 2-space indentation, recommended Next/React domains.
 - Zod 4 is installed. Prefer `z.email()` / `z.url()` over `z.string().email()`.
-
-## Workflow
-- Before repo edits, start through the GSD workflow unless the user explicitly bypasses it: `/gsd-quick` for small tasks, `/gsd-debug` for bugs, `/gsd-execute-phase` for planned phase work.

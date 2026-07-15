@@ -17,6 +17,7 @@ import {
 } from "@repo/ui";
 import {
   ChevronsUpDown,
+  KeyRound,
   LanguagesIcon,
   LogOut,
   Moon,
@@ -32,7 +33,13 @@ import { useTheme } from "next-themes";
 import { Fragment, useMemo } from "react";
 import { useSession } from "@/lib/api";
 
-type UserMenuItem = "userInfo" | "profile" | "theme" | "locale" | "signOut";
+type UserMenuItem =
+  | "userInfo"
+  | "profile"
+  | "tokens"
+  | "theme"
+  | "locale"
+  | "signOut";
 
 interface UserMenuProps {
   full: boolean;
@@ -56,7 +63,7 @@ export function UserMenu({ full, items, avatarRadius }: UserMenuProps) {
   const th = useTranslations("Header");
 
   const visible = new Set(
-    items ?? ["userInfo", "profile", "theme", "locale", "signOut"],
+    items ?? ["userInfo", "profile", "tokens", "theme", "locale", "signOut"],
   );
   const radius = avatarRadius ?? (full ? "rounded" : "circle");
   const radiusClass = radius === "circle" ? "rounded-full" : "rounded-lg";
@@ -85,6 +92,7 @@ export function UserMenu({ full, items, avatarRadius }: UserMenuProps) {
 
   const showLabel = visible.has("userInfo");
   const showProfile = visible.has("profile");
+  const showTokens = visible.has("tokens");
   const showUtilities = visible.has("theme") || visible.has("locale");
   const showSignOut = visible.has("signOut");
 
@@ -177,7 +185,15 @@ export function UserMenu({ full, items, avatarRadius }: UserMenuProps) {
             {t("profile")}
           </DropdownMenuItem>
         )}
-        {showProfile && showUtilities && <DropdownMenuSeparator />}
+        {showTokens && (
+          <DropdownMenuItem render={<Link href="/tokens" />}>
+            <KeyRound />
+            {t("tokens")}
+          </DropdownMenuItem>
+        )}
+        {(showProfile || showTokens) && showUtilities && (
+          <DropdownMenuSeparator />
+        )}
         {showUtilities && (
           <Fragment>
             {visible.has("theme") && (
