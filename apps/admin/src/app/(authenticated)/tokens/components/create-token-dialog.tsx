@@ -20,18 +20,17 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
-import { RevealTokenDialog } from "./reveal-token-dialog";
 
 interface CreateTokenDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
+  onTokenCreated: (token: string) => void;
 }
 
 export function CreateTokenDialog({
   open,
   onOpenChange,
-  onSuccess,
+  onTokenCreated,
 }: CreateTokenDialogProps) {
   const t = useTranslations("Tokens");
   const [name, setName] = useState("");
@@ -40,7 +39,6 @@ export function CreateTokenDialog({
   const [selectedItems, setSelectedItems] = useState<PermissionItem[]>([]);
   const [allScopes, setAllScopes] = useState<PermissionItem[] | null>(null);
   const [saving, setSaving] = useState(false);
-  const [revealedToken, setRevealedToken] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -83,7 +81,6 @@ export function CreateTokenDialog({
     setExpiresAt("");
     setSelectedIds([]);
     setSelectedItems([]);
-    setRevealedToken(null);
   }
 
   function handleClose(open: boolean) {
@@ -107,8 +104,8 @@ export function CreateTokenDialog({
         },
       });
       const data = await res.json();
-      setRevealedToken(data.token);
-      onSuccess();
+      onTokenCreated(data.token);
+      onOpenChange(false);
     } catch {
       // Error handled by API feedback.
     } finally {
@@ -116,85 +113,72 @@ export function CreateTokenDialog({
     }
   }
 
-  function handleRevealClose() {
-    setRevealedToken(null);
-    onOpenChange(false);
-  }
-
   return (
-    <>
-      <Dialog open={open && !revealedToken} onOpenChange={handleClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("create")}</DialogTitle>
-            <DialogDescription>{t("createDescription")}</DialogDescription>
-          </DialogHeader>
-          <DialogBody>
-            <form
-              id="create-token-dialog-form"
-              onSubmit={handleSubmit}
-              className="space-y-4"
-            >
-              <Field>
-                <FieldLabel htmlFor="token-name">{t("fields.name")}</FieldLabel>
-                <Input
-                  id="token-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="token-expiry">
-                  {t("fields.expiry")}
-                </FieldLabel>
-                <Input
-                  id="token-expiry"
-                  type="datetime-local"
-                  value={expiresAt}
-                  onChange={(e) => setExpiresAt(e.target.value)}
-                />
-                <FieldDescription>{t("fields.expiryHint")}</FieldDescription>
-              </Field>
-              <Field>
-                <FieldLabel>{t("fields.scopes")}</FieldLabel>
-                <div className="h-[320px]">
-                  {allScopes ? (
-                    <PermissionSelector
-                      fetchPage={fetchPage}
-                      value={selectedIds}
-                      onChange={setSelectedIds}
-                      selectedItems={selectedItems}
-                    />
-                  ) : null}
-                </div>
-              </Field>
-            </form>
-          </DialogBody>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleClose(false)}
-            >
-              {t("cancel")}
-            </Button>
-            <Button
-              type="submit"
-              form="create-token-dialog-form"
-              disabled={saving || selectedIds.length === 0}
-            >
-              {saving ? t("creating") : t("create")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <RevealTokenDialog
-        open={revealedToken !== null}
-        onOpenChange={(o) => !o && handleRevealClose()}
-        token={revealedToken ?? ""}
-      />
-    </>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t("create")}</DialogTitle>
+          <DialogDescription>{t("createDescription")}</DialogDescription>
+        </DialogHeader>
+        <DialogBody>
+          <form
+            id="create-token-dialog-form"
+            onSubmit={handleSubmit}
+            className="space-y-4"
+          >
+            <Field>
+              <FieldLabel htmlFor="token-name">{t("fields.name")}</FieldLabel>
+              <Input
+                id="token-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="token-expiry">
+                {t("fields.expiry")}
+              </FieldLabel>
+              <Input
+                id="token-expiry"
+                type="datetime-local"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+              />
+              <FieldDescription>{t("fields.expiryHint")}</FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel>{t("fields.scopes")}</FieldLabel>
+              <div className="h-[320px]">
+                {allScopes ? (
+                  <PermissionSelector
+                    fetchPage={fetchPage}
+                    value={selectedIds}
+                    onChange={setSelectedIds}
+                    selectedItems={selectedItems}
+                  />
+                ) : null}
+              </div>
+            </Field>
+          </form>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleClose(false)}
+          >
+            {t("cancel")}
+          </Button>
+          <Button
+            type="submit"
+            form="create-token-dialog-form"
+            disabled={saving || selectedIds.length === 0}
+          >
+            {saving ? t("creating") : t("create")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

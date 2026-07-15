@@ -150,6 +150,7 @@
     "empty": "暂无 API 令牌。创建一个以开始使用。",
     "fields": {
       "name": "名称",
+      "token": "令牌",
       "prefix": "前缀",
       "scopes": "权限范围",
       "status": "状态",

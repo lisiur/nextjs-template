@@ -150,6 +150,7 @@
     "empty": "No API tokens yet. Create one to get started.",
     "fields": {
       "name": "Name",
+      "token": "Token",
       "prefix": "Prefix",
       "scopes": "Scopes",
       "status": "Status",

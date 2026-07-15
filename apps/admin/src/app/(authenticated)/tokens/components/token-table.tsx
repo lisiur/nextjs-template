@@ -31,6 +31,7 @@ import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
 import { CreateTokenDialog } from "./create-token-dialog";
+import { RevealTokenDialog } from "./reveal-token-dialog";
 
 export interface ApiTokenRow {
   id: string;
@@ -49,6 +50,7 @@ export function TokenTable() {
   const confirm = useConfirm();
   const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
+  const [revealedToken, setRevealedToken] = useState<string | null>(null);
   const [scopesToken, setScopesToken] = useState<ApiTokenRow | null>(null);
 
   const tokensQuery = useQuery({
@@ -228,9 +230,18 @@ export function TokenTable() {
         <CreateTokenDialog
           open={showCreate}
           onOpenChange={(open) => !open && setShowCreate(false)}
-          onSuccess={refresh}
+          onTokenCreated={(token) => {
+            setRevealedToken(token);
+            refresh();
+          }}
         />
       )}
+
+      <RevealTokenDialog
+        open={revealedToken !== null}
+        onOpenChange={(open) => !open && setRevealedToken(null)}
+        token={revealedToken ?? ""}
+      />
 
       <Dialog
         open={scopesToken !== null}
