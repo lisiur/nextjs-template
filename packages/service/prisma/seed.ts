@@ -1359,7 +1359,6 @@ export async function seed(client: PrismaClient) {
             members: {
               create: {
                 userId: hapaulUserId,
-                role: "owner",
                 createdAt: new Date(),
               },
             },

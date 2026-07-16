@@ -1,6 +1,13 @@
 import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
+import {
+  countOrgOwners,
+  getOrgOwnerUserIds,
+  getUserOrgRole,
+  isOrgOwner,
+  type OrgRole,
+} from "#lib/org-role";
 
 const memberInclude = {
   user: { select: { id: true, name: true, email: true, image: true } },
@@ -40,8 +47,10 @@ export async function listMembers(
     }),
     prisma.member.count({ where }),
   ]);
+  const ownerUserIds = await getOrgOwnerUserIds(organizationId);
   const members = rows.map(({ memberPositions, ...member }) => ({
     ...member,
+    role: ownerUserIds.has(member.userId) ? "owner" : "member",
     positions: memberPositions.map((mp) => mp.position),
   }));
   return { members, total };
@@ -56,10 +65,8 @@ export async function removeMember(organizationId: string, memberId: string) {
   }
 
   // Check if this is the last owner
-  if (member.role === "owner") {
-    const ownerCount = await prisma.member.count({
-      where: { organizationId, role: "owner" },
-    });
+  if (await isOrgOwner(member.userId, organizationId)) {
+    const ownerCount = await countOrgOwners(organizationId);
     if (ownerCount <= 1) {
       throw new Error("Cannot remove the last owner");
     }
@@ -76,7 +83,9 @@ export async function updateMember(
     employeeId?: string | null;
     departmentId?: string | null;
   },
-): Promise<Prisma.MemberGetPayload<{ include: typeof memberInclude }>> {
+): Promise<
+  Prisma.MemberGetPayload<{ include: typeof memberInclude }> & { role: OrgRole }
+> {
   const member = await prisma.member.findFirst({
     where: { id: memberId, organizationId },
   });
@@ -105,11 +114,14 @@ export async function updateMember(
   if (data.departmentId !== undefined)
     updateData.departmentId = data.departmentId;
 
-  return prisma.member.update({
+  const updated = await prisma.member.update({
     where: { id: memberId },
     data: updateData,
     include: memberInclude,
   });
+
+  const role = await getUserOrgRole(updated.userId, organizationId);
+  return { ...updated, role };
 }
 
 export async function batchUpdateMembers(

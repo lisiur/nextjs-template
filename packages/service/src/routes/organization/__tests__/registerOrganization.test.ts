@@ -116,7 +116,6 @@ describe("POST /register - Register Organization", () => {
         members: {
           create: {
             userId: "user1",
-            role: "owner",
             createdAt: expect.any(Date),
           },
         },

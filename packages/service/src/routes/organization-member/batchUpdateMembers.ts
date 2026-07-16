@@ -8,6 +8,7 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
+import { getOrgOwnerUserIds } from "#lib/org-role";
 import { batchUpdateMembers } from "#services/member.service";
 import { assertAccess } from "#services/role-permission.service";
 import {
@@ -55,6 +56,8 @@ export const batchUpdateOrganizationMembers = defineOpenAPIRoute({
 
     await batchUpdateMembers(orgId, memberIds, { departmentId });
 
+    const ownerUserIds = await getOrgOwnerUserIds(orgId);
+
     const members = await prisma.member.findMany({
       where: { id: { in: memberIds } },
       include: {
@@ -72,6 +75,12 @@ export const batchUpdateOrganizationMembers = defineOpenAPIRoute({
       c,
     });
 
-    return c.json(members, 200);
+    return c.json(
+      members.map((m) => ({
+        ...m,
+        role: ownerUserIds.has(m.userId) ? "owner" : "member",
+      })),
+      200,
+    );
   },
 });

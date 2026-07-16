@@ -1,6 +1,7 @@
 import { ORG_OWNER_ROLE_CODE, ORGANIZATION_APP_CODE } from "@repo/shared";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
+import { getOrgOwners } from "#lib/org-role";
 import { PLATFORM_SCOPE_ID, RoleScopeType } from "#lib/role-scope";
 
 export async function getOrganizationById(id: string) {
@@ -55,7 +56,6 @@ export async function registerOrganizationForUser(
         members: {
           create: {
             userId,
-            role: "owner",
             createdAt: new Date(),
           },
         },
@@ -141,13 +141,6 @@ export async function listOrganizations(params: {
 
   const [organizations, total] = await Promise.all([
     prisma.organization.findMany({
-      include: {
-        members: {
-          where: { role: "owner" },
-          include: { user: { select: { id: true, name: true, email: true } } },
-          take: 1,
-        },
-      },
       orderBy: { createdAt: "desc" },
       take: limit,
       skip: offset,
@@ -155,10 +148,12 @@ export async function listOrganizations(params: {
     prisma.organization.count(),
   ]);
 
+  const owners = await getOrgOwners(organizations.map((o) => o.id));
+
   return {
     organizations: organizations.map((org) => ({
       ...org,
-      owner: org.members[0]?.user ?? null,
+      owner: owners.get(org.id) ?? null,
     })),
     total,
   };

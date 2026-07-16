@@ -1,6 +1,7 @@
 import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
+import { getOrgOwnerUserIds } from "#lib/org-role";
 import { RoleScopeType } from "#lib/role-scope";
 import { getPermissionsForRole } from "#services/role-permission.service";
 
@@ -49,8 +50,11 @@ export async function listPositionMembers(
     },
   });
 
+  const ownerUserIds = await getOrgOwnerUserIds(organizationId);
+
   return memberPositions.map((mp) => ({
     ...mp.member,
+    role: ownerUserIds.has(mp.member.userId) ? "owner" : "member",
     positions: mp.member.memberPositions.map((mp2) => mp2.position),
   }));
 }

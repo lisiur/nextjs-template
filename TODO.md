@@ -21,7 +21,7 @@
       `requireCurrentApp` do the same `X-App-Code` lookup. Consolidate.
 - [x] **Duplicated scope logic** — `PLATFORM_SCOPE_ID` + `RoleScopeType` redefined in both
       `role.repository.ts` and `role-permission.service.ts`. Centralized.
-- [ ] **`member.role` String** (`schema.prisma:223`) separate from `RoleAssignment` RBAC —
+- [x] **`member.role` String** (`schema.prisma:223`) separate from `RoleAssignment` RBAC —
       two sources of truth for a member's role.
 - [x] **Rate-limit SSE broadcast hardcodes `appId: "admin"`** (`middleware/rate-limit.ts:57`)
       — leaks cross-app, ignores request's actual app. Resolved by redesigning
