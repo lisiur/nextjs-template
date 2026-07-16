@@ -177,7 +177,6 @@ CREATE TABLE "member" (
     "id" TEXT NOT NULL,
     "organizationId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "role" TEXT NOT NULL DEFAULT 'member',
     "employeeId" TEXT,
     "departmentId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL,
