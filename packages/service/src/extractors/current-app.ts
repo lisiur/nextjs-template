@@ -3,12 +3,16 @@ import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
 import type { Application } from "#routes/application/schema";
 
-export async function tryCurrentApp(c: Context): Promise<Application | null> {
+async function findCurrentApp(c: Context): Promise<Application | null> {
   const code = c.req.header("X-App-Code");
   if (!code) return null;
   return prisma.application.findFirst({
     where: { code, deletedAt: null },
   });
+}
+
+export async function tryCurrentApp(c: Context): Promise<Application | null> {
+  return findCurrentApp(c);
 }
 
 export async function requireCurrentApp(c: Context): Promise<Application> {
@@ -23,4 +27,12 @@ export async function requireCurrentApp(c: Context): Promise<Application> {
     });
   }
   return currentApp;
+}
+
+export async function tryAppId(c: Context): Promise<string | null> {
+  return (await findCurrentApp(c))?.id ?? null;
+}
+
+export async function requireAppId(c: Context): Promise<string> {
+  return (await requireCurrentApp(c)).id;
 }

@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { requireAppId } from "#extractors/app-id";
+import { requireAppId } from "#extractors/current-app";
 import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { getMenusForUser } from "#services/role-permission.service";

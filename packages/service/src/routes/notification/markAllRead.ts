@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requireAppId } from "#extractors/app-id";
+import { requireAppId } from "#extractors/current-app";
 import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import {
   okResponseFn,

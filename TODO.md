@@ -17,7 +17,7 @@
 
 - [x] **`app-client.ts` duplicated** between admin and organization apps — only `APP_CODE`
       + port differ. Move to `packages/frontend`.
-- [ ] **Redundant extractors** — `tryAppId`/`requireAppId` and `tryCurrentApp`/
+- [x] **Redundant extractors** — `tryAppId`/`requireAppId` and `tryCurrentApp`/
       `requireCurrentApp` do the same `X-App-Code` lookup. Consolidate.
 - [ ] **Duplicated scope logic** — `PLATFORM_SCOPE_ID` + `RoleScopeType` redefined in both
       `role.repository.ts` and `role-permission.service.ts`. Centralize.
