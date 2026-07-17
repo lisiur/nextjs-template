@@ -550,6 +550,9 @@ CREATE INDEX "member_organizationId_idx" ON "member"("organizationId");
 CREATE INDEX "member_userId_idx" ON "member"("userId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "member_organizationId_userId_key" ON "member"("organizationId", "userId");
+
+-- CreateIndex
 CREATE INDEX "invitation_organizationId_idx" ON "invitation"("organizationId");
 
 -- CreateIndex
