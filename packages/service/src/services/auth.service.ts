@@ -82,6 +82,27 @@ export async function signInWithEmail(params: {
     !credential?.password ||
     !(await verifyPassword(credential.password, params.password))
   ) {
+    await logAudit({
+      traceId: params.traceId,
+      userId: user?.id,
+      userName: user?.name,
+      event: "auth.login_failed",
+      category: "authentication",
+      outcome: "failure",
+      severity: "warning",
+      targetType: "user",
+      targetId: user?.id,
+      metadata: {
+        email: params.email,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        reason: !user
+          ? "unknown_user"
+          : !credential?.password
+            ? "no_credential"
+            : "wrong_password",
+      },
+    });
     throw new HTTPException(401, { message: "Invalid email or password" });
   }
 

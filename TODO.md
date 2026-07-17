@@ -22,10 +22,6 @@
       (`services/auth.service.ts:80-86`); argon2 makes the existing-user branch
       tens of ms slower, exposing whether an account exists. Run a dummy
       `verifyPassword` on miss to equalize timing.
-- [ ] **No failed-login audit log** — `signInEmail` emits no `logAudit` on a
-      failed attempt (`routes/auth/signInEmail.ts`), so brute-force and
-      credential-stuffing leave no signal. Emit `auth.login_failed` on every
-      bad password / unknown user.
 - [ ] **`deleteOrganization` orphans org-scoped Roles and RoleAssignments** —
       `organization.delete` cascades to Member/Department/Position but there is
       no relation to the polymorphic `Role`/`RoleAssignment` (scope-modeled), so
