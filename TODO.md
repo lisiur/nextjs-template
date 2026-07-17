@@ -9,12 +9,6 @@
       (`routes/upload/getFile.ts:57,66`). An `<svg onload=...>` /
       `<svg><script>` payload executes in the API origin. Drop SVG from the
       allow-list, force `attachment`, or sanitize.
-- [ ] **No request body size limit — upload memory DoS** — no
-      `bodyLimit`/`contentLengthLimit` middleware is registered anywhere;
-      `uploadFile` calls `c.req.parseBody()` (buffering the whole multipart into
-      memory) before the `size > MAX` check (`routes/upload/uploadFile.ts:36`).
-      A 2 GB field is allocated before rejection. Register Hono `bodyLimit`
-      globally and gate on `Content-Length`.
 - [ ] **IDOR: `replaceUpload` / `deleteUploads` check permission but not
       ownership** — both act on caller-supplied IDs with no `uploaderId` filter
       (`routes/upload/replaceUpload.ts:36-54`,

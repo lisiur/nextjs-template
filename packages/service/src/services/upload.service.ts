@@ -4,6 +4,7 @@ import { mkdir, stat, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
+import { MAX_UPLOAD_FILE_SIZE, UPLOAD_SIGN_EXPIRY_MS } from "#lib/constants";
 import { prisma } from "#lib/db";
 import {
   allowedMimeTypes,
@@ -11,9 +12,7 @@ import {
   verifyMagicBytes,
 } from "#lib/mime";
 
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 const UPLOADS_ROOT = join(process.cwd(), "uploads");
-const SIGN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 const DEFAULT_HOTLINK_CONFIG = {
   enabled: false,
   allowedDomains: [],
@@ -61,9 +60,9 @@ export async function uploadFile(params: {
     });
   }
 
-  if (file.size > MAX_SIZE) {
+  if (file.size > MAX_UPLOAD_FILE_SIZE) {
     throw new HTTPException(400, {
-      message: `File too large. Maximum size: ${MAX_SIZE / 1024 / 1024}MB`,
+      message: `File too large. Maximum size: ${MAX_UPLOAD_FILE_SIZE / 1024 / 1024}MB`,
     });
   }
 
@@ -250,7 +249,7 @@ export async function signFile(params: { id: string; userId: string }) {
     throw new HTTPException(403, { message: "Not file owner" });
   }
 
-  const expiresAt = Date.now() + SIGN_EXPIRY_MS;
+  const expiresAt = Date.now() + UPLOAD_SIGN_EXPIRY_MS;
   const token = createHmac("sha256", getSignSecret())
     .update(`${id}:${expiresAt}`)
     .digest("hex");
@@ -352,9 +351,9 @@ export async function replaceUpload(params: { id: string; file: File }) {
     });
   }
 
-  if (file.size > MAX_SIZE) {
+  if (file.size > MAX_UPLOAD_FILE_SIZE) {
     throw new HTTPException(400, {
-      message: `File too large. Maximum size: ${MAX_SIZE / 1024 / 1024}MB`,
+      message: `File too large. Maximum size: ${MAX_UPLOAD_FILE_SIZE / 1024 / 1024}MB`,
     });
   }
 

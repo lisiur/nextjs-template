@@ -1,8 +1,17 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
+import { bodyLimit } from "hono/body-limit";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
+import {
+  MAX_JSON_BODY_SIZE,
+  MAX_UPLOAD_BODY_SIZE,
+  RATE_LIMIT_AUTH_DEFAULT_MAX,
+  RATE_LIMIT_AUTH_DEFAULT_WINDOW_MS,
+  RATE_LIMIT_GLOBAL_DEFAULT_MAX,
+  RATE_LIMIT_GLOBAL_DEFAULT_WINDOW_MS,
+} from "#lib/constants";
 import { prisma } from "#lib/db";
 import { operationLogger } from "#middleware/operation-logger";
 import { createRateLimiter } from "#middleware/rate-limit";
@@ -87,14 +96,21 @@ openAPIApp.use("*", operationLogger);
 const rateLimitEnabled = process.env.RATE_LIMIT_ENABLED !== "false";
 const globalLimiter = createRateLimiter({
   name: "global",
-  max: Number(process.env.RATE_LIMIT_GLOBAL_MAX ?? 300),
-  windowMs: Number(process.env.RATE_LIMIT_GLOBAL_WINDOW_MS ?? 60_000),
+  max: Number(
+    process.env.RATE_LIMIT_GLOBAL_MAX ?? RATE_LIMIT_GLOBAL_DEFAULT_MAX,
+  ),
+  windowMs: Number(
+    process.env.RATE_LIMIT_GLOBAL_WINDOW_MS ??
+      RATE_LIMIT_GLOBAL_DEFAULT_WINDOW_MS,
+  ),
   enabled: rateLimitEnabled,
 });
 const authLimiter = createRateLimiter({
   name: "auth",
-  max: Number(process.env.RATE_LIMIT_AUTH_MAX ?? 10),
-  windowMs: Number(process.env.RATE_LIMIT_AUTH_WINDOW_MS ?? 60_000),
+  max: Number(process.env.RATE_LIMIT_AUTH_MAX ?? RATE_LIMIT_AUTH_DEFAULT_MAX),
+  windowMs: Number(
+    process.env.RATE_LIMIT_AUTH_WINDOW_MS ?? RATE_LIMIT_AUTH_DEFAULT_WINDOW_MS,
+  ),
   enabled: rateLimitEnabled,
 });
 
@@ -103,6 +119,14 @@ openAPIApp.use("/auth/sign-in/email", authLimiter);
 openAPIApp.use("/auth/sign-up/email", authLimiter);
 openAPIApp.use("/auth/sign-in/wechat", authLimiter);
 openAPIApp.use("/auth/change-password", authLimiter);
+
+openAPIApp.use("*", async (c, next) => {
+  const contentType = c.req.raw.headers.get("content-type") ?? "";
+  const maxSize = contentType.includes("multipart/form-data")
+    ? MAX_UPLOAD_BODY_SIZE
+    : MAX_JSON_BODY_SIZE;
+  return bodyLimit({ maxSize })(c, next);
+});
 
 const app = openAPIApp
   .route("/", routes)
