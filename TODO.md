@@ -2,14 +2,6 @@
 
 ## High Priority
 
-- [ ] **`deleteOrganization` orphans org-scoped Roles and RoleAssignments** —
-      `organization.delete` cascades to Member/Department/Position but there is
-      no relation to the polymorphic `Role`/`RoleAssignment` (scope-modeled), so
-      they stay (`services/organization.service.ts:127-134`). Worse,
-      `getAllUserPermissionCodes` pulls permissions by `userId` with no scope
-      filter, so orphaned assignments keep granting the deleted org's permissions
-      globally (used for API-token scope validation). Sweep both tables scoped to
-      the org before delete.
 - [ ] **`Member` has no unique constraint on `(organizationId, userId)`** —
       `schema.prisma:217-232` only indexes the FKs. A double-submitted invite
       accept, retry, or `registerOrganizationForUser` called twice creates
