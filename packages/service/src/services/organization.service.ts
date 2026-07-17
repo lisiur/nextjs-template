@@ -129,8 +129,16 @@ export async function deleteOrganization(id: string) {
   if (!existing) {
     throw new HTTPException(404, { message: "Organization not found" });
   }
-  const deleted = await prisma.organization.delete({ where: { id } });
-  return { ...deleted, name: existing.name };
+  const result = await prisma.$transaction([
+    prisma.roleAssignment.deleteMany({
+      where: { scopeType: RoleScopeType.ORGANIZATION, scopeId: id },
+    }),
+    prisma.role.deleteMany({
+      where: { scopeType: RoleScopeType.ORGANIZATION, scopeId: id },
+    }),
+    prisma.organization.delete({ where: { id } }),
+  ]);
+  return { ...result[2], name: existing.name };
 }
 
 export async function listOrganizations(params: {

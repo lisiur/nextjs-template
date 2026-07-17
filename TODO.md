@@ -50,6 +50,17 @@
       (`services/auth.service.ts:156-167`); concurrent same-email signups both
       pass the check and the loser throws `PrismaClientKnownRequestError (P2002)`,
       surfacing as a 500. Map `P2002` to `409 "User already exists"`.
+- [ ] **`getAllUserPermissionCodes` resolves permissions with no scope filter** —
+      it walks `roleAssignments.some: { userId }` regardless of scope
+      (`services/role-permission.service.ts:191-210`), so it returns the union
+      of every permission the user holds in *any* scope (PLATFORM, every ORG,
+      every APP). Used by `assertScopesWithinOwner` for API-token scope
+      validation (`services/api-token.service.ts:28-39`), meaning a user can
+      mint a token scoped to a permission they only hold in one organization as
+      if it were global. Orphaned/stale assignments (or any future path that
+      leaks an assignment) inflate this set silently. Accept a scope filter
+      `{ scopeType, scopeId }` (or intersect against the token's own
+      organization/app scope) before treating the result as a global grant set.
 - [ ] **`assignPermissions` allows cross-app privilege grants** — blindly creates
       RolePermission rows for any permission IDs
       (`services/role-permission.service.ts:52-62`); `getPermissionAppWhere`
