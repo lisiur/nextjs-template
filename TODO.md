@@ -2,11 +2,6 @@
 
 ## High Priority
 
-- [ ] **`changePassword` does not invalidate other sessions or rotate the
-      current token** — only updates the hash (`services/auth.service.ts:231-264`).
-      A stolen session cookie keeps working after the victim changes their
-      password. Revoke all of the user's sessions except the caller's and rotate
-      the calling token.
 - [ ] **Banned users keep access via existing session cookies (up to 7 days)** —
       `getSessionByToken` checks `revokedAt`/`expiresAt` but never `user.banned`
       (`lib/session.ts:100-130`). Ban is enforced only at sign-in

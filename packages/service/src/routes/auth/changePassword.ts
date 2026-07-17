@@ -1,10 +1,12 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { HTTPException } from "hono/http-exception";
 import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import {
   badRequestResponse,
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
+import { setSessionCookie } from "#lib/session";
 import { changePassword as changePasswordService } from "#services/auth.service";
 import { changePasswordBodySchema, userMutationResponseSchema } from "./schema";
 
@@ -28,13 +30,19 @@ export const changePassword = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const principal = await requirePrincipal(c);
+    if (principal.kind !== "user") {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
     const body = c.req.valid("json");
-    const { user } = await changePasswordService({
+    const { user, session } = await changePasswordService({
       userId: getPrincipalUserId(principal),
+      callerSessionId: principal.session.id,
       currentPassword: body.currentPassword,
       newPassword: body.newPassword,
+      traceId: c.get("traceId"),
     });
 
+    setSessionCookie(c, session.token);
     return c.json({ user }, 200);
   },
 });

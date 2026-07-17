@@ -233,8 +233,10 @@ export async function createUser(body: {
 
 export async function changePassword(params: {
   userId: string;
+  callerSessionId: string;
   currentPassword: string;
   newPassword: string;
+  traceId?: string;
 }) {
   const user = await prisma.user.findUnique({
     where: { id: params.userId },
@@ -254,16 +256,44 @@ export async function changePassword(params: {
     });
   }
 
-  await prisma.account.update({
-    where: { id: credential.id },
-    data: { password: await hashPassword(params.newPassword) },
+  const callerSession = await prisma.session.findUniqueOrThrow({
+    where: { id: params.callerSessionId },
+  });
+
+  const now = new Date();
+  await prisma.$transaction([
+    prisma.account.update({
+      where: { id: credential.id },
+      data: { password: await hashPassword(params.newPassword) },
+    }),
+    prisma.session.updateMany({
+      where: { userId: user.id, revokedAt: null },
+      data: { revokedAt: now },
+    }),
+  ]);
+
+  const session = await createSession({
+    userId: user.id,
+    ipAddress: callerSession.ipAddress,
+    userAgent: callerSession.userAgent,
+    activeOrganizationId: callerSession.activeOrganizationId,
+  });
+
+  await logAudit({
+    traceId: params.traceId,
+    userId: user.id,
+    sessionId: session.id,
+    event: "auth.password_change",
+    category: "authentication",
+    targetType: "user",
+    targetId: user.id,
   });
 
   const updatedUser = await prisma.user.findUniqueOrThrow({
     where: { id: user.id },
   });
 
-  return { user: updatedUser };
+  return { user: updatedUser, session };
 }
 
 export async function updateUser(params: {
