@@ -2,11 +2,6 @@
 
 ## High Priority
 
-- [ ] **Error handler leaks stack traces to clients** — `openAPIApp.onError`
-      returns `err.stack` in the 500 JSON response body (`src/app.ts:44-53`),
-      including in production. This exposes internal file paths, package names,
-      and library internals to any caller. Log the stack server-side only and
-      return a generic `"Internal Server Error"` message to the client.
 - [ ] **Sign-in response leaks password hashes and OAuth tokens** —
       `signInWithEmail` fetches the user with `include: { accounts: true }` and
       returns `{ user, session }` unchanged (`services/auth.service.ts:74,99`);

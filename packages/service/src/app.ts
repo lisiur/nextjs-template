@@ -41,6 +41,13 @@ openAPIApp.onError((err, c) => {
     return c.json({ code: err.status, message: err.message }, err.status);
   }
   console.error("Unhandled error:", err);
+  const traceId = c.get("traceId") as string | undefined;
+  if (process.env.NODE_ENV === "production") {
+    return c.json(
+      { code: 500, message: "Internal Server Error", traceId },
+      500,
+    );
+  }
   return c.json(
     {
       code: 500,
@@ -48,6 +55,7 @@ openAPIApp.onError((err, c) => {
         err instanceof Error
           ? `${err.name}: ${err.message}\n${err.stack}`
           : String(err),
+      traceId,
     },
     500,
   );
