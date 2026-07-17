@@ -8,6 +8,7 @@ import {
   isOrgOwner,
   type OrgRole,
 } from "#lib/org-role";
+import { RoleScopeType } from "#lib/role-scope";
 
 const memberInclude = {
   user: { select: { id: true, name: true, email: true, image: true } },
@@ -72,7 +73,16 @@ export async function removeMember(organizationId: string, memberId: string) {
     }
   }
 
-  return prisma.member.delete({ where: { id: memberId } });
+  return prisma.$transaction([
+    prisma.roleAssignment.deleteMany({
+      where: {
+        userId: member.userId,
+        scopeType: RoleScopeType.ORGANIZATION,
+        scopeId: organizationId,
+      },
+    }),
+    prisma.member.delete({ where: { id: memberId } }),
+  ]);
 }
 
 export async function updateMember(

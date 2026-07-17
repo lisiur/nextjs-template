@@ -2,12 +2,6 @@
 
 ## High Priority
 
-- [ ] **`removeMember` does not revoke org-scoped roles — kicked members keep
-      access** — only runs `member.delete` (`services/member.service.ts:59-76`);
-      `RoleAssignment` is untouched. Because org-scoped `assertAccess` resolves
-      purely from RoleAssignment rows, a removed member (incl. a removed owner)
-      continues to pass every org permission check. `deleteMany` the user's
-      `(ORGANIZATION, organizationId)` assignments in the same call.
 - [ ] **Built-in roles can be deleted or renamed (global lockout)** —
       `role.service.ts:38-75` has no `isBuiltinRole` guard; the helper exists in
       `@repo/shared` but is used only in the frontend. Deleting `admin`/`owner`
