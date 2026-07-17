@@ -258,19 +258,9 @@ const systemPermissions = [
   },
   { code: "application::view", group: "application", name: "View Application" },
   {
-    code: "application::create",
-    group: "application",
-    name: "Create Application",
-  },
-  {
     code: "application::update",
     group: "application",
     name: "Update Application",
-  },
-  {
-    code: "application::delete",
-    group: "application",
-    name: "Delete Application",
   },
   {
     code: "organization::list",
@@ -325,19 +315,9 @@ const systemPermissions = [
     name: "View Notification Channel",
   },
   {
-    code: "notification-channel::create",
-    group: "notification-channel",
-    name: "Create Notification Channel",
-  },
-  {
     code: "notification-channel::update",
     group: "notification-channel",
     name: "Update Notification Channel",
-  },
-  {
-    code: "notification-channel::delete",
-    group: "notification-channel",
-    name: "Delete Notification Channel",
   },
   {
     code: "notification-template::list",
@@ -350,19 +330,9 @@ const systemPermissions = [
     name: "View Notification Template",
   },
   {
-    code: "notification-template::create",
-    group: "notification-template",
-    name: "Create Notification Template",
-  },
-  {
     code: "notification-template::update",
     group: "notification-template",
     name: "Update Notification Template",
-  },
-  {
-    code: "notification-template::delete",
-    group: "notification-template",
-    name: "Delete Notification Template",
   },
   {
     code: "notification-template::test",
@@ -1064,7 +1034,6 @@ async function upsertNotificationChannel(data: {
       enabled: data.enabled,
       config: Prisma.JsonNull,
       flags: { set: [BUILTIN_NOTIFICATION_FLAG] },
-      deletedAt: null,
     },
     create: { ...data, flags: [BUILTIN_NOTIFICATION_FLAG] },
   });
@@ -1097,7 +1066,6 @@ async function upsertNotificationTemplate(
       variablesSchema: data.variablesSchema,
       sampleVariables: (data.sampleVariables ?? Prisma.JsonNull) as object,
       flags: { set: [BUILTIN_NOTIFICATION_FLAG] },
-      deletedAt: null,
     },
     create: {
       key: data.key,

@@ -1,6 +1,5 @@
 "use client";
 
-import { isBuiltinNotification } from "@repo/shared";
 import {
   Badge,
   Button,
@@ -17,11 +16,10 @@ import {
   TooltipTrigger,
 } from "@repo/ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { FlaskConical, Pencil, Plus, Shield, Trash2 } from "lucide-react";
+import { FlaskConical, Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useConfirm } from "@/hooks/use-confirm";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDate } from "@/utils/date";
@@ -32,9 +30,7 @@ import type { NotificationChannel, NotificationTemplate } from "./types";
 
 export function NotificationTemplateTable() {
   const t = useTranslations("Notifications");
-  const confirm = useConfirm();
   const queryClient = useQueryClient();
-  const [showCreate, setShowCreate] = useState(false);
   const [editTemplate, setEditTemplate] = useState<NotificationTemplate | null>(
     null,
   );
@@ -57,7 +53,7 @@ export function NotificationTemplateTable() {
     queryFn: async () => {
       const res = await withApiFeedback(
         appClient.api["notification-channels"].$get,
-      )({ query: {} });
+      )();
       const data = await res.json();
       return data.channels;
     },
@@ -73,42 +69,10 @@ export function NotificationTemplateTable() {
     });
   }
 
-  function handleCreateSuccess() {
-    setShowCreate(false);
-    refreshTemplates();
-    toast.success(t("templates.createSuccess"));
-  }
-
   function handleEditSuccess() {
     setEditTemplate(null);
     refreshTemplates();
     toast.success(t("templates.updateSuccess"));
-  }
-
-  async function handleDelete(template: NotificationTemplate) {
-    const confirmed = await confirm({
-      title: t("templates.delete"),
-      description: (
-        <>
-          {t("templates.confirmDelete")} <strong>{template.name}</strong>?
-        </>
-      ),
-      confirmLabel: t("actions.delete"),
-      cancelLabel: t("actions.cancel"),
-    });
-    if (!confirmed) return;
-
-    try {
-      await withApiFeedback(
-        appClient.api["notification-templates"][":id"].$delete,
-      )({
-        param: { id: template.id },
-      });
-      refreshTemplates();
-      toast.success(t("templates.deleteSuccess"));
-    } catch {
-      // Error handled by API feedback.
-    }
   }
 
   if (loading) {
@@ -121,15 +85,6 @@ export function NotificationTemplateTable() {
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <div className="mb-4 flex shrink-0 justify-end">
-        <Button
-          onClick={() => setShowCreate(true)}
-          disabled={channels.length === 0}
-        >
-          <Plus className="h-4 w-4" />
-          {t("templates.create")}
-        </Button>
-      </div>
       {templates.length === 0 ? (
         <div className="flex min-h-0 flex-1 items-center justify-center rounded-md border border-dashed py-8 text-muted-foreground">
           {channels.length === 0
@@ -151,119 +106,71 @@ export function NotificationTemplateTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {templates.map((template) => {
-              const builtin = isBuiltinNotification(template.flags);
-              return (
-                <TableRow key={template.id}>
-                  <TableCell>
-                    <span className="inline-flex items-center gap-2">
-                      {getChannelIcon(template.channel?.providerKey)}
-                      {template.name}
-                      {builtin && (
-                        <Badge
-                          variant="secondary"
-                          className="px-1.5"
-                          title={t("templates.protectedActionDisabled")}
-                          aria-label={t("templates.protected")}
-                        >
-                          <Shield className="h-3 w-3" />
-                        </Badge>
-                      )}
-                    </span>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs">
-                    {template.key}
-                  </TableCell>
-                  <TableCell>
-                    {template.channel?.name ?? template.channelId}
-                    <span className="ml-1 text-muted-foreground text-xs">
-                      ({template.channel?.providerKey})
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={template.enabled ? "secondary" : "outline"}>
-                      {template.enabled
-                        ? t("status.enabled")
-                        : t("status.disabled")}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatDate(template.createdAt)}</TableCell>
-                  <TableCell sticky="right" align="right">
-                    <ButtonGroup className="ml-auto">
-                      <Tooltip>
-                        <TooltipTrigger
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              aria-label={t("actions.edit")}
-                              onClick={() => setEditTemplate(template)}
-                            >
-                              <Pencil />
-                            </Button>
-                          }
-                        />
-                        <TooltipContent>{t("actions.edit")}</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger
-                          render={
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              aria-label={t("actions.test")}
-                              onClick={() => setTestTemplate(template)}
-                            >
-                              <FlaskConical />
-                            </Button>
-                          }
-                        />
-                        <TooltipContent>{t("actions.test")}</TooltipContent>
-                      </Tooltip>
-                      {builtin ? (
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          disabled
-                          title={t("templates.protectedActionDisabled")}
-                          aria-label={t("actions.delete")}
-                        >
-                          <Trash2 />
-                        </Button>
-                      ) : (
-                        <Tooltip>
-                          <TooltipTrigger
-                            render={
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                aria-label={t("actions.delete")}
-                                onClick={() => handleDelete(template)}
-                              >
-                                <Trash2 />
-                              </Button>
-                            }
-                          />
-                          <TooltipContent>{t("actions.delete")}</TooltipContent>
-                        </Tooltip>
-                      )}
-                    </ButtonGroup>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {templates.map((template) => (
+              <TableRow key={template.id}>
+                <TableCell>
+                  <span className="inline-flex items-center gap-2">
+                    {getChannelIcon(template.channel?.providerKey)}
+                    {template.name}
+                  </span>
+                </TableCell>
+                <TableCell className="font-mono text-xs">
+                  {template.key}
+                </TableCell>
+                <TableCell>
+                  {template.channel?.name ?? template.channelId}
+                  <span className="ml-1 text-muted-foreground text-xs">
+                    ({template.channel?.providerKey})
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={template.enabled ? "secondary" : "outline"}>
+                    {template.enabled
+                      ? t("status.enabled")
+                      : t("status.disabled")}
+                  </Badge>
+                </TableCell>
+                <TableCell>{formatDate(template.createdAt)}</TableCell>
+                <TableCell sticky="right" align="right">
+                  <ButtonGroup className="ml-auto">
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("actions.edit")}
+                            onClick={() => setEditTemplate(template)}
+                          >
+                            <Pencil />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("actions.edit")}</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("actions.test")}
+                            onClick={() => setTestTemplate(template)}
+                          >
+                            <FlaskConical />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("actions.test")}</TooltipContent>
+                    </Tooltip>
+                  </ButtonGroup>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       )}
 
-      {showCreate && (
-        <NotificationTemplateDialog
-          channels={channels}
-          open={showCreate}
-          onOpenChange={(open) => !open && setShowCreate(false)}
-          onSuccess={handleCreateSuccess}
-        />
-      )}
       {editTemplate && (
         <NotificationTemplateDialog
           template={editTemplate}

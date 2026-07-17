@@ -57,11 +57,8 @@ export function listNotificationChannelProviders() {
   return listNotificationProviders();
 }
 
-export async function listNotificationChannels(params?: {
-  includeDeleted?: boolean;
-}) {
+export async function listNotificationChannels() {
   const channels = await prisma.notificationChannel.findMany({
-    where: params?.includeDeleted ? undefined : { deletedAt: null },
     orderBy: { createdAt: "desc" },
   });
 
@@ -70,48 +67,13 @@ export async function listNotificationChannels(params?: {
 
 export async function getNotificationChannel(id: string) {
   const channel = await prisma.notificationChannel.findFirst({
-    where: { id, deletedAt: null },
+    where: { id },
   });
 
   if (!channel) {
     throw new HTTPException(404, { message: "Notification channel not found" });
   }
 
-  return redactNotificationChannel(channel);
-}
-
-export async function createNotificationChannel(data: {
-  key: string;
-  name: string;
-  providerKey: string;
-  enabled?: boolean;
-  config?: unknown;
-}) {
-  const existing = await prisma.notificationChannel.findUnique({
-    where: { key: data.key },
-  });
-  if (existing) {
-    throw new HTTPException(400, {
-      message: "Notification channel key exists",
-    });
-  }
-
-  const config = validateNotificationProviderConfig(
-    data.providerKey,
-    data.config,
-  );
-
-  const channel = await prisma.notificationChannel.create({
-    data: {
-      key: data.key,
-      name: data.name,
-      providerKey: data.providerKey,
-      enabled: data.enabled ?? true,
-      config: asInputJson(config),
-    },
-  });
-
-  notificationChannelCache.clear();
   return redactNotificationChannel(channel);
 }
 
@@ -126,7 +88,7 @@ export async function updateNotificationChannel(
   },
 ) {
   const existing = await prisma.notificationChannel.findFirst({
-    where: { id, deletedAt: null },
+    where: { id },
   });
   if (!existing) {
     throw new HTTPException(404, { message: "Notification channel not found" });
@@ -199,30 +161,6 @@ export async function updateNotificationChannel(
   return redactNotificationChannel(channel);
 }
 
-export async function deleteNotificationChannel(id: string) {
-  const existing = await prisma.notificationChannel.findFirst({
-    where: { id, deletedAt: null },
-  });
-  if (!existing) {
-    throw new HTTPException(404, { message: "Notification channel not found" });
-  }
-
-  if (isBuiltinNotification(existing.flags)) {
-    throw new HTTPException(403, {
-      message: "Built-in notification channel cannot be deleted",
-    });
-  }
-
-  await prisma.notificationChannel.update({
-    where: { id },
-    data: { deletedAt: new Date(), enabled: false },
-  });
-
-  notificationChannelCache.clear();
-  notificationTemplateCache.clear();
-  return { success: true as const };
-}
-
 export async function getActiveNotificationChannel(id: string) {
   const cached =
     notificationChannelCache.get<
@@ -231,7 +169,7 @@ export async function getActiveNotificationChannel(id: string) {
   if (cached) return cached;
 
   const channel = await prisma.notificationChannel.findFirst({
-    where: { id, deletedAt: null, enabled: true },
+    where: { id, enabled: true },
   });
 
   if (!channel) {
@@ -245,7 +183,7 @@ export async function getActiveNotificationChannel(id: string) {
 /** Returns raw channel config including secrets — use only for internal delivery (e.g. mailer). */
 export async function getChannelById(id: string) {
   const channel = await prisma.notificationChannel.findFirst({
-    where: { id, deletedAt: null },
+    where: { id },
   });
   if (!channel) {
     throw new HTTPException(404, { message: "Notification channel not found" });

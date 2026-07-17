@@ -22,30 +22,15 @@ export const notificationTemplateSchema = z
     flags: z.array(z.string()).default([]),
     createdAt: z.date(),
     updatedAt: z.date(),
-    deletedAt: z.date().nullable().optional(),
   })
   .openapi("NotificationTemplate");
 
 export const listNotificationTemplatesQuerySchema = z.object({
   channelId: z.string().optional(),
-  includeDeleted: z.coerce.boolean().optional(),
 });
 
 export const notificationTemplateIdParamSchema = z.object({
   id: z.string().min(1),
-});
-
-export const createNotificationTemplateBodySchema = z.object({
-  key: z.string().min(1),
-  channelId: z.string().min(1),
-  name: z.string().min(1),
-  description: z.string().nullable().optional(),
-  enabled: z.boolean().optional(),
-  subjectTemplate: z.string().nullable().optional(),
-  titleTemplate: z.string().nullable().optional(),
-  bodyTemplate: z.string().min(1),
-  variablesSchema: jsonValueSchema,
-  sampleVariables: jsonValueSchema,
 });
 
 export const updateNotificationTemplateBodySchema = z.object({

@@ -92,7 +92,6 @@ function enabledTemplate(overrides: Record<string, unknown> = {}) {
       id: "ch-1",
       providerKey: "in-app",
       enabled: true,
-      deletedAt: null,
     },
     ...overrides,
   };
@@ -121,7 +120,6 @@ describe("notification runtime service", () => {
             id: "ch-email",
             providerKey: "smtp-email",
             enabled: true,
-            deletedAt: null,
           },
         }),
       );
@@ -160,7 +158,6 @@ describe("notification runtime service", () => {
             id: "ch-email",
             providerKey: "smtp-email",
             enabled: false,
-            deletedAt: null,
           },
         }),
       );

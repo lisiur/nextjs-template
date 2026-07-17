@@ -7,7 +7,7 @@ async function findCurrentApp(c: Context): Promise<Application | null> {
   const code = c.req.header("X-App-Code");
   if (!code) return null;
   return prisma.application.findFirst({
-    where: { code, deletedAt: null },
+    where: { code },
   });
 }
 

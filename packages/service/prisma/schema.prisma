@@ -308,7 +308,6 @@ model Application {
   watermarkEnabled Boolean @default(false)
   watermarkConfig  String?
   sortOrder   Int          @default(0)
-  deletedAt   DateTime?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   menus        Menu[]
@@ -318,7 +317,6 @@ model Application {
   apiTokens    ApiToken[]
 
   @@unique([code])
-  @@index([deletedAt])
   @@map("application")
 }
 
@@ -499,7 +497,6 @@ model NotificationChannel {
   flags       String[] @default([])
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
 
   templates     NotificationTemplate[]
   notifications Notification[]
@@ -507,7 +504,6 @@ model NotificationChannel {
   @@unique([key])
   @@index([providerKey])
   @@index([enabled])
-  @@index([deletedAt])
   @@map("notification_channel")
 }
 
@@ -525,16 +521,14 @@ model NotificationTemplate {
   variablesSchema Json?
   sampleVariables Json?
   flags           String[]           @default([])
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  deletedAt       DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
 
   notifications Notification[]
 
   @@unique([key])
   @@index([channelId])
   @@index([enabled])
-  @@index([deletedAt])
   @@map("notification_template")
 }
 

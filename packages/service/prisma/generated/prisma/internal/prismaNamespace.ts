@@ -2771,7 +2771,6 @@ export const ApplicationScalarFieldEnum = {
   watermarkEnabled: 'watermarkEnabled',
   watermarkConfig: 'watermarkConfig',
   sortOrder: 'sortOrder',
-  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2913,8 +2912,7 @@ export const NotificationChannelScalarFieldEnum = {
   config: 'config',
   flags: 'flags',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type NotificationChannelScalarFieldEnum = (typeof NotificationChannelScalarFieldEnum)[keyof typeof NotificationChannelScalarFieldEnum]
@@ -2934,8 +2932,7 @@ export const NotificationTemplateScalarFieldEnum = {
   sampleVariables: 'sampleVariables',
   flags: 'flags',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
+  updatedAt: 'updatedAt'
 } as const
 
 export type NotificationTemplateScalarFieldEnum = (typeof NotificationTemplateScalarFieldEnum)[keyof typeof NotificationTemplateScalarFieldEnum]

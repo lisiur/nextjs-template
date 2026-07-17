@@ -47,7 +47,6 @@ export type ApplicationMinAggregateOutputType = {
   watermarkEnabled: boolean | null
   watermarkConfig: string | null
   sortOrder: number | null
-  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -65,7 +64,6 @@ export type ApplicationMaxAggregateOutputType = {
   watermarkEnabled: boolean | null
   watermarkConfig: string | null
   sortOrder: number | null
-  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -83,7 +81,6 @@ export type ApplicationCountAggregateOutputType = {
   watermarkEnabled: number
   watermarkConfig: number
   sortOrder: number
-  deletedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -111,7 +108,6 @@ export type ApplicationMinAggregateInputType = {
   watermarkEnabled?: true
   watermarkConfig?: true
   sortOrder?: true
-  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -129,7 +125,6 @@ export type ApplicationMaxAggregateInputType = {
   watermarkEnabled?: true
   watermarkConfig?: true
   sortOrder?: true
-  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -147,7 +142,6 @@ export type ApplicationCountAggregateInputType = {
   watermarkEnabled?: true
   watermarkConfig?: true
   sortOrder?: true
-  deletedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -252,7 +246,6 @@ export type ApplicationGroupByOutputType = {
   watermarkEnabled: boolean
   watermarkConfig: string | null
   sortOrder: number
-  deletedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: ApplicationCountAggregateOutputType | null
@@ -293,7 +286,6 @@ export type ApplicationWhereInput = {
   watermarkEnabled?: Prisma.BoolFilter<"Application"> | boolean
   watermarkConfig?: Prisma.StringNullableFilter<"Application"> | string | null
   sortOrder?: Prisma.IntFilter<"Application"> | number
-  deletedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   menus?: Prisma.MenuListRelationFilter
@@ -316,7 +308,6 @@ export type ApplicationOrderByWithRelationInput = {
   watermarkEnabled?: Prisma.SortOrder
   watermarkConfig?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   menus?: Prisma.MenuOrderByRelationAggregateInput
@@ -342,7 +333,6 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   watermarkEnabled?: Prisma.BoolFilter<"Application"> | boolean
   watermarkConfig?: Prisma.StringNullableFilter<"Application"> | string | null
   sortOrder?: Prisma.IntFilter<"Application"> | number
-  deletedAt?: Prisma.DateTimeNullableFilter<"Application"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   menus?: Prisma.MenuListRelationFilter
@@ -365,7 +355,6 @@ export type ApplicationOrderByWithAggregationInput = {
   watermarkEnabled?: Prisma.SortOrder
   watermarkConfig?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ApplicationCountOrderByAggregateInput
@@ -391,7 +380,6 @@ export type ApplicationScalarWhereWithAggregatesInput = {
   watermarkEnabled?: Prisma.BoolWithAggregatesFilter<"Application"> | boolean
   watermarkConfig?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"Application"> | number
-  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Application"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
 }
@@ -409,7 +397,6 @@ export type ApplicationCreateInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
@@ -432,7 +419,6 @@ export type ApplicationUncheckedCreateInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
@@ -455,7 +441,6 @@ export type ApplicationUpdateInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
@@ -478,7 +463,6 @@ export type ApplicationUncheckedUpdateInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
@@ -501,7 +485,6 @@ export type ApplicationCreateManyInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -519,7 +502,6 @@ export type ApplicationUpdateManyMutationInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -537,7 +519,6 @@ export type ApplicationUncheckedUpdateManyInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -555,7 +536,6 @@ export type ApplicationCountOrderByAggregateInput = {
   watermarkEnabled?: Prisma.SortOrder
   watermarkConfig?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -577,7 +557,6 @@ export type ApplicationMaxOrderByAggregateInput = {
   watermarkEnabled?: Prisma.SortOrder
   watermarkConfig?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -595,7 +574,6 @@ export type ApplicationMinOrderByAggregateInput = {
   watermarkEnabled?: Prisma.SortOrder
   watermarkConfig?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
-  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -703,7 +681,6 @@ export type ApplicationCreateWithoutMenusInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.RoleCreateNestedManyWithoutAppInput
@@ -725,7 +702,6 @@ export type ApplicationUncheckedCreateWithoutMenusInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.RoleUncheckedCreateNestedManyWithoutAppInput
@@ -763,7 +739,6 @@ export type ApplicationUpdateWithoutMenusInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.RoleUpdateManyWithoutAppNestedInput
@@ -785,7 +760,6 @@ export type ApplicationUncheckedUpdateWithoutMenusInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.RoleUncheckedUpdateManyWithoutAppNestedInput
@@ -807,7 +781,6 @@ export type ApplicationCreateWithoutPermissionsInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
@@ -829,7 +802,6 @@ export type ApplicationUncheckedCreateWithoutPermissionsInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
@@ -867,7 +839,6 @@ export type ApplicationUpdateWithoutPermissionsInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
@@ -889,7 +860,6 @@ export type ApplicationUncheckedUpdateWithoutPermissionsInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
@@ -911,7 +881,6 @@ export type ApplicationCreateWithoutRolesInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
@@ -933,7 +902,6 @@ export type ApplicationUncheckedCreateWithoutRolesInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
@@ -971,7 +939,6 @@ export type ApplicationUpdateWithoutRolesInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
@@ -993,7 +960,6 @@ export type ApplicationUncheckedUpdateWithoutRolesInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
@@ -1015,7 +981,6 @@ export type ApplicationCreateWithoutNotificationsInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
@@ -1037,7 +1002,6 @@ export type ApplicationUncheckedCreateWithoutNotificationsInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
@@ -1075,7 +1039,6 @@ export type ApplicationUpdateWithoutNotificationsInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
@@ -1097,7 +1060,6 @@ export type ApplicationUncheckedUpdateWithoutNotificationsInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
@@ -1119,7 +1081,6 @@ export type ApplicationCreateWithoutApiTokensInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuCreateNestedManyWithoutAppInput
@@ -1141,7 +1102,6 @@ export type ApplicationUncheckedCreateWithoutApiTokensInput = {
   watermarkEnabled?: boolean
   watermarkConfig?: string | null
   sortOrder?: number
-  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   menus?: Prisma.MenuUncheckedCreateNestedManyWithoutAppInput
@@ -1179,7 +1139,6 @@ export type ApplicationUpdateWithoutApiTokensInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUpdateManyWithoutAppNestedInput
@@ -1201,7 +1160,6 @@ export type ApplicationUncheckedUpdateWithoutApiTokensInput = {
   watermarkEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   watermarkConfig?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   menus?: Prisma.MenuUncheckedUpdateManyWithoutAppNestedInput
@@ -1290,7 +1248,6 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   watermarkEnabled?: boolean
   watermarkConfig?: boolean
   sortOrder?: boolean
-  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   menus?: boolean | Prisma.Application$menusArgs<ExtArgs>
@@ -1314,7 +1271,6 @@ export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   watermarkEnabled?: boolean
   watermarkConfig?: boolean
   sortOrder?: boolean
-  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["application"]>
@@ -1332,7 +1288,6 @@ export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   watermarkEnabled?: boolean
   watermarkConfig?: boolean
   sortOrder?: boolean
-  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["application"]>
@@ -1350,12 +1305,11 @@ export type ApplicationSelectScalar = {
   watermarkEnabled?: boolean
   watermarkConfig?: boolean
   sortOrder?: boolean
-  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "description" | "logo" | "favicon" | "copyright" | "icp" | "psif" | "watermarkEnabled" | "watermarkConfig" | "sortOrder" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
+export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "description" | "logo" | "favicon" | "copyright" | "icp" | "psif" | "watermarkEnabled" | "watermarkConfig" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menus?: boolean | Prisma.Application$menusArgs<ExtArgs>
   roles?: boolean | Prisma.Application$rolesArgs<ExtArgs>
@@ -1389,7 +1343,6 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     watermarkEnabled: boolean
     watermarkConfig: string | null
     sortOrder: number
-    deletedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["application"]>
@@ -1832,7 +1785,6 @@ export interface ApplicationFieldRefs {
   readonly watermarkEnabled: Prisma.FieldRef<"Application", 'Boolean'>
   readonly watermarkConfig: Prisma.FieldRef<"Application", 'String'>
   readonly sortOrder: Prisma.FieldRef<"Application", 'Int'>
-  readonly deletedAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Application", 'DateTime'>
 }

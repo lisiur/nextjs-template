@@ -7,10 +7,7 @@ import {
 } from "#lib/openapi";
 import { listNotificationChannels } from "#services/notification/channel.service";
 import { assertAccess } from "#services/role-permission.service";
-import {
-  listNotificationChannelsQuerySchema,
-  listNotificationChannelsResponseSchema,
-} from "./schema";
+import { listNotificationChannelsResponseSchema } from "./schema";
 
 export const listNotificationChannelsRoute = defineOpenAPIRoute({
   route: createRoute({
@@ -18,7 +15,6 @@ export const listNotificationChannelsRoute = defineOpenAPIRoute({
     path: "/",
     tags: ["NotificationChannel"],
     summary: "List notification channels",
-    request: { query: listNotificationChannelsQuerySchema },
     responses: {
       ...unauthorizedResponse,
       ...forbiddenResponse,
@@ -31,8 +27,7 @@ export const listNotificationChannelsRoute = defineOpenAPIRoute({
   handler: async (c) => {
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "notification-channel::list");
-    const query = c.req.valid("query");
-    const channels = await listNotificationChannels(query);
+    const channels = await listNotificationChannels();
     return c.json({ channels }, 200);
   },
 });

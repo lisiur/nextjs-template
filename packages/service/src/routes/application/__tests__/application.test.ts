@@ -8,7 +8,6 @@ vi.mock("../../../lib/db", () => ({
       findFirst: vi.fn(),
       findMany: vi.fn(),
       count: vi.fn(),
-      create: vi.fn(),
       update: vi.fn(),
     },
     auditLog: {
@@ -48,7 +47,6 @@ const mockPrisma = prisma as unknown as {
     findFirst: ReturnType<typeof vi.fn>;
     findMany: ReturnType<typeof vi.fn>;
     count: ReturnType<typeof vi.fn>;
-    create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
   };
   auditLog: {
@@ -131,7 +129,6 @@ describe("GET /current - Current Application", () => {
       description: "Organization workspace",
       logo: "/api/upload/logo1",
       sortOrder: 10,
-      deletedAt: null,
       createdAt: now,
       updatedAt: now,
     });
@@ -146,7 +143,7 @@ describe("GET /current - Current Application", () => {
     expect(res.status).toBe(200);
     expect(mockGetUserPermissions).not.toHaveBeenCalled();
     expect(mockPrisma.application.findFirst).toHaveBeenCalledWith({
-      where: { code: "organization", deletedAt: null },
+      where: { code: "organization" },
     });
     await expect(res.json()).resolves.toEqual({
       name: "Organization",
@@ -166,7 +163,6 @@ describe("GET /current - Current Application", () => {
       description: "Organization workspace",
       logo: "/api/upload/logo1",
       sortOrder: 10,
-      deletedAt: null,
       createdAt: now,
       updatedAt: now,
     });
@@ -180,7 +176,7 @@ describe("GET /current - Current Application", () => {
 
     expect(res.status).toBe(200);
     expect(mockPrisma.application.findFirst).toHaveBeenCalledWith({
-      where: { code: "organization", deletedAt: null },
+      where: { code: "organization" },
     });
     await expect(res.json()).resolves.toEqual({
       name: "Organization",
@@ -221,132 +217,6 @@ describe("GET /current - Current Application", () => {
   });
 });
 
-// ─── CREATE ────────────────────────────────────────────────────────────────
-
-describe("POST / - Create Application", () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    mockGetSession.mockResolvedValue({
-      user: { id: "u1" },
-      session: { id: "s1" },
-    } as any);
-    mockGetUserPermissions.mockResolvedValue(["*"]);
-  });
-
-  it("returns 201 with application object for valid body", async () => {
-    const now = new Date();
-    mockPrisma.application.findFirst.mockResolvedValue(null);
-    mockPrisma.application.create.mockResolvedValue({
-      id: "app1",
-      name: "OA System",
-      code: "oa",
-      description: "Office Automation",
-      logo: null,
-      sortOrder: 0,
-      deletedAt: null,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    const { createApplication } = await import("../createApplication");
-    const res = await testRoute(createApplication, {
-      method: "POST",
-      path: "/",
-      body: { name: "OA System", code: "oa", description: "Office Automation" },
-    });
-
-    expect(res.status).toBe(201);
-    const data = await res.json();
-    expect(data).toMatchObject({
-      id: "app1",
-      name: "OA System",
-      code: "oa",
-    });
-    expect(data.createdAt).toBeDefined();
-  });
-
-  it("persists upload store logo URLs", async () => {
-    const now = new Date();
-    mockPrisma.application.findFirst.mockResolvedValue(null);
-    mockPrisma.application.create.mockResolvedValue({
-      id: "app1",
-      name: "OA System",
-      code: "oa",
-      description: null,
-      logo: "/api/upload/upload1",
-      sortOrder: 0,
-      deletedAt: null,
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    const { createApplication } = await import("../createApplication");
-    const res = await testRoute(createApplication, {
-      method: "POST",
-      path: "/",
-      body: { name: "OA System", code: "oa", logo: "/api/upload/upload1" },
-    });
-
-    expect(res.status).toBe(201);
-    expect(mockPrisma.application.create).toHaveBeenCalledWith({
-      data: {
-        name: "OA System",
-        code: "oa",
-        logo: "/api/upload/upload1",
-        sortOrder: 0,
-      },
-    });
-  });
-
-  it("returns 400 for non-upload logo strings", async () => {
-    const { createApplication } = await import("../createApplication");
-    const res = await testRoute(createApplication, {
-      method: "POST",
-      path: "/",
-      body: {
-        name: "OA System",
-        code: "oa",
-        logo: "data:image/png;base64,abc",
-      },
-    });
-
-    expect(res.status).toBe(400);
-    expect(mockPrisma.application.create).not.toHaveBeenCalled();
-  });
-
-  it("returns 409 for duplicate code (non-deleted)", async () => {
-    mockPrisma.application.findFirst.mockResolvedValue({
-      id: "existing",
-      code: "oa",
-    });
-
-    const { createApplication } = await import("../createApplication");
-    const res = await testRoute(createApplication, {
-      method: "POST",
-      path: "/",
-      body: { name: "Another OA", code: "oa" },
-    });
-
-    expect(res.status).toBe(409);
-    const data = await res.json();
-    expect(data.message).toBe("Application code already exists");
-  });
-
-  it("returns 401 without admin session", async () => {
-    mockGetSession.mockResolvedValue(null);
-
-    const { createApplication } = await import("../createApplication");
-    const res = await testRoute(createApplication, {
-      method: "POST",
-      path: "/",
-      body: { name: "Test", code: "test" },
-      headers: { cookie: "" },
-    });
-
-    expect(res.status).toBe(401);
-  });
-});
-
 // ─── LIST ──────────────────────────────────────────────────────────────────
 
 describe("GET / - List Applications", () => {
@@ -359,10 +229,10 @@ describe("GET / - List Applications", () => {
     mockGetUserPermissions.mockResolvedValue(["*"]);
   });
 
-  it("returns applications with deletedAt: null filter", async () => {
+  it("returns applications", async () => {
     const apps = [
-      { id: "a1", name: "App1", code: "app1", deletedAt: null },
-      { id: "a2", name: "App2", code: "app2", deletedAt: null },
+      { id: "a1", name: "App1", code: "app1" },
+      { id: "a2", name: "App2", code: "app2" },
     ];
     mockPrisma.application.findMany.mockResolvedValue(apps as any);
     mockPrisma.application.count.mockResolvedValue(2);
@@ -377,15 +247,11 @@ describe("GET / - List Applications", () => {
     const data = await res.json();
     expect(data.applications).toHaveLength(2);
     expect(data.total).toBe(2);
-
-    // Verify deletedAt: null filter was used
-    const findManyCall = mockPrisma.application.findMany.mock.calls[0][0];
-    expect(findManyCall.where.deletedAt).toBeNull();
   });
 
   it("returns filtered results with search (case-insensitive)", async () => {
     mockPrisma.application.findMany.mockResolvedValue([
-      { id: "a1", name: "OA System", code: "oa", deletedAt: null },
+      { id: "a1", name: "OA System", code: "oa" },
     ] as any);
     mockPrisma.application.count.mockResolvedValue(1);
 
@@ -432,12 +298,11 @@ describe("GET /{id} - Get Application", () => {
     mockGetUserPermissions.mockResolvedValue(["*"]);
   });
 
-  it("returns application for existing non-deleted app", async () => {
+  it("returns application for existing app", async () => {
     mockPrisma.application.findFirst.mockResolvedValue({
       id: "app1",
       name: "OA",
       code: "oa",
-      deletedAt: null,
     });
 
     const { getApplication } = await import("../getApplication");
@@ -451,13 +316,11 @@ describe("GET /{id} - Get Application", () => {
     const data = await res.json();
     expect(data.id).toBe("app1");
 
-    // Verify findFirst with deletedAt: null
     const call = mockPrisma.application.findFirst.mock.calls[0][0];
-    expect(call.where.deletedAt).toBeNull();
     expect(call.where.id).toBe("app1");
   });
 
-  it("returns 404 for non-existent or deleted app", async () => {
+  it("returns 404 for non-existent app", async () => {
     mockPrisma.application.findFirst.mockResolvedValue(null);
 
     const { getApplication } = await import("../getApplication");
@@ -503,7 +366,6 @@ describe("PUT /{id} - Update Application", () => {
         id: "app1",
         name: "OA",
         code: "oa",
-        deletedAt: null,
       })
       .mockResolvedValueOnce(null); // code uniqueness check
 
@@ -511,7 +373,6 @@ describe("PUT /{id} - Update Application", () => {
       id: "app1",
       name: "Updated OA",
       code: "oa",
-      deletedAt: null,
     });
 
     const { updateApplication } = await import("../updateApplication");
@@ -533,7 +394,6 @@ describe("PUT /{id} - Update Application", () => {
       name: "OA",
       code: "oa",
       logo: "/api/upload/upload1",
-      deletedAt: null,
     });
 
     mockPrisma.application.update.mockResolvedValue({
@@ -541,7 +401,6 @@ describe("PUT /{id} - Update Application", () => {
       name: "OA",
       code: "oa",
       logo: null,
-      deletedAt: null,
     });
 
     const { updateApplication } = await import("../updateApplication");
@@ -565,12 +424,10 @@ describe("PUT /{id} - Update Application", () => {
         id: "app1",
         name: "OA",
         code: "oa",
-        deletedAt: null,
       })
       .mockResolvedValueOnce({
         id: "app2",
         code: "crm",
-        deletedAt: null,
       }); // code already taken
 
     const { updateApplication } = await import("../updateApplication");
@@ -609,75 +466,6 @@ describe("PUT /{id} - Update Application", () => {
       path: "/app1",
       params: { id: "app1" },
       body: { name: "Test" },
-      headers: { cookie: "" },
-    });
-
-    expect(res.status).toBe(401);
-  });
-});
-
-// ─── DELETE ────────────────────────────────────────────────────────────────
-
-describe("DELETE /{id} - Delete Application (soft delete)", () => {
-  beforeEach(() => {
-    vi.resetAllMocks();
-    mockGetSession.mockResolvedValue({
-      user: { id: "u1" },
-      session: { id: "s1" },
-    } as any);
-    mockGetUserPermissions.mockResolvedValue(["*"]);
-  });
-
-  it("returns {success: true} and sets deletedAt (soft delete)", async () => {
-    const now = new Date();
-    mockPrisma.application.findFirst.mockResolvedValue({
-      id: "app1",
-      deletedAt: null,
-    });
-    mockPrisma.application.update.mockResolvedValue({
-      id: "app1",
-      deletedAt: now,
-    });
-
-    const { deleteApplication } = await import("../deleteApplication");
-    const res = await testRoute(deleteApplication, {
-      method: "DELETE",
-      path: "/app1",
-      params: { id: "app1" },
-    });
-
-    expect(res.status).toBe(200);
-    const data = await res.json();
-    expect(data.success).toBe(true);
-
-    // Verify soft delete (update, not delete)
-    expect(mockPrisma.application.update).toHaveBeenCalledWith({
-      where: { id: "app1" },
-      data: { deletedAt: expect.any(Date) },
-    });
-  });
-
-  it("returns 404 for non-existent app", async () => {
-    mockPrisma.application.findFirst.mockResolvedValue(null);
-
-    const { deleteApplication } = await import("../deleteApplication");
-    const res = await testRoute(deleteApplication, {
-      method: "DELETE",
-      path: "/nonexistent",
-      params: { id: "nonexistent" },
-    });
-
-    expect(res.status).toBe(404);
-  });
-
-  it("returns 401 without admin session", async () => {
-    mockGetSession.mockResolvedValue(null);
-
-    const { deleteApplication } = await import("../deleteApplication");
-    const res = await testRoute(deleteApplication, {
-      method: "DELETE",
-      path: "/app1",
-      params: { id: "app1" },
       headers: { cookie: "" },
     });
 

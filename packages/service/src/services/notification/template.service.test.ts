@@ -5,7 +5,6 @@ vi.mock("#lib/db", () => ({
     notificationTemplate: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
-      create: vi.fn(),
       update: vi.fn(),
     },
   },
@@ -28,7 +27,6 @@ import { prisma } from "#lib/db";
 import { notificationTemplateCache } from "#states";
 import { getActiveNotificationChannel } from "./channel.service";
 import {
-  createNotificationTemplate,
   findTemplateForDelivery,
   updateNotificationTemplate,
 } from "./template.service";
@@ -37,7 +35,6 @@ const mockPrisma = prisma as unknown as {
   notificationTemplate: {
     findUnique: ReturnType<typeof vi.fn>;
     findFirst: ReturnType<typeof vi.fn>;
-    create: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
   };
 };
@@ -51,7 +48,6 @@ function channelWith(providerKey: string) {
     id: "ch-1",
     providerKey,
     enabled: true,
-    deletedAt: null,
     config: {},
   };
 }
@@ -59,116 +55,6 @@ function channelWith(providerKey: string) {
 describe("notification template headline validation", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-  });
-
-  it("requires titleTemplate for in-app channel on create", async () => {
-    mockGetActiveChannel.mockResolvedValue(channelWith("in-app"));
-
-    await expect(
-      createNotificationTemplate({
-        key: "welcome",
-        channelId: "ch-1",
-        name: "Welcome",
-        bodyTemplate: "Hello",
-        titleTemplate: null,
-        subjectTemplate: null,
-      }),
-    ).rejects.toMatchObject({ status: 400 });
-
-    expect(mockPrisma.notificationTemplate.create).not.toHaveBeenCalled();
-  });
-
-  it("requires subjectTemplate for smtp-email channel on create", async () => {
-    mockGetActiveChannel.mockResolvedValue(channelWith("smtp-email"));
-
-    await expect(
-      createNotificationTemplate({
-        key: "welcome-email",
-        channelId: "ch-1",
-        name: "Welcome Email",
-        bodyTemplate: "Hello",
-        subjectTemplate: null,
-        titleTemplate: null,
-      }),
-    ).rejects.toMatchObject({ status: 400 });
-
-    expect(mockPrisma.notificationTemplate.create).not.toHaveBeenCalled();
-  });
-
-  it("allows sms template with neither headline field", async () => {
-    mockGetActiveChannel.mockResolvedValue(channelWith("sms"));
-    mockPrisma.notificationTemplate.create.mockResolvedValue({
-      id: "tpl-1",
-      channel: channelWith("sms"),
-    });
-
-    await createNotificationTemplate({
-      key: "welcome-sms",
-      channelId: "ch-1",
-      name: "Welcome SMS",
-      bodyTemplate: "Hello",
-    });
-
-    expect(mockPrisma.notificationTemplate.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          subjectTemplate: null,
-          titleTemplate: null,
-        }),
-      }),
-    );
-  });
-
-  it("coerces stray subjectTemplate to null for in-app channel", async () => {
-    mockGetActiveChannel.mockResolvedValue(channelWith("in-app"));
-    mockPrisma.notificationTemplate.create.mockResolvedValue({
-      id: "tpl-1",
-      channel: channelWith("in-app"),
-    });
-
-    await createNotificationTemplate({
-      key: "welcome",
-      channelId: "ch-1",
-      name: "Welcome",
-      bodyTemplate: "Hello",
-      titleTemplate: "Welcome!",
-      subjectTemplate: "should be dropped",
-    });
-
-    expect(mockPrisma.notificationTemplate.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          titleTemplate: "Welcome!",
-          subjectTemplate: null,
-        }),
-      }),
-    );
-  });
-
-  it("coerces stray titleTemplate to null for smtp-email channel", async () => {
-    mockGetActiveChannel.mockResolvedValue(channelWith("smtp-email"));
-    mockPrisma.notificationTemplate.create.mockResolvedValue({
-      id: "tpl-1",
-      channel: channelWith("smtp-email"),
-    });
-
-    await createNotificationTemplate({
-      key: "welcome-email",
-      channelId: "ch-1",
-      name: "Welcome Email",
-      bodyTemplate: "Hello",
-      subjectTemplate: "Welcome",
-      titleTemplate: "should be dropped",
-    });
-
-    expect(mockPrisma.notificationTemplate.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          subjectTemplate: "Welcome",
-          titleTemplate: null,
-        }),
-      }),
-    );
   });
 
   it("rejects when switching channel to smtp-email without subject on update", async () => {
@@ -243,7 +129,6 @@ describe("findTemplateForDelivery", () => {
         id: "ch-1",
         providerKey: "in-app",
         enabled: true,
-        deletedAt: null,
       },
       ...overrides,
     };
@@ -280,7 +165,6 @@ describe("findTemplateForDelivery", () => {
           id: "ch-email",
           providerKey: "smtp-email",
           enabled: false,
-          deletedAt: null,
         },
       }),
     );

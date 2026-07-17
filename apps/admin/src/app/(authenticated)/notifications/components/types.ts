@@ -16,7 +16,6 @@ export interface NotificationChannel {
   flags: string[];
   createdAt: string;
   updatedAt: string;
-  deletedAt?: string | null;
 }
 
 export interface NotificationTemplate {
@@ -35,7 +34,6 @@ export interface NotificationTemplate {
   flags: string[];
   createdAt: string;
   updatedAt: string;
-  deletedAt?: string | null;
 }
 
 export interface NotificationRecordRelationUser {

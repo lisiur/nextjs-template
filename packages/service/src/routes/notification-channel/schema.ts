@@ -25,24 +25,11 @@ export const notificationChannelSchema = z
     flags: z.array(z.string()).default([]),
     createdAt: z.date(),
     updatedAt: z.date(),
-    deletedAt: z.date().nullable().optional(),
   })
   .openapi("NotificationChannel");
 
-export const listNotificationChannelsQuerySchema = z.object({
-  includeDeleted: z.coerce.boolean().optional(),
-});
-
 export const notificationChannelIdParamSchema = z.object({
   id: z.string().min(1),
-});
-
-export const createNotificationChannelBodySchema = z.object({
-  key: z.string().min(1),
-  name: z.string().min(1),
-  providerKey: z.string().min(1),
-  enabled: z.boolean().optional(),
-  config: jsonValueSchema,
 });
 
 export const updateNotificationChannelBodySchema = z.object({

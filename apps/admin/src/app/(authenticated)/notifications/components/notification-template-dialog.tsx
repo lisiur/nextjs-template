@@ -38,7 +38,7 @@ interface VariableRow {
 }
 
 interface NotificationTemplateDialogProps {
-  template?: NotificationTemplate | null;
+  template: NotificationTemplate;
   channels: NotificationChannel[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -90,8 +90,7 @@ export function NotificationTemplateDialog({
   onSuccess,
 }: NotificationTemplateDialogProps) {
   const t = useTranslations("Notifications");
-  const isEdit = !!template;
-  const builtin = isBuiltinNotification(template?.flags);
+  const builtin = isBuiltinNotification(template.flags);
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
   const [channelId, setChannelId] = useState("");
@@ -185,18 +184,12 @@ export function NotificationTemplateDialog({
           activeRows.length > 0 ? buildVariablesSchema(activeRows) : undefined,
       };
 
-      if (isEdit) {
-        await withApiFeedback(
-          appClient.api["notification-templates"][":id"].$put,
-        )({
-          param: { id: template.id },
-          json: payload,
-        });
-      } else {
-        await withApiFeedback(appClient.api["notification-templates"].$post)({
-          json: payload,
-        });
-      }
+      await withApiFeedback(
+        appClient.api["notification-templates"][":id"].$put,
+      )({
+        param: { id: template.id },
+        json: payload,
+      });
       onSuccess();
     } finally {
       setSaving(false);
@@ -207,13 +200,9 @@ export function NotificationTemplateDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader className="shrink-0">
-          <DialogTitle>
-            {isEdit ? t("templates.edit") : t("templates.create")}
-          </DialogTitle>
+          <DialogTitle>{t("templates.edit")}</DialogTitle>
           <DialogDescription>
-            {isEdit
-              ? t("templates.editDescription")
-              : t("templates.createDescription")}
+            {t("templates.editDescription")}
           </DialogDescription>
         </DialogHeader>
         <DialogBody>

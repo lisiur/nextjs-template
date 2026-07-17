@@ -41,7 +41,6 @@ describe("sendSmtpEmail", () => {
         password: "pass",
         from: "noreply@example.com",
       },
-      deletedAt: null,
     });
 
     const result = await sendSmtpEmail({
@@ -66,7 +65,6 @@ describe("sendSmtpEmail", () => {
       providerKey: "in-app",
       enabled: true,
       config: null,
-      deletedAt: null,
     });
 
     await expect(
@@ -93,7 +91,6 @@ describe("sendSmtpEmail", () => {
       providerKey: "smtp-email",
       enabled: false,
       config: { host: "smtp.example.com", port: 587, from: "from@example.com" },
-      deletedAt: null,
     });
 
     await expect(
@@ -123,7 +120,6 @@ describe("sendSmtpEmail", () => {
         secure: false,
         from: "from@example.com",
       },
-      deletedAt: null,
     });
 
     await sendSmtpEmail({
@@ -158,7 +154,6 @@ describe("sendSmtpEmail", () => {
         username: "user",
         from: "from@example.com",
       },
-      deletedAt: null,
     });
 
     await sendSmtpEmail({

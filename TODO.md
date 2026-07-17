@@ -1,14 +1,5 @@
 # TODO
 
-## High Priority
-
-- [ ] **Soft-deleted Application / NotificationChannel / NotificationTemplate
-      can't be re-created by natural key** — each carries `deletedAt` but the
-      unique index is plain: `@@unique([code])` (`schema.prisma:319`),
-      `@@unique([key])` (`:506`, `:533`). After a soft-delete the pre-check
-      reports "not found" but re-create throws `P2002` → 500. Replace with
-      partial unique indexes `WHERE "deletedAt" IS NULL`.
-
 ## Medium Priority
 
 - [ ] **Client loses RPC type safety** — manual `as` casts (`use-current-organization.ts:16`)

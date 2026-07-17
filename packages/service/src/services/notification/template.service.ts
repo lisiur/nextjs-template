@@ -71,11 +71,9 @@ function redactTemplateChannel<
 
 export async function listNotificationTemplates(params?: {
   channelId?: string;
-  includeDeleted?: boolean;
 }) {
   const templates = await prisma.notificationTemplate.findMany({
     where: {
-      deletedAt: params?.includeDeleted ? undefined : null,
       channelId: params?.channelId,
     },
     include: templateWithChannel,
@@ -87,7 +85,7 @@ export async function listNotificationTemplates(params?: {
 
 export async function getNotificationTemplate(id: string) {
   const template = await prisma.notificationTemplate.findFirst({
-    where: { id, deletedAt: null },
+    where: { id },
     include: templateWithChannel,
   });
 
@@ -97,51 +95,6 @@ export async function getNotificationTemplate(id: string) {
     });
   }
 
-  return redactTemplateChannel(template);
-}
-
-export async function createNotificationTemplate(data: {
-  key: string;
-  channelId: string;
-  name: string;
-  description?: string | null;
-  enabled?: boolean;
-  subjectTemplate?: string | null;
-  titleTemplate?: string | null;
-  bodyTemplate: string;
-  variablesSchema?: unknown;
-  sampleVariables?: unknown;
-}) {
-  const existing = await prisma.notificationTemplate.findUnique({
-    where: { key: data.key },
-  });
-  if (existing) {
-    throw new HTTPException(400, {
-      message: "Notification template key exists",
-    });
-  }
-
-  const channel = await getActiveNotificationChannel(data.channelId);
-
-  const headline = coerceTemplateHeadline(channel.providerKey, data);
-
-  const template = await prisma.notificationTemplate.create({
-    data: {
-      key: data.key,
-      channelId: data.channelId,
-      name: data.name,
-      description: data.description,
-      enabled: data.enabled ?? true,
-      subjectTemplate: headline.subjectTemplate,
-      titleTemplate: headline.titleTemplate,
-      bodyTemplate: data.bodyTemplate,
-      variablesSchema: asInputJson(data.variablesSchema),
-      sampleVariables: asInputJson(data.sampleVariables),
-    },
-    include: templateWithChannel,
-  });
-
-  notificationTemplateCache.clear();
   return redactTemplateChannel(template);
 }
 
@@ -161,7 +114,7 @@ export async function updateNotificationTemplate(
   },
 ) {
   const existing = await prisma.notificationTemplate.findFirst({
-    where: { id, deletedAt: null },
+    where: { id },
     include: templateWithChannel,
   });
   if (!existing) {
@@ -227,31 +180,6 @@ export async function updateNotificationTemplate(
   return redactTemplateChannel(template);
 }
 
-export async function deleteNotificationTemplate(id: string) {
-  const existing = await prisma.notificationTemplate.findFirst({
-    where: { id, deletedAt: null },
-  });
-  if (!existing) {
-    throw new HTTPException(404, {
-      message: "Notification template not found",
-    });
-  }
-
-  if (isBuiltinNotification(existing.flags)) {
-    throw new HTTPException(403, {
-      message: "Built-in notification template cannot be deleted",
-    });
-  }
-
-  await prisma.notificationTemplate.update({
-    where: { id },
-    data: { deletedAt: new Date(), enabled: false },
-  });
-
-  notificationTemplateCache.clear();
-  return { success: true as const };
-}
-
 export async function findTemplateForDelivery(key: string): Promise<{
   template: NotificationTemplateWithChannel;
   disabledReason: string | null;
@@ -261,7 +189,7 @@ export async function findTemplateForDelivery(key: string): Promise<{
   if (cached) return { template: cached, disabledReason: null };
 
   const template = await prisma.notificationTemplate.findFirst({
-    where: { key, deletedAt: null },
+    where: { key },
     include: templateWithChannel,
   });
 
@@ -270,8 +198,8 @@ export async function findTemplateForDelivery(key: string): Promise<{
   let disabledReason: string | null = null;
   if (!template.enabled) {
     disabledReason = `Notification template '${key}' is disabled`;
-  } else if (!template.channel.enabled || template.channel.deletedAt) {
-    disabledReason = `Notification channel for template '${key}' is disabled or deleted`;
+  } else if (!template.channel.enabled) {
+    disabledReason = `Notification channel for template '${key}' is disabled`;
   }
 
   if (!disabledReason) {

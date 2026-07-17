@@ -47,20 +47,6 @@ export const listApplicationsQuerySchema = paginationQuerySchema.extend({
 
 export const applicationIdParamSchema = idParamSchema();
 
-export const createApplicationBodySchema = z.object({
-  name: z.string().min(1).openapi({ example: "OA System" }),
-  code: z.string().min(1).openapi({ example: "oa" }),
-  description: z.string().optional(),
-  logo: uploadUrlSchema.optional(),
-  favicon: uploadUrlSchema.optional(),
-  copyright: z.string().optional(),
-  icp: z.string().optional(),
-  psif: z.string().optional(),
-  watermarkEnabled: z.boolean().optional(),
-  watermarkConfig: z.string().optional(),
-  sortOrder: z.number().int().default(0),
-});
-
 export const updateApplicationBodySchema = z.object({
   name: z.string().min(1).optional(),
   code: z.string().min(1).optional(),
@@ -84,5 +70,4 @@ export const listApplicationsResponseSchema = z
 
 export type Application = z.infer<typeof applicationSchema>;
 export type CurrentApplication = z.infer<typeof currentApplicationSchema>;
-export type CreateApplicationBody = z.infer<typeof createApplicationBodySchema>;
 export type UpdateApplicationBody = z.infer<typeof updateApplicationBodySchema>;

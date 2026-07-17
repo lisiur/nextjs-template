@@ -30,7 +30,7 @@ import { getDefaultConfig, isRecord } from "./notification-form-utils";
 import type { NotificationChannel, NotificationProvider } from "./types";
 
 interface NotificationChannelDialogProps {
-  channel?: NotificationChannel | null;
+  channel: NotificationChannel;
   providers: NotificationProvider[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -45,8 +45,7 @@ export function NotificationChannelDialog({
   onSuccess,
 }: NotificationChannelDialogProps) {
   const t = useTranslations("Notifications");
-  const isEdit = !!channel;
-  const builtin = isBuiltinNotification(channel?.flags);
+  const builtin = isBuiltinNotification(channel.flags);
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
   const [providerKey, setProviderKey] = useState("in-app");
@@ -87,18 +86,12 @@ export function NotificationChannelDialog({
         config: selectedProvider?.configSchema ? config : null,
       };
 
-      if (isEdit) {
-        await withApiFeedback(
-          appClient.api["notification-channels"][":id"].$put,
-        )({
+      await withApiFeedback(appClient.api["notification-channels"][":id"].$put)(
+        {
           param: { id: channel.id },
           json: payload,
-        });
-      } else {
-        await withApiFeedback(appClient.api["notification-channels"].$post)({
-          json: payload,
-        });
-      }
+        },
+      );
       onSuccess();
     } catch {
       // Error handled by API feedback.
@@ -111,14 +104,8 @@ export function NotificationChannelDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            {isEdit ? t("channels.edit") : t("channels.create")}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? t("channels.editDescription")
-              : t("channels.createDescription")}
-          </DialogDescription>
+          <DialogTitle>{t("channels.edit")}</DialogTitle>
+          <DialogDescription>{t("channels.editDescription")}</DialogDescription>
         </DialogHeader>
         <DialogBody>
           <form

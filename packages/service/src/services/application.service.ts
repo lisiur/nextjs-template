@@ -4,36 +4,12 @@ import { prisma } from "#lib/db";
 
 export async function getApplicationById(id: string) {
   const app = await prisma.application.findFirst({
-    where: { id, deletedAt: null },
+    where: { id },
   });
   if (!app) {
     throw new HTTPException(404, { message: "Application not found" });
   }
   return app;
-}
-
-export async function createApplication(data: {
-  name: string;
-  code: string;
-  description?: string;
-  logo?: string;
-  favicon?: string;
-  copyright?: string;
-  icp?: string;
-  psif?: string;
-  watermarkEnabled?: boolean;
-  watermarkConfig?: string;
-  sortOrder?: number;
-}) {
-  const existing = await prisma.application.findFirst({
-    where: { code: data.code, deletedAt: null },
-  });
-  if (existing) {
-    throw new HTTPException(409, {
-      message: "Application code already exists",
-    });
-  }
-  return prisma.application.create({ data });
 }
 
 export async function updateApplication(
@@ -53,7 +29,7 @@ export async function updateApplication(
   },
 ) {
   const existing = await prisma.application.findFirst({
-    where: { id, deletedAt: null },
+    where: { id },
   });
   if (!existing) {
     throw new HTTPException(404, { message: "Application not found" });
@@ -61,7 +37,7 @@ export async function updateApplication(
 
   if (data.code && data.code !== existing.code) {
     const codeTaken = await prisma.application.findFirst({
-      where: { code: data.code, deletedAt: null },
+      where: { code: data.code },
     });
     if (codeTaken) {
       throw new HTTPException(409, {
@@ -73,27 +49,13 @@ export async function updateApplication(
   return prisma.application.update({ where: { id }, data });
 }
 
-export async function deleteApplication(id: string) {
-  const existing = await prisma.application.findFirst({
-    where: { id, deletedAt: null },
-  });
-  if (!existing) {
-    throw new HTTPException(404, { message: "Application not found" });
-  }
-  const deleted = await prisma.application.update({
-    where: { id },
-    data: { deletedAt: new Date() },
-  });
-  return { ...deleted, name: existing.name };
-}
-
 export async function listApplications(params: {
   search?: string;
   limit?: number;
   offset?: number;
 }) {
   const { search, limit = 10, offset = 0 } = params;
-  const where: Prisma.ApplicationWhereInput = { deletedAt: null };
+  const where: Prisma.ApplicationWhereInput = {};
 
   if (search) {
     where.OR = [

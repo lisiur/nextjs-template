@@ -160,7 +160,7 @@ export async function createMenu(data: {
   permissionIds: string[];
 }) {
   const app = await prisma.application.findFirst({
-    where: { id: data.appId, deletedAt: null },
+    where: { id: data.appId },
   });
   if (!app) {
     throw new HTTPException(400, { message: "Application not found" });
