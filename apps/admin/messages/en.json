@@ -153,7 +153,17 @@
     "selectRole": "Select Role",
     "loadingRoles": "Loading roles...",
     "noRolesAvailable": "No roles available",
-    "noRoles": "No roles"
+    "noRoles": "No roles",
+    "confirmPassword": "Confirm New Password",
+    "resetPassword": "Reset Password",
+    "resetPasswordDescription": "Set a new password for",
+    "resetPasswordSuccess": "Password reset successfully",
+    "resetting": "Resetting...",
+    "validation": {
+      "newPasswordMin": "Password must be at least 6 characters",
+      "confirmPasswordRequired": "Please confirm the password",
+      "passwordsMismatch": "Passwords do not match"
+    }
   },
   "Settings": {
     "title": "System Settings",

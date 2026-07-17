@@ -1,6 +1,7 @@
 import { isBuiltinUser } from "@repo/shared";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
+import { logAudit } from "#lib/logger";
 import { hashPassword } from "#lib/password";
 import { assertUserIsNotBuiltin } from "#lib/protected-user";
 import { PLATFORM_SCOPE_ID, RoleScopeType } from "#lib/role-scope";
@@ -121,11 +122,10 @@ export async function updateUser(
   data: {
     name?: string;
     email?: string;
-    password?: string;
     roleIds?: string[];
   },
 ) {
-  const { name, email, password, roleIds } = data;
+  const { name, email, roleIds } = data;
 
   const existingUser = await prisma.user.findUnique({
     where: { id },
@@ -156,37 +156,16 @@ export async function updateUser(
   const updateData: Record<string, unknown> = {};
   if (name) updateData.name = name;
   if (email) updateData.email = email;
-  if (password) {
-    const hashedPassword = await hashPassword(password);
-    const existingAccount = await prisma.account.findFirst({
-      where: { userId: id, providerId: "credential" },
-    });
-    if (existingAccount) {
-      await prisma.account.update({
-        where: { id: existingAccount.id },
-        data: { password: hashedPassword },
-      });
-    } else {
-      await prisma.account.create({
-        data: {
-          accountId: id,
-          providerId: "credential",
-          userId: id,
-          password: hashedPassword,
-        },
+
+  await prisma.$transaction(async (tx) => {
+    if (Object.keys(updateData).length > 0) {
+      await tx.user.update({
+        where: { id },
+        data: updateData,
       });
     }
-  }
 
-  if (Object.keys(updateData).length > 0) {
-    await prisma.user.update({
-      where: { id },
-      data: updateData,
-    });
-  }
-
-  if (!builtin && roleIds !== undefined) {
-    await prisma.$transaction(async (tx) => {
+    if (!builtin && roleIds !== undefined) {
       await tx.roleAssignment.deleteMany({
         where: {
           userId: id,
@@ -214,8 +193,8 @@ export async function updateUser(
           },
         });
       }
-    });
-  }
+    }
+  });
 
   const user = await prisma.user.findUnique({
     where: { id },
@@ -229,6 +208,72 @@ export async function updateUser(
   }
 
   return user;
+}
+
+export async function resetPassword(
+  id: string,
+  newPassword: string,
+  params: { traceId?: string; actorId?: string; actorSessionId?: string },
+) {
+  const existingUser = await prisma.user.findUnique({
+    where: { id },
+  });
+
+  if (!existingUser) {
+    throw new HTTPException(404, { message: "User not found" });
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  await prisma.$transaction(async (tx) => {
+    const existingAccount = await tx.account.findFirst({
+      where: { userId: id, providerId: "credential" },
+    });
+
+    if (existingAccount) {
+      await tx.account.update({
+        where: { id: existingAccount.id },
+        data: { password: hashedPassword },
+      });
+    } else {
+      await tx.account.create({
+        data: {
+          accountId: id,
+          providerId: "credential",
+          userId: id,
+          password: hashedPassword,
+        },
+      });
+    }
+
+    await tx.session.updateMany({
+      where: { userId: id, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+  });
+
+  await logAudit({
+    traceId: params.traceId,
+    userId: params.actorId,
+    sessionId: params.actorSessionId,
+    event: "user.password_reset",
+    category: "authentication",
+    targetType: "user",
+    targetId: id,
+    targetName: existingUser.name,
+  });
+}
+
+export async function updateUserProfile(
+  userId: string,
+  data: { name?: string; image?: string | null },
+) {
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data,
+  });
+
+  return { user };
 }
 
 export async function deleteUser(id: string) {

@@ -1,7 +1,7 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
-import { updateUser as updateUserService } from "#services/auth.service";
+import { updateUserProfile } from "#services/user.service";
 import { updateUserBodySchema, userMutationResponseSchema } from "./schema";
 
 export const updateUser = defineOpenAPIRoute({
@@ -24,10 +24,10 @@ export const updateUser = defineOpenAPIRoute({
   handler: async (c) => {
     const principal = await requirePrincipal(c);
     const body = c.req.valid("json");
-    const { user } = await updateUserService({
-      userId: getPrincipalUserId(principal),
-      data: body,
-    });
+    const { user } = await updateUserProfile(
+      getPrincipalUserId(principal),
+      body,
+    );
 
     return c.json({ user }, 200);
   },

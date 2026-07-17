@@ -317,18 +317,6 @@ export async function changePassword(params: {
   return { user: updatedUser, session };
 }
 
-export async function updateUser(params: {
-  userId: string;
-  data: { name?: string; image?: string | null };
-}) {
-  const user = await prisma.user.update({
-    where: { id: params.userId },
-    data: params.data,
-  });
-
-  return { user };
-}
-
 export async function signInWithWechat(params: {
   code: string;
   ipAddress?: string | null;

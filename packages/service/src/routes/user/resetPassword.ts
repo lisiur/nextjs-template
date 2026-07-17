@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requirePrincipal } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import {
   badRequestResponse,
   forbiddenResponse,
@@ -8,24 +8,24 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { assertAccess } from "#services/role-permission.service";
-import { updateUser as updateUserSvc } from "#services/user.service";
+import { resetPassword as resetPasswordSvc } from "#services/user.service";
 import {
-  adminUserSchema,
-  updateUserBodySchema,
+  resetPasswordBodySchema,
+  successSchema,
   userIdParamSchema,
 } from "./schema";
 
-export const updateUser = defineOpenAPIRoute({
+export const resetPassword = defineOpenAPIRoute({
   route: createRoute({
-    method: "put",
-    path: "/{id}",
+    method: "post",
+    path: "/{id}/reset-password",
     tags: ["AdminUser"],
-    summary: "Update a user with custom roles",
+    summary: "Reset a user's password",
     request: {
       params: userIdParamSchema,
       body: {
         content: {
-          "application/json": { schema: updateUserBodySchema },
+          "application/json": { schema: resetPasswordBodySchema },
         },
         required: true,
       },
@@ -35,15 +35,20 @@ export const updateUser = defineOpenAPIRoute({
       ...forbiddenResponse,
       ...notFoundResponse,
       ...badRequestResponse,
-      ...okResponseFn(adminUserSchema, "Updated user"),
+      ...okResponseFn(successSchema, "Password reset"),
     },
   }),
   handler: async (c) => {
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "user::update");
     const { id } = c.req.valid("param");
-    const { name, email, roleIds } = c.req.valid("json");
-    const user = await updateUserSvc(id, { name, email, roleIds });
-    return c.json(user, 200);
+    const { password } = c.req.valid("json");
+    await resetPasswordSvc(id, password, {
+      traceId: c.get("traceId"),
+      actorId: getPrincipalUserId(principal),
+      actorSessionId:
+        principal.kind === "user" ? principal.session.id : undefined,
+    });
+    return c.json({ success: true }, 200);
   },
 });

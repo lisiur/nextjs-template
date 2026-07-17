@@ -8,11 +8,6 @@
       `@@unique([key])` (`:506`, `:533`). After a soft-delete the pre-check
       reports "not found" but re-create throws `P2002` → 500. Replace with
       partial unique indexes `WHERE "deletedAt" IS NULL`.
-- [ ] **`updateUser` writes password and user fields non-atomically** — the
-      credential `account.update` and the `user.update` are two independent
-      writes with no `$transaction` (`services/user.service.ts:159-186`). If the
-      user update fails (email `P2002`, DB blip) the password is already changed
-      — a partial state the caller never sees. Wrap both in `prisma.$transaction`.
 
 ## Medium Priority
 

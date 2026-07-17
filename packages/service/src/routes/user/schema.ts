@@ -53,8 +53,11 @@ export const createUserBodySchema = z.object({
 export const updateUserBodySchema = z.object({
   name: z.string().min(1).optional(),
   email: z.email().optional(),
-  password: z.string().min(1).optional(),
   roleIds: z.array(z.string()).optional(),
+});
+
+export const resetPasswordBodySchema = z.object({
+  password: z.string().min(6),
 });
 
 export const userIdParamSchema = z.object({

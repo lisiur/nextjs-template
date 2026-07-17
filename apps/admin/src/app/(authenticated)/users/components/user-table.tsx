@@ -15,7 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui";
-import { Pencil, Plus, Shield, Trash2 } from "lucide-react";
+import { KeyRound, Pencil, Plus, Shield, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import { usePaginatedQuery } from "@/hooks/use-paginated-query";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDate } from "@/utils/date";
+import { ResetPasswordDialog } from "./reset-password-dialog";
 import { UserDialog } from "./user-dialog";
 
 interface Role {
@@ -58,6 +59,7 @@ export function UserTable() {
   const confirm = useConfirm();
   const [showCreate, setShowCreate] = useState(false);
   const [editUser, setEditUser] = useState<UserRow | null>(null);
+  const [resetUser, setResetUser] = useState<UserRow | null>(null);
 
   const {
     items: users,
@@ -82,6 +84,11 @@ export function UserTable() {
     setEditUser(null);
     fetchUsers();
     toast.success(t("updateSuccess"));
+  }
+
+  function handleResetSuccess() {
+    setResetUser(null);
+    toast.success(t("resetPasswordSuccess"));
   }
 
   function handleCreateSuccess() {
@@ -203,6 +210,21 @@ export function UserTable() {
                       />
                       <TooltipContent>{t("edit")}</TooltipContent>
                     </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            aria-label={t("resetPassword")}
+                            onClick={() => setResetUser(user)}
+                          >
+                            <KeyRound />
+                          </Button>
+                        }
+                      />
+                      <TooltipContent>{t("resetPassword")}</TooltipContent>
+                    </Tooltip>
                     {builtinUser ? (
                       <Button variant="ghost" size="icon-sm" disabled>
                         <Trash2 />
@@ -246,6 +268,15 @@ export function UserTable() {
           open={!!editUser}
           onOpenChange={(open) => !open && setEditUser(null)}
           onSuccess={handleEditSuccess}
+        />
+      )}
+
+      {resetUser && (
+        <ResetPasswordDialog
+          user={resetUser}
+          open={!!resetUser}
+          onOpenChange={(open) => !open && setResetUser(null)}
+          onSuccess={handleResetSuccess}
         />
       )}
     </>
