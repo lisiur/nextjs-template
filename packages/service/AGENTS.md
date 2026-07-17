@@ -14,9 +14,14 @@
 - Always pass an explicit status to `c.json(data, 200)` and define error responses with the shared `errorSchema` pattern.
 - OpenAPI paths use `{id}` syntax, while Hono RPC client calls use bracket notation for dynamic parameters.
 
+## Repository Layer
+- Database access lives in `src/repositories/` (one repository per model/aggregate).
+- Repositories are the only place that imports `prisma` from `#lib/db` and calls `prisma.<model>.*`.
+- Repository methods accept an optional transaction client, e.g. `tx: Prisma.TransactionClient = prisma`, so services can pass a `prisma.$transaction` handle.
+
 ## Service Layer
 - Routes should only handle: session extraction, permission checks, input validation, service calls, audit logging, and response formatting.
-- Business logic, database operations, and validation rules belong in service files under `src/services/`.
+- Business logic, orchestration of repositories, and validation rules belong in service files under `src/services/`.
 - Services throw `HTTPException` for errors (404, 409, 400, etc.).
 
 ## Permissions
