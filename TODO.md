@@ -2,9 +2,6 @@
 
 ## Medium Priority
 
-- [ ] **Job archive is non-atomic** — `archiveAndDelete` does `jobArchive.create` then
-      `job.delete` as two separate writes (`repositories/job.repository.ts:129`). A crash
-      between them duplicates the row. Wrap both in `prisma.$transaction`.
 - [ ] **Cache has no TTL** — the LRU is configured with `max` only (`lib/cache.ts:19`);
       entries never expire by time and live until evicted or manually cleared. Add a
       `ttl` option (and consider per-namespace TTLs) so stale data can't linger.

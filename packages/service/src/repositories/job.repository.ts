@@ -127,26 +127,28 @@ export class JobRepository {
   }
 
   async archiveAndDelete(job: Job): Promise<void> {
-    await prisma.jobArchive.create({
-      data: {
-        type: job.type,
-        description: job.description,
-        payload: job.payload as Prisma.InputJsonValue,
-        status: job.status,
-        priority: job.priority,
-        result: job.result as Prisma.InputJsonValue | undefined,
-        error: job.error,
-        attempts: job.attempts,
-        maxAttempts: job.maxAttempts,
-        timeoutMs: job.timeoutMs,
-        scheduledAt: job.scheduledAt,
-        startedAt: job.startedAt,
-        completedAt: job.completedAt,
-        createdAt: job.createdAt,
-        originalJobId: job.id,
-      },
-    });
-    await prisma.job.delete({ where: { id: job.id } });
+    await prisma.$transaction([
+      prisma.jobArchive.create({
+        data: {
+          type: job.type,
+          description: job.description,
+          payload: job.payload as Prisma.InputJsonValue,
+          status: job.status,
+          priority: job.priority,
+          result: job.result as Prisma.InputJsonValue | undefined,
+          error: job.error,
+          attempts: job.attempts,
+          maxAttempts: job.maxAttempts,
+          timeoutMs: job.timeoutMs,
+          scheduledAt: job.scheduledAt,
+          startedAt: job.startedAt,
+          completedAt: job.completedAt,
+          createdAt: job.createdAt,
+          originalJobId: job.id,
+        },
+      }),
+      prisma.job.delete({ where: { id: job.id } }),
+    ]);
   }
 
   async findArchivedById(id: string): Promise<JobArchive | null> {
