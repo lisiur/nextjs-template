@@ -2,8 +2,6 @@
 
 ## Medium Priority
 
-- [ ] **Client loses RPC type safety** — manual `as` casts (`use-current-organization.ts:16`)
-      instead of inferred types; use `withApiFeedback` consistently.
 - [ ] **Job `retryJob` targets archived jobs** — `POST /api/jobs/:id/retry` looks up the live
       `Job` table (`services/job.service.ts:81`), but `FAILED` jobs are archived+deleted
       immediately (`lib/queues/job-worker.ts:78`), so manual retry 404s. Target `JobArchive`

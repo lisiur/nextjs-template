@@ -2,8 +2,13 @@
 
 import { useEventStream } from "@repo/frontend";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { API_ORIGIN, APP_CODE, appClient, useSession } from "@/lib/api";
-import { withApiFeedback } from "@/lib/api/utils";
+import {
+  API_ORIGIN,
+  APP_CODE,
+  appClient,
+  useSession,
+  withApiFeedback,
+} from "@/lib/api";
 
 export interface UserNotification {
   id: string;
@@ -12,8 +17,6 @@ export interface UserNotification {
   readAt: string | null;
   createdAt: string;
 }
-
-type ListResponse = { notifications: UserNotification[]; total: number };
 
 const NOTIFICATION_KEY = ["notifications"] as const;
 
@@ -36,9 +39,11 @@ export function useUnreadNotificationCount() {
   return useQuery({
     queryKey: [...NOTIFICATION_KEY, "unread-count"] as const,
     queryFn: async () => {
-      const res = await appClient.api.notifications["unread-count"].$get();
-      if (!res.ok) throw new Error("Failed to load unread count");
-      const data = (await res.json()) as { count: number };
+      const res = await withApiFeedback(
+        appClient.api.notifications["unread-count"].$get,
+        { showError: false },
+      )();
+      const data = await res.json();
       return data.count;
     },
     enabled: !!session?.user,
@@ -49,11 +54,12 @@ export function useRecentNotifications(enabled: boolean) {
   return useQuery({
     queryKey: [...NOTIFICATION_KEY, "list", "recent"] as const,
     queryFn: async () => {
-      const res = await appClient.api.notifications.$get({
+      const res = await withApiFeedback(appClient.api.notifications.$get, {
+        showError: false,
+      })({
         query: { limit: 5, offset: 0 },
       });
-      if (!res.ok) throw new Error("Failed to load notifications");
-      const data = (await res.json()) as ListResponse;
+      const data = await res.json();
       return data.notifications;
     },
     enabled,

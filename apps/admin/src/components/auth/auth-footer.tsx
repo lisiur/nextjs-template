@@ -2,23 +2,22 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { appClient } from "@/lib/api";
+import { withApiFeedback } from "@/lib/api/utils";
 
 const ICP_URL = "https://beian.miit.gov.cn/";
 const PSIF_URL = "https://beian.mps.gov.cn/";
-
-interface CurrentApplication {
-  copyright?: string | null;
-  icp?: string | null;
-  psif?: string | null;
-}
 
 export function AuthFooter() {
   const { data: app } = useQuery({
     queryKey: ["applications", "current", "footer"],
     queryFn: async () => {
-      const res = await appClient.api.applications.current.$get();
-      if (!res.ok) throw new Error("Failed to load current application");
-      return (await res.json()) as CurrentApplication;
+      const res = await withApiFeedback(
+        appClient.api.applications.current.$get,
+        {
+          showError: false,
+        },
+      )();
+      return res.json();
     },
     retry: false,
   });

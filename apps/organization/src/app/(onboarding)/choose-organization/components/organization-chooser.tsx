@@ -15,7 +15,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useSwitchOrganization } from "@/hooks/use-switch-organization";
-import { appClient } from "@/lib/api";
+import { appClient, withApiFeedback } from "@/lib/api";
 
 export function OrganizationChooser() {
   const router = useRouter();
@@ -25,9 +25,10 @@ export function OrganizationChooser() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["organizations", "mine"],
     queryFn: async () => {
-      const res = await appClient.api.organizations.mine.$get();
-      if (!res.ok) throw new Error("Failed to load organizations");
-      return (await res.json()) as { organizations: Organization[] };
+      const res = await withApiFeedback(appClient.api.organizations.mine.$get, {
+        showError: false,
+      })();
+      return res.json();
     },
   });
 

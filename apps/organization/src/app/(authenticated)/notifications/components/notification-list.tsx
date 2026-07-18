@@ -14,7 +14,7 @@ import {
   useUnreadNotificationCount,
 } from "@/hooks/use-notifications";
 import { usePaginatedQuery } from "@/hooks/use-paginated-query";
-import { appClient } from "@/lib/api";
+import { appClient, withApiFeedback } from "@/lib/api";
 
 function NotificationItems({ unreadOnly }: { unreadOnly: boolean }) {
   const t = useTranslations("Notifications");
@@ -24,10 +24,9 @@ function NotificationItems({ unreadOnly }: { unreadOnly: boolean }) {
     usePaginatedQuery<UserNotification>({
       queryKey: ["notifications", "list", { unreadOnly }],
       queryFn: async ({ limit, offset }) => {
-        const res = await appClient.api.notifications.$get({
-          query: { limit, offset, unreadOnly },
-        });
-        if (!res.ok) throw new Error("Failed to load notifications");
+        const res = await withApiFeedback(appClient.api.notifications.$get, {
+          showError: false,
+        })({ query: { limit, offset, unreadOnly } });
         const data = await res.json();
         return { items: data.notifications, total: data.total };
       },

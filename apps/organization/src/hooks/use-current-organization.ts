@@ -1,8 +1,7 @@
 "use client";
 
-import type { Organization } from "@repo/frontend";
 import { useQuery } from "@tanstack/react-query";
-import { appClient, useSession } from "@/lib/api";
+import { appClient, useSession, withApiFeedback } from "@/lib/api";
 
 export function useCurrentOrganization() {
   const { data: session } = useSession();
@@ -11,9 +10,10 @@ export function useCurrentOrganization() {
   const query = useQuery({
     queryKey: ["organizations", "mine"],
     queryFn: async () => {
-      const res = await appClient.api.organizations.mine.$get();
-      if (!res.ok) throw new Error("Failed to load organizations");
-      return (await res.json()) as { organizations: Organization[] };
+      const res = await withApiFeedback(appClient.api.organizations.mine.$get, {
+        showError: false,
+      })();
+      return res.json();
     },
     enabled: !!activeOrganizationId,
   });

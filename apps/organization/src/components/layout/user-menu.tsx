@@ -34,7 +34,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { Fragment, useMemo } from "react";
 import { useSwitchOrganization } from "@/hooks/use-switch-organization";
-import { appClient } from "@/lib/api";
+import { appClient, withApiFeedback } from "@/lib/api";
 import { useSession } from "@/lib/api/use-session";
 
 type UserMenuItem =
@@ -119,16 +119,10 @@ export function UserMenu({ full, items }: UserMenuProps) {
   const { data: mineData } = useQuery({
     queryKey: ["organizations", "mine"],
     queryFn: async () => {
-      const res = await appClient.api.organizations.mine.$get();
-      if (!res.ok) throw new Error("Failed to load organizations");
-      return (await res.json()) as {
-        organizations: {
-          id: string;
-          name: string;
-          slug: string;
-          logo?: string | null;
-        }[];
-      };
+      const res = await withApiFeedback(appClient.api.organizations.mine.$get, {
+        showError: false,
+      })();
+      return res.json();
     },
     enabled: !!user,
   });

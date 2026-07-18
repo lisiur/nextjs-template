@@ -10,7 +10,7 @@ import {
   useRecentNotifications,
   useUnreadNotificationCount,
 } from "@/hooks/use-notifications";
-import { appClient, useSession } from "@/lib/api";
+import { appClient, useSession, withApiFeedback } from "@/lib/api";
 import { StatCard } from "./stat-card";
 
 export function DashboardOverview() {
@@ -24,11 +24,10 @@ export function DashboardOverview() {
     enabled,
     queryFn: async () => {
       if (!orgId) return 0;
-      const res = await appClient.api.organizations[":orgId"].members.$get({
-        param: { orgId },
-        query: { limit: 1, offset: 0 },
-      });
-      if (!res.ok) throw new Error("Failed to load members");
+      const res = await withApiFeedback(
+        appClient.api.organizations[":orgId"].members.$get,
+        { showError: false },
+      )({ param: { orgId }, query: { limit: 1, offset: 0 } });
       const data = await res.json();
       return data.total;
     },
@@ -39,10 +38,10 @@ export function DashboardOverview() {
     enabled,
     queryFn: async () => {
       if (!orgId) return 0;
-      const res = await appClient.api.organizations[":orgId"].departments.$get({
-        param: { orgId },
-      });
-      if (!res.ok) throw new Error("Failed to load departments");
+      const res = await withApiFeedback(
+        appClient.api.organizations[":orgId"].departments.$get,
+        { showError: false },
+      )({ param: { orgId } });
       const data = await res.json();
       return data.departments.length;
     },
@@ -54,10 +53,10 @@ export function DashboardOverview() {
     retry: false,
     queryFn: async () => {
       if (!orgId) return 0;
-      const res = await appClient.api.organizations[":orgId"].positions.$get({
-        param: { orgId },
-      });
-      if (!res.ok) throw new Error("Failed to load positions");
+      const res = await withApiFeedback(
+        appClient.api.organizations[":orgId"].positions.$get,
+        { showError: false },
+      )({ param: { orgId } });
       const data = await res.json();
       return data.positions.length;
     },
