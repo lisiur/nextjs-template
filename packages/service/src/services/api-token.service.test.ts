@@ -141,7 +141,10 @@ describe("updateApiTokenForUser", () => {
       scopes: ["member::read"],
     });
 
-    expect(getAllUserPermissionCodes).toHaveBeenCalledWith("user_1");
+    expect(getAllUserPermissionCodes).toHaveBeenCalledWith("user_1", {
+      organizationId: null,
+      appId: null,
+    });
   });
 
   it("rejects out-of-scope update", async () => {

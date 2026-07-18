@@ -190,14 +190,19 @@ export async function getUserPermissions(
 
 export async function getAllUserPermissionCodes(
   userId: string,
+  scope?: PermissionScope,
 ): Promise<string[]> {
   const permissions = await prisma.permission.findMany({
     where: {
+      ...getPermissionAppWhere(scope?.appId),
       rolePermissions: {
         some: {
           role: {
             roleAssignments: {
-              some: { userId },
+              some: {
+                userId,
+                OR: getRoleAssignmentScopeConditions(scope),
+              },
             },
           },
         },

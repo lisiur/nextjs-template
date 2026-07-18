@@ -7,7 +7,10 @@ import {
   tokenSuffixOf,
 } from "#lib/api-token";
 import { prisma } from "#lib/db";
-import { getAllUserPermissionCodes } from "./role-permission.service";
+import {
+  getAllUserPermissionCodes,
+  type PermissionScope,
+} from "./role-permission.service";
 
 export type ApiTokenPublic = Omit<ApiToken, "tokenHash">;
 
@@ -28,8 +31,9 @@ export type CreateApiTokenInput = {
 async function assertScopesWithinOwner(
   ownerId: string,
   scopes: string[],
+  scope: PermissionScope,
 ): Promise<void> {
-  const ownerPerms = await getAllUserPermissionCodes(ownerId);
+  const ownerPerms = await getAllUserPermissionCodes(ownerId, scope);
   const invalid = scopes.filter((s) => !ownerPerms.includes(s));
   if (invalid.length > 0) {
     throw new HTTPException(403, {
@@ -41,7 +45,10 @@ async function assertScopesWithinOwner(
 export async function createApiTokenForUser(
   input: CreateApiTokenInput,
 ): Promise<{ token: string; record: ApiTokenPublic }> {
-  await assertScopesWithinOwner(input.ownerId, input.scopes);
+  await assertScopesWithinOwner(input.ownerId, input.scopes, {
+    organizationId: input.organizationId ?? null,
+    appId: input.appId ?? null,
+  });
 
   const tokenString = generateApiTokenString();
   let expiresAt: Date | null = null;
@@ -111,7 +118,10 @@ export async function updateApiTokenForUser(
   }
 
   if (data.scopes) {
-    await assertScopesWithinOwner(ownerId, data.scopes);
+    await assertScopesWithinOwner(ownerId, data.scopes, {
+      organizationId: existing.organizationId,
+      appId: existing.appId,
+    });
   }
 
   const updated = await prisma.apiToken.update({
