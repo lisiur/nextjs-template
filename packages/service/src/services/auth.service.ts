@@ -1,4 +1,5 @@
 import { HTTPException } from "hono/http-exception";
+import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import { hashPassword, verifyPassword } from "#lib/password";
@@ -344,63 +345,88 @@ export async function signInWithWechat(params: {
     js_code: params.code,
   });
 
-  const existingAccount = await prisma.account.findFirst({
-    where: {
-      providerId: "wechat",
-      accountId: wechatResult.openid,
-    },
-    include: { user: true },
-  });
+  type AccountWithUser = Prisma.AccountGetPayload<{ include: { user: true } }>;
 
-  if (existingAccount) {
-    assertNotBanned(existingAccount.user);
+  const lookupAccount = () =>
+    prisma.account.findUnique({
+      where: {
+        providerId_accountId: {
+          providerId: "wechat",
+          accountId: wechatResult.openid,
+        },
+      },
+      include: { user: true },
+    });
+
+  async function loginWithAccount(account: AccountWithUser) {
+    assertNotBanned(account.user);
 
     await prisma.account.update({
-      where: { id: existingAccount.id },
+      where: { id: account.id },
       data: { accessToken: wechatResult.session_key },
     });
 
     const session = await createSession({
-      userId: existingAccount.userId,
+      userId: account.userId,
       ipAddress: params.ipAddress,
       userAgent: params.userAgent,
       activeOrganizationId: await getDefaultActiveOrganizationId(
-        existingAccount.userId,
+        account.userId,
       ),
     });
 
     await logAuthLogin(session, params.traceId);
 
-    return { user: existingAccount.user, session };
+    return { user: account.user, session };
+  }
+
+  const existingAccount = await lookupAccount();
+  if (existingAccount) {
+    return await loginWithAccount(existingAccount);
   }
 
   if (!(await getRegistrationEnabled())) {
     throw new HTTPException(403, { message: "Registration is disabled" });
   }
 
-  const user = await prisma.user.create({
-    data: {
-      name: `wx_${wechatResult.openid.slice(0, 8)}`,
-      email: `${wechatResult.openid}@wechat.placeholder`,
-      emailVerified: false,
-      flags: [],
-      accounts: {
-        create: {
-          accountId: wechatResult.openid,
-          providerId: "wechat",
-          accessToken: wechatResult.session_key,
+  try {
+    const user = await prisma.user.create({
+      data: {
+        name: `wx_${wechatResult.openid.slice(0, 8)}`,
+        email: `${wechatResult.openid}@wechat.placeholder`,
+        emailVerified: false,
+        flags: [],
+        accounts: {
+          create: {
+            accountId: wechatResult.openid,
+            providerId: "wechat",
+            accessToken: wechatResult.session_key,
+          },
         },
       },
-    },
-  });
+    });
 
-  const session = await createSession({
-    userId: user.id,
-    ipAddress: params.ipAddress,
-    userAgent: params.userAgent,
-  });
+    const session = await createSession({
+      userId: user.id,
+      ipAddress: params.ipAddress,
+      userAgent: params.userAgent,
+    });
 
-  await logAuthLogin(session, params.traceId);
+    await logAuthLogin(session, params.traceId);
 
-  return { user, session };
+    return { user, session };
+  } catch (err) {
+    if (
+      err &&
+      typeof err === "object" &&
+      "code" in err &&
+      err.code === "P2002"
+    ) {
+      const account = await lookupAccount();
+      if (account) {
+        return await loginWithAccount(account);
+      }
+    }
+    throw err;
+  }
 }

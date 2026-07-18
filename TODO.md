@@ -95,10 +95,6 @@
       `Account.accessToken` (`services/auth.service.ts:318,349`). A DB leak gives
       attackers decryption material for previously captured `encryptedData`.
       Encrypt at rest or don't persist beyond the active session.
-- [ ] **`Account` lacks `@@unique([providerId, accountId])`** —
-      `schema.prisma:54-72`. WeChat lookup is `findFirst` by `(wechat, openid)`
-      (`auth.service.ts:305-311`); a first-login race from two devices can create
-      duplicate Account rows. Add the unique constraint and handle `P2002` as 409.
 - [ ] **`createNotificationsFromTemplate` disabled-template branch is not
       transactional** — the enabled branch uses `$transaction`
       (`notification.service.ts:109`), but the disabled branch uses `Promise.all`

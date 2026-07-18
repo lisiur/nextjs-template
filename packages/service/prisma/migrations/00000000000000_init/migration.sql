@@ -243,7 +243,6 @@ CREATE TABLE "application" (
     "watermarkEnabled" BOOLEAN NOT NULL DEFAULT false,
     "watermarkConfig" TEXT,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
-    "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -386,7 +385,6 @@ CREATE TABLE "notification_channel" (
     "flags" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "notification_channel_pkey" PRIMARY KEY ("id")
 );
@@ -407,7 +405,6 @@ CREATE TABLE "notification_template" (
     "flags" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "notification_template_pkey" PRIMARY KEY ("id")
 );
@@ -493,6 +490,9 @@ CREATE UNIQUE INDEX "session_token_key" ON "session"("token");
 CREATE INDEX "account_userId_idx" ON "account"("userId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "account_providerId_accountId_key" ON "account"("providerId", "accountId");
+
+-- CreateIndex
 CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
 
 -- CreateIndex
@@ -569,9 +569,6 @@ CREATE INDEX "upload_uploaderId_idx" ON "upload"("uploaderId");
 
 -- CreateIndex
 CREATE INDEX "upload_path_idx" ON "upload"("path");
-
--- CreateIndex
-CREATE INDEX "application_deletedAt_idx" ON "application"("deletedAt");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "application_code_key" ON "application"("code");
@@ -682,9 +679,6 @@ CREATE INDEX "notification_channel_providerKey_idx" ON "notification_channel"("p
 CREATE INDEX "notification_channel_enabled_idx" ON "notification_channel"("enabled");
 
 -- CreateIndex
-CREATE INDEX "notification_channel_deletedAt_idx" ON "notification_channel"("deletedAt");
-
--- CreateIndex
 CREATE UNIQUE INDEX "notification_channel_key_key" ON "notification_channel"("key");
 
 -- CreateIndex
@@ -692,9 +686,6 @@ CREATE INDEX "notification_template_channelId_idx" ON "notification_template"("c
 
 -- CreateIndex
 CREATE INDEX "notification_template_enabled_idx" ON "notification_template"("enabled");
-
--- CreateIndex
-CREATE INDEX "notification_template_deletedAt_idx" ON "notification_template"("deletedAt");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "notification_template_key_key" ON "notification_template"("key");
