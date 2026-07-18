@@ -2,10 +2,6 @@
 
 ## Medium Priority
 
-- [ ] **Job `retryJob` targets archived jobs** — `POST /api/jobs/:id/retry` looks up the live
-      `Job` table (`services/job.service.ts:81`), but `FAILED` jobs are archived+deleted
-      immediately (`lib/queues/job-worker.ts:78`), so manual retry 404s. Target `JobArchive`
-      and re-create, or skip auto-archive for failed jobs.
 - [ ] **Job archive is non-atomic** — `archiveAndDelete` does `jobArchive.create` then
       `job.delete` as two separate writes (`repositories/job.repository.ts:129`). A crash
       between them duplicates the row. Wrap both in `prisma.$transaction`.

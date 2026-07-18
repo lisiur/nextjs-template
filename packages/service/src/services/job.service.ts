@@ -77,26 +77,6 @@ export class JobService {
     await jobRepository.deleteArchived(id);
   }
 
-  async retryJob(id: string): Promise<Job> {
-    const job = await this.getJob(id);
-
-    if (job.status !== JobStatus.FAILED) {
-      throw new HTTPException(400, {
-        message: "Only failed jobs can be retried",
-      });
-    }
-
-    const retriedJob = await jobRepository.updateStatus(id, JobStatus.PENDING, {
-      attempts: 0,
-      error: undefined,
-      completedAt: undefined,
-    });
-
-    jobExecutor.enqueue(retriedJob);
-
-    return retriedJob;
-  }
-
   async cancelJob(id: string): Promise<void> {
     const job = await this.getJob(id);
 

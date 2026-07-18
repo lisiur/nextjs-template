@@ -21,7 +21,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui";
-import { Copy, Eye, Plus, RotateCcw, X } from "lucide-react";
+import { Copy, Eye, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { appClient } from "@/lib/api";
@@ -127,18 +127,6 @@ export function JobTable() {
       if (typeDebounceRef.current) clearTimeout(typeDebounceRef.current);
     };
   }, []);
-
-  async function handleRetry(job: Job) {
-    try {
-      await withApiFeedback(appClient.api.jobs[":id"].retry.$post, {
-        showLoading: true,
-        errorMessage: t("retrySuccess"),
-      })({ param: { id: job.id } });
-      fetchJobs();
-    } catch {
-      // Error handled by API feedback.
-    }
-  }
 
   async function handleCancel(job: Job) {
     try {
@@ -350,23 +338,6 @@ export function JobTable() {
                         />
                         <TooltipContent>{t("duplicate")}</TooltipContent>
                       </Tooltip>
-                      {job.status === "FAILED" && (
-                        <Tooltip>
-                          <TooltipTrigger
-                            render={
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                aria-label={t("retry")}
-                                onClick={() => handleRetry(job)}
-                              >
-                                <RotateCcw />
-                              </Button>
-                            }
-                          />
-                          <TooltipContent>{t("retry")}</TooltipContent>
-                        </Tooltip>
-                      )}
                       {job.status === "PENDING" && (
                         <Tooltip>
                           <TooltipTrigger

@@ -7,7 +7,6 @@ import { getJobArchive } from "./get-job-archive";
 import { getJobStats } from "./get-job-stats";
 import { listJobArchives } from "./list-job-archives";
 import { listJobs } from "./list-jobs";
-import { retryJob } from "./retry-job";
 
 const jobRoutes = new OpenAPIHono();
 
@@ -19,7 +18,6 @@ const routes = jobRoutes.openapiRoutes([
   getJobArchive,
   deleteJobArchive,
   getJob,
-  retryJob,
   cancelJob,
 ] as const);
 
