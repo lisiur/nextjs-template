@@ -2,9 +2,6 @@
 
 ## Medium Priority
 
-- [ ] **Cache has no TTL** — the LRU is configured with `max` only (`lib/cache.ts:19`);
-      entries never expire by time and live until evicted or manually cleared. Add a
-      `ttl` option (and consider per-namespace TTLs) so stale data can't linger.
 - [ ] **Cache invalidation is coarse (whole-namespace)** — channel/template mutations call
       `notificationChannelCache.clear()` / `notificationTemplateCache.clear()`, flushing
       *all* entries instead of the affected key (`services/notification/channel.service.ts:221`).
@@ -232,6 +229,9 @@
 
 ## No Dues
 
+- [ ] **Cache has no TTL** — the LRU is configured with `max` only (`lib/cache.ts:19`);
+      entries never expire by time and live until evicted or manually cleared. Add a
+      `ttl` option (and consider per-namespace TTLs) so stale data can't linger.
 - [ ] **No email verification** — `emailVerified` set false, never enforced; no verify
       endpoint in `routes/auth/`. Enforce ownership beyond uniqueness.
 - [ ] **Job queue: no row-level claim / not multi-instance safe** — the scheduler re-queues
