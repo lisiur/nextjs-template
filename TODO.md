@@ -2,11 +2,6 @@
 
 ## Medium Priority
 
-- [ ] **Sign-up TOCTOU race → unhandled P2002 → 500** — `signUpWithEmail` does
-      `findUnique` then `createUser` without catching the unique violation
-      (`services/auth.service.ts:156-167`); concurrent same-email signups both
-      pass the check and the loser throws `PrismaClientKnownRequestError (P2002)`,
-      surfacing as a 500. Map `P2002` to `409 "User already exists"`.
 - [ ] **`getAllUserPermissionCodes` resolves permissions with no scope filter** —
       it walks `roleAssignments.some: { userId }` regardless of scope
       (`services/role-permission.service.ts:191-210`), so it returns the union
@@ -225,6 +220,17 @@
 
 ## No Dues
 
+- [ ] **Sign-up TOCTOU race → unhandled P2002 → 500** — `signUpWithEmail` does
+      `findUnique` then `createUser` without catching the unique violation
+      (`services/auth.service.ts:156-167`); concurrent same-email signups both
+      pass the check and the loser throws `PrismaClientKnownRequestError (P2002)`,
+      surfacing as a 500. Map `P2002` to `409 "User already exists"`.
+      **Deferred:** real-world frequency is near-zero (two humans picking the
+      same email within the ~100ms window doesn't happen organically), and the
+      impact is just an ugly 500 for the loser — no data corruption, no security
+      breach. The `findUnique` pre-check returns a clean 400 for the 99.99% case,
+      and the DB unique constraint remains the source of truth. Revisit only if
+      error-monitoring noise from collisions becomes problematic.
 - [ ] **Cache has no TTL** — the LRU is configured with `max` only (`lib/cache.ts:19`);
       entries never expire by time and live until evicted or manually cleared. Add a
       `ttl` option (and consider per-namespace TTLs) so stale data can't linger.
