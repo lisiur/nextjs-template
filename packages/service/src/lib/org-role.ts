@@ -9,7 +9,7 @@ const ownerRoleWhere = {
   appId: ORGANIZATION_APP_CODE,
 } as const;
 
-const orgOwnerAssignmentWhere = (organizationId: string) => ({
+export const orgOwnerAssignmentWhere = (organizationId: string) => ({
   role: ownerRoleWhere,
   scope: orgScope(organizationId),
 });

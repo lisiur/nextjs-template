@@ -2,13 +2,11 @@ import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 import {
-  countOrgOwners,
   getOrgOwnerUserIds,
   getUserOrgRole,
-  isOrgOwner,
   type OrgRole,
+  orgOwnerAssignmentWhere,
 } from "#lib/org-role";
-import { orgScope } from "#lib/scope";
 
 const memberInclude = {
   user: { select: { id: true, name: true, email: true, image: true } },
@@ -58,30 +56,26 @@ export async function listMembers(
 }
 
 export async function removeMember(organizationId: string, memberId: string) {
-  const member = await prisma.member.findFirst({
-    where: { id: memberId, organizationId },
-  });
-  if (!member) {
-    throw new Error("Member not found");
-  }
-
-  // Check if this is the last owner
-  if (await isOrgOwner(member.userId, organizationId)) {
-    const ownerCount = await countOrgOwners(organizationId);
-    if (ownerCount <= 1) {
-      throw new Error("Cannot remove the last owner");
+  return prisma.$transaction(async (tx) => {
+    const member = await tx.member.findFirst({
+      where: { id: memberId, organizationId },
+    });
+    if (!member) {
+      throw new HTTPException(404, { message: "Member not found" });
     }
-  }
 
-  return prisma.$transaction([
-    prisma.roleAssignment.deleteMany({
+    const isOwner = await tx.roleAssignment.count({
       where: {
         userId: member.userId,
-        scope: orgScope(organizationId),
+        ...orgOwnerAssignmentWhere(organizationId),
       },
-    }),
-    prisma.member.delete({ where: { id: memberId } }),
-  ]);
+    });
+    if (isOwner > 0) {
+      throw new HTTPException(403, { message: "Cannot remove an owner" });
+    }
+
+    await tx.member.delete({ where: { id: memberId } });
+  });
 }
 
 export async function updateMember(
