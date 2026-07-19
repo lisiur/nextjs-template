@@ -88,12 +88,17 @@
       a single SMTP timeout marks the notification `failed` with no in-service
       retry (`notification.service.ts:227-233`). Cache one transporter per
       `channelId` and rely on the job worker's retry/backoff.
-- [ ] **`createNotificationsFromTemplate` disabled-template branch is not
+- [x] **`createNotificationsFromTemplate` disabled-template branch is not
       transactional** — the enabled branch uses `$transaction`
       (`notification.service.ts:109`), but the disabled branch uses
       `Promise.all` of independent `prisma.notification.create` (`:75-91`);
       a mid-iteration failure leaves a partial set of `failed` rows. Replace
       with a single `$transaction` loop.
+      **Done:** wrapped the disabled-template branch in
+      `prisma.$transaction(async (tx) => { ... })` mirroring the enabled
+      branch — sequential `tx.notification.create` loop collecting ids, then
+      returns `{ correlationId, total, pending: 0, failed, notificationIds }`
+      with the same shape. Either all `failed` rows commit or none do.
 
 ### SSE / Events / EventBus
 
