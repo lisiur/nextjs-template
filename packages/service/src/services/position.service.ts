@@ -2,7 +2,7 @@ import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 import { getOrgOwnerUserIds } from "#lib/org-role";
-import { RoleScopeType } from "#lib/role-scope";
+import { orgScope } from "#lib/scope";
 import { getPermissionsForRole } from "#services/role-permission.service";
 
 const ORGANIZATION_APP_ID = "organization";
@@ -265,27 +265,25 @@ export async function setMemberPositions(
         where: {
           userId: member.userId,
           roleId,
-          scopeType: RoleScopeType.ORGANIZATION,
-          scopeId: organizationId,
+          scope: orgScope(organizationId),
         },
       });
     }
     for (const roleId of addedRoleIds) {
+      const scope = orgScope(organizationId);
       await tx.roleAssignment.upsert({
         where: {
-          userId_roleId_scopeType_scopeId: {
+          userId_roleId_scope: {
             userId: member.userId,
             roleId,
-            scopeType: RoleScopeType.ORGANIZATION,
-            scopeId: organizationId,
+            scope,
           },
         },
         update: {},
         create: {
           userId: member.userId,
           roleId,
-          scopeType: RoleScopeType.ORGANIZATION,
-          scopeId: organizationId,
+          scope,
         },
       });
     }
@@ -390,12 +388,12 @@ export async function setPositionPermissions(
   return prisma.$transaction(async (tx) => {
     if (!roleId) {
       const roleCode = `position-${position.code}`;
+      const scope = orgScope(organizationId);
       const existing = await tx.role.findUnique({
         where: {
-          appId_scopeType_scopeId_code: {
+          appId_scope_code: {
             appId: ORGANIZATION_APP_ID,
-            scopeType: RoleScopeType.ORGANIZATION,
-            scopeId: organizationId,
+            scope,
             code: roleCode,
           },
         },
@@ -409,8 +407,7 @@ export async function setPositionPermissions(
       const role = await tx.role.create({
         data: {
           appId: ORGANIZATION_APP_ID,
-          scopeType: RoleScopeType.ORGANIZATION,
-          scopeId: organizationId,
+          scope,
           name: position.name,
           code: roleCode,
         },

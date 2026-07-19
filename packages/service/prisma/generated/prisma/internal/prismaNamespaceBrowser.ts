@@ -388,8 +388,7 @@ export const RoleAssignmentScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   roleId: 'roleId',
-  scopeType: 'scopeType',
-  scopeId: 'scopeId',
+  scope: 'scope',
   createdAt: 'createdAt'
 } as const
 
@@ -399,8 +398,7 @@ export type RoleAssignmentScalarFieldEnum = (typeof RoleAssignmentScalarFieldEnu
 export const RoleScalarFieldEnum = {
   id: 'id',
   appId: 'appId',
-  scopeType: 'scopeType',
-  scopeId: 'scopeId',
+  scope: 'scope',
   name: 'name',
   code: 'code',
   flags: 'flags',

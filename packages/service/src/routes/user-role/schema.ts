@@ -9,13 +9,11 @@ export const roleAssignmentSchema = z
     role: z.object({
       id: z.string(),
       appId: z.string(),
-      scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]),
-      scopeId: z.string(),
+      scope: z.string(),
       name: z.string(),
       code: z.string(),
     }),
-    scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]),
-    scopeId: z.string(),
+    scope: z.string(),
     createdAt: z.date(),
   })
   .openapi("RoleAssignment");
@@ -23,21 +21,18 @@ export const roleAssignmentSchema = z
 export const assignRoleAssignmentBodySchema = z.object({
   userId: z.string().min(1),
   roleId: z.string().min(1),
-  scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
-  scopeId: z.string().optional(),
+  organizationId: z.string().optional(),
 });
 
 export const removeRoleAssignmentParamSchema = z.object({
   userId: z.string().min(1),
   roleId: z.string().min(1),
-  scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
-  scopeId: z.string().optional(),
+  organizationId: z.string().optional(),
 });
 
 export const listRoleAssignmentsQuerySchema = z.object({
   userId: z.string().min(1),
-  scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
-  scopeId: z.string().optional(),
+  organizationId: z.string().optional(),
 });
 
 export const errorSchema = z

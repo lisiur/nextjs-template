@@ -6,8 +6,7 @@ export const roleSchema = z
   .object({
     id: z.string().openapi({ example: "clx1234567890" }),
     appId: z.string().openapi({ example: "app-admin" }),
-    scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]),
-    scopeId: z.string(),
+    scope: z.string().openapi({ example: "admin" }),
     name: z.string().openapi({ example: "Administrator" }),
     code: z.string().openapi({ example: "admin" }),
     flags: z.array(z.string()).openapi({ example: ["builtin"] }),
@@ -18,14 +17,12 @@ export const roleSchema = z
 
 export const listRolesQuerySchema = z.object({
   appId: z.string().min(1),
-  scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
-  scopeId: z.string().optional(),
+  organizationId: z.string().optional(),
 });
 
 export const createRoleBodySchema = z.object({
   appId: z.string().min(1),
-  scopeType: z.enum(["PLATFORM", "ORGANIZATION", "APPLICATION"]).optional(),
-  scopeId: z.string().optional(),
+  organizationId: z.string().optional(),
   name: z.string().min(1),
   code: z.string().min(1),
 });

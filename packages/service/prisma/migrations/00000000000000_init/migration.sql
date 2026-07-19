@@ -10,9 +10,6 @@ CREATE TYPE "JobPriority" AS ENUM ('CRITICAL', 'HIGH', 'NORMAL', 'LOW', 'IDLE');
 -- CreateEnum
 CREATE TYPE "LinkType" AS ENUM ('GROUP', 'INTERNAL', 'EXTERNAL');
 
--- CreateEnum
-CREATE TYPE "RoleScopeType" AS ENUM ('PLATFORM', 'ORGANIZATION', 'APPLICATION');
-
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -279,7 +276,7 @@ CREATE TABLE "menu_permission" (
 -- CreateTable
 CREATE TABLE "permission" (
     "id" TEXT NOT NULL,
-    "appId" TEXT,
+    "appId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "group" TEXT NOT NULL,
@@ -305,8 +302,7 @@ CREATE TABLE "role_assignment" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "roleId" TEXT NOT NULL,
-    "scopeType" "RoleScopeType" NOT NULL DEFAULT 'PLATFORM',
-    "scopeId" TEXT NOT NULL DEFAULT '',
+    "scope" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "role_assignment_pkey" PRIMARY KEY ("id")
@@ -316,8 +312,7 @@ CREATE TABLE "role_assignment" (
 CREATE TABLE "role" (
     "id" TEXT NOT NULL,
     "appId" TEXT NOT NULL,
-    "scopeType" "RoleScopeType" NOT NULL DEFAULT 'PLATFORM',
-    "scopeId" TEXT NOT NULL DEFAULT '',
+    "scope" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "flags" TEXT[] DEFAULT ARRAY[]::TEXT[],
@@ -613,19 +608,19 @@ CREATE INDEX "role_assignment_userId_idx" ON "role_assignment"("userId");
 CREATE INDEX "role_assignment_roleId_idx" ON "role_assignment"("roleId");
 
 -- CreateIndex
-CREATE INDEX "role_assignment_scopeType_scopeId_idx" ON "role_assignment"("scopeType", "scopeId");
+CREATE INDEX "role_assignment_scope_idx" ON "role_assignment"("scope");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "role_assignment_userId_roleId_scopeType_scopeId_key" ON "role_assignment"("userId", "roleId", "scopeType", "scopeId");
+CREATE UNIQUE INDEX "role_assignment_userId_roleId_scope_key" ON "role_assignment"("userId", "roleId", "scope");
 
 -- CreateIndex
 CREATE INDEX "role_appId_idx" ON "role"("appId");
 
 -- CreateIndex
-CREATE INDEX "role_scopeType_scopeId_idx" ON "role"("scopeType", "scopeId");
+CREATE INDEX "role_scope_idx" ON "role"("scope");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "role_appId_scopeType_scopeId_code_key" ON "role"("appId", "scopeType", "scopeId", "code");
+CREATE UNIQUE INDEX "role_appId_scope_code_key" ON "role"("appId", "scope", "code");
 
 -- CreateIndex
 CREATE INDEX "operation_log_traceId_idx" ON "operation_log"("traceId");

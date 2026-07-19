@@ -37,8 +37,7 @@ interface Role {
 interface RoleAssignment {
   id: string;
   roleId: string;
-  scopeType?: string;
-  scopeId?: string;
+  scope?: string;
   role: Role;
 }
 

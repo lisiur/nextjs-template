@@ -1,7 +1,7 @@
 import { isBuiltinRole } from "@repo/shared";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
-import type { RoleScopeType } from "#lib/role-scope";
+import { type ScopeContext, scopeFromContext } from "#lib/scope";
 import { roleRepository } from "#repositories/role.repository";
 
 export async function getRoleById(id: string) {
@@ -14,26 +14,29 @@ export async function getRoleById(id: string) {
 
 export async function createRole(data: {
   appId: string;
-  scopeType?: RoleScopeType;
-  scopeId?: string | null;
+  organizationId?: string | null;
   name: string;
   code: string;
   flags?: string[];
 }) {
+  const scope = scopeFromContext({ organizationId: data.organizationId });
   const existing = await roleRepository.findByAppAndCode(
     data.appId,
     data.code,
-    {
-      scopeId: data.scopeId,
-      scopeType: data.scopeType,
-    },
+    scope,
   );
   if (existing) {
     throw new HTTPException(409, {
       message: "Role code already exists in this scope",
     });
   }
-  return roleRepository.create(data);
+  return roleRepository.create({
+    appId: data.appId,
+    scope,
+    name: data.name,
+    code: data.code,
+    flags: data.flags,
+  });
 }
 
 export async function updateRole(
@@ -60,7 +63,7 @@ export async function updateRole(
     const codeTaken = await roleRepository.findByAppAndCode(
       role.appId,
       data.code,
-      { scopeId: role.scopeId, scopeType: role.scopeType },
+      role.scope,
     );
     if (codeTaken) {
       throw new HTTPException(409, {
@@ -86,9 +89,6 @@ export async function deleteRole(id: string) {
   return { name: role.name };
 }
 
-export async function listRoles(
-  appId: string,
-  scope?: { scopeType?: RoleScopeType; scopeId?: string | null },
-) {
-  return roleRepository.findByAppId(appId, scope);
+export async function listRoles(appId: string, ctx: ScopeContext = {}) {
+  return roleRepository.findByAppId(appId, ctx);
 }

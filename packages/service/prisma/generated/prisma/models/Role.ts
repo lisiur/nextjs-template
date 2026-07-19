@@ -27,8 +27,7 @@ export type AggregateRole = {
 export type RoleMinAggregateOutputType = {
   id: string | null
   appId: string | null
-  scopeType: $Enums.RoleScopeType | null
-  scopeId: string | null
+  scope: string | null
   name: string | null
   code: string | null
   createdAt: Date | null
@@ -38,8 +37,7 @@ export type RoleMinAggregateOutputType = {
 export type RoleMaxAggregateOutputType = {
   id: string | null
   appId: string | null
-  scopeType: $Enums.RoleScopeType | null
-  scopeId: string | null
+  scope: string | null
   name: string | null
   code: string | null
   createdAt: Date | null
@@ -49,8 +47,7 @@ export type RoleMaxAggregateOutputType = {
 export type RoleCountAggregateOutputType = {
   id: number
   appId: number
-  scopeType: number
-  scopeId: number
+  scope: number
   name: number
   code: number
   flags: number
@@ -63,8 +60,7 @@ export type RoleCountAggregateOutputType = {
 export type RoleMinAggregateInputType = {
   id?: true
   appId?: true
-  scopeType?: true
-  scopeId?: true
+  scope?: true
   name?: true
   code?: true
   createdAt?: true
@@ -74,8 +70,7 @@ export type RoleMinAggregateInputType = {
 export type RoleMaxAggregateInputType = {
   id?: true
   appId?: true
-  scopeType?: true
-  scopeId?: true
+  scope?: true
   name?: true
   code?: true
   createdAt?: true
@@ -85,8 +80,7 @@ export type RoleMaxAggregateInputType = {
 export type RoleCountAggregateInputType = {
   id?: true
   appId?: true
-  scopeType?: true
-  scopeId?: true
+  scope?: true
   name?: true
   code?: true
   flags?: true
@@ -170,8 +164,7 @@ export type RoleGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type RoleGroupByOutputType = {
   id: string
   appId: string
-  scopeType: $Enums.RoleScopeType
-  scopeId: string
+  scope: string
   name: string
   code: string
   flags: string[]
@@ -203,8 +196,7 @@ export type RoleWhereInput = {
   NOT?: Prisma.RoleWhereInput | Prisma.RoleWhereInput[]
   id?: Prisma.StringFilter<"Role"> | string
   appId?: Prisma.StringFilter<"Role"> | string
-  scopeType?: Prisma.EnumRoleScopeTypeFilter<"Role"> | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFilter<"Role"> | string
+  scope?: Prisma.StringFilter<"Role"> | string
   name?: Prisma.StringFilter<"Role"> | string
   code?: Prisma.StringFilter<"Role"> | string
   flags?: Prisma.StringNullableListFilter<"Role">
@@ -219,8 +211,7 @@ export type RoleWhereInput = {
 export type RoleOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   appId?: Prisma.SortOrder
-  scopeType?: Prisma.SortOrder
-  scopeId?: Prisma.SortOrder
+  scope?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   flags?: Prisma.SortOrder
@@ -234,13 +225,12 @@ export type RoleOrderByWithRelationInput = {
 
 export type RoleWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  appId_scopeType_scopeId_code?: Prisma.RoleAppIdScopeTypeScopeIdCodeCompoundUniqueInput
+  appId_scope_code?: Prisma.RoleAppIdScopeCodeCompoundUniqueInput
   AND?: Prisma.RoleWhereInput | Prisma.RoleWhereInput[]
   OR?: Prisma.RoleWhereInput[]
   NOT?: Prisma.RoleWhereInput | Prisma.RoleWhereInput[]
   appId?: Prisma.StringFilter<"Role"> | string
-  scopeType?: Prisma.EnumRoleScopeTypeFilter<"Role"> | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFilter<"Role"> | string
+  scope?: Prisma.StringFilter<"Role"> | string
   name?: Prisma.StringFilter<"Role"> | string
   code?: Prisma.StringFilter<"Role"> | string
   flags?: Prisma.StringNullableListFilter<"Role">
@@ -250,13 +240,12 @@ export type RoleWhereUniqueInput = Prisma.AtLeast<{
   rolePermissions?: Prisma.RolePermissionListRelationFilter
   roleAssignments?: Prisma.RoleAssignmentListRelationFilter
   position?: Prisma.XOR<Prisma.PositionNullableScalarRelationFilter, Prisma.PositionWhereInput> | null
-}, "id" | "appId_scopeType_scopeId_code">
+}, "id" | "appId_scope_code">
 
 export type RoleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   appId?: Prisma.SortOrder
-  scopeType?: Prisma.SortOrder
-  scopeId?: Prisma.SortOrder
+  scope?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   flags?: Prisma.SortOrder
@@ -273,8 +262,7 @@ export type RoleScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RoleScalarWhereWithAggregatesInput | Prisma.RoleScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Role"> | string
   appId?: Prisma.StringWithAggregatesFilter<"Role"> | string
-  scopeType?: Prisma.EnumRoleScopeTypeWithAggregatesFilter<"Role"> | $Enums.RoleScopeType
-  scopeId?: Prisma.StringWithAggregatesFilter<"Role"> | string
+  scope?: Prisma.StringWithAggregatesFilter<"Role"> | string
   name?: Prisma.StringWithAggregatesFilter<"Role"> | string
   code?: Prisma.StringWithAggregatesFilter<"Role"> | string
   flags?: Prisma.StringNullableListFilter<"Role">
@@ -284,8 +272,7 @@ export type RoleScalarWhereWithAggregatesInput = {
 
 export type RoleCreateInput = {
   id?: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -300,8 +287,7 @@ export type RoleCreateInput = {
 export type RoleUncheckedCreateInput = {
   id?: string
   appId: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -314,8 +300,7 @@ export type RoleUncheckedCreateInput = {
 
 export type RoleUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -330,8 +315,7 @@ export type RoleUpdateInput = {
 export type RoleUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appId?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -345,8 +329,7 @@ export type RoleUncheckedUpdateInput = {
 export type RoleCreateManyInput = {
   id?: string
   appId: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -356,8 +339,7 @@ export type RoleCreateManyInput = {
 
 export type RoleUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -368,8 +350,7 @@ export type RoleUpdateManyMutationInput = {
 export type RoleUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appId?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -397,18 +378,16 @@ export type RoleScalarRelationFilter = {
   isNot?: Prisma.RoleWhereInput
 }
 
-export type RoleAppIdScopeTypeScopeIdCodeCompoundUniqueInput = {
+export type RoleAppIdScopeCodeCompoundUniqueInput = {
   appId: string
-  scopeType: $Enums.RoleScopeType
-  scopeId: string
+  scope: string
   code: string
 }
 
 export type RoleCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   appId?: Prisma.SortOrder
-  scopeType?: Prisma.SortOrder
-  scopeId?: Prisma.SortOrder
+  scope?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   flags?: Prisma.SortOrder
@@ -419,8 +398,7 @@ export type RoleCountOrderByAggregateInput = {
 export type RoleMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   appId?: Prisma.SortOrder
-  scopeType?: Prisma.SortOrder
-  scopeId?: Prisma.SortOrder
+  scope?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -430,8 +408,7 @@ export type RoleMaxOrderByAggregateInput = {
 export type RoleMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   appId?: Prisma.SortOrder
-  scopeType?: Prisma.SortOrder
-  scopeId?: Prisma.SortOrder
+  scope?: Prisma.SortOrder
   name?: Prisma.SortOrder
   code?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -535,8 +512,7 @@ export type RoleUpdateflagsInput = {
 
 export type RoleCreateWithoutPositionInput = {
   id?: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -550,8 +526,7 @@ export type RoleCreateWithoutPositionInput = {
 export type RoleUncheckedCreateWithoutPositionInput = {
   id?: string
   appId: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -579,8 +554,7 @@ export type RoleUpdateToOneWithWhereWithoutPositionInput = {
 
 export type RoleUpdateWithoutPositionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -594,8 +568,7 @@ export type RoleUpdateWithoutPositionInput = {
 export type RoleUncheckedUpdateWithoutPositionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appId?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -607,8 +580,7 @@ export type RoleUncheckedUpdateWithoutPositionInput = {
 
 export type RoleCreateWithoutAppInput = {
   id?: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -621,8 +593,7 @@ export type RoleCreateWithoutAppInput = {
 
 export type RoleUncheckedCreateWithoutAppInput = {
   id?: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -665,8 +636,7 @@ export type RoleScalarWhereInput = {
   NOT?: Prisma.RoleScalarWhereInput | Prisma.RoleScalarWhereInput[]
   id?: Prisma.StringFilter<"Role"> | string
   appId?: Prisma.StringFilter<"Role"> | string
-  scopeType?: Prisma.EnumRoleScopeTypeFilter<"Role"> | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFilter<"Role"> | string
+  scope?: Prisma.StringFilter<"Role"> | string
   name?: Prisma.StringFilter<"Role"> | string
   code?: Prisma.StringFilter<"Role"> | string
   flags?: Prisma.StringNullableListFilter<"Role">
@@ -676,8 +646,7 @@ export type RoleScalarWhereInput = {
 
 export type RoleCreateWithoutRolePermissionsInput = {
   id?: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -691,8 +660,7 @@ export type RoleCreateWithoutRolePermissionsInput = {
 export type RoleUncheckedCreateWithoutRolePermissionsInput = {
   id?: string
   appId: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -720,8 +688,7 @@ export type RoleUpdateToOneWithWhereWithoutRolePermissionsInput = {
 
 export type RoleUpdateWithoutRolePermissionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -735,8 +702,7 @@ export type RoleUpdateWithoutRolePermissionsInput = {
 export type RoleUncheckedUpdateWithoutRolePermissionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appId?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -748,8 +714,7 @@ export type RoleUncheckedUpdateWithoutRolePermissionsInput = {
 
 export type RoleCreateWithoutRoleAssignmentsInput = {
   id?: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -763,8 +728,7 @@ export type RoleCreateWithoutRoleAssignmentsInput = {
 export type RoleUncheckedCreateWithoutRoleAssignmentsInput = {
   id?: string
   appId: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -792,8 +756,7 @@ export type RoleUpdateToOneWithWhereWithoutRoleAssignmentsInput = {
 
 export type RoleUpdateWithoutRoleAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -807,8 +770,7 @@ export type RoleUpdateWithoutRoleAssignmentsInput = {
 export type RoleUncheckedUpdateWithoutRoleAssignmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   appId?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -820,8 +782,7 @@ export type RoleUncheckedUpdateWithoutRoleAssignmentsInput = {
 
 export type RoleCreateManyAppInput = {
   id?: string
-  scopeType?: $Enums.RoleScopeType
-  scopeId?: string
+  scope: string
   name: string
   code: string
   flags?: Prisma.RoleCreateflagsInput | string[]
@@ -831,8 +792,7 @@ export type RoleCreateManyAppInput = {
 
 export type RoleUpdateWithoutAppInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -845,8 +805,7 @@ export type RoleUpdateWithoutAppInput = {
 
 export type RoleUncheckedUpdateWithoutAppInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -859,8 +818,7 @@ export type RoleUncheckedUpdateWithoutAppInput = {
 
 export type RoleUncheckedUpdateManyWithoutAppInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  scopeType?: Prisma.EnumRoleScopeTypeFieldUpdateOperationsInput | $Enums.RoleScopeType
-  scopeId?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   flags?: Prisma.RoleUpdateflagsInput | string[]
@@ -911,8 +869,7 @@ export type RoleCountOutputTypeCountRoleAssignmentsArgs<ExtArgs extends runtime.
 export type RoleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   appId?: boolean
-  scopeType?: boolean
-  scopeId?: boolean
+  scope?: boolean
   name?: boolean
   code?: boolean
   flags?: boolean
@@ -928,8 +885,7 @@ export type RoleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type RoleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   appId?: boolean
-  scopeType?: boolean
-  scopeId?: boolean
+  scope?: boolean
   name?: boolean
   code?: boolean
   flags?: boolean
@@ -941,8 +897,7 @@ export type RoleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type RoleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   appId?: boolean
-  scopeType?: boolean
-  scopeId?: boolean
+  scope?: boolean
   name?: boolean
   code?: boolean
   flags?: boolean
@@ -954,8 +909,7 @@ export type RoleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type RoleSelectScalar = {
   id?: boolean
   appId?: boolean
-  scopeType?: boolean
-  scopeId?: boolean
+  scope?: boolean
   name?: boolean
   code?: boolean
   flags?: boolean
@@ -963,7 +917,7 @@ export type RoleSelectScalar = {
   updatedAt?: boolean
 }
 
-export type RoleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appId" | "scopeType" | "scopeId" | "name" | "code" | "flags" | "createdAt" | "updatedAt", ExtArgs["result"]["role"]>
+export type RoleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "appId" | "scope" | "name" | "code" | "flags" | "createdAt" | "updatedAt", ExtArgs["result"]["role"]>
 export type RoleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   app?: boolean | Prisma.ApplicationDefaultArgs<ExtArgs>
   rolePermissions?: boolean | Prisma.Role$rolePermissionsArgs<ExtArgs>
@@ -989,8 +943,7 @@ export type $RolePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     appId: string
-    scopeType: $Enums.RoleScopeType
-    scopeId: string
+    scope: string
     name: string
     code: string
     flags: string[]
@@ -1425,8 +1378,7 @@ export interface Prisma__RoleClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface RoleFieldRefs {
   readonly id: Prisma.FieldRef<"Role", 'String'>
   readonly appId: Prisma.FieldRef<"Role", 'String'>
-  readonly scopeType: Prisma.FieldRef<"Role", 'RoleScopeType'>
-  readonly scopeId: Prisma.FieldRef<"Role", 'String'>
+  readonly scope: Prisma.FieldRef<"Role", 'String'>
   readonly name: Prisma.FieldRef<"Role", 'String'>
   readonly code: Prisma.FieldRef<"Role", 'String'>
   readonly flags: Prisma.FieldRef<"Role", 'String[]'>

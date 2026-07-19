@@ -44,13 +44,12 @@ describe("getUserPermissions", () => {
     ]);
     expect(mockPrisma.permission.findMany).toHaveBeenCalledWith({
       where: {
-        appId: null,
         rolePermissions: {
           some: {
             role: {
               roleAssignments: {
                 some: {
-                  OR: [{ scopeId: "", scopeType: "PLATFORM" }],
+                  OR: [{ scope: "admin" }],
                   userId: "user1",
                 },
               },
@@ -155,14 +154,7 @@ describe("getMenusForUser", () => {
                         roleAssignments: {
                           some: {
                             userId: "user1",
-                            OR: [
-                              { scopeType: "PLATFORM", scopeId: "" },
-                              { scopeType: "ORGANIZATION", scopeId: "org1" },
-                              {
-                                scopeType: "APPLICATION",
-                                scopeId: "organization",
-                              },
-                            ],
+                            OR: [{ scope: "org:org1" }],
                           },
                         },
                       },

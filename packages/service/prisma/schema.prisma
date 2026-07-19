@@ -290,12 +290,6 @@ enum LinkType {
   EXTERNAL
 }
 
-enum RoleScopeType {
-  PLATFORM
-  ORGANIZATION
-  APPLICATION
-}
-
 model Application {
   id          String       @id @default(cuid())
   name        String
@@ -359,8 +353,8 @@ model MenuPermission {
 
 model Permission {
   id              String           @id @default(cuid())
-  appId           String?
-  app             Application?     @relation(fields: [appId], references: [id], onDelete: Cascade)
+  appId           String
+  app             Application      @relation(fields: [appId], references: [id], onDelete: Cascade)
   name            String
   code            String
   group           String
@@ -391,19 +385,18 @@ model RolePermission {
 }
 
 model RoleAssignment {
-  id        String        @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
   roleId    String
-  role      Role          @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  scopeType RoleScopeType @default(PLATFORM)
-  scopeId   String        @default("")
-  createdAt DateTime      @default(now())
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scope     String
+  createdAt DateTime @default(now())
 
-  @@unique([userId, roleId, scopeType, scopeId])
+  @@unique([userId, roleId, scope])
   @@index([userId])
   @@index([roleId])
-  @@index([scopeType, scopeId])
+  @@index([scope])
   @@map("role_assignment")
 }
 
@@ -411,8 +404,7 @@ model Role {
   id              String           @id @default(cuid())
   appId           String
   app             Application      @relation(fields: [appId], references: [id], onDelete: Cascade)
-  scopeType       RoleScopeType    @default(PLATFORM)
-  scopeId         String           @default("")
+  scope           String
   name            String
   code            String
   flags           String[]         @default([])
@@ -422,9 +414,9 @@ model Role {
   roleAssignments RoleAssignment[]
   position        Position?
 
-  @@unique([appId, scopeType, scopeId, code])
+  @@unique([appId, scope, code])
   @@index([appId])
-  @@index([scopeType, scopeId])
+  @@index([scope])
   @@map("role")
 }
 

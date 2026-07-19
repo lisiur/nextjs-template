@@ -39,8 +39,7 @@ const mockPrisma = prisma as unknown as {
 const builtinRole = {
   id: "r-builtin",
   appId: "app-admin",
-  scopeType: "PLATFORM",
-  scopeId: "",
+  scope: "admin",
   name: "Administrator",
   code: "admin",
   flags: ["builtin"],
@@ -51,8 +50,7 @@ const builtinRole = {
 const customRole = {
   id: "r-custom",
   appId: "app-admin",
-  scopeType: "PLATFORM",
-  scopeId: "",
+  scope: "admin",
   name: "Editor",
   code: "editor",
   flags: [],

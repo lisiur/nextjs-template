@@ -82,7 +82,7 @@ export async function fillAncestorGroups(
 async function assertPermissionsInApp(appId: string, permissionIds: string[]) {
   if (permissionIds.length === 0) return;
   const valid = await prisma.permission.findMany({
-    where: { id: { in: permissionIds }, OR: [{ appId }, { appId: null }] },
+    where: { id: { in: permissionIds }, appId },
     select: { id: true },
   });
   if (valid.length !== new Set(permissionIds).size) {

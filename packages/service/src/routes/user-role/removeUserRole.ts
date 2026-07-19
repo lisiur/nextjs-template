@@ -36,13 +36,13 @@ export const removeRoleAssignment = defineOpenAPIRoute({
   handler: async (c) => {
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "user-role::remove");
-    const { roleId, scopeId, scopeType, userId } = c.req.valid("json");
-    await removeUserRoleSvc(userId, roleId, { scopeId, scopeType });
+    const { roleId, organizationId, userId } = c.req.valid("json");
+    await removeUserRoleSvc(userId, roleId, { organizationId });
 
     logAudit({
       event: "role_assignment.removed",
       category: "role_assignment",
-      metadata: { userId, roleId, scopeType, scopeId },
+      metadata: { userId, roleId, organizationId },
       c,
     });
 

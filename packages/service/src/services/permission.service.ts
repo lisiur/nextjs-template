@@ -4,7 +4,7 @@ import { prisma } from "#lib/db";
 export type PermissionSortField = "name" | "description";
 
 export function createPermission(data: {
-  appId?: string | null;
+  appId: string;
   name: string;
   code: string;
   group: string;
@@ -13,15 +13,15 @@ export function createPermission(data: {
   return prisma.permission.create({ data });
 }
 
-export function findPermissionByCode(code: string, appId?: string | null) {
+export function findPermissionByCode(code: string, appId: string) {
   return prisma.permission.findFirst({
-    where: { appId: appId ?? null, code },
+    where: { appId, code },
   });
 }
 
-export function findPermissionsByGroup(group: string, appId?: string | null) {
+export function findPermissionsByGroup(group: string, appId: string) {
   return prisma.permission.findMany({
-    where: { appId: appId ?? null, group },
+    where: { appId, group },
   });
 }
 
@@ -45,11 +45,10 @@ export async function listPermissionsForApp(
 ) {
   const { search, sort, sortDir, limit, offset } = params;
 
-  const appScope = { OR: [{ appId }, { appId: null }] };
   const where: Prisma.PermissionWhereInput = search
     ? {
         AND: [
-          appScope,
+          { appId },
           {
             OR: [
               { name: { contains: search, mode: "insensitive" } },
@@ -59,7 +58,7 @@ export async function listPermissionsForApp(
           },
         ],
       }
-    : appScope;
+    : { appId };
 
   const orderBy: Prisma.PermissionOrderByWithRelationInput[] = sort
     ? [{ [sort]: sortDir === "desc" ? "desc" : "asc" }]
@@ -78,10 +77,7 @@ export async function listPermissionsForApp(
   return { permissions, total };
 }
 
-export async function deletePermissionByCode(
-  code: string,
-  appId?: string | null,
-) {
+export async function deletePermissionByCode(code: string, appId: string) {
   const permission = await findPermissionByCode(code, appId);
   if (!permission) return null;
   return prisma.permission.delete({ where: { id: permission.id } });

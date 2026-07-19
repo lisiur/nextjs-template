@@ -37,12 +37,3 @@ export const LinkType = {
 } as const
 
 export type LinkType = (typeof LinkType)[keyof typeof LinkType]
-
-
-export const RoleScopeType = {
-  PLATFORM: 'PLATFORM',
-  ORGANIZATION: 'ORGANIZATION',
-  APPLICATION: 'APPLICATION'
-} as const
-
-export type RoleScopeType = (typeof RoleScopeType)[keyof typeof RoleScopeType]

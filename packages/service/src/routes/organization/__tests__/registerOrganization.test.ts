@@ -135,10 +135,9 @@ describe("POST /register - Register Organization", () => {
     });
     expect(tx.role.findUnique).toHaveBeenCalledWith({
       where: {
-        appId_scopeType_scopeId_code: {
+        appId_scope_code: {
           appId: "organization",
-          scopeType: "PLATFORM",
-          scopeId: "",
+          scope: "admin",
           code: "owner",
         },
       },
@@ -146,19 +145,17 @@ describe("POST /register - Register Organization", () => {
     });
     expect(tx.roleAssignment.upsert).toHaveBeenCalledWith({
       where: {
-        userId_roleId_scopeType_scopeId: {
+        userId_roleId_scope: {
           userId: "user1",
           roleId: "owner-role-id",
-          scopeType: "ORGANIZATION",
-          scopeId: "org1",
+          scope: "org:org1",
         },
       },
       update: {},
       create: {
         userId: "user1",
         roleId: "owner-role-id",
-        scopeType: "ORGANIZATION",
-        scopeId: "org1",
+        scope: "org:org1",
       },
     });
     expect(mockPrisma.session.update).toHaveBeenCalledWith({

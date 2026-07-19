@@ -2833,8 +2833,7 @@ export const RoleAssignmentScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   roleId: 'roleId',
-  scopeType: 'scopeType',
-  scopeId: 'scopeId',
+  scope: 'scope',
   createdAt: 'createdAt'
 } as const
 
@@ -2844,8 +2843,7 @@ export type RoleAssignmentScalarFieldEnum = (typeof RoleAssignmentScalarFieldEnu
 export const RoleScalarFieldEnum = {
   id: 'id',
   appId: 'appId',
-  scopeType: 'scopeType',
-  scopeId: 'scopeId',
+  scope: 'scope',
   name: 'name',
   code: 'code',
   flags: 'flags',
@@ -3162,20 +3160,6 @@ export type EnumLinkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
  * Reference to a field of type 'LinkType[]'
  */
 export type ListEnumLinkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LinkType[]'>
-    
-
-
-/**
- * Reference to a field of type 'RoleScopeType'
- */
-export type EnumRoleScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScopeType'>
-    
-
-
-/**
- * Reference to a field of type 'RoleScopeType[]'
- */
-export type ListEnumRoleScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleScopeType[]'>
     
 
 

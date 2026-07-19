@@ -612,12 +612,10 @@ export type ApplicationCreateNestedOneWithoutPermissionsInput = {
   connect?: Prisma.ApplicationWhereUniqueInput
 }
 
-export type ApplicationUpdateOneWithoutPermissionsNestedInput = {
+export type ApplicationUpdateOneRequiredWithoutPermissionsNestedInput = {
   create?: Prisma.XOR<Prisma.ApplicationCreateWithoutPermissionsInput, Prisma.ApplicationUncheckedCreateWithoutPermissionsInput>
   connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutPermissionsInput
   upsert?: Prisma.ApplicationUpsertWithoutPermissionsInput
-  disconnect?: Prisma.ApplicationWhereInput | boolean
-  delete?: Prisma.ApplicationWhereInput | boolean
   connect?: Prisma.ApplicationWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutPermissionsInput, Prisma.ApplicationUpdateWithoutPermissionsInput>, Prisma.ApplicationUncheckedUpdateWithoutPermissionsInput>
 }

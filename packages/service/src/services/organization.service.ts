@@ -2,7 +2,7 @@ import { ORG_OWNER_ROLE_CODE, ORGANIZATION_APP_CODE } from "@repo/shared";
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
 import { getOrgOwners } from "#lib/org-role";
-import { PLATFORM_SCOPE_ID, RoleScopeType } from "#lib/role-scope";
+import { ADMIN_SCOPE, orgScope } from "#lib/scope";
 
 export async function getOrganizationById(id: string) {
   const org = await prisma.organization.findUnique({ where: { id } });
@@ -70,10 +70,9 @@ export async function registerOrganizationForUser(
 
     const ownerRole = await tx.role.findUnique({
       where: {
-        appId_scopeType_scopeId_code: {
+        appId_scope_code: {
           appId: ORGANIZATION_APP_CODE,
-          scopeType: RoleScopeType.PLATFORM,
-          scopeId: PLATFORM_SCOPE_ID,
+          scope: ADMIN_SCOPE,
           code: ORG_OWNER_ROLE_CODE,
         },
       },
@@ -81,21 +80,20 @@ export async function registerOrganizationForUser(
     });
 
     if (ownerRole) {
+      const ownerScope = orgScope(organization.id);
       await tx.roleAssignment.upsert({
         where: {
-          userId_roleId_scopeType_scopeId: {
+          userId_roleId_scope: {
             userId,
             roleId: ownerRole.id,
-            scopeType: RoleScopeType.ORGANIZATION,
-            scopeId: organization.id,
+            scope: ownerScope,
           },
         },
         update: {},
         create: {
           userId,
           roleId: ownerRole.id,
-          scopeType: RoleScopeType.ORGANIZATION,
-          scopeId: organization.id,
+          scope: ownerScope,
         },
       });
     }
@@ -137,10 +135,10 @@ export async function deleteOrganization(id: string) {
   }
   const result = await prisma.$transaction([
     prisma.roleAssignment.deleteMany({
-      where: { scopeType: RoleScopeType.ORGANIZATION, scopeId: id },
+      where: { scope: orgScope(id) },
     }),
     prisma.role.deleteMany({
-      where: { scopeType: RoleScopeType.ORGANIZATION, scopeId: id },
+      where: { scope: orgScope(id) },
     }),
     prisma.organization.delete({ where: { id } }),
   ]);

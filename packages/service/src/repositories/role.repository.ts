@@ -1,29 +1,17 @@
 import { prisma } from "#lib/db";
-import {
-  PLATFORM_SCOPE_ID,
-  RoleScopeType,
-  scopeIdOrDefault,
-} from "#lib/role-scope";
+import { ADMIN_SCOPE, type ScopeContext, scopeFromContext } from "#lib/scope";
 
 export const roleRepository = {
-  findByAppId(
-    appId: string,
-    scope?: { scopeType?: RoleScopeType; scopeId?: string | null },
-  ) {
-    const scopedWhere = scope?.scopeType
-      ? {
-          OR: [
-            { scopeType: RoleScopeType.PLATFORM, scopeId: PLATFORM_SCOPE_ID },
-            {
-              scopeType: scope.scopeType,
-              scopeId: scopeIdOrDefault(scope.scopeId),
-            },
-          ],
-        }
-      : { scopeType: RoleScopeType.PLATFORM, scopeId: PLATFORM_SCOPE_ID };
+  findByAppId(appId: string, ctx: ScopeContext = {}) {
+    const scope = scopeFromContext(ctx);
+    // Include globally-defined roles (admin scope) plus the requested scope (if org-scoped)
+    const scopeWhere =
+      scope === ADMIN_SCOPE
+        ? { scope: ADMIN_SCOPE }
+        : { OR: [{ scope: ADMIN_SCOPE }, { scope }] };
 
     return prisma.role.findMany({
-      where: { appId, ...scopedWhere },
+      where: { appId, ...scopeWhere },
       orderBy: { createdAt: "asc" },
     });
   },
@@ -32,35 +20,22 @@ export const roleRepository = {
     return prisma.role.findUnique({ where: { id } });
   },
 
-  findByAppAndCode(
-    appId: string,
-    code: string,
-    scope?: { scopeType?: RoleScopeType; scopeId?: string | null },
-  ) {
-    const scopeType = scope?.scopeType ?? RoleScopeType.PLATFORM;
-    const scopeId = scopeIdOrDefault(scope?.scopeId);
+  findByAppAndCode(appId: string, code: string, scope: string) {
     return prisma.role.findUnique({
       where: {
-        appId_scopeType_scopeId_code: { appId, scopeType, scopeId, code },
+        appId_scope_code: { appId, scope, code },
       },
     });
   },
 
   create(data: {
     appId: string;
-    scopeType?: RoleScopeType;
-    scopeId?: string | null;
+    scope: string;
     name: string;
     code: string;
     flags?: string[];
   }) {
-    return prisma.role.create({
-      data: {
-        ...data,
-        scopeType: data.scopeType ?? RoleScopeType.PLATFORM,
-        scopeId: scopeIdOrDefault(data.scopeId),
-      },
-    });
+    return prisma.role.create({ data });
   },
 
   update(

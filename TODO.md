@@ -2,13 +2,6 @@
 
 ## Medium Priority
 
-- [ ] **`assignPermissions` allows cross-app privilege grants** — blindly creates
-      RolePermission rows for any permission IDs
-      (`services/role-permission.service.ts:52-62`); `getPermissionAppWhere`
-      includes `appId IS NULL` permissions for every scope (`:45-50`). Attaching
-      a system permission (e.g. `user::delete`, `appId = null`) to an org role
-      grants it to every holder of that org role. Reject when `permission.appId`
-      is neither null-and-platform-role nor equal to `role.appId`.
 - [ ] **TOCTOU in last-org-owner protection** — `removeMember` does findFirst →
       isOrgOwner → countOrgOwners → delete as separate, non-transactional steps
       (`services/member.service.ts:59-76`). Two concurrent removes of the last
@@ -92,12 +85,6 @@
       app leaves orphaned Role/Permission/Menu rows and silently degrades org
       permission/menu resolution. Refuse to soft-delete apps whose code is
       `admin`/`organization`.
-- [ ] **Permission `@@unique([appId, code])` doesn't enforce uniqueness for
-      system perms** — Postgres treats NULLs as distinct (`schema.prisma:373`),
-      so `seed.ts` uses `findFirst`+`create` instead of a real upsert
-      (`prisma/seed.ts:889-917`); concurrent seeds can duplicate system
-      permissions. Add a partial unique index `ON permission(code) WHERE "appId"
-      IS NULL`.
 - [ ] **`seed.ts` is not wrapped in a transaction** — only the built-in-org block
       uses `$transaction` (`prisma/seed.ts:1353`); the other ~14 steps are
       independent writes. A mid-seed failure leaves reference data partially

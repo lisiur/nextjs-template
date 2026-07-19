@@ -34,7 +34,7 @@ import {
   USER_ROLE_CODE,
 } from "@repo/shared";
 import { hashPassword } from "../src/lib/password";
-import { PLATFORM_SCOPE_ID, RoleScopeType } from "../src/lib/role-scope";
+import { ADMIN_SCOPE, orgScope } from "../src/lib/scope";
 import { Prisma, type PrismaClient } from "./generated/prisma/client";
 
 // ============================================================
@@ -856,7 +856,7 @@ async function upsertApplication(data: {
 }
 
 async function upsertPermission(
-  appId: string | null,
+  appId: string,
   data: { code: string; name: string; group: string; description?: string },
 ) {
   const existing = await prisma.permission.findFirst({
@@ -886,7 +886,7 @@ async function upsertPermission(
 }
 
 async function upsertPermissions(
-  appId: string | null,
+  appId: string,
   definitions: {
     code: string;
     name: string;
@@ -964,18 +964,16 @@ async function upsertRole(
 ) {
   return prisma.role.upsert({
     where: {
-      appId_scopeType_scopeId_code: {
+      appId_scope_code: {
         appId,
-        scopeType: RoleScopeType.PLATFORM,
-        scopeId: PLATFORM_SCOPE_ID,
+        scope: ADMIN_SCOPE,
         code: data.code,
       },
     },
     update: { name: data.name, flags: data.flags },
     create: {
       appId,
-      scopeType: RoleScopeType.PLATFORM,
-      scopeId: PLATFORM_SCOPE_ID,
+      scope: ADMIN_SCOPE,
       name: data.name,
       code: data.code,
       flags: data.flags,
@@ -1136,8 +1134,7 @@ async function upsertRoleAssignment(params: {
   const role = await prisma.role.findFirst({
     where: {
       appId: params.appId,
-      scopeType: RoleScopeType.PLATFORM,
-      scopeId: PLATFORM_SCOPE_ID,
+      scope: ADMIN_SCOPE,
       code: params.roleCode,
     },
   });
@@ -1149,19 +1146,17 @@ async function upsertRoleAssignment(params: {
   }
   await prisma.roleAssignment.upsert({
     where: {
-      userId_roleId_scopeType_scopeId: {
+      userId_roleId_scope: {
         userId: params.userId,
         roleId: role.id,
-        scopeType: RoleScopeType.PLATFORM,
-        scopeId: PLATFORM_SCOPE_ID,
+        scope: ADMIN_SCOPE,
       },
     },
     update: {},
     create: {
       userId: params.userId,
       roleId: role.id,
-      scopeType: RoleScopeType.PLATFORM,
-      scopeId: PLATFORM_SCOPE_ID,
+      scope: ADMIN_SCOPE,
     },
   });
 }
@@ -1210,9 +1205,12 @@ export async function seed(client: PrismaClient) {
   }
   console.log(`  ${applications.length} applications ready.\n`);
 
-  // 5. System Permissions (appId: null)
+  // 5. System Permissions (admin app)
   console.log("System permissions:");
-  const systemPermIds = await upsertPermissions(null, systemPermissions);
+  const systemPermIds = await upsertPermissions(
+    appRecords[ADMIN_APP_CODE],
+    systemPermissions,
+  );
   console.log(`  ${systemPermissions.length} system permissions ready.\n`);
 
   // 6. Organization App Permissions
@@ -1341,31 +1339,29 @@ export async function seed(client: PrismaClient) {
         });
         const ownerRole = await tx.role.findUnique({
           where: {
-            appId_scopeType_scopeId_code: {
+            appId_scope_code: {
               appId: ORGANIZATION_APP_CODE,
-              scopeType: RoleScopeType.PLATFORM,
-              scopeId: PLATFORM_SCOPE_ID,
+              scope: ADMIN_SCOPE,
               code: ORG_OWNER_ROLE_CODE,
             },
           },
           select: { id: true },
         });
         if (ownerRole) {
+          const ownerScope = orgScope(org.id);
           await tx.roleAssignment.upsert({
             where: {
-              userId_roleId_scopeType_scopeId: {
+              userId_roleId_scope: {
                 userId: hapaulUserId,
                 roleId: ownerRole.id,
-                scopeType: RoleScopeType.ORGANIZATION,
-                scopeId: org.id,
+                scope: ownerScope,
               },
             },
             update: {},
             create: {
               userId: hapaulUserId,
               roleId: ownerRole.id,
-              scopeType: RoleScopeType.ORGANIZATION,
-              scopeId: org.id,
+              scope: ownerScope,
             },
           });
         }

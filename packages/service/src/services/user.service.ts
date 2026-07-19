@@ -4,12 +4,12 @@ import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import { hashPassword } from "#lib/password";
 import { assertUserIsNotBuiltin } from "#lib/protected-user";
-import { PLATFORM_SCOPE_ID, RoleScopeType } from "#lib/role-scope";
+import { ADMIN_SCOPE } from "#lib/scope";
 import { createUser as createAuthUser } from "#services/auth.service";
 
 const userWithRolesInclude = {
   roleAssignments: {
-    where: { scopeType: RoleScopeType.PLATFORM, scopeId: PLATFORM_SCOPE_ID },
+    where: { scope: ADMIN_SCOPE },
     include: {
       role: {
         select: {
@@ -83,19 +83,17 @@ export async function createUser(data: {
       for (const roleId of roleIds) {
         await tx.roleAssignment.upsert({
           where: {
-            userId_roleId_scopeType_scopeId: {
+            userId_roleId_scope: {
               userId,
               roleId,
-              scopeType: RoleScopeType.PLATFORM,
-              scopeId: PLATFORM_SCOPE_ID,
+              scope: ADMIN_SCOPE,
             },
           },
           update: {},
           create: {
             userId,
             roleId,
-            scopeType: RoleScopeType.PLATFORM,
-            scopeId: PLATFORM_SCOPE_ID,
+            scope: ADMIN_SCOPE,
           },
         });
       }
@@ -169,27 +167,24 @@ export async function updateUser(
       await tx.roleAssignment.deleteMany({
         where: {
           userId: id,
-          scopeType: RoleScopeType.PLATFORM,
-          scopeId: PLATFORM_SCOPE_ID,
+          scope: ADMIN_SCOPE,
         },
       });
 
       for (const roleId of roleIds) {
         await tx.roleAssignment.upsert({
           where: {
-            userId_roleId_scopeType_scopeId: {
+            userId_roleId_scope: {
               userId: id,
               roleId,
-              scopeType: RoleScopeType.PLATFORM,
-              scopeId: PLATFORM_SCOPE_ID,
+              scope: ADMIN_SCOPE,
             },
           },
           update: {},
           create: {
             userId: id,
             roleId,
-            scopeType: RoleScopeType.PLATFORM,
-            scopeId: PLATFORM_SCOPE_ID,
+            scope: ADMIN_SCOPE,
           },
         });
       }

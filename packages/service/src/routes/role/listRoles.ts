@@ -27,8 +27,8 @@ export const listRoles = defineOpenAPIRoute({
   handler: async (c) => {
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "role::list");
-    const { appId, scopeId, scopeType } = c.req.valid("query");
-    const roles = await listRolesService(appId, { scopeId, scopeType });
+    const { appId, organizationId } = c.req.valid("query");
+    const roles = await listRolesService(appId, { organizationId });
     return c.json(roles, 200);
   },
 });

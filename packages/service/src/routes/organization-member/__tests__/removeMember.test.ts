@@ -38,12 +38,11 @@ describe("removeMember", () => {
 
     await removeMember("org1", "member1");
 
-    // Org-scoped role assignments for (ORGANIZATION, org1) must be revoked
+    // Org-scoped role assignments for org1 must be revoked
     expect(db.roleAssignment.deleteMany).toHaveBeenCalledWith({
       where: {
         userId: "user1",
-        scopeType: "ORGANIZATION",
-        scopeId: "org1",
+        scope: "org:org1",
       },
     });
     // Member must be deleted
@@ -66,8 +65,7 @@ describe("removeMember", () => {
     expect(db.roleAssignment.deleteMany).toHaveBeenCalledWith({
       where: {
         userId: "user1",
-        scopeType: "ORGANIZATION",
-        scopeId: "org1",
+        scope: "org:org1",
       },
     });
     expect(db.member.delete).toHaveBeenCalledWith({

@@ -1,7 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { HTTPException } from "hono/http-exception";
 import { requirePrincipal } from "#extractors/session";
-import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import {
   forbiddenResponse,
@@ -50,11 +48,6 @@ export const batchAssignRolePermissions = defineOpenAPIRoute({
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "role::update");
     const { roleId, permissionIds } = c.req.valid("json");
-
-    const role = await prisma.role.findUnique({ where: { id: roleId } });
-    if (!role) {
-      throw new HTTPException(404, { message: "Role not found" });
-    }
 
     await assignPermissions(roleId, permissionIds);
 

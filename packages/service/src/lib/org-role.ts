@@ -1,6 +1,6 @@
 import { ORG_OWNER_ROLE_CODE, ORGANIZATION_APP_CODE } from "@repo/shared";
 import { prisma } from "#lib/db";
-import { PLATFORM_SCOPE_ID, RoleScopeType } from "#lib/role-scope";
+import { ADMIN_SCOPE, ORG_SCOPE_PREFIX, orgScope } from "#lib/scope";
 
 export type OrgRole = "owner" | "member";
 
@@ -11,17 +11,15 @@ const ownerRoleWhere = {
 
 const orgOwnerAssignmentWhere = (organizationId: string) => ({
   role: ownerRoleWhere,
-  scopeType: RoleScopeType.ORGANIZATION,
-  scopeId: organizationId,
+  scope: orgScope(organizationId),
 });
 
 export async function getOrgOwnerRoleId(): Promise<string | null> {
   const role = await prisma.role.findUnique({
     where: {
-      appId_scopeType_scopeId_code: {
+      appId_scope_code: {
         appId: ORGANIZATION_APP_CODE,
-        scopeType: RoleScopeType.PLATFORM,
-        scopeId: PLATFORM_SCOPE_ID,
+        scope: ADMIN_SCOPE,
         code: ORG_OWNER_ROLE_CODE,
       },
     },
@@ -67,22 +65,25 @@ export async function getOrgOwners(
   organizationIds: string[],
 ): Promise<Map<string, { id: string; name: string; email: string }>> {
   if (organizationIds.length === 0) return new Map();
+  const ownerScopes = organizationIds.map(orgScope);
   const rows = await prisma.roleAssignment.findMany({
     where: {
       role: ownerRoleWhere,
-      scopeType: RoleScopeType.ORGANIZATION,
-      scopeId: { in: organizationIds },
+      scope: { in: ownerScopes },
     },
     select: {
-      scopeId: true,
+      scope: true,
       user: { select: { id: true, name: true, email: true } },
     },
     orderBy: { createdAt: "asc" },
   });
   const owners = new Map<string, { id: string; name: string; email: string }>();
   for (const row of rows) {
-    if (!owners.has(row.scopeId)) {
-      owners.set(row.scopeId, row.user);
+    const orgId = row.scope.startsWith(ORG_SCOPE_PREFIX)
+      ? row.scope.slice(ORG_SCOPE_PREFIX.length)
+      : row.scope;
+    if (!owners.has(orgId)) {
+      owners.set(orgId, row.user);
     }
   }
   return owners;

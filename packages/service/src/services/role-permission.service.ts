@@ -3,10 +3,11 @@ import type { Principal } from "#extractors/session";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 import {
-  PLATFORM_SCOPE_ID,
-  RoleScopeType,
-  scopeIdOrDefault,
-} from "#lib/role-scope";
+  ADMIN_SCOPE,
+  orgScope,
+  parseScope,
+  scopeFromContext,
+} from "#lib/scope";
 import {
   fillAncestorGroups,
   menuPermissionsInclude,
@@ -21,38 +22,48 @@ export type PermissionScope = {
 function getRoleAssignmentScopeConditions(
   scope?: PermissionScope,
 ): Prisma.RoleAssignmentWhereInput[] {
-  const conditions: Prisma.RoleAssignmentWhereInput[] = [
-    { scopeType: RoleScopeType.PLATFORM, scopeId: PLATFORM_SCOPE_ID },
-  ];
-
   if (scope?.organizationId) {
-    conditions.push({
-      scopeType: RoleScopeType.ORGANIZATION,
-      scopeId: scope.organizationId,
-    });
+    return [{ scope: orgScope(scope.organizationId) }];
   }
-
-  if (scope?.appId) {
-    conditions.push({
-      scopeType: RoleScopeType.APPLICATION,
-      scopeId: scope.appId,
-    });
-  }
-
-  return conditions;
+  return [{ scope: ADMIN_SCOPE }];
 }
 
 function getPermissionAppWhere(
   appId?: string | null,
-): Pick<Prisma.PermissionWhereInput, "OR" | "appId"> {
-  if (!appId) return { appId: null };
-  return { OR: [{ appId: null }, { appId }] };
+): Prisma.PermissionWhereInput {
+  if (!appId) return {};
+  return { appId };
 }
 
 export async function assignPermissions(
   roleId: string,
   permissionIds: string[],
 ) {
+  const role = await prisma.role.findUnique({
+    where: { id: roleId },
+    select: { appId: true },
+  });
+  if (!role) {
+    throw new HTTPException(404, { message: "Role not found" });
+  }
+
+  if (permissionIds.length > 0) {
+    const perms = await prisma.permission.findMany({
+      where: { id: { in: permissionIds } },
+      select: { id: true, appId: true },
+    });
+    if (perms.length !== permissionIds.length) {
+      throw new HTTPException(400, { message: "Unknown permission id" });
+    }
+    for (const p of perms) {
+      if (p.appId !== role.appId) {
+        throw new HTTPException(400, {
+          message: `Permission ${p.id} does not belong to role's app`,
+        });
+      }
+    }
+  }
+
   return prisma.$transaction([
     prisma.rolePermission.deleteMany({ where: { roleId } }),
     prisma.rolePermission.createMany({
@@ -79,20 +90,16 @@ export function getPermissionCodesForRole(roleId: string) {
 export async function assignRole(params: {
   userId: string;
   roleId: string;
-  scopeType: RoleScopeType;
-  scopeId?: string | null;
+  organizationId?: string | null;
 }) {
   const role = await prisma.role.findUnique({ where: { id: params.roleId } });
   if (!role) {
     throw new HTTPException(404, { message: "Role not found" });
   }
 
-  const scopeId = scopeIdOrDefault(params.scopeId);
-  if (
-    role.scopeType === RoleScopeType.ORGANIZATION &&
-    (params.scopeType !== RoleScopeType.ORGANIZATION ||
-      scopeId !== role.scopeId)
-  ) {
+  const scope = scopeFromContext({ organizationId: params.organizationId });
+  const roleScope = parseScope(role.scope);
+  if (roleScope.kind === "org" && role.scope !== scope) {
     throw new HTTPException(400, {
       message:
         "Organization-specific role can only be assigned in its organization",
@@ -101,19 +108,17 @@ export async function assignRole(params: {
 
   return prisma.roleAssignment.upsert({
     where: {
-      userId_roleId_scopeType_scopeId: {
+      userId_roleId_scope: {
         userId: params.userId,
         roleId: params.roleId,
-        scopeType: params.scopeType,
-        scopeId,
+        scope,
       },
     },
     update: {},
     create: {
       userId: params.userId,
       roleId: params.roleId,
-      scopeType: params.scopeType,
-      scopeId,
+      scope,
     },
   });
 }
