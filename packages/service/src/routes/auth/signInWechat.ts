@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { getClientIpFromContextOrNull } from "#lib/get-client-ip";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { setSessionCookie } from "#lib/session";
 import { signInWithWechat } from "#services/auth.service";
@@ -25,10 +26,7 @@ export const signInWechat = defineOpenAPIRoute({
     const { code } = c.req.valid("json");
     const { user, session } = await signInWithWechat({
       code,
-      ipAddress:
-        c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ??
-        c.req.header("x-real-ip") ??
-        null,
+      ipAddress: getClientIpFromContextOrNull(c),
       traceId: c.get("traceId"),
       userAgent: c.req.header("user-agent") ?? null,
     });

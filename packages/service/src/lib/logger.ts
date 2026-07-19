@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import { trySession } from "#extractors/session";
 import { prisma } from "#lib/db";
+import { getClientIpFromContextOrNull } from "#lib/get-client-ip";
 
 type OperationLogLevel = "debug" | "info" | "warn" | "error";
 type AuditSeverity = "info" | "warning" | "critical";
@@ -99,7 +100,7 @@ export async function logAudit(params: LogAuditParams) {
         before: toJsonValue(params.before),
         after: toJsonValue(params.after),
         metadata: toJsonValue(params.metadata),
-        ip: params.c ? getClientIp(params.c) : null,
+        ip: params.c ? getClientIpFromContextOrNull(params.c) : null,
         userAgent: params.c
           ? (params.c.req.header("user-agent") ?? null)
           : null,
@@ -139,14 +140,4 @@ function normalizeError(error: unknown): {
 function toJsonValue(value: unknown) {
   if (value === undefined) return undefined;
   return JSON.parse(JSON.stringify(value));
-}
-
-function getClientIp(c: Context): string | null {
-  const forwarded = c.req.header("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0]?.trim() ?? null;
-  }
-  const realIp = c.req.header("x-real-ip");
-  if (realIp) return realIp.trim();
-  return null;
 }

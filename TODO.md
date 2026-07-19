@@ -49,7 +49,7 @@
       `repositories/user-role.repository.ts:36-49`); a PLATFORM role (e.g.
       `admin`) can be assigned with `scopeType = ORGANIZATION`. Require
       `params.scopeType === role.scopeType`.
-- [ ] **Audit log records a spoofable client IP** — `logAudit` reads IP via a
+- [x] **Audit log records a spoofable client IP** — `logAudit` reads IP via a
       local helper that blindly takes `x-forwarded-for[0]`/`x-real-ip`
       (`lib/logger.ts:144-152`), ignoring the proxy-aware `resolveClientIp`
       in `lib/client-ip.ts`. The same naive extraction populates
@@ -57,6 +57,17 @@
       `routes/auth/signInEmail.ts:29-32`, `routes/auth/signUpEmail.ts:36-39`,
       and `routes/auth/signInWechat.ts:28-31`. Use `resolveClientIp`
       everywhere.
+      **Done:** lifted the canonical `getClientIp(c)` wrapper out of
+      `middleware/rate-limit.ts` into a shared `lib/get-client-ip.ts`
+      (exports `getClientIpFromContext` + `getClientIpFromContextOrNull`,
+      both calling `resolveClientIp` with `getTrustSpecSync()`).
+      `lib/logger.ts`, `routes/auth/signInEmail.ts`,
+      `routes/auth/signUpEmail.ts`, and `routes/auth/signInWechat.ts` all
+      import the shared helper; the previous naive inline
+      `x-forwarded-for[0] ?? x-real-ip` extractions are removed. The
+      nullable variant preserves the existing "null when IP unknown"
+      semantics for `AuditLog.ip` / `Session.ipAddress`; rate-limit keeps
+      the non-null form (uses the IP as a key suffix).
 - [ ] **No audit on user delete or permission denials** — `deleteUser`
       (`services/user.service.ts:274-286`) writes no audit row;
       `assertAccess` throws 403 with no audit

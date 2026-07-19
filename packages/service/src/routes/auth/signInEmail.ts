@@ -1,4 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { getClientIpFromContextOrNull } from "#lib/get-client-ip";
 import { okResponseFn, unauthorizedResponse } from "#lib/openapi";
 import { setSessionCookie } from "#lib/session";
 import { signInWithEmail } from "#services/auth.service";
@@ -26,10 +27,7 @@ export const signInEmail = defineOpenAPIRoute({
     const { user, session } = await signInWithEmail({
       email,
       password,
-      ipAddress:
-        c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ??
-        c.req.header("x-real-ip") ??
-        null,
+      ipAddress: getClientIpFromContextOrNull(c),
       traceId: c.get("traceId"),
       userAgent: c.req.header("user-agent") ?? null,
     });

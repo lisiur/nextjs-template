@@ -1,5 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requireAppId } from "#extractors/current-app";
+import { getClientIpFromContextOrNull } from "#lib/get-client-ip";
 import {
   badRequestResponse,
   createdResponseFn,
@@ -33,10 +34,7 @@ export const signUpEmail = defineOpenAPIRoute({
     const { user, session } = await signUpWithEmail({
       ...body,
       appId,
-      ipAddress:
-        c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ??
-        c.req.header("x-real-ip") ??
-        null,
+      ipAddress: getClientIpFromContextOrNull(c),
       traceId: c.get("traceId"),
       userAgent: c.req.header("user-agent") ?? null,
     });

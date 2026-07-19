@@ -1,11 +1,8 @@
-import { getConnInfo } from "@hono/node-server/conninfo";
-import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
-import { resolveClientIp } from "#lib/client-ip";
+import { getClientIpFromContext } from "#lib/get-client-ip";
 import { rateLimitRegistry } from "#lib/rate-limit-registry";
 import { RateLimitStore } from "#lib/rate-limit-store";
 import { getSessionFromHeaders } from "#lib/session";
-import { getTrustSpecSync } from "#services/rate-limit.service";
 import { eventBus } from "#states/event-bus";
 
 export type RateLimiterOptions = {
@@ -15,22 +12,6 @@ export type RateLimiterOptions = {
   store?: RateLimitStore;
   enabled?: boolean;
 };
-
-function getPeerIp(c: Context): string | null {
-  try {
-    return getConnInfo(c).remote.address ?? null;
-  } catch {
-    return null;
-  }
-}
-
-function getClientIp(c: Context): string {
-  const peerIp = getPeerIp(c);
-  const xff = c.req.header("x-forwarded-for");
-  const xRealIp = c.req.header("x-real-ip");
-  const trust = getTrustSpecSync();
-  return resolveClientIp({ peerIp, xForwardedFor: xff, xRealIp, trust });
-}
 
 export function createRateLimiter(options: RateLimiterOptions) {
   const { name, max, windowMs } = options;
@@ -48,7 +29,7 @@ export function createRateLimiter(options: RateLimiterOptions) {
     const session = await getSessionFromHeaders(c.req.raw.headers);
     const subject = session
       ? `user:${session.user.id}`
-      : `ip:${getClientIp(c)}`;
+      : `ip:${getClientIpFromContext(c)}`;
 
     const policy = rateLimitRegistry.resolvePolicy(name, subject);
     if (policy.bypass) {
