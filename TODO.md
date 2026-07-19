@@ -4,18 +4,6 @@
 
 ### Auth & Session
 
-- [x] **Password policy is far too weak** — sign-up and change-password both use
-      `z.string().min(6)` (`routes/auth/schema.ts:57,67`); no max length (argon2
-      DoS on huge input), no complexity, no breach check, and no centralized
-      policy helper in `lib/password.ts`. Enforce a sensible min (10–12), cap
-      input length, and centralize the rules.
-      **Done:** centralized rules in `lib/password.ts` (`PASSWORD_POLICY` +
-      `passwordSchema`: 10–256 chars, must contain a letter and a digit).
-      `signUpEmailBodySchema`, `changePasswordBodySchema.newPassword`,
-      `createUserBodySchema.password`, and `resetPasswordBodySchema.password`
-      all import the shared schema. Sign-in / current-password paths unchanged.
-      Seed admin/user passwords bumped to 10 chars. Breach-list check remains
-      out of scope.
 - [ ] **WeChat `session_key` persisted in plaintext** — written verbatim to
       `Account.accessToken` (`services/auth.service.ts:366,403`). A DB leak
       gives attackers decryption material for previously captured
@@ -49,25 +37,6 @@
       `repositories/user-role.repository.ts:36-49`); a PLATFORM role (e.g.
       `admin`) can be assigned with `scopeType = ORGANIZATION`. Require
       `params.scopeType === role.scopeType`.
-- [x] **Audit log records a spoofable client IP** — `logAudit` reads IP via a
-      local helper that blindly takes `x-forwarded-for[0]`/`x-real-ip`
-      (`lib/logger.ts:144-152`), ignoring the proxy-aware `resolveClientIp`
-      in `lib/client-ip.ts`. The same naive extraction populates
-      `session.ipAddress` in three auth routes —
-      `routes/auth/signInEmail.ts:29-32`, `routes/auth/signUpEmail.ts:36-39`,
-      and `routes/auth/signInWechat.ts:28-31`. Use `resolveClientIp`
-      everywhere.
-      **Done:** lifted the canonical `getClientIp(c)` wrapper out of
-      `middleware/rate-limit.ts` into a shared `lib/get-client-ip.ts`
-      (exports `getClientIpFromContext` + `getClientIpFromContextOrNull`,
-      both calling `resolveClientIp` with `getTrustSpecSync()`).
-      `lib/logger.ts`, `routes/auth/signInEmail.ts`,
-      `routes/auth/signUpEmail.ts`, and `routes/auth/signInWechat.ts` all
-      import the shared helper; the previous naive inline
-      `x-forwarded-for[0] ?? x-real-ip` extractions are removed. The
-      nullable variant preserves the existing "null when IP unknown"
-      semantics for `AuditLog.ip` / `Session.ipAddress`; rate-limit keeps
-      the non-null form (uses the IP as a key suffix).
 - [ ] **No audit on user delete or permission denials** — `deleteUser`
       (`services/user.service.ts:274-286`) writes no audit row;
       `assertAccess` throws 403 with no audit
@@ -88,17 +57,6 @@
       a single SMTP timeout marks the notification `failed` with no in-service
       retry (`notification.service.ts:227-233`). Cache one transporter per
       `channelId` and rely on the job worker's retry/backoff.
-- [x] **`createNotificationsFromTemplate` disabled-template branch is not
-      transactional** — the enabled branch uses `$transaction`
-      (`notification.service.ts:109`), but the disabled branch uses
-      `Promise.all` of independent `prisma.notification.create` (`:75-91`);
-      a mid-iteration failure leaves a partial set of `failed` rows. Replace
-      with a single `$transaction` loop.
-      **Done:** wrapped the disabled-template branch in
-      `prisma.$transaction(async (tx) => { ... })` mirroring the enabled
-      branch — sequential `tx.notification.create` loop collecting ids, then
-      returns `{ correlationId, total, pending: 0, failed, notificationIds }`
-      with the same shape. Either all `failed` rows commit or none do.
 
 ### SSE / Events / EventBus
 
