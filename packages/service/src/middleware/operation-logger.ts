@@ -40,9 +40,9 @@ export const operationLogger = createMiddleware(async (c, next) => {
   }
 });
 
-function shouldSkipOperationLog(method: string, path: string): boolean {
+export function shouldSkipOperationLog(method: string, path: string): boolean {
   if (method !== "GET") return false;
-  return /^\/api\/log(?:\/[^/]+)?$/.test(path);
+  return /^\/api\/(operation-logs|audit-logs)(?:\/[^/]+)?$/.test(path);
 }
 
 function getModuleFromPath(path: string): string | null {

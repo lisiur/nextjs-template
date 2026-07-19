@@ -82,12 +82,14 @@
       `services/system-config.service.ts:5-19`); `value` is a free-form
       string regardless of `type`. Maintain an allowlist of `(group, key)`
       with per-key value schemas.
-- [ ] **Operation logger creates a row for every GET on the log endpoints**
-      — `shouldSkipOperationLog` matches `^/api/log(?:/[^/]+)?$`
-      (`middleware/operation-logger.ts:43-46`) but the real routes are
-      `/api/operation-logs` and `/api/audit-logs` (`routes/index.ts:42-43`).
-      Polling dashboards grow the operation log with every poll. Fix the
-      regex to `^/api/(operation-logs|audit-logs)(/[^/]+)?$`.
+- [x] **Operation logger creates a row for every GET on the log endpoints**
+      — `shouldSkipOperationLog` matched `^/api/log(?:/[^/]+)?$` but the real
+      routes are `/api/operation-logs` and `/api/audit-logs`
+      (`routes/index.ts:42-43`), so polling dashboards grew the operation log
+      with every poll. Fixed the regex to
+      `^/api/(operation-logs|audit-logs)(?:/[^/]+)?$` in
+      `middleware/operation-logger.ts:45`; added unit tests in
+      `middleware/operation-logger.test.ts`.
 
 ### Seed & Migrations
 
