@@ -1,11 +1,6 @@
 import { HTTPException } from "hono/http-exception";
 import { prisma } from "#lib/db";
-import {
-  ADMIN_SCOPE,
-  parseScope,
-  type ScopeContext,
-  scopeFromContext,
-} from "#lib/scope";
+import { ADMIN_SCOPE, type ScopeContext, scopeFromContext } from "#lib/scope";
 import {
   fillAncestorGroups,
   menuPermissionsInclude,
@@ -40,11 +35,10 @@ export const userRoleRepository = {
     }
 
     const scope = scopeFromContext(ctx);
-    const roleScope = parseScope(role.scope);
-    if (roleScope.kind === "org" && role.scope !== scope) {
+    if (role.scope !== scope) {
       throw new HTTPException(400, {
         message:
-          "Organization-specific role can only be assigned in its organization",
+          "Role cannot be assigned under a scope that does not match its own",
       });
     }
 

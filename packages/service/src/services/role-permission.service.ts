@@ -2,12 +2,7 @@ import { HTTPException } from "hono/http-exception";
 import type { Principal } from "#extractors/session";
 import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
-import {
-  ADMIN_SCOPE,
-  orgScope,
-  parseScope,
-  scopeFromContext,
-} from "#lib/scope";
+import { ADMIN_SCOPE, orgScope, scopeFromContext } from "#lib/scope";
 import {
   fillAncestorGroups,
   menuPermissionsInclude,
@@ -98,11 +93,10 @@ export async function assignRole(params: {
   }
 
   const scope = scopeFromContext({ organizationId: params.organizationId });
-  const roleScope = parseScope(role.scope);
-  if (roleScope.kind === "org" && role.scope !== scope) {
+  if (role.scope !== scope) {
     throw new HTTPException(400, {
       message:
-        "Organization-specific role can only be assigned in its organization",
+        "Role cannot be assigned under a scope that does not match its own",
     });
   }
 

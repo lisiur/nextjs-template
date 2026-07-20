@@ -31,12 +31,18 @@
       with no admin-count check; only `assign()` at `:36-49` does any scope
       validation) can strip the last admin assignment. Count remaining
       admin assignments and reject with 409 at zero.
-- [ ] **`assignRole` scope validation is asymmetric — PLATFORM roles
+- [x] **`assignRole` scope validation is asymmetric — PLATFORM roles
       assignable at ORG scope** — only an ORGANIZATION role under a
       mismatched scope is rejected (`services/role-permission.service.ts:90-100`,
       `repositories/user-role.repository.ts:36-49`); a PLATFORM role (e.g.
       `admin`) can be assigned with `scopeType = ORGANIZATION`. Require
       `params.scopeType === role.scopeType`.
+      Fixed: replaced the asymmetric `roleScope.kind === "org" && ...` check
+      with a strict `role.scope !== scope` equality in both
+      `repositories/user-role.repository.ts:assign()` and
+      `services/role-permission.service.ts:assignRole()`; added unit tests in
+      `repositories/user-role.repository.test.ts` covering platform/org happy
+      paths plus the platform-at-org-scope rejection.
 - [ ] **No audit on user delete or permission denials** — `deleteUser`
       (`services/user.service.ts:274-286`) writes no audit row;
       `assertAccess` throws 403 with no audit
