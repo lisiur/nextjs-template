@@ -11,7 +11,7 @@ vi.mock("#lib/db", () => ({
 }));
 
 vi.mock("./channel.service", () => ({
-  getActiveNotificationChannel: vi.fn(),
+  getNotificationChannel: vi.fn(),
   redactNotificationChannel: (channel: unknown) => channel,
 }));
 
@@ -25,7 +25,7 @@ vi.mock("#states", () => ({
 
 import { prisma } from "#lib/db";
 import { notificationTemplateCache } from "#states";
-import { getActiveNotificationChannel } from "./channel.service";
+import { getNotificationChannel } from "./channel.service";
 import {
   findTemplateForDelivery,
   updateNotificationTemplate,
@@ -39,9 +39,7 @@ const mockPrisma = prisma as unknown as {
   };
 };
 
-const mockGetActiveChannel = getActiveNotificationChannel as ReturnType<
-  typeof vi.fn
->;
+const mockGetChannel = getNotificationChannel as ReturnType<typeof vi.fn>;
 
 function channelWith(providerKey: string) {
   return {
@@ -65,7 +63,7 @@ describe("notification template headline validation", () => {
       titleTemplate: "Old title",
       channel: channelWith("in-app"),
     });
-    mockGetActiveChannel.mockResolvedValue(channelWith("smtp-email"));
+    mockGetChannel.mockResolvedValue(channelWith("smtp-email"));
 
     await expect(
       updateNotificationTemplate("tpl-1", {
@@ -103,6 +101,36 @@ describe("notification template headline validation", () => {
           subjectTemplate: "Welcome",
           titleTemplate: null,
         }),
+      }),
+    );
+  });
+
+  it("allows editing when the target channel is disabled", async () => {
+    mockPrisma.notificationTemplate.findFirst.mockResolvedValue({
+      id: "tpl-1",
+      channelId: "ch-email",
+      subjectTemplate: "Welcome",
+      titleTemplate: null,
+      channel: { ...channelWith("smtp-email"), enabled: false },
+    });
+    mockGetChannel.mockResolvedValue({
+      ...channelWith("smtp-email"),
+      enabled: false,
+    });
+    mockPrisma.notificationTemplate.update.mockResolvedValue({
+      id: "tpl-1",
+      channel: { ...channelWith("smtp-email"), enabled: false },
+    });
+
+    await updateNotificationTemplate("tpl-1", {
+      channelId: "ch-email",
+      bodyTemplate: "<p>Updated</p>",
+    });
+
+    expect(mockPrisma.notificationTemplate.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: "tpl-1" },
+        data: expect.objectContaining({ bodyTemplate: "<p>Updated</p>" }),
       }),
     );
   });

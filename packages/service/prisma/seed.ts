@@ -777,7 +777,7 @@ const notificationTemplates = [
     enabled: false,
     subjectTemplate: "Welcome to {{siteName}}!",
     bodyTemplate:
-      "Hi {{userName}},\n\nWelcome to {{siteName}}! Your account has been created successfully.\n\nWe're glad to have you on board.\n\n— The {{siteName}} Team",
+      "<p>Hi {{userName}},</p><p>Welcome to <strong>{{siteName}}</strong>! Your account has been created successfully.</p><p>We're glad to have you on board.</p><p>— The {{siteName}} Team</p>",
     variablesSchema: {
       properties: {
         userName: { type: "string", description: "The user's name" },

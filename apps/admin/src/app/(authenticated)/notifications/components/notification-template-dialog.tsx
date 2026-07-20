@@ -21,8 +21,9 @@ import {
   SelectValue,
   Switch,
   Textarea,
+  Tiptap,
 } from "@repo/ui";
-import { Plus, Trash2 } from "lucide-react";
+
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { appClient } from "@/lib/api";
@@ -66,20 +67,6 @@ function parseVariablesSchema(schema: unknown): VariableRow[] {
           : "",
       required: required.has(name),
     }));
-}
-
-function buildVariablesSchema(rows: VariableRow[]) {
-  const required = rows.filter((row) => row.required).map((row) => row.name);
-
-  const properties: Record<string, { type: string; description?: string }> = {};
-  for (const row of rows) {
-    properties[row.name] = {
-      type: "string",
-      ...(row.description ? { description: row.description } : {}),
-    };
-  }
-
-  return { properties, ...(required.length > 0 ? { required } : {}) };
 }
 
 export function NotificationTemplateDialog({
@@ -145,43 +132,18 @@ export function NotificationTemplateDialog({
     }
   }
 
-  function addVariableRow() {
-    setVariableRows((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        name: "",
-        description: "",
-        required: true,
-      },
-    ]);
-  }
-
-  function removeVariableRow(id: string) {
-    setVariableRows((prev) => prev.filter((row) => row.id !== id));
-  }
-
-  function updateVariableRow(id: string, patch: Partial<VariableRow>) {
-    setVariableRows((prev) =>
-      prev.map((row) => (row.id === id ? { ...row, ...patch } : row)),
-    );
-  }
-
   async function handleSubmit(event: { preventDefault(): void }) {
     event.preventDefault();
     setSaving(true);
     try {
-      const activeRows = variableRows.filter((row) => row.name.trim());
       const payload = {
         name,
-        key,
-        channelId,
+        ...(key === template.key ? {} : { key }),
+        ...(channelId === template.channelId ? {} : { channelId }),
         enabled,
         subjectTemplate: subjectTemplate || null,
         titleTemplate: titleTemplate || null,
         bodyTemplate,
-        variablesSchema:
-          activeRows.length > 0 ? buildVariablesSchema(activeRows) : undefined,
       };
 
       await withApiFeedback(
@@ -299,13 +261,24 @@ export function NotificationTemplateDialog({
                 <FieldLabel htmlFor="template-body">
                   {t("fields.bodyTemplate")}
                 </FieldLabel>
-                <Textarea
-                  id="template-body"
-                  value={bodyTemplate}
-                  onChange={(event) => setBodyTemplate(event.target.value)}
-                  rows={5}
-                  required
-                />
+                {selectedProviderKey === "smtp-email" ? (
+                  <Tiptap
+                    id="template-body"
+                    value={bodyTemplate}
+                    onChange={setBodyTemplate}
+                    variables={variableRows
+                      .map((row) => row.name.trim())
+                      .filter(Boolean)}
+                  />
+                ) : (
+                  <Textarea
+                    id="template-body"
+                    value={bodyTemplate}
+                    onChange={(event) => setBodyTemplate(event.target.value)}
+                    rows={5}
+                    required
+                  />
+                )}
                 <FieldDescription>
                   {t("templates.variableHint")}
                 </FieldDescription>
@@ -315,79 +288,37 @@ export function NotificationTemplateDialog({
                 <FieldDescription>
                   {t("templates.variableDescription")}
                 </FieldDescription>
-                <div className="space-y-3">
-                  {variableRows.map((row) => (
-                    <div
-                      key={row.id}
-                      className="flex items-start gap-2 rounded-md border p-3"
-                    >
-                      <div className="min-w-0 flex-1 space-y-3">
-                        <div className="grid gap-2 md:grid-cols-2">
-                          <div>
-                            <FieldLabel htmlFor={`var-name-${row.id}`}>
-                              {t("fields.variableName")}
-                            </FieldLabel>
-                            <Input
-                              id={`var-name-${row.id}`}
-                              value={row.name}
-                              onChange={(event) =>
-                                updateVariableRow(row.id, {
-                                  name: event.target.value,
-                                })
-                              }
-                              placeholder="userName"
-                            />
-                          </div>
-                          <div>
-                            <FieldLabel htmlFor={`var-desc-${row.id}`}>
-                              {t("fields.variableDescription")}
-                            </FieldLabel>
-                            <Input
-                              id={`var-desc-${row.id}`}
-                              value={row.description}
-                              onChange={(event) =>
-                                updateVariableRow(row.id, {
-                                  description: event.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2 pt-5">
-                        <label
-                          htmlFor={`var-required-${row.id}`}
-                          className="flex cursor-pointer items-center gap-1.5 text-sm"
-                        >
-                          <Switch
-                            id={`var-required-${row.id}`}
-                            checked={row.required}
-                            onCheckedChange={(checked) =>
-                              updateVariableRow(row.id, { required: checked })
-                            }
-                          />
-                          {t("fields.variableRequired")}
-                        </label>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeVariableRow(row.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addVariableRow}
-                  >
-                    <Plus className="h-4 w-4" />
-                    {t("fields.addVariable")}
-                  </Button>
+                <div className="rounded-md border">
+                  {variableRows.length === 0 ? (
+                    <p className="py-3 text-center text-sm text-muted-foreground">
+                      —
+                    </p>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b bg-muted/50">
+                          <th className="px-3 py-2 text-left font-medium">
+                            {t("fields.variableName")}
+                          </th>
+                          <th className="px-3 py-2 text-left font-medium">
+                            {t("fields.variableDescription")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {variableRows.map((row) => (
+                          <tr key={row.id} className="border-b last:border-b-0">
+                            <td className="px-3 py-2 font-mono text-sm">
+                              {row.name}
+                            </td>
+                            <td className="px-3 py-2 text-muted-foreground">
+                              {row.description || "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               </Field>
             </div>

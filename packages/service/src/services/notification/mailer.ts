@@ -1,4 +1,5 @@
 import { HTTPException } from "hono/http-exception";
+import { htmlToText } from "html-to-text";
 import type { Transporter } from "nodemailer";
 import nodemailer from "nodemailer";
 import { z } from "zod";
@@ -70,7 +71,13 @@ export async function sendSmtpEmail(params: {
     from: config.from,
     to: parsed.to,
     subject: parsed.subject,
-    text: parsed.body,
+    html: parsed.body,
+    text: htmlToText(parsed.body, {
+      wordwrap: 80,
+      selectors: [
+        { selector: "a", options: { hideLinkHrefIfSameAsText: true } },
+      ],
+    }),
   });
 
   return { messageId: info.messageId, sentAt: new Date() };

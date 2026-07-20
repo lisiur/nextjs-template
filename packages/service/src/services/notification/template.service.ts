@@ -4,7 +4,7 @@ import type { Prisma } from "#generated/prisma/client";
 import { prisma } from "#lib/db";
 import { notificationTemplateCache } from "#states";
 import {
-  getActiveNotificationChannel,
+  getNotificationChannel,
   redactNotificationChannel,
 } from "./channel.service";
 import {
@@ -148,7 +148,7 @@ export async function updateNotificationTemplate(
   }
 
   const activeChannel = data.channelId
-    ? await getActiveNotificationChannel(data.channelId)
+    ? await getNotificationChannel(data.channelId)
     : null;
 
   const providerKey =

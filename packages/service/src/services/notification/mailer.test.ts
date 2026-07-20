@@ -55,8 +55,41 @@ describe("sendSmtpEmail", () => {
       from: "noreply@example.com",
       to: "user@example.com",
       subject: "Hello",
+      html: "World",
       text: "World",
     });
+  });
+
+  it("converts html body into a plain-text fallback", async () => {
+    const sendMailMock = vi.fn().mockResolvedValue({ messageId: "msg-html" });
+    (nodemailer.createTransport as ReturnType<typeof vi.fn>).mockReturnValue({
+      sendMail: sendMailMock,
+    });
+
+    mockPrisma.notificationChannel.findFirst.mockResolvedValue({
+      id: "ch-1",
+      providerKey: "smtp-email",
+      enabled: true,
+      config: {
+        host: "smtp.example.com",
+        port: 587,
+        secure: false,
+        from: "noreply@example.com",
+      },
+    });
+
+    await sendSmtpEmail({
+      channelId: "ch-1",
+      to: "user@example.com",
+      subject: "Hello",
+      body: "<p>Hi <strong>Alice</strong>,</p><p>Welcome.</p>",
+    });
+
+    const call = sendMailMock.mock.calls[0][0];
+    expect(call.html).toBe("<p>Hi <strong>Alice</strong>,</p><p>Welcome.</p>");
+    expect(call.text).toContain("Hi Alice");
+    expect(call.text).toContain("Welcome.");
+    expect(call.text).not.toContain("<");
   });
 
   it("throws 400 when channel is not smtp-email", async () => {
