@@ -49,10 +49,18 @@ export async function requireBearerToken(
 
 export async function tryPrincipal(c: Context): Promise<Principal | null> {
   const session = await trySession(c);
-  if (session) return { kind: "user", ...session };
+  if (session) {
+    const principal: Principal = { kind: "user", ...session };
+    c.set("principal", principal);
+    return principal;
+  }
 
   const token = await tryBearerToken(c);
-  if (token) return { kind: "token", ...token };
+  if (token) {
+    const principal: Principal = { kind: "token", ...token };
+    c.set("principal", principal);
+    return principal;
+  }
 
   return null;
 }

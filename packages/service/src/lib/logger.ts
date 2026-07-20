@@ -1,5 +1,6 @@
 import type { Context } from "hono";
 import { getContext } from "hono/context-storage";
+import type { Principal } from "#extractors/session";
 import { trySession } from "#extractors/session";
 import { prisma } from "#lib/db";
 import { getClientIpFromContextOrNull } from "#lib/get-client-ip";
@@ -30,6 +31,7 @@ interface LogAuditParams {
   sessionId?: string;
   userId?: string;
   userName?: string;
+  principal?: Principal;
   event: string;
   category: string;
   severity?: AuditSeverity;
@@ -79,12 +81,28 @@ export async function logAudit(params: LogAuditParams) {
     let userId = params.userId;
     let userName = params.userName;
     let sessionId = params.sessionId;
+    const principal = params.principal ?? c?.get("principal");
 
-    if ((!userId || !sessionId) && c) {
+    if (principal?.kind === "user") {
+      userId = userId ?? principal.user.id;
+      userName = userName ?? principal.user.name;
+      sessionId = sessionId ?? principal.session.id;
+    } else if (principal?.kind === "token") {
+      userId = userId ?? principal.ownerId;
+    } else if ((!userId || !sessionId) && c) {
       const session = await trySession(c);
       userId = session?.user?.id;
       userName = session?.user?.name;
       sessionId = session?.session?.id;
+    }
+
+    let metadata = toJsonValue(params.metadata);
+    if (principal?.kind === "token") {
+      metadata = {
+        apiTokenId: principal.token.id,
+        apiTokenName: principal.token.name,
+        ...(metadata ?? {}),
+      };
     }
 
     await prisma.auditLog.create({
@@ -102,7 +120,7 @@ export async function logAudit(params: LogAuditParams) {
         targetName: params.targetName ?? null,
         before: toJsonValue(params.before),
         after: toJsonValue(params.after),
-        metadata: toJsonValue(params.metadata),
+        metadata,
         ip: c ? getClientIpFromContextOrNull(c) : null,
         userAgent: c ? (c.req.header("user-agent") ?? null) : null,
       },
