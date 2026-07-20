@@ -1,5 +1,6 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { requirePrincipal } from "#extractors/session";
+import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
   forbiddenResponse,
@@ -32,7 +33,16 @@ export const deleteUser = defineOpenAPIRoute({
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "user::delete");
     const { id } = c.req.valid("param");
-    const result = await deleteUserSvc(id);
-    return c.json(result, 200);
+    const { name } = await deleteUserSvc(id);
+
+    await logAudit({
+      event: "user.deleted",
+      category: "user",
+      targetId: id,
+      targetName: name,
+      c,
+    });
+
+    return c.json({ success: true }, 200);
   },
 });

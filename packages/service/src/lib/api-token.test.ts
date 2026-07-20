@@ -9,6 +9,9 @@ vi.mock("#lib/db", () => ({
     permission: {
       findMany: vi.fn(),
     },
+    auditLog: {
+      create: vi.fn().mockResolvedValue(null),
+    },
   },
 }));
 
@@ -23,6 +26,9 @@ const mockPrisma = prisma as unknown as {
   };
   permission: {
     findMany: ReturnType<typeof vi.fn>;
+  };
+  auditLog: {
+    create: ReturnType<typeof vi.fn>;
   };
 };
 

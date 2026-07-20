@@ -1,6 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
 import { bodyLimit } from "hono/body-limit";
+import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
@@ -70,6 +71,7 @@ openAPIApp.onError((err, c) => {
   );
 });
 
+openAPIApp.use("*", contextStorage());
 openAPIApp.use("*", logger());
 const allowedOrigins = (process.env.CORS_ALLOWED_ORIGINS ?? "")
   .split(",")

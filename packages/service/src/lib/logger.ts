@@ -1,4 +1,5 @@
 import type { Context } from "hono";
+import { getContext } from "hono/context-storage";
 import { trySession } from "#extractors/session";
 import { prisma } from "#lib/db";
 import { getClientIpFromContextOrNull } from "#lib/get-client-ip";
@@ -44,12 +45,13 @@ interface LogAuditParams {
 
 export async function logOperation(params: LogOperationParams) {
   try {
+    const c = resolveContext(params.c);
     const error = normalizeError(params.error);
-    const sessionId = await resolveSessionId(params.c, params.sessionId);
+    const sessionId = await resolveSessionId(c, params.sessionId);
 
     await prisma.operationLog.create({
       data: {
-        traceId: resolveTraceId(params.c, params.traceId),
+        traceId: resolveTraceId(c, params.traceId),
         sessionId: sessionId ?? null,
         level: params.level ?? "info",
         source: params.source ?? null,
@@ -73,12 +75,13 @@ export async function logOperation(params: LogOperationParams) {
 
 export async function logAudit(params: LogAuditParams) {
   try {
+    const c = resolveContext(params.c);
     let userId = params.userId;
     let userName = params.userName;
     let sessionId = params.sessionId;
 
-    if ((!userId || !sessionId) && params.c) {
-      const session = await trySession(params.c);
+    if ((!userId || !sessionId) && c) {
+      const session = await trySession(c);
       userId = session?.user?.id;
       userName = session?.user?.name;
       sessionId = session?.session?.id;
@@ -86,7 +89,7 @@ export async function logAudit(params: LogAuditParams) {
 
     await prisma.auditLog.create({
       data: {
-        traceId: resolveTraceId(params.c, params.traceId),
+        traceId: resolveTraceId(c, params.traceId),
         sessionId: sessionId ?? null,
         userId: userId ?? null,
         userName: userName ?? null,
@@ -100,14 +103,21 @@ export async function logAudit(params: LogAuditParams) {
         before: toJsonValue(params.before),
         after: toJsonValue(params.after),
         metadata: toJsonValue(params.metadata),
-        ip: params.c ? getClientIpFromContextOrNull(params.c) : null,
-        userAgent: params.c
-          ? (params.c.req.header("user-agent") ?? null)
-          : null,
+        ip: c ? getClientIpFromContextOrNull(c) : null,
+        userAgent: c ? (c.req.header("user-agent") ?? null) : null,
       },
     });
   } catch (e) {
     console.error("[logAudit] Failed to write audit log:", e);
+  }
+}
+
+function resolveContext(c?: Context): Context | undefined {
+  if (c) return c;
+  try {
+    return getContext();
+  } catch {
+    return undefined;
   }
 }
 

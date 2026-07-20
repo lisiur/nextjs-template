@@ -17,7 +17,7 @@
 
 ### Permissions & Roles
 
-- [ ] **No audit on user delete or permission denials** — `deleteUser`
+- [x] **No audit on user delete or permission denials** — `deleteUser`
       (`services/user.service.ts:274-286`) writes no audit row;
       `assertAccess` throws 403 with no audit
       (`services/role-permission.service.ts:300-302` and `:328-334`), so

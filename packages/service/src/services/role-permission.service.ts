@@ -1,7 +1,9 @@
 import { HTTPException } from "hono/http-exception";
 import type { Principal } from "#extractors/session";
 import type { Prisma } from "#generated/prisma/client";
+import type { ApiTokenPrincipal } from "#lib/api-token";
 import { prisma } from "#lib/db";
+import { logAudit } from "#lib/logger";
 import { ADMIN_SCOPE, orgScope, scopeFromContext } from "#lib/scope";
 import {
   fillAncestorGroups,
@@ -292,18 +294,41 @@ export async function assertPermission(
 ) {
   const allowed = await checkPermission(userId, permission, scope);
   if (!allowed) {
+    await auditPermissionDenied(
+      "user",
+      userId,
+      permission,
+      scope,
+      "user_lacks_permission",
+    );
     throw new HTTPException(403, { message: "Permission denied" });
   }
 }
 
-function enforceTokenBinding(
-  token: { organizationId: string | null; appId: string | null },
+async function enforceTokenBinding(
+  principal: { kind: "token" } & ApiTokenPrincipal,
+  permission: string,
   scope?: PermissionScope,
 ) {
+  const token = principal.token;
   if (token.organizationId && token.organizationId !== scope?.organizationId) {
+    await auditPermissionDenied(
+      "api_token",
+      token.id,
+      permission,
+      scope,
+      "org_binding_mismatch",
+    );
     throw new HTTPException(403, { message: "Permission denied" });
   }
   if (token.appId && token.appId !== scope?.appId) {
+    await auditPermissionDenied(
+      "api_token",
+      token.id,
+      permission,
+      scope,
+      "app_binding_mismatch",
+    );
     throw new HTTPException(403, { message: "Permission denied" });
   }
 }
@@ -317,13 +342,45 @@ export async function assertAccess(
     return assertPermission(principal.user.id, permission, scope);
   }
 
-  enforceTokenBinding(principal.token, scope);
+  await enforceTokenBinding(principal, permission, scope);
 
   if (!matchPermission(principal.scopes, permission)) {
+    await auditPermissionDenied(
+      "api_token",
+      principal.token.id,
+      permission,
+      scope,
+      "token_lacks_scope",
+    );
     throw new HTTPException(403, { message: "Permission denied" });
   }
 
   if (!(await checkPermission(principal.ownerId, permission, scope))) {
+    await auditPermissionDenied(
+      "user",
+      principal.ownerId,
+      permission,
+      scope,
+      "owner_lacks_permission",
+    );
     throw new HTTPException(403, { message: "Permission denied" });
   }
+}
+
+async function auditPermissionDenied(
+  targetType: "user" | "api_token",
+  targetId: string,
+  permission: string,
+  scope: PermissionScope | undefined,
+  reason: string,
+) {
+  await logAudit({
+    event: "permission.denied",
+    category: "permission",
+    outcome: "denied",
+    severity: "warning",
+    targetType,
+    targetId,
+    metadata: { permission, scope, reason },
+  });
 }
