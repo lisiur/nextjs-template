@@ -70,8 +70,8 @@ describe("sendSmtpEmail", () => {
     await expect(
       sendSmtpEmail({
         channelId: "ch-inapp",
-        to: "x",
-        subject: "x",
+        to: "user@example.com",
+        subject: "Hi",
         body: "x",
       }),
     ).rejects.toMatchObject({ status: 400 });
@@ -81,7 +81,12 @@ describe("sendSmtpEmail", () => {
     mockPrisma.notificationChannel.findFirst.mockResolvedValue(null);
 
     await expect(
-      sendSmtpEmail({ channelId: "missing", to: "x", subject: "x", body: "x" }),
+      sendSmtpEmail({
+        channelId: "missing",
+        to: "user@example.com",
+        subject: "Hi",
+        body: "x",
+      }),
     ).rejects.toMatchObject({ status: 404 });
   });
 
@@ -96,8 +101,8 @@ describe("sendSmtpEmail", () => {
     await expect(
       sendSmtpEmail({
         channelId: "ch-disabled",
-        to: "x",
-        subject: "x",
+        to: "user@example.com",
+        subject: "Hi",
         body: "x",
       }),
     ).rejects.toMatchObject({ status: 400 });
@@ -168,5 +173,104 @@ describe("sendSmtpEmail", () => {
       nodemailer.createTransport as ReturnType<typeof vi.fn>
     ).mock.calls[0][0];
     expect(transportCall.auth).toBeUndefined();
+  });
+
+  it("rejects CR in recipient (SMTP header injection)", async () => {
+    mockPrisma.notificationChannel.findFirst.mockResolvedValue({
+      id: "ch-1",
+      providerKey: "smtp-email",
+      enabled: true,
+      config: {
+        host: "smtp.example.com",
+        port: 587,
+        from: "noreply@example.com",
+      },
+    });
+
+    await expect(
+      sendSmtpEmail({
+        channelId: "ch-1",
+        to: "victim@example.com\r\nBcc: leak@example.com",
+        subject: "Hi",
+        body: "x",
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("rejects LF in subject (SMTP header injection)", async () => {
+    const sendMailMock = vi.fn().mockResolvedValue({ messageId: "msg-x" });
+    (nodemailer.createTransport as ReturnType<typeof vi.fn>).mockReturnValue({
+      sendMail: sendMailMock,
+    });
+    mockPrisma.notificationChannel.findFirst.mockResolvedValue({
+      id: "ch-1",
+      providerKey: "smtp-email",
+      enabled: true,
+      config: {
+        host: "smtp.example.com",
+        port: 587,
+        from: "noreply@example.com",
+      },
+    });
+
+    await expect(
+      sendSmtpEmail({
+        channelId: "ch-1",
+        to: "victim@example.com",
+        subject: "Hi\nBcc: leak@example.com",
+        body: "x",
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(sendMailMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects malformed recipient address", async () => {
+    mockPrisma.notificationChannel.findFirst.mockResolvedValue({
+      id: "ch-1",
+      providerKey: "smtp-email",
+      enabled: true,
+      config: {
+        host: "smtp.example.com",
+        port: 587,
+        from: "noreply@example.com",
+      },
+    });
+
+    await expect(
+      sendSmtpEmail({
+        channelId: "ch-1",
+        to: "not-an-email",
+        subject: "Hi",
+        body: "x",
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("accepts 'Name <email>' form for recipient", async () => {
+    const sendMailMock = vi.fn().mockResolvedValue({ messageId: "msg-n" });
+    (nodemailer.createTransport as ReturnType<typeof vi.fn>).mockReturnValue({
+      sendMail: sendMailMock,
+    });
+    mockPrisma.notificationChannel.findFirst.mockResolvedValue({
+      id: "ch-1",
+      providerKey: "smtp-email",
+      enabled: true,
+      config: {
+        host: "smtp.example.com",
+        port: 587,
+        from: "noreply@example.com",
+      },
+    });
+
+    await sendSmtpEmail({
+      channelId: "ch-1",
+      to: "Alice <alice@example.com>",
+      subject: "Hi",
+      body: "x",
+    });
+
+    expect(sendMailMock).toHaveBeenCalledWith(
+      expect.objectContaining({ to: "Alice <alice@example.com>" }),
+    );
   });
 });

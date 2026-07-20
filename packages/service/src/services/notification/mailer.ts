@@ -1,13 +1,25 @@
 import { HTTPException } from "hono/http-exception";
 import type { Transporter } from "nodemailer";
 import nodemailer from "nodemailer";
+import { z } from "zod";
 import { getChannelById } from "./channel.service";
-import { smtpEmailConfigSchema } from "./provider";
+import {
+  emailAddressField,
+  singleLineTextField,
+  smtpEmailConfigSchema,
+} from "./provider";
 
 export interface SendEmailResult {
   messageId: string;
   sentAt: Date;
 }
+
+const sendEmailParamsSchema = z.object({
+  channelId: z.string().min(1),
+  to: emailAddressField,
+  subject: singleLineTextField,
+  body: z.string(),
+});
 
 export async function sendSmtpEmail(params: {
   channelId: string;
@@ -15,7 +27,17 @@ export async function sendSmtpEmail(params: {
   subject: string;
   body: string;
 }): Promise<SendEmailResult> {
-  const channel = await getChannelById(params.channelId);
+  let parsed: z.infer<typeof sendEmailParamsSchema>;
+  try {
+    parsed = sendEmailParamsSchema.parse(params);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw new HTTPException(400, { message: "Invalid email parameters" });
+    }
+    throw error;
+  }
+
+  const channel = await getChannelById(parsed.channelId);
 
   if (channel.providerKey !== "smtp-email") {
     throw new HTTPException(400, {
@@ -46,9 +68,9 @@ export async function sendSmtpEmail(params: {
 
   const info = await transporter.sendMail({
     from: config.from,
-    to: params.to,
-    subject: params.subject,
-    text: params.body,
+    to: parsed.to,
+    subject: parsed.subject,
+    text: parsed.body,
   });
 
   return { messageId: info.messageId, sentAt: new Date() };

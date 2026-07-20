@@ -23,13 +23,36 @@ export interface NotificationProviderDefinition {
 
 const inAppConfigSchema = z.object({}).strict().optional().nullable();
 
+const hasNoNewlines = (value: string) =>
+  !value.includes("\r") && !value.includes("\n");
+
+const parseAddrSpec = (value: string): string | null => {
+  if (!value.includes("<")) {
+    return z.email().safeParse(value).success ? value : null;
+  }
+  const match = value.match(/^.*<([^<>]+)>$/);
+  return match && z.email().safeParse(match[1]).success ? match[1] : null;
+};
+
+export const emailAddressField = z
+  .string()
+  .min(1)
+  .refine(hasNoNewlines, { message: "must not contain CR or LF" })
+  .refine((value) => parseAddrSpec(value) !== null, {
+    message: "must be a valid email address or 'Name <email>'",
+  });
+
+export const singleLineTextField = z
+  .string()
+  .refine(hasNoNewlines, { message: "must not contain CR or LF" });
+
 export const smtpEmailConfigSchema = z.object({
   host: z.string().min(1),
   port: z.coerce.number().int().min(1).max(65_535),
   secure: z.boolean().default(false),
   username: z.string().optional(),
   password: z.string().optional(),
-  from: z.string().min(1),
+  from: emailAddressField,
 });
 
 const smsConfigSchema = z.object({

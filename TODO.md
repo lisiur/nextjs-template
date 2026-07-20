@@ -26,12 +26,6 @@
 
 ### Notifications
 
-- [ ] **SMTP headers not sanitized; `from` not validated as an email** —
-      channel `from` is `z.string().min(1)`
-      (`services/notification/provider.ts:26-33`) and per-message
-      `to`/`subject` are unchecked (`services/notification/mailer.ts:47-52`)
-      — CRLF/mail-header injection risk. Validate with `z.email()` and
-      reject any `\r`/`\n`.
 - [ ] **SMTP transporter rebuilt for every email** — `createTransport` runs
       inside `sendSmtpEmail` per call (`services/notification/mailer.ts:34-45`);
       a single SMTP timeout marks the notification `failed` with no in-service
