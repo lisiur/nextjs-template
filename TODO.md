@@ -15,15 +15,6 @@
       scheduled cleanup job (contrast uploads, etc.). Add a sweep that
       deletes rows where `revokedAt IS NOT NULL` or `expiresAt < now()`.
 
-### Permissions & Roles
-
-- [x] **No audit on user delete or permission denials** — `deleteUser`
-      (`services/user.service.ts:274-286`) writes no audit row;
-      `assertAccess` throws 403 with no audit
-      (`services/role-permission.service.ts:300-302` and `:328-334`), so
-      `AuditOutcome "denied"` is dead code. Emit `logAudit` for these
-      events.
-
 ### SSE / Events / EventBus
 
 - [ ] **SSE: write failures silently swallowed, no per-user connection cap**
