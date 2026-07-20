@@ -35,7 +35,6 @@ CREATE TABLE "session" (
     "ipAddress" TEXT,
     "userAgent" TEXT,
     "userId" TEXT NOT NULL,
-    "impersonatedBy" TEXT,
     "activeOrganizationId" TEXT,
     "revokedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -125,8 +124,8 @@ CREATE TABLE "organization" (
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "logo" TEXT,
-    "metadata" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "organization_pkey" PRIMARY KEY ("id")
 );
@@ -155,6 +154,7 @@ CREATE TABLE "position" (
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
     "roleId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "position_pkey" PRIMARY KEY ("id")
 );
@@ -177,6 +177,7 @@ CREATE TABLE "member" (
     "employeeId" TEXT,
     "departmentId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "member_pkey" PRIMARY KEY ("id")
 );
