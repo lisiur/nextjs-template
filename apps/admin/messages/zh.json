@@ -366,7 +366,6 @@
     "cropLogoDescription": "调整 Logo 区域，保存为 128×128 PNG。",
     "chooseFile": "选择文件",
     "logoHint": "支持 PNG、JPG、GIF、WebP 或 SVG，最大 2MB。",
-    "metadata": "元数据",
     "createdAt": "创建时间",
     "actions": "操作",
     "noOrgs": "暂无组织",

@@ -366,7 +366,6 @@
     "cropLogoDescription": "Adjust the logo area. It will be saved as 128×128 PNG.",
     "chooseFile": "Choose File",
     "logoHint": "PNG, JPG, GIF, WebP or SVG. Max 2MB.",
-    "metadata": "Metadata",
     "createdAt": "Created At",
     "actions": "Actions",
     "noOrgs": "No organizations found",

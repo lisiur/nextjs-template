@@ -13,7 +13,6 @@ import {
   FieldGroup,
   FieldLabel,
   Input,
-  Textarea,
 } from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
@@ -46,7 +45,6 @@ export function OrganizationRegistrationForm({
       .string()
       .min(1, tc("required", { field: t("slug") }))
       .regex(/^[a-z0-9-]+$/, t("invalidSlug")),
-    metadata: z.string().optional(),
   });
 
   type OrgInput = z.infer<typeof orgSchema>;
@@ -59,7 +57,7 @@ export function OrganizationRegistrationForm({
     formState: { errors, isSubmitting },
   } = useForm<OrgInput>({
     resolver: zodResolver(orgSchema),
-    defaultValues: { name: "", slug: "", metadata: "" },
+    defaultValues: { name: "", slug: "" },
   });
 
   const nameValue = watch("name");
@@ -77,7 +75,6 @@ export function OrganizationRegistrationForm({
       json: {
         name: data.name,
         slug: data.slug,
-        metadata: data.metadata || undefined,
       },
     });
     toast.success(t("registrationSuccess"));
@@ -115,28 +112,6 @@ export function OrganizationRegistrationForm({
               />
               <FieldDescription>{t("slugDescription")}</FieldDescription>
               <FieldError errors={errors.slug ? [errors.slug] : undefined} />
-            </Field>
-          </FieldGroup>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("additionalInfoTitle")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="organization-metadata">
-                {t("metadata")}
-              </FieldLabel>
-              <Textarea
-                id="organization-metadata"
-                rows={3}
-                placeholder={t("metadataPlaceholder")}
-                {...register("metadata")}
-              />
-              <FieldDescription>{t("metadataDescription")}</FieldDescription>
             </Field>
           </FieldGroup>
         </CardContent>

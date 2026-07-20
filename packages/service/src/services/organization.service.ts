@@ -16,7 +16,6 @@ export async function createOrganization(data: {
   name: string;
   slug: string;
   logo?: string;
-  metadata?: string;
 }) {
   const existing = await prisma.organization.findUnique({
     where: { slug: data.slug },
@@ -38,7 +37,6 @@ export async function registerOrganizationForUser(
     name: string;
     slug: string;
     logo?: string;
-    metadata?: string;
   },
 ) {
   return prisma.$transaction(async (tx) => {
@@ -108,7 +106,6 @@ export async function updateOrganization(
     name?: string;
     slug?: string;
     logo?: string | null;
-    metadata?: string | null;
   },
 ) {
   const existing = await prisma.organization.findUnique({ where: { id } });

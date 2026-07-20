@@ -97,7 +97,6 @@ describe("POST /register - Register Organization", () => {
       name: "Acme Corp",
       slug: "acme-corp",
       logo: null,
-      metadata: null,
       createdAt: now,
     });
     tx.member.upsert.mockResolvedValue({});

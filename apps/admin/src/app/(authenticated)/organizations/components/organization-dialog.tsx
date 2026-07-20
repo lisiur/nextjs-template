@@ -17,7 +17,6 @@ import {
   ImageCropper,
   type ImageCropperRef,
   Input,
-  Textarea,
 } from "@repo/ui";
 import { ImagePlus } from "lucide-react";
 import Image from "next/image";
@@ -37,7 +36,6 @@ const orgSchema = z.object({
     .min(1)
     .regex(/^[a-z0-9-]+$/),
   logo: z.string().optional().or(z.literal("")),
-  metadata: z.string().optional(),
 });
 
 type OrgInput = z.infer<typeof orgSchema>;
@@ -48,7 +46,6 @@ interface OrganizationDialogProps {
     name: string;
     slug: string;
     logo?: string | null;
-    metadata?: string | null;
   };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -94,7 +91,6 @@ export function OrganizationDialog({
       name: organization?.name ?? "",
       slug: organization?.slug ?? "",
       logo: organization?.logo ?? "",
-      metadata: organization?.metadata ?? "",
     },
   });
 
@@ -184,7 +180,6 @@ export function OrganizationDialog({
             name: data.name,
             slug: data.slug,
             logo,
-            metadata: data.metadata || null,
           },
         });
       } else {
@@ -193,7 +188,6 @@ export function OrganizationDialog({
             name: data.name,
             slug: data.slug,
             logo: logo ?? undefined,
-            metadata: data.metadata || undefined,
           },
         });
       }
@@ -293,13 +287,6 @@ export function OrganizationDialog({
                   </div>
                   <FieldError
                     errors={errors.logo ? [errors.logo] : undefined}
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="metadata">{t("metadata")}</FieldLabel>
-                  <Textarea id="metadata" {...register("metadata")} rows={3} />
-                  <FieldError
-                    errors={errors.metadata ? [errors.metadata] : undefined}
                   />
                 </Field>
               </FieldGroup>

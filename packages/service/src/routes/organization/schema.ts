@@ -13,7 +13,6 @@ export const organizationSchema = z
     name: z.string().openapi({ example: "Acme Corp" }),
     slug: z.string().openapi({ example: "acme-corp" }),
     logo: z.string().nullable().optional(),
-    metadata: z.string().nullable().optional(),
     createdAt: z.date(),
     owner: z
       .object({
@@ -38,7 +37,6 @@ export const createOrganizationBodySchema = z.object({
     .regex(/^[a-z0-9-]+$/)
     .openapi({ example: "acme-corp" }),
   logo: uploadUrlSchema.optional(),
-  metadata: z.string().optional(),
 });
 
 export const registerOrganizationBodySchema = createOrganizationBodySchema;
@@ -51,7 +49,6 @@ export const updateOrganizationBodySchema = z.object({
     .regex(/^[a-z0-9-]+$/)
     .optional(),
   logo: uploadUrlSchema.nullable().optional(),
-  metadata: z.string().nullable().optional(),
 });
 
 export const listOrganizationsResponseSchema = z

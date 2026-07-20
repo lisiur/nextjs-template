@@ -38,7 +38,6 @@ const fakeOrg = {
   name: "Acme",
   slug: "acme",
   logo: null,
-  metadata: null,
   createdAt: new Date(),
 };
 
