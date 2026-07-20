@@ -69,6 +69,21 @@ export async function createSession(params: {
   const token = createSessionToken();
   const expiresAt = new Date(Date.now() + SESSION_MAX_AGE_SECONDS * 1000);
 
+  const sessions = await prisma.session.findMany({
+    where: { userId: params.userId },
+  });
+
+  const now = new Date();
+  const deadIds = sessions
+    .filter(
+      (s) => s.revokedAt !== null || s.expiresAt.getTime() < now.getTime(),
+    )
+    .map((s) => s.id);
+
+  if (deadIds.length > 0) {
+    await prisma.session.deleteMany({ where: { id: { in: deadIds } } });
+  }
+
   const session = await prisma.session.create({
     data: {
       token,
