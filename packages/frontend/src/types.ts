@@ -3,7 +3,7 @@ export type AuthUser = {
   name: string;
   email: string;
   emailVerified: boolean;
-  image?: string | null;
+  avatar?: string | null;
   role?: string | null;
   flags: string[];
 };

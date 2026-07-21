@@ -16,7 +16,8 @@ CREATE TABLE "user" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
-    "image" TEXT,
+    "avatar" TEXT,
+    "avatarId" TEXT,
     "banned" BOOLEAN DEFAULT false,
     "banReason" TEXT,
     "banExpires" TIMESTAMP(3),
@@ -124,6 +125,7 @@ CREATE TABLE "organization" (
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "logo" TEXT,
+    "logoId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -220,11 +222,23 @@ CREATE TABLE "upload" (
     "path" TEXT NOT NULL,
     "mimeType" TEXT NOT NULL,
     "size" INTEGER NOT NULL,
-    "visibility" TEXT NOT NULL DEFAULT 'private',
-    "uploaderId" TEXT NOT NULL,
+    "hash" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "upload_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "attachment" (
+    "id" TEXT NOT NULL,
+    "bizType" TEXT NOT NULL,
+    "bizId" TEXT NOT NULL,
+    "uploadId" TEXT NOT NULL,
+    "visibility" TEXT NOT NULL DEFAULT 'private',
+    "createdBy" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "attachment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -234,7 +248,9 @@ CREATE TABLE "application" (
     "code" TEXT NOT NULL,
     "description" TEXT,
     "logo" TEXT,
+    "logoId" TEXT,
     "favicon" TEXT,
+    "faviconId" TEXT,
     "copyright" TEXT,
     "icp" TEXT,
     "psif" TEXT,
@@ -561,10 +577,19 @@ CREATE INDEX "system_config_group_idx" ON "system_config"("group");
 CREATE UNIQUE INDEX "system_config_group_key_key" ON "system_config"("group", "key");
 
 -- CreateIndex
-CREATE INDEX "upload_uploaderId_idx" ON "upload"("uploaderId");
+CREATE UNIQUE INDEX "upload_hash_key" ON "upload"("hash");
 
 -- CreateIndex
 CREATE INDEX "upload_path_idx" ON "upload"("path");
+
+-- CreateIndex
+CREATE INDEX "attachment_bizType_bizId_idx" ON "attachment"("bizType", "bizId");
+
+-- CreateIndex
+CREATE INDEX "attachment_uploadId_idx" ON "attachment"("uploadId");
+
+-- CreateIndex
+CREATE INDEX "attachment_createdBy_idx" ON "attachment"("createdBy");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "application_code_key" ON "application"("code");
@@ -768,7 +793,10 @@ ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organizationId_fkey" FOREIGN
 ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviterId_fkey" FOREIGN KEY ("inviterId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "upload" ADD CONSTRAINT "upload_uploaderId_fkey" FOREIGN KEY ("uploaderId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "attachment" ADD CONSTRAINT "attachment_uploadId_fkey" FOREIGN KEY ("uploadId") REFERENCES "upload"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "attachment" ADD CONSTRAINT "attachment_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "menu" ADD CONSTRAINT "menu_appId_fkey" FOREIGN KEY ("appId") REFERENCES "application"("id") ON DELETE CASCADE ON UPDATE CASCADE;

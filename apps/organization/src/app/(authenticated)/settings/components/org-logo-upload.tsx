@@ -64,18 +64,15 @@ export function OrgLogoUpload({
 
     setUploading(true);
     try {
-      const res = await withApiFeedback(appClient.api.upload.$post)({
-        form: { file, visibility: "public" },
+      const res = await withApiFeedback(
+        appClient.api.organizations[":id"].logo.$post,
+      )({
+        param: { id: organizationId },
+        form: { file },
       });
       const data = await res.json();
-      const logoUrl = data.url;
 
-      await withApiFeedback(appClient.api.organizations[":id"].settings.$put)({
-        param: { id: organizationId },
-        json: { logo: logoUrl },
-      });
-
-      onLogoUpdate(logoUrl);
+      onLogoUpdate(data.url ?? "");
       setCropOpen(false);
       toast.success(t("logoUpdated"));
     } catch {

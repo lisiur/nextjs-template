@@ -5,32 +5,38 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
+import { listAttachments } from "#services/attachment.service";
 import { assertAccess } from "#services/role-permission.service";
-import { listUploads } from "#services/upload.service";
-import { listUploadsQuerySchema, listUploadsResponseSchema } from "./schema";
+import {
+  listAttachmentsQuerySchema,
+  listAttachmentsResponseSchema,
+} from "./schema";
 
-export const listUploadsRoute = defineOpenAPIRoute({
+export const listAttachmentsRoute = defineOpenAPIRoute({
   route: createRoute({
     method: "get",
     path: "/",
-    tags: ["Upload"],
-    summary: "List uploads",
+    tags: ["Attachment"],
+    summary: "List attachments",
     description:
-      "Returns a paginated list of uploaded files with optional filters.",
+      "Returns a paginated list of file attachments with optional filters.",
     request: {
-      query: listUploadsQuerySchema,
+      query: listAttachmentsQuerySchema,
     },
     responses: {
       ...unauthorizedResponse,
       ...forbiddenResponse,
-      ...okResponseFn(listUploadsResponseSchema, "Paginated list of uploads"),
+      ...okResponseFn(
+        listAttachmentsResponseSchema,
+        "Paginated list of attachments",
+      ),
     },
   }),
   handler: async (c) => {
     const principal = await requirePrincipal(c);
-    await assertAccess(principal, "upload::list");
+    await assertAccess(principal, "attachment::list");
     const query = c.req.valid("query");
-    const result = await listUploads(query);
+    const result = await listAttachments(query);
     return c.json(result, 200);
   },
 });

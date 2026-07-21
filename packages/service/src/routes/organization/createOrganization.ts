@@ -1,18 +1,16 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requirePrincipal } from "#extractors/session";
+import { HTTPException } from "hono/http-exception";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
+  badRequestResponse,
   createdResponseFn,
   forbiddenResponse,
   unauthorizedResponse,
 } from "#lib/openapi";
 import { createOrganization as createOrganizationService } from "#services/organization.service";
 import { assertAccess } from "#services/role-permission.service";
-import {
-  createOrganizationBodySchema,
-  errorSchema,
-  organizationSchema,
-} from "./schema";
+import { createOrganizationBodySchema, organizationSchema } from "./schema";
 
 export const createOrganization = defineOpenAPIRoute({
   route: createRoute({
@@ -20,24 +18,22 @@ export const createOrganization = defineOpenAPIRoute({
     path: "/",
     tags: ["Organization"],
     summary: "Create an organization",
-    description: "Create a new organization.",
+    description:
+      "Create a new organization. Accepts multipart/form-data with optional logo file.",
     request: {
       body: {
         content: {
-          "application/json": {
+          "multipart/form-data": {
             schema: createOrganizationBodySchema,
           },
         },
-        required: true,
       },
     },
     responses: {
+      ...badRequestResponse,
       ...unauthorizedResponse,
       ...forbiddenResponse,
       409: {
-        content: {
-          "application/json": { schema: errorSchema },
-        },
         description: "Slug already taken",
       },
       ...createdResponseFn(organizationSchema, "The created organization"),
@@ -46,8 +42,28 @@ export const createOrganization = defineOpenAPIRoute({
   handler: async (c) => {
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "organization::create");
-    const body = c.req.valid("json");
-    const org = await createOrganizationService(body);
+
+    const contentType = c.req.raw.headers.get("content-type") ?? "";
+    if (!contentType.includes("multipart/form-data")) {
+      throw new HTTPException(400, {
+        message: "Expected multipart/form-data",
+      });
+    }
+
+    const body = c.req.valid("form");
+    const name = body.name;
+    const slug = body.slug;
+
+    if (!name || !slug) {
+      throw new HTTPException(400, { message: "name and slug are required" });
+    }
+
+    const logoFile = body.logo instanceof File ? body.logo : undefined;
+    const org = await createOrganizationService(
+      { name, slug },
+      logoFile,
+      getPrincipalUserId(principal),
+    );
 
     logAudit({
       event: "organization.created",

@@ -14,7 +14,7 @@ export const authUserSchema = z
     name: z.string(),
     email: z.email(),
     emailVerified: z.boolean(),
-    image: z.string().nullable().optional(),
+    avatar: z.string().nullable().optional(),
     role: z.string().nullable().optional(),
     banned: z.boolean().nullable().optional(),
     banReason: z.string().nullable().optional(),
@@ -60,7 +60,6 @@ export const signUpEmailBodySchema = z.object({
 
 export const updateUserBodySchema = z.object({
   name: z.string().min(1).optional(),
-  image: z.string().nullable().optional(),
 });
 
 export const changePasswordBodySchema = z.object({

@@ -33,6 +33,7 @@ import { listOrganizations } from "./listOrganizations";
 import { registerOrganization } from "./registerOrganization";
 import { updateOrganization } from "./updateOrganization";
 import { updateOrganizationSettings } from "./updateSettings";
+import { uploadOrganizationLogoRoute } from "./uploadLogo";
 
 const organizationRoutes = new OpenAPIHono();
 
@@ -52,6 +53,7 @@ const routes = organizationRoutes.openapiRoutes([
   setMemberPositions,
   getOrganizationSettings,
   updateOrganizationSettings,
+  uploadOrganizationLogoRoute,
   listDepartments,
   createDepartment,
   getDepartment,

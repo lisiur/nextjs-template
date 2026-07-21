@@ -26,7 +26,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { appClient } from "@/lib/api";
-import { uploadPublicFile } from "@/lib/api/upload-file";
 import { withApiFeedback } from "@/lib/api/utils";
 
 const orgSchema = z.object({
@@ -74,7 +73,7 @@ export function OrganizationDialog({
     organization?.logo ?? "",
   );
   const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
-  const [logoRemoved, setLogoRemoved] = useState(false);
+  const [_logoRemoved, setLogoRemoved] = useState(false);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [cropOpen, setCropOpen] = useState(false);
 
@@ -167,27 +166,21 @@ export function OrganizationDialog({
 
   async function onSubmit(data: OrgInput) {
     try {
-      const logo = selectedLogoFile
-        ? await uploadPublicFile(selectedLogoFile)
-        : logoRemoved
-          ? null
-          : (organization?.logo ?? null);
-
       if (isEdit) {
         await withApiFeedback(appClient.api.organizations[":id"].$put)({
           param: { id: organization.id },
-          json: {
+          form: {
             name: data.name,
             slug: data.slug,
-            logo,
+            ...(selectedLogoFile ? { logo: selectedLogoFile } : {}),
           },
         });
       } else {
         await withApiFeedback(appClient.api.organizations.$post)({
-          json: {
+          form: {
             name: data.name,
             slug: data.slug,
-            logo: logo ?? undefined,
+            ...(selectedLogoFile ? { logo: selectedLogoFile } : {}),
           },
         });
       }

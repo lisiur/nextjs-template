@@ -40,7 +40,9 @@ export type ApplicationMinAggregateOutputType = {
   code: string | null
   description: string | null
   logo: string | null
+  logoId: string | null
   favicon: string | null
+  faviconId: string | null
   copyright: string | null
   icp: string | null
   psif: string | null
@@ -57,7 +59,9 @@ export type ApplicationMaxAggregateOutputType = {
   code: string | null
   description: string | null
   logo: string | null
+  logoId: string | null
   favicon: string | null
+  faviconId: string | null
   copyright: string | null
   icp: string | null
   psif: string | null
@@ -74,7 +78,9 @@ export type ApplicationCountAggregateOutputType = {
   code: number
   description: number
   logo: number
+  logoId: number
   favicon: number
+  faviconId: number
   copyright: number
   icp: number
   psif: number
@@ -101,7 +107,9 @@ export type ApplicationMinAggregateInputType = {
   code?: true
   description?: true
   logo?: true
+  logoId?: true
   favicon?: true
+  faviconId?: true
   copyright?: true
   icp?: true
   psif?: true
@@ -118,7 +126,9 @@ export type ApplicationMaxAggregateInputType = {
   code?: true
   description?: true
   logo?: true
+  logoId?: true
   favicon?: true
+  faviconId?: true
   copyright?: true
   icp?: true
   psif?: true
@@ -135,7 +145,9 @@ export type ApplicationCountAggregateInputType = {
   code?: true
   description?: true
   logo?: true
+  logoId?: true
   favicon?: true
+  faviconId?: true
   copyright?: true
   icp?: true
   psif?: true
@@ -239,7 +251,9 @@ export type ApplicationGroupByOutputType = {
   code: string
   description: string | null
   logo: string | null
+  logoId: string | null
   favicon: string | null
+  faviconId: string | null
   copyright: string | null
   icp: string | null
   psif: string | null
@@ -279,7 +293,9 @@ export type ApplicationWhereInput = {
   code?: Prisma.StringFilter<"Application"> | string
   description?: Prisma.StringNullableFilter<"Application"> | string | null
   logo?: Prisma.StringNullableFilter<"Application"> | string | null
+  logoId?: Prisma.StringNullableFilter<"Application"> | string | null
   favicon?: Prisma.StringNullableFilter<"Application"> | string | null
+  faviconId?: Prisma.StringNullableFilter<"Application"> | string | null
   copyright?: Prisma.StringNullableFilter<"Application"> | string | null
   icp?: Prisma.StringNullableFilter<"Application"> | string | null
   psif?: Prisma.StringNullableFilter<"Application"> | string | null
@@ -301,7 +317,9 @@ export type ApplicationOrderByWithRelationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoId?: Prisma.SortOrderInput | Prisma.SortOrder
   favicon?: Prisma.SortOrderInput | Prisma.SortOrder
+  faviconId?: Prisma.SortOrderInput | Prisma.SortOrder
   copyright?: Prisma.SortOrderInput | Prisma.SortOrder
   icp?: Prisma.SortOrderInput | Prisma.SortOrder
   psif?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,7 +344,9 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Application"> | string
   description?: Prisma.StringNullableFilter<"Application"> | string | null
   logo?: Prisma.StringNullableFilter<"Application"> | string | null
+  logoId?: Prisma.StringNullableFilter<"Application"> | string | null
   favicon?: Prisma.StringNullableFilter<"Application"> | string | null
+  faviconId?: Prisma.StringNullableFilter<"Application"> | string | null
   copyright?: Prisma.StringNullableFilter<"Application"> | string | null
   icp?: Prisma.StringNullableFilter<"Application"> | string | null
   psif?: Prisma.StringNullableFilter<"Application"> | string | null
@@ -348,7 +368,9 @@ export type ApplicationOrderByWithAggregationInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoId?: Prisma.SortOrderInput | Prisma.SortOrder
   favicon?: Prisma.SortOrderInput | Prisma.SortOrder
+  faviconId?: Prisma.SortOrderInput | Prisma.SortOrder
   copyright?: Prisma.SortOrderInput | Prisma.SortOrder
   icp?: Prisma.SortOrderInput | Prisma.SortOrder
   psif?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -373,7 +395,9 @@ export type ApplicationScalarWhereWithAggregatesInput = {
   code?: Prisma.StringWithAggregatesFilter<"Application"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   logo?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
+  logoId?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   favicon?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
+  faviconId?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   copyright?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   icp?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
   psif?: Prisma.StringNullableWithAggregatesFilter<"Application"> | string | null
@@ -390,7 +414,9 @@ export type ApplicationCreateInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -412,7 +438,9 @@ export type ApplicationUncheckedCreateInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -434,7 +462,9 @@ export type ApplicationUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -456,7 +486,9 @@ export type ApplicationUncheckedUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -478,7 +510,9 @@ export type ApplicationCreateManyInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -495,7 +529,9 @@ export type ApplicationUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -512,7 +548,9 @@ export type ApplicationUncheckedUpdateManyInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -529,7 +567,9 @@ export type ApplicationCountOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  logoId?: Prisma.SortOrder
   favicon?: Prisma.SortOrder
+  faviconId?: Prisma.SortOrder
   copyright?: Prisma.SortOrder
   icp?: Prisma.SortOrder
   psif?: Prisma.SortOrder
@@ -550,7 +590,9 @@ export type ApplicationMaxOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  logoId?: Prisma.SortOrder
   favicon?: Prisma.SortOrder
+  faviconId?: Prisma.SortOrder
   copyright?: Prisma.SortOrder
   icp?: Prisma.SortOrder
   psif?: Prisma.SortOrder
@@ -567,7 +609,9 @@ export type ApplicationMinOrderByAggregateInput = {
   code?: Prisma.SortOrder
   description?: Prisma.SortOrder
   logo?: Prisma.SortOrder
+  logoId?: Prisma.SortOrder
   favicon?: Prisma.SortOrder
+  faviconId?: Prisma.SortOrder
   copyright?: Prisma.SortOrder
   icp?: Prisma.SortOrder
   psif?: Prisma.SortOrder
@@ -672,7 +716,9 @@ export type ApplicationCreateWithoutMenusInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -693,7 +739,9 @@ export type ApplicationUncheckedCreateWithoutMenusInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -730,7 +778,9 @@ export type ApplicationUpdateWithoutMenusInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -751,7 +801,9 @@ export type ApplicationUncheckedUpdateWithoutMenusInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -772,7 +824,9 @@ export type ApplicationCreateWithoutPermissionsInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -793,7 +847,9 @@ export type ApplicationUncheckedCreateWithoutPermissionsInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -830,7 +886,9 @@ export type ApplicationUpdateWithoutPermissionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -851,7 +909,9 @@ export type ApplicationUncheckedUpdateWithoutPermissionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -872,7 +932,9 @@ export type ApplicationCreateWithoutRolesInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -893,7 +955,9 @@ export type ApplicationUncheckedCreateWithoutRolesInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -930,7 +994,9 @@ export type ApplicationUpdateWithoutRolesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -951,7 +1017,9 @@ export type ApplicationUncheckedUpdateWithoutRolesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -972,7 +1040,9 @@ export type ApplicationCreateWithoutNotificationsInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -993,7 +1063,9 @@ export type ApplicationUncheckedCreateWithoutNotificationsInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -1030,7 +1102,9 @@ export type ApplicationUpdateWithoutNotificationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1051,7 +1125,9 @@ export type ApplicationUncheckedUpdateWithoutNotificationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1072,7 +1148,9 @@ export type ApplicationCreateWithoutApiTokensInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -1093,7 +1171,9 @@ export type ApplicationUncheckedCreateWithoutApiTokensInput = {
   code: string
   description?: string | null
   logo?: string | null
+  logoId?: string | null
   favicon?: string | null
+  faviconId?: string | null
   copyright?: string | null
   icp?: string | null
   psif?: string | null
@@ -1130,7 +1210,9 @@ export type ApplicationUpdateWithoutApiTokensInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1151,7 +1233,9 @@ export type ApplicationUncheckedUpdateWithoutApiTokensInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   favicon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  faviconId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   copyright?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   icp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   psif?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1239,7 +1323,9 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   code?: boolean
   description?: boolean
   logo?: boolean
+  logoId?: boolean
   favicon?: boolean
+  faviconId?: boolean
   copyright?: boolean
   icp?: boolean
   psif?: boolean
@@ -1262,7 +1348,9 @@ export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   code?: boolean
   description?: boolean
   logo?: boolean
+  logoId?: boolean
   favicon?: boolean
+  faviconId?: boolean
   copyright?: boolean
   icp?: boolean
   psif?: boolean
@@ -1279,7 +1367,9 @@ export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   code?: boolean
   description?: boolean
   logo?: boolean
+  logoId?: boolean
   favicon?: boolean
+  faviconId?: boolean
   copyright?: boolean
   icp?: boolean
   psif?: boolean
@@ -1296,7 +1386,9 @@ export type ApplicationSelectScalar = {
   code?: boolean
   description?: boolean
   logo?: boolean
+  logoId?: boolean
   favicon?: boolean
+  faviconId?: boolean
   copyright?: boolean
   icp?: boolean
   psif?: boolean
@@ -1307,7 +1399,7 @@ export type ApplicationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "description" | "logo" | "favicon" | "copyright" | "icp" | "psif" | "watermarkEnabled" | "watermarkConfig" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
+export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "code" | "description" | "logo" | "logoId" | "favicon" | "faviconId" | "copyright" | "icp" | "psif" | "watermarkEnabled" | "watermarkConfig" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menus?: boolean | Prisma.Application$menusArgs<ExtArgs>
   roles?: boolean | Prisma.Application$rolesArgs<ExtArgs>
@@ -1334,7 +1426,9 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
     code: string
     description: string | null
     logo: string | null
+    logoId: string | null
     favicon: string | null
+    faviconId: string | null
     copyright: string | null
     icp: string | null
     psif: string | null
@@ -1776,7 +1870,9 @@ export interface ApplicationFieldRefs {
   readonly code: Prisma.FieldRef<"Application", 'String'>
   readonly description: Prisma.FieldRef<"Application", 'String'>
   readonly logo: Prisma.FieldRef<"Application", 'String'>
+  readonly logoId: Prisma.FieldRef<"Application", 'String'>
   readonly favicon: Prisma.FieldRef<"Application", 'String'>
+  readonly faviconId: Prisma.FieldRef<"Application", 'String'>
   readonly copyright: Prisma.FieldRef<"Application", 'String'>
   readonly icp: Prisma.FieldRef<"Application", 'String'>
   readonly psif: Prisma.FieldRef<"Application", 'String'>

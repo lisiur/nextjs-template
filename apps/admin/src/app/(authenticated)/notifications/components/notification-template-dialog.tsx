@@ -27,7 +27,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { appClient } from "@/lib/api";
-import { uploadPublicFile } from "@/lib/api/upload-file";
+import { uploadPublicFile } from "@/lib/api/attachment-file";
 import { withApiFeedback } from "@/lib/api/utils";
 import { isRecord } from "./notification-form-utils";
 import type { NotificationChannel, NotificationTemplate } from "./types";
@@ -270,7 +270,13 @@ export function NotificationTemplateDialog({
                     variables={variableRows
                       .map((row) => row.name.trim())
                       .filter(Boolean)}
-                    onUploadFile={uploadPublicFile}
+                    onUploadFile={(file) =>
+                      uploadPublicFile(
+                        file,
+                        "notification-template:attachment",
+                        template.id,
+                      )
+                    }
                   />
                 ) : (
                   <Textarea

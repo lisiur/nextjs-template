@@ -12,22 +12,57 @@ export async function getOrganizationById(id: string) {
   return org;
 }
 
-export async function createOrganization(data: {
-  name: string;
-  slug: string;
-  logo?: string;
-}) {
+export async function createOrganization(
+  data: {
+    name: string;
+    slug: string;
+  },
+  logoFile?: File,
+  uploaderId?: string,
+) {
+  const { createAttachment: createAttachmentSvc, deleteAttachmentsByBiz } =
+    await import("#services/attachment.service");
+
   const existing = await prisma.organization.findUnique({
     where: { slug: data.slug },
   });
   if (existing) {
     throw new HTTPException(409, { message: "Slug already taken" });
   }
-  return prisma.organization.create({
-    data: {
-      ...data,
-      createdAt: new Date(),
-    },
+
+  return prisma.$transaction(async (tx) => {
+    const org = await tx.organization.create({
+      data: {
+        name: data.name,
+        slug: data.slug,
+        createdAt: new Date(),
+      },
+    });
+
+    if (logoFile) {
+      await deleteAttachmentsByBiz("organization:logo", org.id, tx);
+
+      const result = await createAttachmentSvc({
+        file: logoFile,
+        visibility: "public",
+        uploaderId: uploaderId!,
+        bizType: "organization:logo",
+        bizId: org.id,
+        tx,
+      });
+
+      const updatedOrg = await tx.organization.update({
+        where: { id: org.id },
+        data: {
+          logo: result.url,
+          logoId: result.attachmentId,
+        },
+      });
+
+      return updatedOrg;
+    }
+
+    return org;
   });
 }
 
@@ -36,9 +71,12 @@ export async function registerOrganizationForUser(
   data: {
     name: string;
     slug: string;
-    logo?: string;
   },
+  logoFile?: File,
 ) {
+  const { createAttachment: createAttachmentSvc, deleteAttachmentsByBiz } =
+    await import("#services/attachment.service");
+
   return prisma.$transaction(async (tx) => {
     const existing = await tx.organization.findUnique({
       where: { slug: data.slug },
@@ -49,7 +87,8 @@ export async function registerOrganizationForUser(
 
     const organization = await tx.organization.create({
       data: {
-        ...data,
+        name: data.name,
+        slug: data.slug,
         createdAt: new Date(),
       },
     });
@@ -96,6 +135,29 @@ export async function registerOrganizationForUser(
       });
     }
 
+    if (logoFile) {
+      await deleteAttachmentsByBiz("organization:logo", organization.id, tx);
+
+      const result = await createAttachmentSvc({
+        file: logoFile,
+        visibility: "public",
+        uploaderId: userId,
+        bizType: "organization:logo",
+        bizId: organization.id,
+        tx,
+      });
+
+      const updatedOrg = await tx.organization.update({
+        where: { id: organization.id },
+        data: {
+          logo: result.url,
+          logoId: result.attachmentId,
+        },
+      });
+
+      return updatedOrg;
+    }
+
     return organization;
   });
 }
@@ -105,9 +167,13 @@ export async function updateOrganization(
   data: {
     name?: string;
     slug?: string;
-    logo?: string | null;
   },
+  logoFile?: File,
+  uploaderId?: string,
 ) {
+  const { createAttachment: createAttachmentSvc, deleteAttachmentsByBiz } =
+    await import("#services/attachment.service");
+
   const existing = await prisma.organization.findUnique({ where: { id } });
   if (!existing) {
     throw new HTTPException(404, { message: "Organization not found" });
@@ -122,7 +188,76 @@ export async function updateOrganization(
     }
   }
 
-  return prisma.organization.update({ where: { id }, data });
+  return prisma.$transaction(async (tx) => {
+    const org = await tx.organization.update({
+      where: { id },
+      data: {
+        name: data.name ?? existing.name,
+        slug: data.slug ?? existing.slug,
+      },
+    });
+
+    if (logoFile) {
+      await deleteAttachmentsByBiz("organization:logo", org.id, tx);
+
+      const result = await createAttachmentSvc({
+        file: logoFile,
+        visibility: "public",
+        uploaderId: uploaderId!,
+        bizType: "organization:logo",
+        bizId: org.id,
+        tx,
+      });
+
+      const updatedOrg = await tx.organization.update({
+        where: { id: org.id },
+        data: {
+          logo: result.url,
+          logoId: result.attachmentId,
+        },
+      });
+
+      return updatedOrg;
+    }
+
+    return org;
+  });
+}
+
+export async function uploadOrganizationLogo(
+  orgId: string,
+  file: File,
+  uploaderId: string,
+) {
+  const { createAttachment: createAttachmentSvc, deleteAttachmentsByBiz } =
+    await import("#services/attachment.service");
+
+  return prisma.$transaction(async (tx) => {
+    await deleteAttachmentsByBiz("organization:logo", orgId, tx);
+
+    const result = await createAttachmentSvc({
+      file,
+      visibility: "public",
+      uploaderId,
+      bizType: "organization:logo",
+      bizId: orgId,
+      tx,
+    });
+
+    const org = await tx.organization.update({
+      where: { id: orgId },
+      data: {
+        logo: result.url,
+        logoId: result.attachmentId,
+      },
+    });
+
+    return {
+      url: result.url,
+      attachmentId: result.attachmentId,
+      org,
+    };
+  });
 }
 
 export async function deleteOrganization(id: string) {

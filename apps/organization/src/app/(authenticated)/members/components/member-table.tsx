@@ -31,7 +31,7 @@ interface MemberUser {
   id: string;
   name: string;
   email: string;
-  image: string | null;
+  avatar: string | null;
 }
 
 interface MemberPosition {

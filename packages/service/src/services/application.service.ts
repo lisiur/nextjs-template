@@ -18,8 +18,6 @@ export async function updateApplication(
     name?: string;
     code?: string;
     description?: string | null;
-    logo?: string | null;
-    favicon?: string | null;
     copyright?: string | null;
     icp?: string | null;
     psif?: string | null;
@@ -47,6 +45,78 @@ export async function updateApplication(
   }
 
   return prisma.application.update({ where: { id }, data });
+}
+
+export async function uploadApplicationLogo(
+  appId: string,
+  file: File,
+  uploaderId: string,
+) {
+  const { createAttachment: createAttachmentSvc, deleteAttachmentsByBiz } =
+    await import("#services/attachment.service");
+
+  return prisma.$transaction(async (tx) => {
+    await deleteAttachmentsByBiz("application:logo", appId, tx);
+
+    const result = await createAttachmentSvc({
+      file,
+      visibility: "public",
+      uploaderId,
+      bizType: "application:logo",
+      bizId: appId,
+      tx,
+    });
+
+    const app = await tx.application.update({
+      where: { id: appId },
+      data: {
+        logo: result.url,
+        logoId: result.attachmentId,
+      },
+    });
+
+    return {
+      url: result.url,
+      attachmentId: result.attachmentId,
+      app,
+    };
+  });
+}
+
+export async function uploadApplicationFavicon(
+  appId: string,
+  file: File,
+  uploaderId: string,
+) {
+  const { createAttachment: createAttachmentSvc, deleteAttachmentsByBiz } =
+    await import("#services/attachment.service");
+
+  return prisma.$transaction(async (tx) => {
+    await deleteAttachmentsByBiz("application:favicon", appId, tx);
+
+    const result = await createAttachmentSvc({
+      file,
+      visibility: "public",
+      uploaderId,
+      bizType: "application:favicon",
+      bizId: appId,
+      tx,
+    });
+
+    const app = await tx.application.update({
+      where: { id: appId },
+      data: {
+        favicon: result.url,
+        faviconId: result.attachmentId,
+      },
+    });
+
+    return {
+      url: result.url,
+      attachmentId: result.attachmentId,
+      app,
+    };
+  });
 }
 
 export async function listApplications(params: {

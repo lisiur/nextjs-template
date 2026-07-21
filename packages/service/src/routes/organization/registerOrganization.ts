@@ -1,14 +1,15 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
+import { HTTPException } from "hono/http-exception";
 import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
-import { createdResponseFn, unauthorizedResponse } from "#lib/openapi";
-import { registerOrganizationForUser } from "#services/organization.service";
 import {
-  errorSchema,
-  organizationSchema,
-  registerOrganizationBodySchema,
-} from "./schema";
+  badRequestResponse,
+  createdResponseFn,
+  unauthorizedResponse,
+} from "#lib/openapi";
+import { registerOrganizationForUser } from "#services/organization.service";
+import { organizationSchema, registerOrganizationBodySchema } from "./schema";
 
 export const registerOrganization = defineOpenAPIRoute({
   route: createRoute({
@@ -17,23 +18,20 @@ export const registerOrganization = defineOpenAPIRoute({
     tags: ["Organization"],
     summary: "Register an organization for the current user",
     description:
-      "Create a new organization and add the authenticated user as its owner.",
+      "Create a new organization and add the authenticated user as its owner. Accepts multipart/form-data with optional logo file.",
     request: {
       body: {
         content: {
-          "application/json": {
+          "multipart/form-data": {
             schema: registerOrganizationBodySchema,
           },
         },
-        required: true,
       },
     },
     responses: {
+      ...badRequestResponse,
       ...unauthorizedResponse,
       409: {
-        content: {
-          "application/json": { schema: errorSchema },
-        },
         description: "Slug already taken",
       },
       ...createdResponseFn(organizationSchema, "The registered organization"),
@@ -41,10 +39,27 @@ export const registerOrganization = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const principal = await requirePrincipal(c);
-    const body = c.req.valid("json");
+
+    const contentType = c.req.raw.headers.get("content-type") ?? "";
+    if (!contentType.includes("multipart/form-data")) {
+      throw new HTTPException(400, {
+        message: "Expected multipart/form-data",
+      });
+    }
+
+    const body = c.req.valid("form");
+    const name = body.name;
+    const slug = body.slug;
+
+    if (!name || !slug) {
+      throw new HTTPException(400, { message: "name and slug are required" });
+    }
+
+    const logoFile = body.logo instanceof File ? body.logo : undefined;
     const org = await registerOrganizationForUser(
       getPrincipalUserId(principal),
-      body,
+      { name, slug },
+      logoFile,
     );
 
     await prisma.session.update({

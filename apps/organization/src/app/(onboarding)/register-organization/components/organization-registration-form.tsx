@@ -72,7 +72,7 @@ export function OrganizationRegistrationForm({
     await withApiFeedback(appClient.api.organizations.register.$post, {
       showError: false,
     })({
-      json: {
+      form: {
         name: data.name,
         slug: data.slug,
       },

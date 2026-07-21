@@ -19,20 +19,20 @@ import { toast } from "sonner";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 
-interface UploadReplaceDialogProps {
+interface AttachmentReplaceDialogProps {
   open: boolean;
-  upload: { id: string; path: string; mimeType: string } | null;
+  attachment: { id: string } | null;
   onOpenChange: (open: boolean) => void;
   onReplaced: () => void;
 }
 
-export function UploadReplaceDialog({
+export function AttachmentReplaceDialog({
   open,
-  upload,
+  attachment,
   onOpenChange,
   onReplaced,
-}: UploadReplaceDialogProps) {
-  const t = useTranslations("Uploads");
+}: AttachmentReplaceDialogProps) {
+  const t = useTranslations("Attachments");
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -52,15 +52,13 @@ export function UploadReplaceDialog({
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!upload || !selectedFile) return;
+    if (!attachment || !selectedFile) return;
     setSaving(true);
     try {
-      await withApiFeedback(appClient.api.upload[":id"].replace.$put)({
-        param: { id: upload.id },
+      await withApiFeedback(appClient.api.attachment[":id"].replace.$put)({
+        param: { id: attachment.id },
         form: { file: selectedFile },
-      } as Parameters<
-        (typeof appClient.api.upload)[":id"]["replace"]["$put"]
-      >[0]);
+      });
       toast.success(t("replaceSuccess"));
       handleClose(false);
       onReplaced();
@@ -77,7 +75,7 @@ export function UploadReplaceDialog({
         <DialogHeader>
           <DialogTitle>{t("replaceTitle")}</DialogTitle>
         </DialogHeader>
-        <form id="upload-replace-form" onSubmit={handleSubmit}>
+        <form id="attachment-replace-form" onSubmit={handleSubmit}>
           <DialogBody>
             <Field>
               <FieldLabel htmlFor="replace-file">{t("chooseFile")}</FieldLabel>
@@ -104,7 +102,7 @@ export function UploadReplaceDialog({
           </Button>
           <Button
             type="submit"
-            form="upload-replace-form"
+            form="attachment-replace-form"
             disabled={saving || !selectedFile}
           >
             {saving ? <Spinner /> : null}

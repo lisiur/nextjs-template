@@ -259,14 +259,48 @@ export async function resetPassword(
 
 export async function updateUserProfile(
   userId: string,
-  data: { name?: string; image?: string | null },
+  data: { name?: string },
 ) {
   const user = await prisma.user.update({
     where: { id: userId },
-    data,
+    data: {
+      name: data.name,
+    },
   });
 
   return { user };
+}
+
+export async function uploadAvatar(userId: string, file: File) {
+  const { createAttachment: createAttachmentSvc, deleteAttachmentsByBiz } =
+    await import("#services/attachment.service");
+
+  return prisma.$transaction(async (tx) => {
+    await deleteAttachmentsByBiz("user:avatar", userId, tx);
+
+    const result = await createAttachmentSvc({
+      file,
+      visibility: "public",
+      uploaderId: userId,
+      bizType: "user:avatar",
+      bizId: userId,
+      tx,
+    });
+
+    const user = await tx.user.update({
+      where: { id: userId },
+      data: {
+        avatar: result.url,
+        avatarId: result.attachmentId,
+      },
+    });
+
+    return {
+      url: result.url,
+      attachmentId: result.attachmentId,
+      user,
+    };
+  });
 }
 
 export async function deleteUser(id: string) {

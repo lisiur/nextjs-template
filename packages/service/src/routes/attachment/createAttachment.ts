@@ -6,21 +6,24 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { uploadFile as uploadFileToStorage } from "#services/upload.service";
-import { uploadResponseSchema } from "./schema";
+import { createAttachment as createAttachmentToStorage } from "#services/attachment.service";
+import { createAttachmentResponseSchema } from "./schema";
 
-export const uploadFile = defineOpenAPIRoute({
+export const createAttachment = defineOpenAPIRoute({
   route: createRoute({
     method: "post",
     path: "/",
-    tags: ["Upload"],
-    summary: "Upload a file",
+    tags: ["Attachment"],
+    summary: "Create an attachment",
     description:
-      "Upload a file with sharded storage and public/private visibility.",
+      "Upload a file and create an attachment with sharded storage and public/private visibility.",
     responses: {
       ...badRequestResponse,
       ...unauthorizedResponse,
-      ...okResponseFn(uploadResponseSchema, "File uploaded successfully"),
+      ...okResponseFn(
+        createAttachmentResponseSchema,
+        "Attachment created successfully",
+      ),
     },
   }),
   handler: async (c) => {
@@ -36,6 +39,9 @@ export const uploadFile = defineOpenAPIRoute({
     const body = await c.req.parseBody();
     const file = body.file;
     const rawVisibility = (body.visibility as string) || "private";
+    const bizType = body.bizType as string;
+    const bizId = (body.bizId as string) || getPrincipalUserId(principal);
+
     if (rawVisibility !== "public" && rawVisibility !== "private") {
       throw new HTTPException(400, {
         message: "visibility must be 'public' or 'private'",
@@ -46,10 +52,12 @@ export const uploadFile = defineOpenAPIRoute({
       throw new HTTPException(400, { message: "No file provided" });
     }
 
-    const result = await uploadFileToStorage({
+    const result = await createAttachmentToStorage({
       file,
       visibility: rawVisibility,
       uploaderId: getPrincipalUserId(principal),
+      bizType,
+      bizId,
     });
 
     return c.json(result, 200);

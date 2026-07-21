@@ -39,7 +39,7 @@ export async function listPositionMembers(
     include: {
       member: {
         include: {
-          user: { select: { id: true, name: true, email: true, image: true } },
+          user: { select: { id: true, name: true, email: true, avatar: true } },
           memberPositions: {
             include: {
               position: { select: { id: true, name: true, code: true } },

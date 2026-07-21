@@ -21,7 +21,7 @@ import { SlidersHorizontal } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import type { DateRange } from "react-day-picker";
 
-export interface UploadFilters {
+export interface AttachmentFilters {
   visibility?: string;
   mimeType?: string;
   uploader?: string;
@@ -31,10 +31,12 @@ export interface UploadFilters {
 
 const VISIBILITY_OPTIONS = ["public", "private"] as const;
 
-interface UploadFilterProps {
-  filters: UploadFilters;
+interface AttachmentFilterProps {
+  filters: AttachmentFilters;
   onFiltersChange: (
-    newFiltersOrFn: UploadFilters | ((prev: UploadFilters) => UploadFilters),
+    newFiltersOrFn:
+      | AttachmentFilters
+      | ((prev: AttachmentFilters) => AttachmentFilters),
   ) => void;
   labels: {
     mimeType: string;
@@ -47,21 +49,21 @@ interface UploadFilterProps {
   };
 }
 
-interface UploadFilterFieldsProps {
-  filters: UploadFilters;
-  setFilter: (key: keyof UploadFilters, value: string) => void;
+interface AttachmentFilterFieldsProps {
+  filters: AttachmentFilters;
+  setFilter: (key: keyof AttachmentFilters, value: string) => void;
   handleDateChange: (range: DateRange | undefined) => void;
-  labels: UploadFilterProps["labels"];
+  labels: AttachmentFilterProps["labels"];
   resetKey: number;
 }
 
-function UploadFilterFields({
+function AttachmentFilterFields({
   filters,
   setFilter,
   handleDateChange,
   labels,
   resetKey,
-}: UploadFilterFieldsProps) {
+}: AttachmentFilterFieldsProps) {
   return (
     <>
       <Select
@@ -105,11 +107,11 @@ function UploadFilterFields({
   );
 }
 
-export function UploadFilter({
+export function AttachmentFilter({
   filters,
   onFiltersChange,
   labels,
-}: UploadFilterProps) {
+}: AttachmentFilterProps) {
   const onFiltersChangeRef = useRef(onFiltersChange);
   onFiltersChangeRef.current = onFiltersChange;
   const [resetKey, setResetKey] = useState(0);
@@ -127,7 +129,7 @@ export function UploadFilter({
     }));
   }, []);
 
-  function setFilter(key: keyof UploadFilters, value: string) {
+  function setFilter(key: keyof AttachmentFilters, value: string) {
     onFiltersChange({ ...filters, [key]: value || undefined });
   }
 
@@ -165,7 +167,7 @@ export function UploadFilter({
               <SheetTitle>{labels.filtersTitle}</SheetTitle>
             </SheetHeader>
             <SheetBody>
-              <UploadFilterFields
+              <AttachmentFilterFields
                 filters={filters}
                 setFilter={setFilter}
                 handleDateChange={handleDateChange}
@@ -189,7 +191,7 @@ export function UploadFilter({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <UploadFilterFields
+      <AttachmentFilterFields
         filters={filters}
         setFilter={setFilter}
         handleDateChange={handleDateChange}

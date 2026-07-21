@@ -9,7 +9,7 @@ export const adminUserSchema = z
     name: z.string().openapi({ example: "John Doe" }),
     email: z.string().openapi({ example: "john@example.com" }),
     emailVerified: z.boolean(),
-    image: z.string().nullable().optional(),
+    avatar: z.string().nullable().optional(),
     role: z.string().nullable().optional(),
     banned: z.boolean().nullable().optional(),
     flags: z.array(z.string()).optional(),

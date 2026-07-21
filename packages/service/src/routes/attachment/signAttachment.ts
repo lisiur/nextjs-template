@@ -7,18 +7,18 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
-import { signFile as generateSignedUrl } from "#services/upload.service";
-import { signedUrlResponseSchema, signFileParamSchema } from "./schema";
+import { signFile as generateSignedUrl } from "#services/attachment.service";
+import { signAttachmentParamSchema, signedUrlResponseSchema } from "./schema";
 
-export const signFile = defineOpenAPIRoute({
+export const signAttachment = defineOpenAPIRoute({
   route: createRoute({
     method: "post",
     path: "/{id}/sign",
-    tags: ["Upload"],
+    tags: ["Attachment"],
     summary: "Generate signed URL for a private file",
     description: "Create a time-limited signed URL to access a private file.",
     request: {
-      params: signFileParamSchema,
+      params: signAttachmentParamSchema,
     },
     responses: {
       ...unauthorizedResponse,

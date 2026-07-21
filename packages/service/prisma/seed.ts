@@ -359,10 +359,22 @@ const systemPermissions = [
     group: "notification-record",
     name: "View Notification Record",
   },
-  { code: "upload::sign", group: "upload", name: "Sign Upload URL" },
-  { code: "upload::list", group: "upload", name: "List Uploads" },
-  { code: "upload::delete", group: "upload", name: "Delete Uploads" },
-  { code: "upload::replace", group: "upload", name: "Replace Upload" },
+  {
+    code: "attachment::sign",
+    group: "attachment",
+    name: "Sign Attachment URL",
+  },
+  { code: "attachment::list", group: "attachment", name: "List Attachments" },
+  {
+    code: "attachment::delete",
+    group: "attachment",
+    name: "Delete Attachments",
+  },
+  {
+    code: "attachment::replace",
+    group: "attachment",
+    name: "Replace Attachment",
+  },
   { code: "job::list", group: "job", name: "List Jobs" },
   { code: "job::create", group: "job", name: "Create Job" },
   { code: "job::view", group: "job", name: "View Job" },
@@ -579,15 +591,15 @@ const adminMenus = [
     permissions: ["rate-limit::manage"],
   },
   {
-    id: "uploads",
-    code: "uploads",
-    name: "Uploads",
+    id: "attachments",
+    code: "attachments",
+    name: "Attachments",
     icon: "Upload",
     linkType: "INTERNAL" as const,
-    url: "/admin/uploads",
+    url: "/admin/attachments",
     parentId: "infrastructure",
     sortOrder: 14,
-    permissions: ["upload::list"],
+    permissions: ["attachment::list"],
   },
   {
     id: "settings",
@@ -725,7 +737,7 @@ const organizationRoles = [
 // --- Role -> Permission mappings (by role code) ---
 const adminRolePermissions: Record<string, string[]> = {
   [ADMIN_ROLE_CODE]: systemPermissions.map((p) => p.code),
-  [USER_ROLE_CODE]: ["upload::sign"],
+  [USER_ROLE_CODE]: ["attachment::sign"],
 };
 
 const organizationRolePermissions: Record<string, string[]> = {

@@ -4,6 +4,7 @@ import { mkdir, stat, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
+import type { Prisma } from "#generated/prisma/client";
 import { MAX_UPLOAD_FILE_SIZE, UPLOAD_SIGN_EXPIRY_MS } from "#lib/constants";
 import { prisma } from "#lib/db";
 import {
@@ -46,12 +47,22 @@ function shardPath(hash: string, ext: string): string {
   return `${hash.slice(0, 2)}/${hash.slice(2, 4)}/${hash}${ext}`;
 }
 
-export async function uploadFile(params: {
+export async function createAttachment(params: {
   file: File;
   visibility: string;
   uploaderId: string;
+  bizType: string;
+  bizId?: string;
+  tx?: Prisma.TransactionClient;
 }) {
-  const { file, visibility, uploaderId } = params;
+  const {
+    file,
+    visibility,
+    uploaderId,
+    bizType,
+    bizId = uploaderId,
+    tx = prisma,
+  } = params;
   const allowedTypes = allowedMimeTypes();
 
   if (!allowedTypes.includes(file.type)) {
@@ -83,25 +94,43 @@ export async function uploadFile(params: {
   const relPath = shardPath(hash, ext);
   const dir = visibility === "public" ? "public" : "private";
   const fullPath = join(UPLOADS_ROOT, dir, relPath);
-
-  await mkdir(join(UPLOADS_ROOT, dir, dirname(relPath)), {
-    recursive: true,
-  });
-  await writeFile(fullPath, buffer);
-
   const dbPath = `${dir}/${relPath}`;
 
-  const upload = await prisma.upload.create({
+  let upload = await tx.upload.findUnique({
+    where: { hash },
+  });
+
+  if (!upload) {
+    await mkdir(join(UPLOADS_ROOT, dir, dirname(relPath)), {
+      recursive: true,
+    });
+    await writeFile(fullPath, buffer);
+
+    upload = await tx.upload.create({
+      data: {
+        path: dbPath,
+        mimeType: file.type,
+        size: file.size,
+        hash,
+      },
+    });
+  }
+
+  const attachment = await tx.attachment.create({
     data: {
-      path: dbPath,
-      mimeType: file.type,
-      size: file.size,
+      bizType,
+      bizId,
+      uploadId: upload.id,
       visibility,
-      uploaderId,
+      createdBy: uploaderId,
     },
   });
 
-  return { id: upload.id, url: `/api/upload/${upload.id}` };
+  return {
+    attachmentId: attachment.id,
+    uploadId: upload.id,
+    url: `/api/attachment/${attachment.id}`,
+  };
 }
 
 export function verifySignature(
@@ -127,12 +156,15 @@ export async function getFileAccess(params: {
 }) {
   const { id, token, expires, headers } = params;
 
-  const upload = await prisma.upload.findUnique({ where: { id } });
-  if (!upload) {
+  const attachment = await prisma.attachment.findUnique({
+    where: { id },
+    include: { upload: true },
+  });
+  if (!attachment) {
     throw new HTTPException(404, { message: "File not found" });
   }
 
-  if (upload.visibility === "private") {
+  if (attachment.visibility === "private") {
     if (!token || !expires) {
       throw new HTTPException(403, {
         message: "Token required for private files",
@@ -151,7 +183,7 @@ export async function getFileAccess(params: {
 
   await assertHotlinkAllowed(headers);
 
-  const filePath = join(UPLOADS_ROOT, upload.path);
+  const filePath = join(UPLOADS_ROOT, attachment.upload.path);
 
   try {
     await stat(filePath);
@@ -176,10 +208,10 @@ export async function getFileAccess(params: {
 
   return {
     stream: webStream,
-    path: upload.path,
-    mimeType: upload.mimeType,
-    size: upload.size,
-    visibility: upload.visibility,
+    path: attachment.upload.path,
+    mimeType: attachment.upload.mimeType,
+    size: attachment.upload.size,
+    visibility: attachment.visibility,
   };
 }
 
@@ -239,12 +271,15 @@ async function assertHotlinkAllowed(headers?: Headers) {
 export async function signFile(params: { id: string; userId: string }) {
   const { id, userId } = params;
 
-  const upload = await prisma.upload.findUnique({ where: { id } });
-  if (!upload) {
+  const attachment = await prisma.attachment.findUnique({
+    where: { id },
+  });
+  if (!attachment) {
     throw new HTTPException(404, { message: "File not found" });
   }
 
-  const isOwner = upload.uploaderId === userId;
+  const isOwner =
+    attachment.bizType === "user:avatar" && attachment.bizId === userId;
   if (!isOwner) {
     throw new HTTPException(403, { message: "Not file owner" });
   }
@@ -254,12 +289,12 @@ export async function signFile(params: { id: string; userId: string }) {
     .update(`${id}:${expiresAt}`)
     .digest("hex");
 
-  const url = `/api/upload/${id}?token=${token}&expires=${expiresAt}`;
+  const url = `/api/attachment/${id}?token=${token}&expires=${expiresAt}`;
 
   return { url, expiresAt: new Date(expiresAt) };
 }
 
-export async function listUploads(params: {
+export async function listAttachments(params: {
   limit?: number;
   offset?: number;
   visibility?: string;
@@ -281,67 +316,105 @@ export async function listUploads(params: {
   const where: {
     visibility?: string;
     mimeType?: { contains: string; mode: "insensitive" };
-    uploader?: { OR: Array<Record<string, unknown>> };
+    createdBy?: { equals: string };
     createdAt?: { gte?: Date; lte?: Date };
   } = {};
   if (visibility) where.visibility = visibility;
   if (mimeType) where.mimeType = { contains: mimeType, mode: "insensitive" };
-  if (uploader) {
-    where.uploader = {
-      OR: [
-        { name: { contains: uploader, mode: "insensitive" } },
-        { email: { contains: uploader, mode: "insensitive" } },
-      ],
-    };
-  }
+  if (uploader) where.createdBy = { equals: uploader };
   if (startDate || endDate) {
     where.createdAt = {};
     if (startDate) where.createdAt.gte = startDate;
     if (endDate) where.createdAt.lte = endDate;
   }
 
-  const [uploads, total] = await Promise.all([
-    prisma.upload.findMany({
+  const [attachments, total] = await Promise.all([
+    prisma.attachment.findMany({
       where,
-      include: {
-        uploader: { select: { id: true, name: true, email: true } },
+      select: {
+        id: true,
+        bizType: true,
+        bizId: true,
+        visibility: true,
+        createdBy: true,
+        createdAt: true,
+        upload: {
+          select: {
+            id: true,
+            path: true,
+            mimeType: true,
+            size: true,
+            hash: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
       take: limit,
       skip: offset,
     }),
-    prisma.upload.count({ where }),
+    prisma.attachment.count({ where }),
   ]);
 
-  return { uploads, total };
+  return { attachments, total };
 }
 
-export async function deleteUploads(ids: string[]) {
-  const uploads = await prisma.upload.findMany({
+export async function deleteAttachments(ids: string[]) {
+  const attachments = await prisma.attachment.findMany({
+    where: { id: { in: ids } },
+    include: { upload: true },
+  });
+
+  await prisma.attachment.deleteMany({
     where: { id: { in: ids } },
   });
 
-  await prisma.upload.deleteMany({
-    where: { id: { in: ids } },
-  });
-
-  await Promise.all(
-    uploads.map(async (upload) => {
-      const refCount = await prisma.upload.count({
-        where: { path: upload.path },
-      });
-      if (refCount === 0) {
-        try {
-          await unlink(join(UPLOADS_ROOT, upload.path));
-        } catch {
-          // File already absent — ignore.
-        }
+  for (const attachment of attachments) {
+    const remainingCount = await prisma.attachment.count({
+      where: { uploadId: attachment.uploadId },
+    });
+    if (remainingCount === 0) {
+      try {
+        await unlink(join(UPLOADS_ROOT, attachment.upload.path));
+      } catch {
+        // File already absent — ignore.
       }
-    }),
-  );
+      await prisma.upload.delete({ where: { id: attachment.uploadId } });
+    }
+  }
 }
 
-export async function replaceUpload(params: { id: string; file: File }) {
+export async function deleteAttachmentsByBiz(
+  bizType: string,
+  bizId: string,
+  tx: Prisma.TransactionClient = prisma,
+) {
+  const attachments = await tx.attachment.findMany({
+    where: { bizType, bizId },
+    include: { upload: true },
+  });
+
+  if (attachments.length === 0) return;
+
+  await tx.attachment.deleteMany({
+    where: { id: { in: attachments.map((a) => a.id) } },
+  });
+
+  for (const attachment of attachments) {
+    const remainingCount = await tx.attachment.count({
+      where: { uploadId: attachment.uploadId },
+    });
+    if (remainingCount === 0) {
+      try {
+        await unlink(join(UPLOADS_ROOT, attachment.upload.path));
+      } catch {
+        // File already absent — ignore.
+      }
+      await tx.upload.delete({ where: { id: attachment.uploadId } });
+    }
+  }
+}
+
+export async function replaceAttachment(params: { id: string; file: File }) {
   const { id, file } = params;
   const allowedTypes = allowedMimeTypes();
 
@@ -357,8 +430,11 @@ export async function replaceUpload(params: { id: string; file: File }) {
     });
   }
 
-  const upload = await prisma.upload.findUnique({ where: { id } });
-  if (!upload) {
+  const attachment = await prisma.attachment.findUnique({
+    where: { id },
+    include: { upload: true },
+  });
+  if (!attachment) {
     throw new HTTPException(404, { message: "File not found" });
   }
 
@@ -377,35 +453,59 @@ export async function replaceUpload(params: { id: string; file: File }) {
 
   const hash = computeHash(buffer);
   const relPath = shardPath(hash, ext);
-  const dir = upload.visibility === "public" ? "public" : "private";
+  const dir = attachment.visibility === "public" ? "public" : "private";
   const fullPath = join(UPLOADS_ROOT, dir, relPath);
   const dbPath = `${dir}/${relPath}`;
 
-  if (dbPath !== upload.path) {
+  const oldUpload = attachment.upload;
+  const oldPath = oldUpload.path;
+
+  if (hash !== oldUpload.hash) {
     await mkdir(join(UPLOADS_ROOT, dir, dirname(relPath)), {
       recursive: true,
     });
     await writeFile(fullPath, buffer);
 
-    const refCount = await prisma.upload.count({
-      where: { path: upload.path },
+    const newUpload = await prisma.upload.create({
+      data: {
+        path: dbPath,
+        mimeType: file.type,
+        size: file.size,
+        hash,
+      },
     });
-    if (refCount <= 1) {
+
+    await prisma.attachment.update({
+      where: { id },
+      data: { uploadId: newUpload.id },
+    });
+
+    const remainingCount = await prisma.attachment.count({
+      where: { uploadId: oldUpload.id },
+    });
+    if (remainingCount === 0) {
       try {
-        await unlink(join(UPLOADS_ROOT, upload.path));
+        await unlink(join(UPLOADS_ROOT, oldPath));
       } catch {
         // Old file already absent — ignore.
       }
+      await prisma.upload.delete({ where: { id: oldUpload.id } });
     }
+
+    return { attachmentId: id, uploadId: newUpload.id };
   }
 
-  const updated = await prisma.upload.update({
-    where: { id },
-    data: { path: dbPath, mimeType: file.type, size: file.size },
-    include: {
-      uploader: { select: { id: true, name: true, email: true } },
-    },
-  });
+  if (dbPath !== oldUpload.path) {
+    await mkdir(join(UPLOADS_ROOT, dir, dirname(relPath)), {
+      recursive: true,
+    });
+    await writeFile(fullPath, buffer);
 
-  return updated;
+    await prisma.upload.update({
+      where: { id: oldUpload.id },
+      data: { path: dbPath, mimeType: file.type, size: file.size },
+    });
+  }
+
+  return { attachmentId: id, uploadId: oldUpload.id };
 }

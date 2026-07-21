@@ -15,20 +15,20 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { formatDateTime } from "@/utils/date";
 import { formatBytes } from "@/utils/format";
-import type { UploadEntry } from "./upload-table";
+import type { AttachmentEntry } from "./attachment-table";
 
-interface UploadDetailDialogProps {
+interface AttachmentDetailDialogProps {
   open: boolean;
-  upload: UploadEntry | null;
+  attachment: AttachmentEntry | null;
   onOpenChange: (open: boolean) => void;
 }
 
-export function UploadDetailDialog({
+export function AttachmentDetailDialog({
   open,
-  upload,
+  attachment,
   onOpenChange,
-}: UploadDetailDialogProps) {
-  const t = useTranslations("Uploads");
+}: AttachmentDetailDialogProps) {
+  const t = useTranslations("Attachments");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -37,43 +37,60 @@ export function UploadDetailDialog({
           <DialogTitle>{t("detailTitle")}</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          {upload ? (
+          {attachment ? (
             <dl className="grid grid-cols-3 gap-x-4 gap-y-3 text-sm">
-              <DetailRow label={t("columns.id")} value={upload.id} mono />
+              <DetailRow label={t("columns.id")} value={attachment.id} mono />
+              <DetailRow
+                label={t("columns.bizType")}
+                value={attachment.bizType}
+              />
+              <DetailRow
+                label={t("columns.bizId")}
+                value={attachment.bizId}
+                mono
+              />
+              <DetailRow
+                label={t("columns.createdBy")}
+                value={attachment.createdBy}
+                mono
+              />
               <DetailRow
                 label={t("columns.path")}
-                value={upload.path}
+                value={attachment.upload.path}
                 mono
                 colSpan={2}
               />
               <DetailRow
                 label={t("columns.mimeType")}
-                value={upload.mimeType}
+                value={attachment.upload.mimeType}
               />
               <DetailRow
                 label={t("columns.size")}
-                value={formatBytes(upload.size)}
+                value={formatBytes(attachment.upload.size)}
+              />
+              <DetailRow
+                label={t("columns.hash")}
+                value={attachment.upload.hash}
+                mono
+                colSpan={2}
               />
               <DetailRow
                 label={t("columns.visibility")}
                 value={
                   <Badge
                     variant={
-                      upload.visibility === "public" ? "secondary" : "outline"
+                      attachment.visibility === "public"
+                        ? "secondary"
+                        : "outline"
                     }
                   >
-                    {upload.visibility}
+                    {attachment.visibility}
                   </Badge>
                 }
               />
               <DetailRow
-                label={t("columns.uploader")}
-                value={`${upload.uploader.name} (${upload.uploader.email})`}
-                colSpan={2}
-              />
-              <DetailRow
                 label={t("columns.createdAt")}
-                value={formatDateTime(upload.createdAt)}
+                value={formatDateTime(attachment.createdAt)}
                 colSpan={3}
               />
             </dl>

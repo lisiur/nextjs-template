@@ -1,11 +1,11 @@
 import { HTTPException } from "hono/http-exception";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("../../../services/upload.service", () => ({
+vi.mock("../../../services/attachment.service", () => ({
   getFileAccess: vi.fn(),
 }));
 
-import { getFileAccess } from "../../../services/upload.service";
+import { getFileAccess } from "../../../services/attachment.service";
 
 const mockGetFileAccess = vi.mocked(getFileAccess);
 
@@ -22,7 +22,7 @@ async function testRoute(options: {
   headers?: Record<string, string>;
 }) {
   const { OpenAPIHono } = await import("@hono/zod-openapi");
-  const { getFile } = await import("../getFile");
+  const { getAttachment: getFile } = await import("../getAttachment");
 
   const app = new OpenAPIHono();
   app.onError((err, c) => {

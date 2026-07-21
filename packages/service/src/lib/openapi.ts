@@ -5,12 +5,12 @@ export const paginationQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-export const uploadUrlSchema = z
+export const attachmentUrlSchema = z
   .string()
-  .regex(/^\/api\/upload\/[A-Za-z0-9_-]+$/, {
-    message: "Expected an upload store URL",
+  .regex(/^\/api\/attachment\/[A-Za-z0-9_-]+$/, {
+    message: "Expected an attachment URL",
   })
-  .openapi({ example: "/api/upload/clx1234567890" });
+  .openapi({ example: "/api/attachment/clx1234567890" });
 
 export const errorSchema = z
   .object({

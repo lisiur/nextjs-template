@@ -18,7 +18,6 @@ import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { appClient } from "@/lib/api";
-import { uploadPublicFile } from "@/lib/api/upload-file";
 import { withApiFeedback } from "@/lib/api/utils";
 
 const FAVICON_MAX_SIZE = 2 * 1024 * 1024;
@@ -67,11 +66,12 @@ export function ApplicationFaviconForm({
 
     setUploading(true);
     try {
-      const favicon = await uploadPublicFile(file);
-      await withApiFeedback(appClient.api.applications[":id"].$put)({
+      await withApiFeedback(appClient.api.applications[":id"].favicon.$post)({
         param: { id: appId },
-        json: { favicon },
-      });
+        form: { file },
+      } as Parameters<
+        (typeof appClient.api.applications)[":id"]["favicon"]["$post"]
+      >[0]);
 
       setCropOpen(false);
       toast.success(t("updateSuccess"));

@@ -134,11 +134,11 @@ export function UserMenu({ full, items }: UserMenuProps) {
     <div
       className={`relative flex h-full w-full shrink-0 items-center justify-center overflow-hidden ${
         full ? "rounded-lg" : "rounded-full"
-      } ${user?.image ? "" : full ? "bg-sidebar-primary text-sidebar-primary-foreground" : "bg-muted"}`}
+      } ${user?.avatar ? "" : full ? "bg-sidebar-primary text-sidebar-primary-foreground" : "bg-muted"}`}
     >
-      {user?.image ? (
+      {user?.avatar ? (
         <Image
-          src={user.image}
+          src={user.avatar}
           alt={user.name ?? ""}
           fill
           className="object-cover"

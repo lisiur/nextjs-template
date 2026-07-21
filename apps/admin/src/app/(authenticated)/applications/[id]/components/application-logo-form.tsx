@@ -18,7 +18,6 @@ import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { appClient } from "@/lib/api";
-import { uploadPublicFile } from "@/lib/api/upload-file";
 import { withApiFeedback } from "@/lib/api/utils";
 
 const LOGO_MAX_SIZE = 2 * 1024 * 1024;
@@ -67,11 +66,12 @@ export function ApplicationLogoForm({
 
     setUploading(true);
     try {
-      const logo = await uploadPublicFile(file);
-      await withApiFeedback(appClient.api.applications[":id"].$put)({
+      await withApiFeedback(appClient.api.applications[":id"].logo.$post)({
         param: { id: appId },
-        json: { logo },
-      });
+        form: { file },
+      } as Parameters<
+        (typeof appClient.api.applications)[":id"]["logo"]["$post"]
+      >[0]);
 
       setCropOpen(false);
       toast.success(t("updateSuccess"));

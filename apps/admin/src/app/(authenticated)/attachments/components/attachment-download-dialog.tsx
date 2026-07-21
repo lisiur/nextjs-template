@@ -17,30 +17,34 @@ import { useState } from "react";
 import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 
-interface UploadDownloadDialogProps {
+interface AttachmentDownloadDialogProps {
   open: boolean;
-  upload: { id: string; path: string; visibility: string } | null;
+  attachment: {
+    id: string;
+    visibility: string;
+    upload: { path: string };
+  } | null;
   onOpenChange: (open: boolean) => void;
 }
 
-export function UploadDownloadDialog({
+export function AttachmentDownloadDialog({
   open,
-  upload,
+  attachment,
   onOpenChange,
-}: UploadDownloadDialogProps) {
-  const t = useTranslations("Uploads");
+}: AttachmentDownloadDialogProps) {
+  const t = useTranslations("Attachments");
   const [downloading, setDownloading] = useState(false);
 
   async function handleDownload() {
-    if (!upload) return;
+    if (!attachment) return;
     setDownloading(true);
     try {
-      let url = `/api/upload/${upload.id}`;
-      if (upload.visibility === "private") {
+      let url = `/api/attachment/${attachment.id}`;
+      if (attachment.visibility === "private") {
         const res = await withApiFeedback(
-          appClient.api.upload[":id"].sign.$post,
+          appClient.api.attachment[":id"].sign.$post,
         )({
-          param: { id: upload.id },
+          param: { id: attachment.id },
         });
         const data = await res.json();
         url = data.url;
@@ -64,7 +68,9 @@ export function UploadDownloadDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{t("downloadTitle")}</DialogTitle>
-          {upload && <DialogDescription>{upload.path}</DialogDescription>}
+          {attachment && (
+            <DialogDescription>{attachment.upload.path}</DialogDescription>
+          )}
         </DialogHeader>
         <DialogBody>
           <p className="text-muted-foreground text-sm">{t("downloadHint")}</p>

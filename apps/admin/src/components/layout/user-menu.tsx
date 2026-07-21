@@ -99,16 +99,16 @@ export function UserMenu({ full, items, avatarRadius }: UserMenuProps) {
   const avatar = (
     <div
       className={`relative flex h-full w-full shrink-0 items-center justify-center overflow-hidden ${radiusClass} ${
-        user?.image
+        user?.avatar
           ? ""
           : full
             ? "bg-sidebar-primary text-sidebar-primary-foreground"
             : "bg-muted"
       }`}
     >
-      {user?.image ? (
+      {user?.avatar ? (
         <Image
-          src={user.image}
+          src={user.avatar}
           alt={user.name ?? ""}
           fill
           className="object-cover"

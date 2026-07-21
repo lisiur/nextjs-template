@@ -65,6 +65,7 @@ export const ModelName = {
   Invitation: 'Invitation',
   SystemConfig: 'SystemConfig',
   Upload: 'Upload',
+  Attachment: 'Attachment',
   Application: 'Application',
   Menu: 'Menu',
   MenuPermission: 'MenuPermission',
@@ -102,7 +103,8 @@ export const UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   emailVerified: 'emailVerified',
-  image: 'image',
+  avatar: 'avatar',
+  avatarId: 'avatarId',
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires',
@@ -210,6 +212,7 @@ export const OrganizationScalarFieldEnum = {
   name: 'name',
   slug: 'slug',
   logo: 'logo',
+  logoId: 'logoId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -306,12 +309,24 @@ export const UploadScalarFieldEnum = {
   path: 'path',
   mimeType: 'mimeType',
   size: 'size',
-  visibility: 'visibility',
-  uploaderId: 'uploaderId',
+  hash: 'hash',
   createdAt: 'createdAt'
 } as const
 
 export type UploadScalarFieldEnum = (typeof UploadScalarFieldEnum)[keyof typeof UploadScalarFieldEnum]
+
+
+export const AttachmentScalarFieldEnum = {
+  id: 'id',
+  bizType: 'bizType',
+  bizId: 'bizId',
+  uploadId: 'uploadId',
+  visibility: 'visibility',
+  createdBy: 'createdBy',
+  createdAt: 'createdAt'
+} as const
+
+export type AttachmentScalarFieldEnum = (typeof AttachmentScalarFieldEnum)[keyof typeof AttachmentScalarFieldEnum]
 
 
 export const ApplicationScalarFieldEnum = {
@@ -320,7 +335,9 @@ export const ApplicationScalarFieldEnum = {
   code: 'code',
   description: 'description',
   logo: 'logo',
+  logoId: 'logoId',
   favicon: 'favicon',
+  faviconId: 'faviconId',
   copyright: 'copyright',
   icp: 'icp',
   psif: 'psif',

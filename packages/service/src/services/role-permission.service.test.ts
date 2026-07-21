@@ -35,12 +35,12 @@ describe("getUserPermissions", () => {
   it("loads only global API permissions", async () => {
     mockPrisma.permission.findMany.mockResolvedValue([
       { code: "organization::create" },
-      { code: "upload::sign" },
+      { code: "attachment::sign" },
     ]);
 
     await expect(getUserPermissions("user1")).resolves.toEqual([
       "organization::create",
-      "upload::sign",
+      "attachment::sign",
     ]);
     expect(mockPrisma.permission.findMany).toHaveBeenCalledWith({
       where: {

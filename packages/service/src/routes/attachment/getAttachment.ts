@@ -1,19 +1,19 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
 import { forbiddenResponse, notFoundResponse } from "#lib/openapi";
-import { getFileAccess } from "#services/upload.service";
-import { getFileParamSchema, getFileQuerySchema } from "./schema";
+import { getFileAccess } from "#services/attachment.service";
+import { getAttachmentParamSchema, getAttachmentQuerySchema } from "./schema";
 
-export const getFile = defineOpenAPIRoute({
+export const getAttachment = defineOpenAPIRoute({
   route: createRoute({
     method: "get",
     path: "/{id}",
-    tags: ["Files"],
+    tags: ["Attachment"],
     summary: "Get a file",
     description:
       "Access a file by ID. Public files are served directly. Private files require a signed URL.",
     request: {
-      params: getFileParamSchema,
-      query: getFileQuerySchema,
+      params: getAttachmentParamSchema,
+      query: getAttachmentQuerySchema,
     },
     responses: {
       200: {

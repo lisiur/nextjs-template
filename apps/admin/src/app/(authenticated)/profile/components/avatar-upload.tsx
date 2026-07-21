@@ -64,15 +64,13 @@ export function AvatarUpload({
 
     setUploading(true);
     try {
-      const res = await withApiFeedback(appClient.api.upload.$post)({
-        form: { file, visibility: "public" },
+      const res = await withApiFeedback(
+        appClient.api.users["upload-avatar"].$post,
+      )({
+        form: { file },
       });
       const data = await res.json();
       const imageUrl = data.url;
-
-      await withApiFeedback(appClient.api.auth["update-user"].$post)({
-        json: { image: imageUrl },
-      });
 
       onImageUpdate(imageUrl);
       toast.success(t("avatarUpdated"));

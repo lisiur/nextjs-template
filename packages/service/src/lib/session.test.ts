@@ -39,7 +39,7 @@ function buildRow(overrides: Partial<Record<string, unknown>> = {}) {
       name: "Jane",
       email: "jane@example.com",
       emailVerified: true,
-      image: null,
+      avatar: null,
       banned: false,
       banReason: null,
       banExpires: null,

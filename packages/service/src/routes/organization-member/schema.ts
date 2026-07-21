@@ -30,7 +30,7 @@ export const memberSchema = z
       id: z.string(),
       name: z.string(),
       email: z.string(),
-      image: z.string().nullable(),
+      avatar: z.string().nullable(),
     }),
   })
   .openapi("Member");

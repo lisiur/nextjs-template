@@ -12,7 +12,8 @@ model User {
   name          String
   email         String
   emailVerified Boolean      @default(false)
-  image         String?
+  avatar        String?
+  avatarId      String?
   banned        Boolean?     @default(false)
   banReason     String?
   banExpires    DateTime?
@@ -23,10 +24,10 @@ model User {
   accounts      Account[]
   members       Member[]
   invitations   Invitation[]
-  uploads       Upload[]
   roleAssignments RoleAssignment[]
   notifications   Notification[]
   apiTokens       ApiToken[]
+  attachments     Attachment[] @relation("AttachmentCreator")
 
   @@unique([email])
   @@map("user")
@@ -150,6 +151,7 @@ model Organization {
   name        String
   slug        String
   logo        String?
+  logoId      String?
   createdAt   DateTime
   updatedAt   DateTime     @updatedAt
   members     Member[]
@@ -275,14 +277,30 @@ model Upload {
   path       String
   mimeType   String
   size       Int
-  visibility String   @default("private")
-  uploaderId String
-  uploader   User     @relation(fields: [uploaderId], references: [id], onDelete: Cascade)
+  hash       String   @unique
   createdAt  DateTime @default(now())
 
-  @@index([uploaderId])
+  attachments Attachment[]
+
   @@index([path])
   @@map("upload")
+}
+
+model Attachment {
+  id         String   @id @default(cuid())
+  bizType    String
+  bizId      String
+  uploadId   String
+  upload     Upload   @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  visibility String   @default("private")
+  createdBy  String
+  creator    User     @relation("AttachmentCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@index([bizType, bizId])
+  @@index([uploadId])
+  @@index([createdBy])
+  @@map("attachment")
 }
 
 enum LinkType {
@@ -297,7 +315,9 @@ model Application {
   code        String
   description String?
   logo        String?
+  logoId      String?
   favicon     String?
+  faviconId   String?
   copyright   String?
   icp         String?
   psif        String?

@@ -112,6 +112,11 @@ export type SystemConfig = Prisma.SystemConfigModel
  */
 export type Upload = Prisma.UploadModel
 /**
+ * Model Attachment
+ * 
+ */
+export type Attachment = Prisma.AttachmentModel
+/**
  * Model Application
  * 
  */

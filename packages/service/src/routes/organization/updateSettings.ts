@@ -13,7 +13,7 @@ import { assertAccess } from "#services/role-permission.service";
 import {
   organizationIdParamSchema,
   organizationSchema,
-  updateOrganizationBodySchema,
+  updateOrganizationSettingsBodySchema,
 } from "./schema";
 
 export const updateOrganizationSettings = defineOpenAPIRoute({
@@ -28,7 +28,7 @@ export const updateOrganizationSettings = defineOpenAPIRoute({
       params: organizationIdParamSchema,
       body: {
         content: {
-          "application/json": { schema: updateOrganizationBodySchema },
+          "application/json": { schema: updateOrganizationSettingsBodySchema },
         },
         required: true,
       },

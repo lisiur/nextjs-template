@@ -16,7 +16,7 @@ export default function ProfilePage() {
     id: string;
     name: string;
     email: string;
-    image?: string | null;
+    avatar?: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function ProfilePage() {
         id: session.data.user.id,
         name: session.data.user.name,
         email: session.data.user.email,
-        image: session.data.user.image,
+        avatar: session.data.user.avatar,
       });
     }
   }, [session.data]);
@@ -58,9 +58,9 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <AvatarUpload
-                currentImage={user.image}
+                currentImage={user.avatar}
                 name={user.name}
-                onImageUpdate={(url) => setUser({ ...user, image: url })}
+                onImageUpdate={(url) => setUser({ ...user, avatar: url })}
               />
             </CardContent>
           </Card>

@@ -7,22 +7,23 @@ import {
   okResponseFn,
   unauthorizedResponse,
 } from "#lib/openapi";
+import { deleteAttachments } from "#services/attachment.service";
 import { assertAccess } from "#services/role-permission.service";
-import { deleteUploads } from "#services/upload.service";
-import { deleteUploadsBodySchema } from "./schema";
+import { deleteAttachmentsBodySchema } from "./schema";
 
-export const deleteUploadsRoute = defineOpenAPIRoute({
+export const deleteAttachmentsRoute = defineOpenAPIRoute({
   route: createRoute({
     method: "delete",
     path: "/",
-    tags: ["Upload"],
-    summary: "Delete uploads",
-    description: "Batch delete uploaded files by IDs, removing files on disk.",
+    tags: ["Attachment"],
+    summary: "Delete attachments",
+    description:
+      "Batch delete attachments by IDs, removing files on disk when no other attachments reference them.",
     request: {
       body: {
         content: {
           "application/json": {
-            schema: deleteUploadsBodySchema,
+            schema: deleteAttachmentsBodySchema,
           },
         },
         required: true,
@@ -36,13 +37,13 @@ export const deleteUploadsRoute = defineOpenAPIRoute({
   }),
   handler: async (c) => {
     const principal = await requirePrincipal(c);
-    await assertAccess(principal, "upload::delete");
+    await assertAccess(principal, "attachment::delete");
     const { ids } = c.req.valid("json");
 
-    await deleteUploads(ids);
+    await deleteAttachments(ids);
 
     await logAudit({
-      event: "upload.deleted",
+      event: "attachment.deleted",
       category: "file_management",
       severity: "warning",
       metadata: { ids },

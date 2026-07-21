@@ -9,7 +9,7 @@ import {
 } from "#lib/org-role";
 
 const memberInclude = {
-  user: { select: { id: true, name: true, email: true, image: true } },
+  user: { select: { id: true, name: true, email: true, avatar: true } },
   department: { select: { id: true, name: true } },
 } satisfies Prisma.MemberInclude;
 
@@ -32,7 +32,7 @@ export async function listMembers(
     prisma.member.findMany({
       where,
       include: {
-        user: { select: { id: true, name: true, email: true, image: true } },
+        user: { select: { id: true, name: true, email: true, avatar: true } },
         department: { select: { id: true, name: true } },
         memberPositions: {
           include: {

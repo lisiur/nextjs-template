@@ -25,43 +25,49 @@ import { appClient } from "@/lib/api";
 import { withApiFeedback } from "@/lib/api/utils";
 import { formatDateTime } from "@/utils/date";
 import { formatBytes } from "@/utils/format";
-import { UploadDetailDialog } from "./upload-detail-dialog";
-import { UploadDownloadDialog } from "./upload-download-dialog";
-import { UploadFilter, type UploadFilters } from "./upload-filter";
-import { UploadReplaceDialog } from "./upload-replace-dialog";
+import { AttachmentDetailDialog } from "./attachment-detail-dialog";
+import { AttachmentDownloadDialog } from "./attachment-download-dialog";
+import { AttachmentFilter, type AttachmentFilters } from "./attachment-filter";
+import { AttachmentReplaceDialog } from "./attachment-replace-dialog";
 
-export type { UploadFilters };
+export type { AttachmentFilters };
 
-export interface UploadEntry {
+export interface AttachmentEntry {
   id: string;
-  path: string;
-  mimeType: string;
-  size: number;
+  bizType: string;
+  bizId: string;
   visibility: string;
-  uploaderId: string;
+  createdBy: string;
   createdAt: string;
-  uploader: { id: string; name: string; email: string };
+  upload: {
+    id: string;
+    path: string;
+    mimeType: string;
+    size: number;
+    hash: string;
+  };
 }
 
-export function UploadTable() {
-  const t = useTranslations("Uploads");
-  const [uploads, setUploads] = useState<UploadEntry[]>([]);
+export function AttachmentTable() {
+  const t = useTranslations("Attachments");
+  const [attachments, setAttachments] = useState<AttachmentEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<UploadFilters>({});
+  const [filters, setFilters] = useState<AttachmentFilters>({});
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [detailUpload, setDetailUpload] = useState<UploadEntry | null>(null);
-  const [replaceUpload, setReplaceUpload] = useState<UploadEntry | null>(null);
-  const [downloadUpload, setDownloadUpload] = useState<UploadEntry | null>(
-    null,
-  );
+  const [detailAttachment, setDetailAttachment] =
+    useState<AttachmentEntry | null>(null);
+  const [replaceAttachment, setReplaceAttachment] =
+    useState<AttachmentEntry | null>(null);
+  const [downloadAttachment, setDownloadAttachment] =
+    useState<AttachmentEntry | null>(null);
   const lastEffectFetchKeyRef = useRef<string>(undefined);
 
   const pageSize = 20;
   const effectFetchKey = JSON.stringify({ page, filters });
 
-  const fetchUploads = useCallback(async () => {
+  const fetchAttachments = useCallback(async () => {
     setLoading(true);
     try {
       const query: Record<string, string | number> = {
@@ -74,15 +80,15 @@ export function UploadTable() {
       if (filters.startDate) query.startDate = filters.startDate.toISOString();
       if (filters.endDate) query.endDate = filters.endDate.toISOString();
 
-      const res = await withApiFeedback(appClient.api.upload.$get)({
+      const res = await withApiFeedback(appClient.api.attachment.$get)({
         query,
       });
       const data = await res.json();
-      setUploads(data.uploads);
+      setAttachments(data.attachments);
       setTotal(data.total);
       setSelectedIds(new Set());
     } catch {
-      setUploads([]);
+      setAttachments([]);
       setTotal(0);
       setSelectedIds(new Set());
     } finally {
@@ -93,11 +99,13 @@ export function UploadTable() {
   useEffect(() => {
     if (lastEffectFetchKeyRef.current === effectFetchKey) return;
     lastEffectFetchKeyRef.current = effectFetchKey;
-    fetchUploads();
-  }, [effectFetchKey, fetchUploads]);
+    fetchAttachments();
+  }, [effectFetchKey, fetchAttachments]);
 
   function handleFiltersChange(
-    newFiltersOrFn: UploadFilters | ((prev: UploadFilters) => UploadFilters),
+    newFiltersOrFn:
+      | AttachmentFilters
+      | ((prev: AttachmentFilters) => AttachmentFilters),
   ) {
     setFilters(newFiltersOrFn);
     setPage(1);
@@ -106,37 +114,37 @@ export function UploadTable() {
   async function handleBatchDelete() {
     if (selectedIds.size === 0) return;
     try {
-      await withApiFeedback(appClient.api.upload.$delete)({
+      await withApiFeedback(appClient.api.attachment.$delete)({
         json: { ids: Array.from(selectedIds) },
       });
       toast.success(t("deleteSuccess"));
-      fetchUploads();
+      fetchAttachments();
     } catch {
       // Error handled by API feedback.
     }
   }
 
-  async function handleSingleDelete(upload: UploadEntry) {
+  async function handleSingleDelete(attachment: AttachmentEntry) {
     try {
-      await withApiFeedback(appClient.api.upload.$delete)({
-        json: { ids: [upload.id] },
+      await withApiFeedback(appClient.api.attachment.$delete)({
+        json: { ids: [attachment.id] },
       });
       toast.success(t("deleteSuccess"));
-      fetchUploads();
+      fetchAttachments();
     } catch {
       // Error handled by API feedback.
     }
   }
 
-  async function handleViewFile(upload: UploadEntry) {
-    if (upload.mimeType.startsWith("image/")) {
-      let url = `/api/upload/${upload.id}`;
-      if (upload.visibility === "private") {
+  async function handleViewFile(attachment: AttachmentEntry) {
+    if (attachment.upload.mimeType.startsWith("image/")) {
+      let url = `/api/attachment/${attachment.id}`;
+      if (attachment.visibility === "private") {
         try {
           const res = await withApiFeedback(
-            appClient.api.upload[":id"].sign.$post,
+            appClient.api.attachment[":id"].sign.$post,
           )({
-            param: { id: upload.id },
+            param: { id: attachment.id },
           });
           const data = await res.json();
           url = data.url;
@@ -146,14 +154,17 @@ export function UploadTable() {
       }
       window.open(`${window.location.origin}${url}`, "_blank");
     } else {
-      setDownloadUpload(upload);
+      setDownloadAttachment(attachment);
     }
   }
 
-  const allSelected = uploads.length > 0 && selectedIds.size === uploads.length;
+  const allSelected =
+    attachments.length > 0 && selectedIds.size === attachments.length;
 
   function toggleAll() {
-    setSelectedIds(allSelected ? new Set() : new Set(uploads.map((u) => u.id)));
+    setSelectedIds(
+      allSelected ? new Set() : new Set(attachments.map((a) => a.id)),
+    );
   }
 
   function toggleOne(id: string) {
@@ -168,7 +179,7 @@ export function UploadTable() {
   return (
     <div className="flex min-h-0 w-full flex-col">
       <div className="mb-4 flex shrink-0 flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <UploadFilter
+        <AttachmentFilter
           filters={filters}
           onFiltersChange={handleFiltersChange}
           labels={{
@@ -192,9 +203,9 @@ export function UploadTable() {
         <div className="flex min-h-0 flex-1 items-center justify-center py-8">
           <Spinner />
         </div>
-      ) : uploads.length === 0 ? (
+      ) : attachments.length === 0 ? (
         <div className="flex min-h-0 flex-1 items-center justify-center py-8 text-center text-muted-foreground">
-          {t("noUploads")}
+          {t("noAttachments")}
         </div>
       ) : (
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
@@ -213,7 +224,9 @@ export function UploadTable() {
                 <TableHead className="w-28">
                   {t("columns.visibility")}
                 </TableHead>
-                <TableHead className="w-56">{t("columns.uploader")}</TableHead>
+                <TableHead className="w-36">{t("columns.bizType")}</TableHead>
+                <TableHead className="w-36">{t("columns.bizId")}</TableHead>
+                <TableHead className="w-36">{t("columns.createdBy")}</TableHead>
                 <TableHead
                   sticky="right"
                   className="w-48 bg-background text-right"
@@ -223,38 +236,43 @@ export function UploadTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {uploads.map((upload) => (
+              {attachments.map((attachment) => (
                 <TableRow
-                  key={upload.id}
-                  data-selected={selectedIds.has(upload.id)}
+                  key={attachment.id}
+                  data-selected={selectedIds.has(attachment.id)}
                 >
                   <TableCell sticky="left">
                     <Checkbox
-                      checked={selectedIds.has(upload.id)}
-                      onCheckedChange={() => toggleOne(upload.id)}
+                      checked={selectedIds.has(attachment.id)}
+                      onCheckedChange={() => toggleOne(attachment.id)}
                     />
                   </TableCell>
                   <TableCell className="whitespace-nowrap text-sm">
-                    {formatDateTime(upload.createdAt)}
+                    {formatDateTime(attachment.createdAt)}
                   </TableCell>
                   <TableCell className="font-mono text-xs">
-                    {upload.mimeType}
+                    {attachment.upload.mimeType}
                   </TableCell>
-                  <TableCell>{formatBytes(upload.size)}</TableCell>
+                  <TableCell>{formatBytes(attachment.upload.size)}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
-                        upload.visibility === "public" ? "secondary" : "outline"
+                        attachment.visibility === "public"
+                          ? "secondary"
+                          : "outline"
                       }
                     >
-                      {upload.visibility}
+                      {attachment.visibility}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm">
-                    <div>{upload.uploader.name}</div>
-                    <div className="text-muted-foreground text-xs">
-                      {upload.uploader.email}
-                    </div>
+                  <TableCell className="font-mono text-xs">
+                    {attachment.bizType}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs truncate max-w-[100px]">
+                    {attachment.bizId}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs truncate max-w-[100px]">
+                    {attachment.createdBy}
                   </TableCell>
                   <TableCell
                     sticky="right"
@@ -268,7 +286,7 @@ export function UploadTable() {
                               variant="ghost"
                               size="icon-sm"
                               aria-label={t("viewFile")}
-                              onClick={() => handleViewFile(upload)}
+                              onClick={() => handleViewFile(attachment)}
                             >
                               <Eye />
                             </Button>
@@ -283,7 +301,7 @@ export function UploadTable() {
                               variant="ghost"
                               size="icon-sm"
                               aria-label={t("detail")}
-                              onClick={() => setDetailUpload(upload)}
+                              onClick={() => setDetailAttachment(attachment)}
                             >
                               <Info />
                             </Button>
@@ -298,7 +316,7 @@ export function UploadTable() {
                               variant="ghost"
                               size="icon-sm"
                               aria-label={t("replace")}
-                              onClick={() => setReplaceUpload(upload)}
+                              onClick={() => setReplaceAttachment(attachment)}
                             >
                               <Replace />
                             </Button>
@@ -313,7 +331,7 @@ export function UploadTable() {
                               variant="ghost"
                               size="icon-sm"
                               aria-label={t("delete")}
-                              onClick={() => handleSingleDelete(upload)}
+                              onClick={() => handleSingleDelete(attachment)}
                             >
                               <Trash2 />
                             </Button>
@@ -336,21 +354,21 @@ export function UploadTable() {
           />
         </div>
       )}
-      <UploadDetailDialog
-        open={!!detailUpload}
-        upload={detailUpload}
-        onOpenChange={(open) => !open && setDetailUpload(null)}
+      <AttachmentDetailDialog
+        open={!!detailAttachment}
+        attachment={detailAttachment}
+        onOpenChange={(open) => !open && setDetailAttachment(null)}
       />
-      <UploadReplaceDialog
-        open={!!replaceUpload}
-        upload={replaceUpload}
-        onOpenChange={(open) => !open && setReplaceUpload(null)}
-        onReplaced={fetchUploads}
+      <AttachmentReplaceDialog
+        open={!!replaceAttachment}
+        attachment={replaceAttachment}
+        onOpenChange={(open) => !open && setReplaceAttachment(null)}
+        onReplaced={fetchAttachments}
       />
-      <UploadDownloadDialog
-        open={!!downloadUpload}
-        upload={downloadUpload}
-        onOpenChange={(open) => !open && setDownloadUpload(null)}
+      <AttachmentDownloadDialog
+        open={!!downloadAttachment}
+        attachment={downloadAttachment}
+        onOpenChange={(open) => !open && setDownloadAttachment(null)}
       />
     </div>
   );
