@@ -69,9 +69,7 @@ export function ApplicationFaviconForm({
       await withApiFeedback(appClient.api.applications[":id"].favicon.$post)({
         param: { id: appId },
         form: { file },
-      } as Parameters<
-        (typeof appClient.api.applications)[":id"]["favicon"]["$post"]
-      >[0]);
+      });
 
       setCropOpen(false);
       toast.success(t("updateSuccess"));

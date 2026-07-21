@@ -69,9 +69,7 @@ export function ApplicationLogoForm({
       await withApiFeedback(appClient.api.applications[":id"].logo.$post)({
         param: { id: appId },
         form: { file },
-      } as Parameters<
-        (typeof appClient.api.applications)[":id"]["logo"]["$post"]
-      >[0]);
+      });
 
       setCropOpen(false);
       toast.success(t("updateSuccess"));
