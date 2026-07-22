@@ -74,6 +74,28 @@ describe("EventBus", () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
+  it("subscriber with wildcard app segment receives from any app bucket", () => {
+    const bus = new EventBus();
+    const fn = vi.fn();
+    bus.subscribe({ targets: ["sse:*:u1:*"], onEvent: fn });
+    bus.publish(mkEvent("sse:admin:u1:t1"));
+    bus.publish(mkEvent("sse:organization:u1:t1"));
+    bus.publish(mkEvent("sse:admin:u2:t1"));
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  it("targeted publish only scans the matching bucket", () => {
+    const bus = new EventBus();
+    const admin = vi.fn();
+    const org = vi.fn();
+    bus.subscribe({ targets: ["sse:admin:u1:t1"], onEvent: admin });
+    bus.subscribe({ targets: ["sse:organization:u2:t2"], onEvent: org });
+
+    bus.publish(mkEvent("sse:admin:*:*"));
+    expect(admin).toHaveBeenCalledTimes(1);
+    expect(org).not.toHaveBeenCalled();
+  });
+
   it("unsubscribe stops further delivery", () => {
     const bus = new EventBus();
     const fn = vi.fn();

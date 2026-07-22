@@ -30,11 +30,12 @@
       no cap on concurrent SSE connections per user. On write failure,
       call `unsubscribe()` + `stream.abort()`; track connections per
       `userId`.
-- [ ] **`eventBus.publish` is O(subscribers × targets)** — every publish
-      iterates the entire subscriber Set and runs `matches` (which splits
-      strings) per comparison (`lib/event-bus.ts:29-35`); a broadcast to
-      `sse:admin:*:*` walks every idle SSE connection. Index subscribers by
-      the first non-wildcard segment or add a dedicated `broadcast()` path.
+- [x] **`eventBus.publish` is O(subscribers × targets)** — FIXED: subscribers
+      are now indexed by segment[1] (appCode) in a `Map<string, Set<...>>`;
+      a targeted publish like `sse:admin:*:*` only scans the `admin` bucket
+      instead of every subscriber. Subscriber targets are also pre-split at
+      subscribe time, eliminating per-comparison `split(":")`.
+      (`lib/event-bus.ts`)
 
 ### System Config / Operation Logger
 
