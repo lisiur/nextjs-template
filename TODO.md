@@ -155,19 +155,6 @@
 
 ### Schema & DB
 
-- [x] **`Notification.creatorId` has no FK/index; `status` is a free-text
-      string** — `creatorId String?` with no relation (`schema.prisma:556`),
-      and `status String @default("pending")` with no enum (`:562`) — typos
-      like `"pendnig"` are silently accepted. Add a `creator User?`
-      relation + `@@index([creatorId])` and a `NotificationStatus` enum.
-- [x] **`Member.departmentId` and `Invitation.inviterId` FKs have no
-      index** — `schema.prisma:221,241`. List/filter queries on those
-      columns table-scan. Add `@@index`.
-- [x] **`db.ts` configures no pool sizing, statement_timeout, or logging**
-      — `new PrismaClient({ adapter })` and `new PrismaPg({ connectionString })`
-      pass no options (`lib/db.ts:6-11`); a runaway list query holds
-      connections indefinitely. Pass `pool`/`statement_timeout` and
-      `log: ['warn','error']`.
 - [ ] **Only a single baseline migration; schema drift relies on
       `db:push`** — `prisma/migrations/` contains only
       `00000000000000_init/`. Later additions (Notification, ApiToken,
