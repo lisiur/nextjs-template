@@ -1,6 +1,5 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
-import { bodyLimit } from "hono/body-limit";
 import { contextStorage } from "hono/context-storage";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
@@ -14,6 +13,7 @@ import {
   RATE_LIMIT_GLOBAL_DEFAULT_WINDOW_MS,
 } from "#lib/constants";
 import { prisma } from "#lib/db";
+import { bodyLimit } from "#middleware/body-limit";
 import { operationLogger } from "#middleware/operation-logger";
 import { createRateLimiter } from "#middleware/rate-limit";
 import { traceContext } from "#middleware/trace-context";
