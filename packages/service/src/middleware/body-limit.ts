@@ -1,3 +1,4 @@
+import type { Context } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 
@@ -5,7 +6,7 @@ const ERROR_MESSAGE = "Payload Too Large";
 
 type BodyLimitOptions = {
   maxSize: number;
-  onError?: (c: any) => Response | Promise<Response>;
+  onError?: (c: Context) => Response | Promise<Response>;
 };
 
 export function bodyLimit(options: BodyLimitOptions) {
