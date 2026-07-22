@@ -13,6 +13,7 @@ import {
   FieldGroup,
   FieldLabel,
   Input,
+  InputPassword,
 } from "@repo/ui";
 import { startAuthentication } from "@simplewebauthn/browser";
 import type { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types";
@@ -134,9 +135,8 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 
         <Field>
           <FieldLabel htmlFor="password">{tc("password")}</FieldLabel>
-          <Input
+          <InputPassword
             id="password"
-            type="password"
             placeholder="••••••••"
             {...register("password")}
           />

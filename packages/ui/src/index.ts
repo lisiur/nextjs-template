@@ -13,6 +13,7 @@ export * from "./components/field";
 export * from "./components/icon-picker";
 export * from "./components/image-cropper";
 export * from "./components/input";
+export * from "./components/input-password";
 export * from "./components/input-group";
 export * from "./components/label";
 export * from "./components/pagination";
