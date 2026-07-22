@@ -234,6 +234,7 @@ model Member {
   @@unique([organizationId, userId])
   @@index([organizationId])
   @@index([userId])
+  @@index([departmentId])
   @@map("member")
 }
 
@@ -251,6 +252,7 @@ model Invitation {
 
   @@index([organizationId])
   @@index([email])
+  @@index([inviterId])
   @@map("invitation")
 }
 

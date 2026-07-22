@@ -160,7 +160,7 @@
       and `status String @default("pending")` with no enum (`:562`) — typos
       like `"pendnig"` are silently accepted. Add a `creator User?`
       relation + `@@index([creatorId])` and a `NotificationStatus` enum.
-- [ ] **`Member.departmentId` and `Invitation.inviterId` FKs have no
+- [x] **`Member.departmentId` and `Invitation.inviterId` FKs have no
       index** — `schema.prisma:221,241`. List/filter queries on those
       columns table-scan. Add `@@index`.
 - [ ] **`db.ts` configures no pool sizing, statement_timeout, or logging**
