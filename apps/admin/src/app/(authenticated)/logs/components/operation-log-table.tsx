@@ -50,6 +50,7 @@ interface OperationLogEntry {
   errorMessage?: string | null;
   stack?: string | null;
   metadata?: unknown;
+  ip?: string | null;
   createdAt: string;
 }
 
@@ -213,7 +214,7 @@ export function OperationLogTable({
       ) : (
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <Table
-            className="w-[1698px] min-w-[1698px]"
+            className="w-[1826px] min-w-[1826px]"
             containerClassName="min-h-0 min-w-0 flex-1 overflow-auto rounded-md border"
           >
             <TableHeader sticky>
@@ -226,6 +227,7 @@ export function OperationLogTable({
                 <TableHead className="w-40">{t("columns.event")}</TableHead>
                 <TableHead className="w-36">{t("columns.module")}</TableHead>
                 <TableHead className="w-96">{t("columns.request")}</TableHead>
+                <TableHead className="w-32">{t("columns.ip")}</TableHead>
                 <TableHead>{t("columns.statusCode")}</TableHead>
                 <TableHead>{t("columns.durationMs")}</TableHead>
                 <TableHead className="w-44">{t("columns.traceId")}</TableHead>
@@ -259,6 +261,9 @@ export function OperationLogTable({
                   <TableCell>{log.module || "-"}</TableCell>
                   <TableCell className="font-mono text-xs">
                     {[log.method, log.path].filter(Boolean).join(" ") || "-"}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {log.ip || "-"}
                   </TableCell>
                   <TableCell>{log.statusCode ?? "-"}</TableCell>
                   <TableCell>{log.durationMs ?? "-"}</TableCell>

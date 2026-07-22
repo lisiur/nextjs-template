@@ -74,6 +74,7 @@ export async function logOperation(params: LogOperationParams) {
         errorMessage: error.message,
         stack: error.stack,
         metadata: toJsonValue(params.metadata),
+        ip: c ? getClientIpFromContextOrNull(c) : null,
       },
     });
   } catch (e) {

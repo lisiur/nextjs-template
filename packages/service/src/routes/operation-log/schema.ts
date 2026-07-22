@@ -21,6 +21,7 @@ export const operationLogSchema = z
     errorMessage: z.string().nullable().optional(),
     stack: z.string().nullable().optional(),
     metadata: z.unknown().nullable().optional(),
+    ip: z.string().nullable().optional(),
     createdAt: z.date(),
   })
   .openapi("OperationLog");

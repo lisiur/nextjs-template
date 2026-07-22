@@ -355,6 +355,7 @@ CREATE TABLE "operation_log" (
     "errorMessage" TEXT,
     "stack" TEXT,
     "metadata" JSONB,
+    "ip" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "operation_log_pkey" PRIMARY KEY ("id")
@@ -559,6 +560,9 @@ CREATE INDEX "member_organizationId_idx" ON "member"("organizationId");
 CREATE INDEX "member_userId_idx" ON "member"("userId");
 
 -- CreateIndex
+CREATE INDEX "member_departmentId_idx" ON "member"("departmentId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "member_organizationId_userId_key" ON "member"("organizationId", "userId");
 
 -- CreateIndex
@@ -566,6 +570,9 @@ CREATE INDEX "invitation_organizationId_idx" ON "invitation"("organizationId");
 
 -- CreateIndex
 CREATE INDEX "invitation_email_idx" ON "invitation"("email");
+
+-- CreateIndex
+CREATE INDEX "invitation_inviterId_idx" ON "invitation"("inviterId");
 
 -- CreateIndex
 CREATE INDEX "system_config_group_idx" ON "system_config"("group");

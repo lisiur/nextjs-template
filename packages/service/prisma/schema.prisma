@@ -462,6 +462,7 @@ model OperationLog {
   errorMessage String?
   stack        String?
   metadata     Json?
+  ip           String?
   createdAt    DateTime @default(now())
 
   @@index([traceId])
