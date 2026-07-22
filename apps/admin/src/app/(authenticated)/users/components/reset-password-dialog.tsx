@@ -15,7 +15,7 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  Input,
+  InputPassword,
 } from "@repo/ui";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -106,9 +106,8 @@ export function ResetPasswordDialog({
                 <FieldLabel htmlFor="newPassword">
                   {t("newPassword")}
                 </FieldLabel>
-                <Input
+                <InputPassword
                   id="newPassword"
-                  type="password"
                   aria-invalid={!!errors.newPassword}
                   {...register("newPassword")}
                 />
@@ -120,9 +119,8 @@ export function ResetPasswordDialog({
                 <FieldLabel htmlFor="confirmPassword">
                   {t("confirmPassword")}
                 </FieldLabel>
-                <Input
+                <InputPassword
                   id="confirmPassword"
-                  type="password"
                   aria-invalid={!!errors.confirmPassword}
                   {...register("confirmPassword")}
                 />

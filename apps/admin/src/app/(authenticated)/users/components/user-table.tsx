@@ -15,7 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@repo/ui";
-import { KeyRound, Pencil, Plus, Shield, Trash2 } from "lucide-react";
+import { Pencil, Plus, RotateCcwKey, Shield, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -218,7 +218,7 @@ export function UserTable() {
                             aria-label={t("resetPassword")}
                             onClick={() => setResetUser(user)}
                           >
-                            <KeyRound />
+                            <RotateCcwKey />
                           </Button>
                         }
                       />
