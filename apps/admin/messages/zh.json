@@ -772,7 +772,11 @@
       "allLevels": "全部级别",
       "allSeverities": "全部严重性",
       "allOutcomes": "全部结果",
-      "allAuthTypes": "全部认证方式"
+      "allAuthTypes": "全部认证方式",
+      "allSources": "全部来源",
+      "isSsr": "来源",
+      "ssr": "SSR",
+      "browser": "浏览器"
     }
   },
   "Monitor": {

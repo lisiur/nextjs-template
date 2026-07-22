@@ -3,6 +3,7 @@ import { getClientIpFromContext } from "#lib/get-client-ip";
 import { rateLimitRegistry } from "#lib/rate-limit-registry";
 import { RateLimitStore } from "#lib/rate-limit-store";
 import { getSessionFromHeaders } from "#lib/session";
+import { isSsrRequest } from "#lib/ssr";
 import { eventBus } from "#states/event-bus";
 
 export type RateLimiterOptions = {
@@ -23,6 +24,10 @@ export function createRateLimiter(options: RateLimiterOptions) {
   return createMiddleware(async (c, next) => {
     const entry = rateLimitRegistry.getLimiter(name);
     if (!entry?.enabled) {
+      return next();
+    }
+
+    if (isSsrRequest(c)) {
       return next();
     }
 

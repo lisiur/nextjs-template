@@ -5,10 +5,8 @@ import { hc } from "hono/client";
 export function createAppClient<AppType extends Hono<any, any, any>>(
   appCode: string,
 ) {
-  const API_ORIGIN =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : process.env.API_ORIGIN;
+  const isServer = typeof window === "undefined";
+  const API_ORIGIN = isServer ? process.env.API_ORIGIN : window.location.origin;
 
   if (!API_ORIGIN) {
     throw new Error(
@@ -17,9 +15,12 @@ export function createAppClient<AppType extends Hono<any, any, any>>(
     );
   }
 
-  const appClient = hc<AppType>(API_ORIGIN, {
-    headers: { "X-App-Code": appCode },
-  });
+  const headers: Record<string, string> = { "X-App-Code": appCode };
+  if (isServer && process.env.INTERNAL_API_TOKEN) {
+    headers["X-Internal-Token"] = process.env.INTERNAL_API_TOKEN;
+  }
+
+  const appClient = hc<AppType>(API_ORIGIN, { headers });
 
   return { appClient, APP_CODE: appCode, API_ORIGIN };
 }

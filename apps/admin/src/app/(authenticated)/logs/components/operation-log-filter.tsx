@@ -33,6 +33,7 @@ export interface OperationLogFilters {
   event?: string;
   path?: string;
   statusCode?: string;
+  isSsr?: string;
   startDate?: Date;
   endDate?: Date;
 }
@@ -52,6 +53,10 @@ interface OperationLogFilterProps {
     event: string;
     path: string;
     statusCode: string;
+    isSsr: string;
+    allSources: string;
+    ssr: string;
+    browser: string;
     allLevels: string;
     allAuthTypes: string;
     clear: string;
@@ -150,6 +155,25 @@ function OperationLogFilterFields({
         value={filters.statusCode ?? ""}
         onChange={(event) => setFilter("statusCode", event.target.value)}
       />
+      <Select
+        value={filters.isSsr ?? "all"}
+        onValueChange={(value) =>
+          setFilter("isSsr", !value || value === "all" ? "" : value)
+        }
+      >
+        <SelectTrigger className="h-9 w-full md:w-32">
+          {filters.isSsr === "true"
+            ? labels.ssr
+            : filters.isSsr === "false"
+              ? labels.browser
+              : labels.allSources}
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{labels.allSources}</SelectItem>
+          <SelectItem value="true">{labels.ssr}</SelectItem>
+          <SelectItem value="false">{labels.browser}</SelectItem>
+        </SelectContent>
+      </Select>
       <DateRangePicker
         key={resetKey}
         startDate={filters.startDate ?? null}

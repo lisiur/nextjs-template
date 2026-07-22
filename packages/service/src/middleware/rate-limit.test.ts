@@ -197,6 +197,31 @@ describe("createRateLimiter middleware", () => {
     }
   });
 
+  it("skips limiting for SSR requests carrying the internal token", async () => {
+    vi.stubEnv("INTERNAL_API_TOKEN", "test-secret");
+    const app = createApp({ max: 1 });
+
+    for (let i = 0; i < 5; i++) {
+      const res = await app.request("/ping", {
+        headers: { "x-internal-token": "test-secret" },
+      });
+      expect(res.status).toBe(200);
+      expect(res.headers.get("x-ratelimit-limit")).toBeNull();
+    }
+
+    const wrongAllowed = await app.request("/ping", {
+      headers: { "x-internal-token": "wrong" },
+    });
+    expect(wrongAllowed.status).toBe(200);
+
+    const wrongBlocked = await app.request("/ping", {
+      headers: { "x-internal-token": "wrong" },
+    });
+    expect(wrongBlocked.status).toBe(429);
+
+    vi.unstubAllEnvs();
+  });
+
   it("resets after the window elapses", async () => {
     vi.useFakeTimers({ now: new Date(0) });
     const app = createApp({ max: 1, windowMs: 1000 });

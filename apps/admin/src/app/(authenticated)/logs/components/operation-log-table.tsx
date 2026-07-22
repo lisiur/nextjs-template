@@ -51,6 +51,7 @@ interface OperationLogEntry {
   stack?: string | null;
   metadata?: unknown;
   ip?: string | null;
+  isSsr?: boolean;
   createdAt: string;
 }
 
@@ -104,6 +105,7 @@ export function OperationLogTable({
       if (filters.event) query.event = filters.event;
       if (filters.path) query.path = filters.path;
       if (filters.statusCode) query.statusCode = Number(filters.statusCode);
+      if (filters.isSsr) query.isSsr = filters.isSsr;
       if (filters.startDate) query.startDate = filters.startDate.toISOString();
       if (filters.endDate) query.endDate = filters.endDate.toISOString();
 
@@ -188,6 +190,10 @@ export function OperationLogTable({
             event: t("filters.event"),
             path: t("filters.path"),
             statusCode: t("filters.statusCode"),
+            isSsr: t("filters.isSsr"),
+            allSources: t("filters.allSources"),
+            ssr: t("filters.ssr"),
+            browser: t("filters.browser"),
             allLevels: t("filters.allLevels"),
             allAuthTypes: t("filters.allAuthTypes"),
             clear: t("clearFilters"),
@@ -214,7 +220,7 @@ export function OperationLogTable({
       ) : (
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <Table
-            className="w-[1826px] min-w-[1826px]"
+            className="w-[1970px] min-w-[1970px]"
             containerClassName="min-h-0 min-w-0 flex-1 overflow-auto rounded-md border"
           >
             <TableHeader sticky>
@@ -229,6 +235,7 @@ export function OperationLogTable({
                 <TableHead className="w-96">{t("columns.request")}</TableHead>
                 <TableHead className="w-32">{t("columns.ip")}</TableHead>
                 <TableHead>{t("columns.statusCode")}</TableHead>
+                <TableHead className="w-24">{t("columns.source")}</TableHead>
                 <TableHead>{t("columns.durationMs")}</TableHead>
                 <TableHead className="w-44">{t("columns.traceId")}</TableHead>
                 <TableHead className="w-56">{t("columns.auth")}</TableHead>
@@ -266,6 +273,11 @@ export function OperationLogTable({
                     {log.ip || "-"}
                   </TableCell>
                   <TableCell>{log.statusCode ?? "-"}</TableCell>
+                  <TableCell>
+                    <Badge variant={log.isSsr ? "default" : "outline"}>
+                      {log.isSsr ? t("filters.ssr") : t("filters.browser")}
+                    </Badge>
+                  </TableCell>
                   <TableCell>{log.durationMs ?? "-"}</TableCell>
                   <TableCell className="font-mono text-xs">
                     {log.traceId}

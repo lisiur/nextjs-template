@@ -54,6 +54,7 @@ export type OperationLogMinAggregateOutputType = {
   errorMessage: string | null
   stack: string | null
   ip: string | null
+  isSsr: boolean | null
   createdAt: Date | null
 }
 
@@ -75,6 +76,7 @@ export type OperationLogMaxAggregateOutputType = {
   errorMessage: string | null
   stack: string | null
   ip: string | null
+  isSsr: boolean | null
   createdAt: Date | null
 }
 
@@ -97,6 +99,7 @@ export type OperationLogCountAggregateOutputType = {
   stack: number
   metadata: number
   ip: number
+  isSsr: number
   createdAt: number
   _all: number
 }
@@ -130,6 +133,7 @@ export type OperationLogMinAggregateInputType = {
   errorMessage?: true
   stack?: true
   ip?: true
+  isSsr?: true
   createdAt?: true
 }
 
@@ -151,6 +155,7 @@ export type OperationLogMaxAggregateInputType = {
   errorMessage?: true
   stack?: true
   ip?: true
+  isSsr?: true
   createdAt?: true
 }
 
@@ -173,6 +178,7 @@ export type OperationLogCountAggregateInputType = {
   stack?: true
   metadata?: true
   ip?: true
+  isSsr?: true
   createdAt?: true
   _all?: true
 }
@@ -282,6 +288,7 @@ export type OperationLogGroupByOutputType = {
   stack: string | null
   metadata: runtime.JsonValue | null
   ip: string | null
+  isSsr: boolean
   createdAt: Date
   _count: OperationLogCountAggregateOutputType | null
   _avg: OperationLogAvgAggregateOutputType | null
@@ -327,6 +334,7 @@ export type OperationLogWhereInput = {
   stack?: Prisma.StringNullableFilter<"OperationLog"> | string | null
   metadata?: Prisma.JsonNullableFilter<"OperationLog">
   ip?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  isSsr?: Prisma.BoolFilter<"OperationLog"> | boolean
   createdAt?: Prisma.DateTimeFilter<"OperationLog"> | Date | string
 }
 
@@ -349,6 +357,7 @@ export type OperationLogOrderByWithRelationInput = {
   stack?: Prisma.SortOrderInput | Prisma.SortOrder
   metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   ip?: Prisma.SortOrderInput | Prisma.SortOrder
+  isSsr?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -374,6 +383,7 @@ export type OperationLogWhereUniqueInput = Prisma.AtLeast<{
   stack?: Prisma.StringNullableFilter<"OperationLog"> | string | null
   metadata?: Prisma.JsonNullableFilter<"OperationLog">
   ip?: Prisma.StringNullableFilter<"OperationLog"> | string | null
+  isSsr?: Prisma.BoolFilter<"OperationLog"> | boolean
   createdAt?: Prisma.DateTimeFilter<"OperationLog"> | Date | string
 }, "id">
 
@@ -396,6 +406,7 @@ export type OperationLogOrderByWithAggregationInput = {
   stack?: Prisma.SortOrderInput | Prisma.SortOrder
   metadata?: Prisma.SortOrderInput | Prisma.SortOrder
   ip?: Prisma.SortOrderInput | Prisma.SortOrder
+  isSsr?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.OperationLogCountOrderByAggregateInput
   _avg?: Prisma.OperationLogAvgOrderByAggregateInput
@@ -426,6 +437,7 @@ export type OperationLogScalarWhereWithAggregatesInput = {
   stack?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
   metadata?: Prisma.JsonNullableWithAggregatesFilter<"OperationLog">
   ip?: Prisma.StringNullableWithAggregatesFilter<"OperationLog"> | string | null
+  isSsr?: Prisma.BoolWithAggregatesFilter<"OperationLog"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"OperationLog"> | Date | string
 }
 
@@ -448,6 +460,7 @@ export type OperationLogCreateInput = {
   stack?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ip?: string | null
+  isSsr?: boolean
   createdAt?: Date | string
 }
 
@@ -470,6 +483,7 @@ export type OperationLogUncheckedCreateInput = {
   stack?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ip?: string | null
+  isSsr?: boolean
   createdAt?: Date | string
 }
 
@@ -492,6 +506,7 @@ export type OperationLogUpdateInput = {
   stack?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSsr?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -514,6 +529,7 @@ export type OperationLogUncheckedUpdateInput = {
   stack?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSsr?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -536,6 +552,7 @@ export type OperationLogCreateManyInput = {
   stack?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ip?: string | null
+  isSsr?: boolean
   createdAt?: Date | string
 }
 
@@ -558,6 +575,7 @@ export type OperationLogUpdateManyMutationInput = {
   stack?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSsr?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -580,6 +598,7 @@ export type OperationLogUncheckedUpdateManyInput = {
   stack?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   ip?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSsr?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -602,6 +621,7 @@ export type OperationLogCountOrderByAggregateInput = {
   stack?: Prisma.SortOrder
   metadata?: Prisma.SortOrder
   ip?: Prisma.SortOrder
+  isSsr?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -628,6 +648,7 @@ export type OperationLogMaxOrderByAggregateInput = {
   errorMessage?: Prisma.SortOrder
   stack?: Prisma.SortOrder
   ip?: Prisma.SortOrder
+  isSsr?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -649,6 +670,7 @@ export type OperationLogMinOrderByAggregateInput = {
   errorMessage?: Prisma.SortOrder
   stack?: Prisma.SortOrder
   ip?: Prisma.SortOrder
+  isSsr?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -686,6 +708,7 @@ export type OperationLogSelect<ExtArgs extends runtime.Types.Extensions.Internal
   stack?: boolean
   metadata?: boolean
   ip?: boolean
+  isSsr?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["operationLog"]>
 
@@ -708,6 +731,7 @@ export type OperationLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   stack?: boolean
   metadata?: boolean
   ip?: boolean
+  isSsr?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["operationLog"]>
 
@@ -730,6 +754,7 @@ export type OperationLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   stack?: boolean
   metadata?: boolean
   ip?: boolean
+  isSsr?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["operationLog"]>
 
@@ -752,10 +777,11 @@ export type OperationLogSelectScalar = {
   stack?: boolean
   metadata?: boolean
   ip?: boolean
+  isSsr?: boolean
   createdAt?: boolean
 }
 
-export type OperationLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "traceId" | "authType" | "authTokenId" | "level" | "source" | "module" | "event" | "message" | "method" | "path" | "statusCode" | "durationMs" | "errorName" | "errorMessage" | "stack" | "metadata" | "ip" | "createdAt", ExtArgs["result"]["operationLog"]>
+export type OperationLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "traceId" | "authType" | "authTokenId" | "level" | "source" | "module" | "event" | "message" | "method" | "path" | "statusCode" | "durationMs" | "errorName" | "errorMessage" | "stack" | "metadata" | "ip" | "isSsr" | "createdAt", ExtArgs["result"]["operationLog"]>
 
 export type $OperationLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "OperationLog"
@@ -779,6 +805,7 @@ export type $OperationLogPayload<ExtArgs extends runtime.Types.Extensions.Intern
     stack: string | null
     metadata: runtime.JsonValue | null
     ip: string | null
+    isSsr: boolean
     createdAt: Date
   }, ExtArgs["result"]["operationLog"]>
   composites: {}
@@ -1221,6 +1248,7 @@ export interface OperationLogFieldRefs {
   readonly stack: Prisma.FieldRef<"OperationLog", 'String'>
   readonly metadata: Prisma.FieldRef<"OperationLog", 'Json'>
   readonly ip: Prisma.FieldRef<"OperationLog", 'String'>
+  readonly isSsr: Prisma.FieldRef<"OperationLog", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"OperationLog", 'DateTime'>
 }
     

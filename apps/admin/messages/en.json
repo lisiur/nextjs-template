@@ -772,7 +772,11 @@
       "allLevels": "All Levels",
       "allSeverities": "All Severities",
       "allOutcomes": "All Outcomes",
-      "allAuthTypes": "All Auth Types"
+      "allAuthTypes": "All Auth Types",
+      "allSources": "All Sources",
+      "isSsr": "Source",
+      "ssr": "SSR",
+      "browser": "Browser"
     }
   },
   "Monitor": {
