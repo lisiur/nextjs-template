@@ -181,7 +181,9 @@ export async function getFileAccess(params: {
     }
   }
 
-  await assertHotlinkAllowed(headers);
+  if (attachment.visibility === "public") {
+    await assertHotlinkAllowed(headers);
+  }
 
   const filePath = join(UPLOADS_ROOT, attachment.upload.path);
 

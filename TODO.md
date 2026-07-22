@@ -109,13 +109,12 @@
       minimal (webp checks only RIFF + "WEBP", PDF only `%PDF`, GIF only
       `GIF8`) (`lib/mime.ts:22-46`); a polyglot (JPEG with trailing HTML)
       passes. Use a real format-aware library (e.g. `file-type`).
-- [ ] **Hotlink guard applied even to valid signed-URL requests** —
-      `assertHotlinkAllowed` runs after the private-file signature check
-      (`services/attachment.service.ts:184`, helper at `:245-269`, config
-      at `:232-243`), so a correctly-signed URL in an `<img>` on a
-      non-allowlisted origin is rejected — defeating much of the purpose
-      of signed URLs. Only enforce hotlink protection on
-      `visibility === "public"`.
+- [x] **Hotlink guard applied even to valid signed-URL requests** — FIXED:
+      `assertHotlinkAllowed` is now only called when
+      `visibility === "public"` (`services/attachment.service.ts:184`);
+      private files are gated solely by their HMAC signature/expiry check,
+      so a correctly-signed URL works regardless of the embedding origin.
+      Public files are still subject to hotlink protection.
 - [ ] **Dead auth check in `signFile`** — `if (!getPrincipalUserId(principal))
       throw 401` (`routes/attachment/signAttachment.ts:32-34`) is unreachable
       because `getPrincipalUserId` always returns a non-empty string. Remove
