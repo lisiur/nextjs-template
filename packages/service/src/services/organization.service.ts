@@ -40,12 +40,17 @@ export async function createOrganization(
     });
 
     if (logoFile) {
+      if (!uploaderId) {
+        throw new HTTPException(400, {
+          message: "uploaderId is required when logoFile is provided",
+        });
+      }
       await deleteAttachmentsByBiz("organization:logo", org.id, tx);
 
       const result = await createAttachmentSvc({
         file: logoFile,
         visibility: "public",
-        uploaderId: uploaderId!,
+        uploaderId,
         bizType: "organization:logo",
         bizId: org.id,
         tx,
@@ -198,12 +203,17 @@ export async function updateOrganization(
     });
 
     if (logoFile) {
+      if (!uploaderId) {
+        throw new HTTPException(400, {
+          message: "uploaderId is required when logoFile is provided",
+        });
+      }
       await deleteAttachmentsByBiz("organization:logo", org.id, tx);
 
       const result = await createAttachmentSvc({
         file: logoFile,
         visibility: "public",
-        uploaderId: uploaderId!,
+        uploaderId,
         bizType: "organization:logo",
         bizId: org.id,
         tx,
