@@ -163,7 +163,7 @@
 - [x] **`Member.departmentId` and `Invitation.inviterId` FKs have no
       index** — `schema.prisma:221,241`. List/filter queries on those
       columns table-scan. Add `@@index`.
-- [ ] **`db.ts` configures no pool sizing, statement_timeout, or logging**
+- [x] **`db.ts` configures no pool sizing, statement_timeout, or logging**
       — `new PrismaClient({ adapter })` and `new PrismaPg({ connectionString })`
       pass no options (`lib/db.ts:6-11`); a runaway list query holds
       connections indefinitely. Pass `pool`/`statement_timeout` and
