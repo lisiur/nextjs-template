@@ -14,6 +14,7 @@
     "#services/*": "./src/services/*.ts",
     "#states": "./src/states/index.ts",
     "#states/*": "./src/states/*.ts",
+    "#types/*": "./src/types/*.ts",
     "#utils/*": "./src/utils/*.ts"
   },
   "scripts": {
@@ -33,6 +34,8 @@
     "@prisma/client": "^7.8.0",
     "@repo/shared": "workspace:*",
     "@scalar/hono-api-reference": "^0.10.14",
+    "@simplewebauthn/server": "^12.0.0",
+    "@simplewebauthn/types": "^12.0.0",
     "argon2": "^0.44.0",
     "hono": "^4.0.0",
     "html-to-text": "^10.0.0",

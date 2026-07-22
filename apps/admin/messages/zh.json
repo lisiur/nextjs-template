@@ -31,7 +31,12 @@
     "goToLogin": "前往登录",
     "unauthorizedTitle": "该角色未授权菜单",
     "unauthorizedDescription": "当前角色没有可用的菜单权限，请联系管理员。",
-    "backToLogin": "返回登录"
+    "backToLogin": "返回登录",
+    "emailRequired": "请输入邮箱",
+    "or": "或",
+    "signInWithPasskey": "通行密钥登录",
+    "biometricLoginFailed": "生物识别登录失败",
+    "biometricCancelled": "生物识别认证已取消"
   },
   "FormDemo": {
     "title": "表单演示",
@@ -170,6 +175,7 @@
     "description": "管理应用配置",
     "tabs": {
       "auth": "认证",
+      "webauthn": "WebAuthn",
       "upload": "上传",
       "rate-limit": "限流"
     },
@@ -491,7 +497,25 @@
       "newPasswordMin": "新密码须为 10–256 个字符,且需同时包含字母和数字",
       "confirmPasswordRequired": "请确认新密码",
       "passwordsMismatch": "两次输入的密码不一致"
-    }
+    },
+    "biometricLogin": "生物识别登录",
+    "devicesEnrolled": "已注册 {count} 台设备",
+    "platformAuthenticator": "平台认证器",
+    "securityKey": "安全密钥",
+    "removing": "移除中...",
+    "remove": "移除",
+    "biometricNotSetup": "尚未设置生物识别登录。",
+    "deviceName": "设备名称",
+    "deviceNamePlaceholder": "例如：MacBook 指纹（可选）",
+    "registerDeviceTitle": "注册设备",
+    "registerDeviceDescription": "为此设备命名，然后进行身份验证以完成注册。",
+    "register": "注册",
+    "registeringDevice": "正在注册设备...",
+    "registerNewDevice": "注册新设备",
+    "setupBiometric": "设置生物识别登录",
+    "biometricRegistrationFailed": "注册生物识别设备失败",
+    "biometricRegistrationCancelled": "生物识别注册已取消",
+    "biometricRemoveFailed": "移除凭证失败"
   },
   "Tokens": {
     "title": "API 令牌",
@@ -592,20 +616,28 @@
         "rateLimitGlobalWindowMs": "全局 — 时间窗口（毫秒）",
         "rateLimitAuthMax": "认证 — 最大请求数",
         "rateLimitAuthWindowMs": "认证 — 时间窗口（毫秒）",
-        "rateLimitTrustProxy": "可信代理链"
+        "rateLimitTrustProxy": "可信代理链",
+        "webauthnEnabled": "启用 WebAuthn",
+        "webauthnRpName": "服务方名称",
+        "webauthnRpId": "服务方 ID",
+        "webauthnOrigin": "预期 Origin"
       },
       "fieldsDesc": {
         "enableRegistration": "允许新用户注册",
-        "sessionMaxAge": "会话最长有效期（天）",
+        "sessionMaxAge": "会话最长有效天数",
         "uploadHotlink": "控制上传文件的全局防盗链保护",
-        "uploadHotlinkAllowedDomains": "允许引用上传文件的主机名",
-        "uploadHotlinkAllowEmptyReferer": "当 Referer 和 Origin 请求头缺失时允许直接访问",
-        "rateLimitEnabled": "所有限流器的总开关（立即生效）",
-        "rateLimitGlobalMax": "全局所有限流器每个时间窗口的最大请求数",
+        "uploadHotlinkAllowedDomains": "允许内嵌上传文件的主机",
+        "uploadHotlinkAllowEmptyReferer": "当 Referer 和 Origin 头缺失时是否允许直接访问",
+        "rateLimitEnabled": "全局限流器主开关（立即生效）",
+        "rateLimitGlobalMax": "所有接口每个时间窗口的最大请求数",
         "rateLimitGlobalWindowMs": "全局限流器的时间窗口大小（毫秒）",
         "rateLimitAuthMax": "认证相关接口（登录、注册等）每个时间窗口的最大请求数",
         "rateLimitAuthWindowMs": "认证限流器的时间窗口大小（毫秒）",
-        "rateLimitTrustProxy": "可信代理列表，用于 X-Forwarded-For 解析。支持 IP、CIDR（如 10.0.0.0/8）及关键字：loopback、uniqueLocal、linkLocal、private、all。空/none = 不信任任何代理。"
+        "rateLimitTrustProxy": "可信代理列表，用于 X-Forwarded-For 解析。支持 IP、CIDR（如 10.0.0.0/8）及关键字：loopback、uniqueLocal、linkLocal、private、all。空/none = 不信任任何代理。",
+        "webauthnEnabled": "允许用户使用通行密钥登录或注册",
+        "webauthnRpName": "浏览器 WebAuthn 提示中显示的友好名称",
+        "webauthnRpId": "服务方域名（如 localhost、example.com），必须与浏览器 Origin 的域名一致。",
+        "webauthnOrigin": "浏览器访问应用的完整 Origin（如 http://localhost:3000、https://example.com）"
       }
     }
   },

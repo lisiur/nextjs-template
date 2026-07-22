@@ -18,7 +18,12 @@
     "namePlaceholder": "你的姓名",
     "sessionExpired": "会话已过期",
     "sessionExpiredDescription": "您的会话已过期，请重新登录。",
-    "goToLogin": "前往登录"
+    "goToLogin": "前往登录",
+    "emailRequired": "请输入邮箱",
+    "or": "或",
+    "signInWithPasskey": "通行密钥登录",
+    "biometricLoginFailed": "生物识别登录失败",
+    "biometricCancelled": "生物识别认证已取消"
   },
   "Common": {
     "name": "姓名",
@@ -110,7 +115,25 @@
       "newPasswordMin": "新密码须为 10–256 个字符,且需同时包含字母和数字",
       "confirmPasswordRequired": "请确认你的密码",
       "passwordsMismatch": "两次输入的密码不一致"
-    }
+    },
+    "biometricLogin": "生物识别登录",
+    "devicesEnrolled": "已注册 {count} 台设备",
+    "platformAuthenticator": "平台认证器",
+    "securityKey": "安全密钥",
+    "removing": "移除中...",
+    "remove": "移除",
+    "biometricNotSetup": "尚未设置生物识别登录。",
+    "deviceName": "设备名称",
+    "deviceNamePlaceholder": "例如：MacBook 指纹（可选）",
+    "registerDeviceTitle": "注册设备",
+    "registerDeviceDescription": "为此设备命名，然后进行身份验证以完成注册。",
+    "register": "注册",
+    "registeringDevice": "正在注册设备...",
+    "registerNewDevice": "注册新设备",
+    "setupBiometric": "设置生物识别登录",
+    "biometricRegistrationFailed": "注册生物识别设备失败",
+    "biometricRegistrationCancelled": "生物识别注册已取消",
+    "biometricRemoveFailed": "移除凭证失败"
   },
   "Tokens": {
     "title": "API 令牌",

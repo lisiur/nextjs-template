@@ -9,3 +9,5 @@ export const notificationTemplateCache = globalCache.namespace(
   "notification:template",
 );
 export const rateLimitCache = globalCache.namespace("rate-limit");
+export const webauthnChallengeCache =
+  globalCache.namespace("webauthn:challenge");

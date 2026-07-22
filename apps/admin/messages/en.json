@@ -31,7 +31,12 @@
     "goToLogin": "Go to Login",
     "unauthorizedTitle": "Role Not Authorized",
     "unauthorizedDescription": "Your current role has no menu permissions. Please contact the administrator.",
-    "backToLogin": "Back to Login"
+    "backToLogin": "Back to Login",
+    "emailRequired": "Email is required",
+    "or": "or",
+    "signInWithPasskey": "Sign in with passkey",
+    "biometricLoginFailed": "Biometric login failed",
+    "biometricCancelled": "Biometric authentication was cancelled"
   },
   "FormDemo": {
     "title": "Form Demo",
@@ -170,6 +175,7 @@
     "description": "Manage your application configuration",
     "tabs": {
       "auth": "Authentication",
+      "webauthn": "WebAuthn",
       "upload": "Upload",
       "rate-limit": "Rate Limit"
     },
@@ -491,7 +497,25 @@
       "newPasswordMin": "New password must be 10–256 characters long and contain both letters and numbers",
       "confirmPasswordRequired": "Please confirm your password",
       "passwordsMismatch": "Passwords do not match"
-    }
+    },
+    "biometricLogin": "Biometric Login",
+    "devicesEnrolled": "{count, plural, one {# device enrolled} other {# devices enrolled}}",
+    "platformAuthenticator": "Platform Authenticator",
+    "securityKey": "Security Key",
+    "removing": "Removing...",
+    "remove": "Remove",
+    "biometricNotSetup": "Biometric login is not set up yet.",
+    "deviceName": "Device Name",
+    "deviceNamePlaceholder": "e.g., MacBook Touch ID (optional)",
+    "registerDeviceTitle": "Register Device",
+    "registerDeviceDescription": "Enter a name for this device, then authenticate to complete registration.",
+    "register": "Register",
+    "registeringDevice": "Registering device...",
+    "registerNewDevice": "Register New Device",
+    "setupBiometric": "Set Up Biometric Login",
+    "biometricRegistrationFailed": "Failed to register biometric device",
+    "biometricRegistrationCancelled": "Biometric registration was cancelled",
+    "biometricRemoveFailed": "Failed to remove credential"
   },
   "Tokens": {
     "title": "API Tokens",
@@ -592,7 +616,11 @@
         "rateLimitGlobalWindowMs": "Global — Window (ms)",
         "rateLimitAuthMax": "Auth — Max Requests",
         "rateLimitAuthWindowMs": "Auth — Window (ms)",
-        "rateLimitTrustProxy": "Trust Proxy Chain"
+        "rateLimitTrustProxy": "Trust Proxy Chain",
+        "webauthnEnabled": "Enable WebAuthn",
+        "webauthnRpName": "Relying Party Name",
+        "webauthnRpId": "Relying Party ID",
+        "webauthnOrigin": "Expected Origin"
       },
       "fieldsDesc": {
         "enableRegistration": "Allow new users to register",
@@ -605,7 +633,11 @@
         "rateLimitGlobalWindowMs": "Window size in milliseconds for the global limiter",
         "rateLimitAuthMax": "Maximum requests per window for auth endpoints (login, signup, etc.)",
         "rateLimitAuthWindowMs": "Window size in milliseconds for the auth limiter",
-        "rateLimitTrustProxy": "Comma-separated list of trusted proxies for X-Forwarded-For resolution. Supports IPs, CIDRs (e.g. 10.0.0.0/8), and keywords: loopback, uniqueLocal, linkLocal, private, all. Empty/none = trust no proxy."
+        "rateLimitTrustProxy": "Comma-separated list of trusted proxies for X-Forwarded-For resolution. Supports IPs, CIDRs (e.g. 10.0.0.0/8), and keywords: loopback, uniqueLocal, linkLocal, private, all. Empty/none = trust no proxy.",
+        "webauthnEnabled": "Allow users to sign in and register passkey credentials",
+        "webauthnRpName": "Human-friendly name shown in the browser's WebAuthn prompt",
+        "webauthnRpId": "Domain of the relying party (e.g. localhost, example.com). Must match the browser origin's domain.",
+        "webauthnOrigin": "Full origin the browser uses to access the app (e.g. http://localhost:3000, https://example.com)"
       }
     }
   },

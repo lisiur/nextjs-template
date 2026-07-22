@@ -1,5 +1,9 @@
 import { HTTPException } from "hono/http-exception";
 import type { Prisma } from "#generated/prisma/client";
+import {
+  getCredentialPassword,
+  getWechatProviderData,
+} from "#lib/account-provider-data";
 import { prisma } from "#lib/db";
 import { logAudit } from "#lib/logger";
 import { hashPassword, verifyPassword } from "#lib/password";
@@ -16,7 +20,7 @@ import { eventBus } from "#states";
 
 export type { AuthSession, AuthSessionUser, AuthType };
 
-function assertNotBanned(user: {
+export function assertNotBanned(user: {
   banned?: boolean | null;
   banReason?: string | null;
   banExpires?: Date | null;
@@ -51,7 +55,7 @@ async function logAuthLogin(
   });
 }
 
-async function getDefaultActiveOrganizationId(userId: string) {
+export async function getDefaultActiveOrganizationId(userId: string) {
   const memberships = await prisma.member.findMany({
     where: { userId },
     orderBy: { createdAt: "asc" },
@@ -82,10 +86,12 @@ export async function signInWithEmail(params: {
     (account) => account.providerId === "credential",
   );
 
+  const password = getCredentialPassword(credential?.providerData);
+
   if (
     !user ||
-    !credential?.password ||
-    !(await verifyPassword(credential.password, params.password))
+    !password ||
+    !(await verifyPassword(password, params.password))
   ) {
     await logAudit({
       traceId: params.traceId,
@@ -101,7 +107,7 @@ export async function signInWithEmail(params: {
         userAgent: params.userAgent,
         reason: !user
           ? "unknown_user"
-          : !credential?.password
+          : !password
             ? "no_credential"
             : "wrong_password",
       },
@@ -251,7 +257,7 @@ export async function createUser(body: {
         create: {
           accountId: body.email.toLowerCase(),
           providerId: "credential",
-          password: await hashPassword(body.password),
+          providerData: { password: await hashPassword(body.password) },
         },
       },
     },
@@ -274,10 +280,13 @@ export async function changePassword(params: {
     (account) => account.providerId === "credential",
   );
 
+  const currentPassword = getCredentialPassword(credential?.providerData);
+
   if (
     !user ||
-    !credential?.password ||
-    !(await verifyPassword(credential.password, params.currentPassword))
+    !credential ||
+    !currentPassword ||
+    !(await verifyPassword(currentPassword, params.currentPassword))
   ) {
     throw new HTTPException(400, {
       message: "Current password is incorrect",
@@ -292,7 +301,9 @@ export async function changePassword(params: {
   await prisma.$transaction([
     prisma.account.update({
       where: { id: credential.id },
-      data: { password: await hashPassword(params.newPassword) },
+      data: {
+        providerData: { password: await hashPassword(params.newPassword) },
+      },
     }),
     prisma.session.updateMany({
       where: { userId: user.id, revokedAt: null },
@@ -368,7 +379,12 @@ export async function signInWithWechat(params: {
 
     await prisma.account.update({
       where: { id: account.id },
-      data: { accessToken: wechatResult.session_key },
+      data: {
+        providerData: {
+          ...getWechatProviderData(account.providerData),
+          accessToken: wechatResult.session_key,
+        },
+      },
     });
 
     const session = await createSession({
@@ -405,7 +421,7 @@ export async function signInWithWechat(params: {
           create: {
             accountId: wechatResult.openid,
             providerId: "wechat",
-            accessToken: wechatResult.session_key,
+            providerData: { accessToken: wechatResult.session_key },
           },
         },
       },

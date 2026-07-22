@@ -121,6 +121,8 @@ openAPIApp.use("/auth/sign-in/email", authLimiter);
 openAPIApp.use("/auth/sign-up/email", authLimiter);
 openAPIApp.use("/auth/sign-in/wechat", authLimiter);
 openAPIApp.use("/auth/change-password", authLimiter);
+openAPIApp.use("/auth/webauthn/login-options", authLimiter);
+openAPIApp.use("/auth/webauthn/login-verify", authLimiter);
 
 openAPIApp.use("*", async (c, next) => {
   const contentType = c.req.raw.headers.get("content-type") ?? "";

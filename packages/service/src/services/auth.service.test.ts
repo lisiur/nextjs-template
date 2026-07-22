@@ -59,7 +59,7 @@ const credentialAccount = {
   id: "acct_1",
   providerId: "credential",
   accountId: "jane@example.com",
-  password: "hashed:secret",
+  providerData: { password: "hashed:secret" },
   userId: "user_1",
 };
 

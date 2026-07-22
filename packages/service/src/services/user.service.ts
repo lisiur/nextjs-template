@@ -228,15 +228,15 @@ export async function resetPassword(
     if (existingAccount) {
       await tx.account.update({
         where: { id: existingAccount.id },
-        data: { password: hashedPassword },
+        data: { providerData: { password: hashedPassword } },
       });
     } else {
       await tx.account.create({
         data: {
-          accountId: id,
+          accountId: existingUser.email.toLowerCase(),
           providerId: "credential",
           userId: id,
-          password: hashedPassword,
+          providerData: { password: hashedPassword },
         },
       });
     }

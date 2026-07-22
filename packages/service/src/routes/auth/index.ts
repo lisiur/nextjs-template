@@ -7,6 +7,15 @@ import { signInWechat } from "./signInWechat";
 import { signOut } from "./signOut";
 import { signUpEmail } from "./signUpEmail";
 import { updateUser } from "./updateUser";
+import {
+  webAuthnCredentials,
+  webAuthnLoginOptions,
+  webAuthnLoginVerify,
+  webAuthnRegisterOptions,
+  webAuthnRegisterVerify,
+  webAuthnRemoveCredential,
+  webAuthnStatus,
+} from "./webauthn";
 
 const authRoutes = new OpenAPIHono();
 
@@ -19,6 +28,13 @@ const routes = authRoutes.openapiRoutes([
   getRegistrationStatus,
   updateUser,
   changePassword,
+  webAuthnStatus,
+  webAuthnRegisterOptions,
+  webAuthnRegisterVerify,
+  webAuthnLoginOptions,
+  webAuthnLoginVerify,
+  webAuthnCredentials,
+  webAuthnRemoveCredential,
 ] as const);
 
 export { routes as authRoutes };

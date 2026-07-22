@@ -2,12 +2,22 @@
 
 import { Card, CardContent, CardHeader, CardTitle, Separator } from "@repo/ui";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { WebAuthnSettings } from "@/components/auth/webauthn-settings";
 import { ManagementPageShell } from "@/components/management-page-shell";
+import { appClient } from "@/lib/api";
 import { useSession } from "@/lib/api/use-session";
 import { AvatarUpload } from "./components/avatar-upload";
 import { PasswordForm } from "./components/password-form";
 import { ProfileForm } from "./components/profile-form";
+
+interface WebAuthnCredential {
+  id: string;
+  credentialId: string;
+  deviceType: "platform" | "cross-platform";
+  deviceName: string;
+  createdAt: string;
+}
 
 export default function ProfilePage() {
   const t = useTranslations("Profile");
@@ -18,6 +28,22 @@ export default function ProfilePage() {
     email: string;
     avatar?: string | null;
   } | null>(null);
+  const [credentials, setCredentials] = useState<WebAuthnCredential[]>([]);
+  const [credentialsLoading, setCredentialsLoading] = useState(true);
+
+  const fetchCredentials = useCallback(async () => {
+    try {
+      const res = await appClient.api.auth.webauthn.credentials.$get();
+      if (res.ok) {
+        const data = await res.json();
+        setCredentials(data.credentials || []);
+      }
+    } catch {
+      setCredentials([]);
+    } finally {
+      setCredentialsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (session.data?.user) {
@@ -29,6 +55,12 @@ export default function ProfilePage() {
       });
     }
   }, [session.data]);
+
+  useEffect(() => {
+    if (user) {
+      void fetchCredentials();
+    }
+  }, [user, fetchCredentials]);
 
   if (session.isPending) {
     return (
@@ -90,6 +122,24 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <PasswordForm />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("biometricLogin")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {credentialsLoading ? (
+                <div className="flex items-center justify-center py-4">
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                </div>
+              ) : (
+                <WebAuthnSettings
+                  credentials={credentials}
+                  onCredentialsChange={fetchCredentials}
+                />
+              )}
             </CardContent>
           </Card>
         </div>

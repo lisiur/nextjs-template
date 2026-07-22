@@ -18,7 +18,12 @@
     "namePlaceholder": "Your name",
     "sessionExpired": "Session Expired",
     "sessionExpiredDescription": "Your session has expired. Please sign in again.",
-    "goToLogin": "Go to Login"
+    "goToLogin": "Go to Login",
+    "emailRequired": "Email is required",
+    "or": "or",
+    "signInWithPasskey": "Sign in with passkey",
+    "biometricLoginFailed": "Biometric login failed",
+    "biometricCancelled": "Biometric authentication was cancelled"
   },
   "Common": {
     "name": "Name",
@@ -110,7 +115,25 @@
       "newPasswordMin": "New password must be 10–256 characters long and contain both letters and numbers",
       "confirmPasswordRequired": "Please confirm your password",
       "passwordsMismatch": "Passwords do not match"
-    }
+    },
+    "biometricLogin": "Biometric Login",
+    "devicesEnrolled": "{count, plural, one {# device enrolled} other {# devices enrolled}}",
+    "platformAuthenticator": "Platform Authenticator",
+    "securityKey": "Security Key",
+    "removing": "Removing...",
+    "remove": "Remove",
+    "biometricNotSetup": "Biometric login is not set up yet.",
+    "deviceName": "Device Name",
+    "deviceNamePlaceholder": "e.g., MacBook Touch ID (optional)",
+    "registerDeviceTitle": "Register Device",
+    "registerDeviceDescription": "Enter a name for this device, then authenticate to complete registration.",
+    "register": "Register",
+    "registeringDevice": "Registering device...",
+    "registerNewDevice": "Register New Device",
+    "setupBiometric": "Set Up Biometric Login",
+    "biometricRegistrationFailed": "Failed to register biometric device",
+    "biometricRegistrationCancelled": "Biometric registration was cancelled",
+    "biometricRemoveFailed": "Failed to remove credential"
   },
   "Tokens": {
     "title": "API Tokens",

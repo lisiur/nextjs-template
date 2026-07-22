@@ -84,6 +84,46 @@ const systemConfigs = [
     sortOrder: 1,
   },
   {
+    group: "webauthn",
+    key: "enabled",
+    value: "true",
+    type: "boolean",
+    label: "settings.fields.webauthnEnabled",
+    description: "settings.fieldsDesc.webauthnEnabled",
+    isSecret: false,
+    sortOrder: 0,
+  },
+  {
+    group: "webauthn",
+    key: "rp.name",
+    value: "My Application",
+    type: "string",
+    label: "settings.fields.webauthnRpName",
+    description: "settings.fieldsDesc.webauthnRpName",
+    isSecret: false,
+    sortOrder: 1,
+  },
+  {
+    group: "webauthn",
+    key: "rp.id",
+    value: "localhost",
+    type: "string",
+    label: "settings.fields.webauthnRpId",
+    description: "settings.fieldsDesc.webauthnRpId",
+    isSecret: false,
+    sortOrder: 2,
+  },
+  {
+    group: "webauthn",
+    key: "origin",
+    value: "http://localhost:3000",
+    type: "string",
+    label: "settings.fields.webauthnOrigin",
+    description: "settings.fieldsDesc.webauthnOrigin",
+    isSecret: false,
+    sortOrder: 3,
+  },
+  {
     group: "upload",
     key: "hotlink",
     value: JSON.stringify({
@@ -1121,15 +1161,15 @@ async function upsertUser(params: {
   if (existingAccount) {
     await prisma.account.update({
       where: { id: existingAccount.id },
-      data: { password: hashedPassword },
+      data: { providerData: { password: hashedPassword } },
     });
   } else {
     await prisma.account.create({
       data: {
-        accountId: user.id,
+        accountId: params.email.toLowerCase(),
         providerId: "credential",
         userId: user.id,
-        password: hashedPassword,
+        providerData: { password: hashedPassword },
       },
     });
   }
