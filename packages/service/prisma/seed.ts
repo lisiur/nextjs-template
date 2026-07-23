@@ -903,6 +903,18 @@ const builtInJobTemplates = [
     description: "Delete expired verification rows",
     cronExpression: "30 * * * *",
   },
+  {
+    name: "operation-log-sweep",
+    type: "operation-log-sweep",
+    description: "Delete operation logs older than 30 days",
+    cronExpression: "15 3 * * *",
+  },
+  {
+    name: "audit-log-sweep",
+    type: "audit-log-sweep",
+    description: "Delete audit logs older than 180 days",
+    cronExpression: "30 3 * * *",
+  },
 ];
 
 // ============================================================

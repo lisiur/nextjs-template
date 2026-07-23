@@ -118,13 +118,6 @@
       API but does not affect execution order (`p-queue` runs FIFO). Either
       wire priority into queue ordering or drop the field/docs claiming it.
 
-### Logger / Audit
-
-- [ ] **Audit/operation logs have no retention or pruning** [#18](https://github.com/lisiur/platform/issues/18) — both tables
-      grow forever; `deleteLogs` requires manual ID selection. Combined
-      with the op-logger feedback loop, the operation log grows faster
-      than necessary. Add a scheduled retention job.
-
 ### Schema & DB
 
 - [ ] **Only a single baseline migration; schema drift relies on
