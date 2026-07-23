@@ -415,6 +415,11 @@ const systemPermissions = [
     group: "attachment",
     name: "Replace Attachment",
   },
+  {
+    code: "attachment::manage-all",
+    group: "attachment",
+    name: "Manage All Users' Attachments",
+  },
   { code: "job::list", group: "job", name: "List Jobs" },
   { code: "job::create", group: "job", name: "Create Job" },
   { code: "job::view", group: "job", name: "View Job" },

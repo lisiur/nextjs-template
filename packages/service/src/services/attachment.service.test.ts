@@ -369,7 +369,10 @@ describe("createAttachment validation", () => {
       0,
     );
 
-    await deleteAttachments(["attachment1"]);
+    await deleteAttachments(["attachment1"], {
+      userId: "user1",
+      canManageAll: true,
+    });
 
     expect(mockPrisma.attachment.deleteMany).toHaveBeenCalledWith({
       where: { id: { in: ["attachment1"] } },
@@ -392,7 +395,10 @@ describe("createAttachment validation", () => {
       1,
     );
 
-    await deleteAttachments(["attachment1"]);
+    await deleteAttachments(["attachment1"], {
+      userId: "user1",
+      canManageAll: true,
+    });
 
     expect(mockUnlink).not.toHaveBeenCalled();
     expect(mockPrisma.upload.delete).not.toHaveBeenCalled();
@@ -410,6 +416,7 @@ describe("createAttachment validation", () => {
     const result = await replaceAttachment({
       id: "attachment1",
       file: new File([new Uint8Array(png)], "new.png", { type: "image/png" }),
+      actor: { userId: "user1", canManageAll: true },
     });
 
     expect(result.uploadId).toBe("newUpload");
@@ -424,7 +431,126 @@ describe("createAttachment validation", () => {
         file: new File([new Uint8Array([0x00])], "test.png", {
           type: "image/png",
         }),
+        actor: { userId: "user1", canManageAll: true },
       }),
     ).rejects.toMatchObject({ status: 404 });
+  });
+});
+
+const PNG_BYTES = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00];
+
+describe("attachment ownership scoping", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    process.env.UPLOAD_SIGN_SECRET = "test-secret";
+  });
+
+  it("rejects replace by a non-owner without manage-all", async () => {
+    mockPrisma.attachment.findUnique.mockResolvedValue({
+      ...publicAttachment,
+      createdBy: "owner-user",
+    });
+
+    await expect(
+      replaceAttachment({
+        id: "attachment1",
+        file: new File([new Uint8Array(PNG_BYTES)], "new.png", {
+          type: "image/png",
+        }),
+        actor: { userId: "other-user", canManageAll: false },
+      }),
+    ).rejects.toMatchObject({ status: 403 });
+  });
+
+  it("allows replace by the owner", async () => {
+    mockPrisma.attachment.findUnique.mockResolvedValue({
+      ...publicAttachment,
+      createdBy: "user1",
+    });
+    mockPrisma.upload.create.mockResolvedValue({ id: "newUpload" });
+    mockPrisma.attachment.count.mockResolvedValue(1);
+
+    const result = await replaceAttachment({
+      id: "attachment1",
+      file: new File([new Uint8Array(PNG_BYTES)], "new.png", {
+        type: "image/png",
+      }),
+      actor: { userId: "user1", canManageAll: false },
+    });
+
+    expect(result.uploadId).toBe("newUpload");
+  });
+
+  it("allows replace on others' files with manage-all", async () => {
+    mockPrisma.attachment.findUnique.mockResolvedValue({
+      ...publicAttachment,
+      createdBy: "owner-user",
+    });
+    mockPrisma.upload.create.mockResolvedValue({ id: "newUpload" });
+    mockPrisma.attachment.count.mockResolvedValue(1);
+
+    const result = await replaceAttachment({
+      id: "attachment1",
+      file: new File([new Uint8Array(PNG_BYTES)], "new.png", {
+        type: "image/png",
+      }),
+      actor: { userId: "admin", canManageAll: true },
+    });
+
+    expect(result.uploadId).toBe("newUpload");
+  });
+
+  it("scopes deleteAttachments to caller's own files without manage-all", async () => {
+    const ownedAttachment = { ...publicAttachment, id: "owned" };
+    (
+      mockPrisma.attachment.findMany as ReturnType<typeof vi.fn>
+    ).mockResolvedValue([ownedAttachment]);
+    (
+      mockPrisma.attachment.deleteMany as ReturnType<typeof vi.fn>
+    ).mockResolvedValue({ count: 1 });
+
+    await deleteAttachments(["owned", "someone-elses"], {
+      userId: "user1",
+      canManageAll: false,
+    });
+
+    const findWhere = (
+      mockPrisma.attachment.findMany as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0].where;
+    expect(findWhere.createdBy).toBe("user1");
+    expect(findWhere.id.in).toEqual(["owned", "someone-elses"]);
+
+    const deleteWhere = (
+      mockPrisma.attachment.deleteMany as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0].where;
+    expect(deleteWhere.createdBy).toBe("user1");
+    expect(deleteWhere.id.in).toEqual(["owned"]);
+  });
+
+  it("deleteAttachments ignores ownership with manage-all", async () => {
+    (
+      mockPrisma.attachment.findMany as ReturnType<typeof vi.fn>
+    ).mockResolvedValue([
+      { ...publicAttachment, id: "a" },
+      { ...publicAttachment, id: "b" },
+    ]);
+    (
+      mockPrisma.attachment.deleteMany as ReturnType<typeof vi.fn>
+    ).mockResolvedValue({ count: 2 });
+
+    await deleteAttachments(["a", "b"], {
+      userId: "admin",
+      canManageAll: true,
+    });
+
+    const findWhere = (
+      mockPrisma.attachment.findMany as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0].where;
+    expect(findWhere.createdBy).toBeUndefined();
+    const deleteWhere = (
+      mockPrisma.attachment.deleteMany as ReturnType<typeof vi.fn>
+    ).mock.calls[0][0].where;
+    expect(deleteWhere.createdBy).toBeUndefined();
+    expect(deleteWhere.id.in).toEqual(["a", "b"]);
   });
 });

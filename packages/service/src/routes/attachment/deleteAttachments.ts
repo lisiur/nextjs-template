@@ -1,5 +1,5 @@
 import { createRoute, defineOpenAPIRoute } from "@hono/zod-openapi";
-import { requirePrincipal } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   deleteSuccessSchema,
@@ -8,7 +8,10 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { deleteAttachments } from "#services/attachment.service";
-import { assertAccess } from "#services/role-permission.service";
+import {
+  assertAccess,
+  checkPermission,
+} from "#services/role-permission.service";
 import { deleteAttachmentsBodySchema } from "./schema";
 
 export const deleteAttachmentsRoute = defineOpenAPIRoute({
@@ -38,15 +41,20 @@ export const deleteAttachmentsRoute = defineOpenAPIRoute({
   handler: async (c) => {
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "attachment::delete");
+    const userId = getPrincipalUserId(principal);
+    const canManageAll = await checkPermission(
+      userId,
+      "attachment::manage-all",
+    );
     const { ids } = c.req.valid("json");
 
-    await deleteAttachments(ids);
+    const deletedIds = await deleteAttachments(ids, { userId, canManageAll });
 
     await logAudit({
       event: "attachment.deleted",
       category: "file_management",
       severity: "warning",
-      metadata: { ids },
+      metadata: { requestedIds: ids, deletedIds },
       c,
     });
 

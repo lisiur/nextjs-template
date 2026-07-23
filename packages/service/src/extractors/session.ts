@@ -5,22 +5,23 @@ import { getApiTokenByBearer } from "#lib/api-token";
 import type { AuthType } from "#lib/session";
 import { getSessionFromHeaders } from "#lib/session";
 
-export type Principal =
-  | ({ kind: "user" } & AuthType)
-  | ({ kind: "token" } & ApiTokenPrincipal);
+export type UserPrincipal = { kind: "user" } & AuthType;
+export type TokenPrincipal = { kind: "token" } & ApiTokenPrincipal;
+
+export type Principal = UserPrincipal | TokenPrincipal;
 
 export async function trySession(c: Context): Promise<AuthType | null> {
   return getSessionFromHeaders(c.req.raw.headers);
 }
 
-export async function requireSession(c: Context): Promise<AuthType> {
+export async function requireSession(c: Context): Promise<UserPrincipal> {
   const session = await trySession(c);
   if (!session) {
     throw new HTTPException(401, {
       message: "Unauthorized",
     });
   }
-  return session;
+  return { kind: "user", ...session };
 }
 
 function getBearerToken(headers: Headers): string | null {

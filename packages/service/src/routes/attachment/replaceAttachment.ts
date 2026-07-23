@@ -1,6 +1,6 @@
 import { createRoute, defineOpenAPIRoute, z } from "@hono/zod-openapi";
 import { HTTPException } from "hono/http-exception";
-import { requirePrincipal } from "#extractors/session";
+import { getPrincipalUserId, requirePrincipal } from "#extractors/session";
 import { logAudit } from "#lib/logger";
 import {
   badRequestResponse,
@@ -10,7 +10,10 @@ import {
   unauthorizedResponse,
 } from "#lib/openapi";
 import { replaceAttachment as replaceAttachmentFile } from "#services/attachment.service";
-import { assertAccess } from "#services/role-permission.service";
+import {
+  assertAccess,
+  checkPermission,
+} from "#services/role-permission.service";
 import {
   replaceAttachmentParamSchema,
   replaceAttachmentResponseSchema,
@@ -52,6 +55,11 @@ export const replaceAttachmentRoute = defineOpenAPIRoute({
   handler: async (c) => {
     const principal = await requirePrincipal(c);
     await assertAccess(principal, "attachment::replace");
+    const userId = getPrincipalUserId(principal);
+    const canManageAll = await checkPermission(
+      userId,
+      "attachment::manage-all",
+    );
 
     const { id } = c.req.valid("param");
 
@@ -68,7 +76,11 @@ export const replaceAttachmentRoute = defineOpenAPIRoute({
       throw new HTTPException(400, { message: "No file provided" });
     }
 
-    const updated = await replaceAttachmentFile({ id, file });
+    const updated = await replaceAttachmentFile({
+      id,
+      file,
+      actor: { userId, canManageAll },
+    });
 
     await logAudit({
       event: "attachment.replaced",

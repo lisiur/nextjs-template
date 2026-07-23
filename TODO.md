@@ -119,15 +119,16 @@
       throw 401` (`routes/attachment/signAttachment.ts:32-34`) is unreachable
       because `getPrincipalUserId` always returns a non-empty string. Remove
       or replace with a real ownership check.
-- [ ] **IDOR: `replaceAttachment` / `deleteAttachments` check permission but
-      not ownership** — both act on caller-supplied IDs with no `createdBy`
-      filter (`routes/attachment/replaceAttachment.ts:52-71`,
-      `routes/attachment/deleteAttachments.ts:38-43`; service
-      `attachment.service.ts:417-511` for replace, `:361-384` for delete).
-      Contrast `signFile` which enforces `bizType === "user:avatar" &&
-      bizId === userId` (`attachment.service.ts:281-285`). A holder of
-      `attachment::replace` can silently swap any user's file content.
-      Scope the `where` to `createdBy` for non-superusers.
+- [x] **IDOR: `replaceAttachment` / `deleteAttachments` check permission but
+      not ownership** — FIXED: both routes now resolve an actor
+      (`{ userId, canManageAll }`); `canManageAll` is gated by a new
+      `attachment::manage-all` permission (auto-granted to the admin role via
+      seed). `replaceAttachment` 403s when a non-`manage-all` caller isn't the
+      `createdBy` owner; `deleteAttachments` scopes its `findMany`/`deleteMany`
+      `where` to `createdBy = userId` for non-`manage-all` callers, silently
+      skipping ids they don't own. Contrast `signFile` which enforces
+      `bizType === "user:avatar" && bizId === userId`
+      (`attachment.service.ts:281-285`).
 
 ### Cache
 

@@ -360,14 +360,24 @@ export async function listAttachments(params: {
   return { attachments, total };
 }
 
-export async function deleteAttachments(ids: string[]) {
+export type AttachmentActor = {
+  userId: string;
+  canManageAll: boolean;
+};
+
+export async function deleteAttachments(
+  ids: string[],
+  actor: AttachmentActor,
+): Promise<string[]> {
+  const scopeWhere = actor.canManageAll ? {} : { createdBy: actor.userId };
   const attachments = await prisma.attachment.findMany({
-    where: { id: { in: ids } },
+    where: { id: { in: ids }, ...scopeWhere },
     include: { upload: true },
   });
 
+  const scopedIds = attachments.map((a) => a.id);
   await prisma.attachment.deleteMany({
-    where: { id: { in: ids } },
+    where: { id: { in: scopedIds }, ...scopeWhere },
   });
 
   for (const attachment of attachments) {
@@ -383,6 +393,8 @@ export async function deleteAttachments(ids: string[]) {
       await prisma.upload.delete({ where: { id: attachment.uploadId } });
     }
   }
+
+  return scopedIds;
 }
 
 export async function deleteAttachmentsByBiz(
@@ -416,8 +428,12 @@ export async function deleteAttachmentsByBiz(
   }
 }
 
-export async function replaceAttachment(params: { id: string; file: File }) {
-  const { id, file } = params;
+export async function replaceAttachment(params: {
+  id: string;
+  file: File;
+  actor: AttachmentActor;
+}) {
+  const { id, file, actor } = params;
   const allowedTypes = allowedMimeTypes();
 
   if (!allowedTypes.includes(file.type)) {
@@ -438,6 +454,9 @@ export async function replaceAttachment(params: { id: string; file: File }) {
   });
   if (!attachment) {
     throw new HTTPException(404, { message: "File not found" });
+  }
+  if (!actor.canManageAll && attachment.createdBy !== actor.userId) {
+    throw new HTTPException(403, { message: "Permission denied" });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
