@@ -509,6 +509,9 @@ CREATE UNIQUE INDEX "account_providerId_accountId_key" ON "account"("providerId"
 CREATE INDEX "verification_identifier_idx" ON "verification"("identifier");
 
 -- CreateIndex
+CREATE INDEX "verification_expiresAt_idx" ON "verification"("expiresAt");
+
+-- CreateIndex
 CREATE INDEX "job_instance_jobId_idx" ON "job_instance"("jobId");
 
 -- CreateIndex

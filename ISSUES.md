@@ -174,13 +174,6 @@
       **Deferred:** not a critical problem; the job worker already handles
       retries and SMTP setup cost is negligible at expected notification volume.
 
-### Cache
-
-- [ ] **Cache has no TTL** [#25](https://github.com/lisiur/platform/issues/25) — the LRU is configured with `max` only
-      (`lib/cache.ts:19`); entries never expire by time and live until
-      evicted or manually cleared. Add a `ttl` option (and consider
-      per-namespace TTLs) so stale data can't linger.
-
 ### Jobs / Queue
 
 - [ ] **Job queue: no row-level claim / not multi-instance safe** [#26](https://github.com/lisiur/platform/issues/26) — the

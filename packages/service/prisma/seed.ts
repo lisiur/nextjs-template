@@ -897,6 +897,12 @@ const builtInJobTemplates = [
     description: "Delete completed/failed job instances older than 30 days",
     cronExpression: "0 3 * * *",
   },
+  {
+    name: "verification-sweep",
+    type: "verification-sweep",
+    description: "Delete expired verification rows",
+    cronExpression: "30 * * * *",
+  },
 ];
 
 // ============================================================
