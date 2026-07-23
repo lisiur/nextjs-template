@@ -166,8 +166,8 @@ export function JobTemplateDialog({
             {isEdit ? t("editTemplate") : t("addTemplate")}
           </DialogTitle>
         </DialogHeader>
-        <form id="job-template-form" onSubmit={handleSubmit}>
-          <DialogBody>
+        <DialogBody>
+          <form id="job-template-form" onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="tpl-name">{t("form.name")}</FieldLabel>
@@ -317,8 +317,8 @@ export function JobTemplateDialog({
                 {errors.payload && <FieldError>{errors.payload}</FieldError>}
               </Field>
             </FieldGroup>
-          </DialogBody>
-        </form>
+          </form>
+        </DialogBody>
         <DialogFooter>
           <Button
             type="button"
