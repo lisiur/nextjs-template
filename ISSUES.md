@@ -9,13 +9,6 @@
       gives attackers decryption material for previously captured
       `encryptedData`. Encrypt at rest or don't persist beyond the active
       session.
-- [ ] **Session table is never swept by a scheduled job** [#1](https://github.com/lisiur/platform/issues/1) — expired/revoked
-      rows are only lazily marked (`lib/session.ts:137-141` lazy `revokedAt`
-      on expired, `:144-148` on banned; `:174-183` `deleteSessionByToken`
-      only sets `revokedAt`). `createSession` now proactively deletes the
-      caller's own dead sessions on login (`:72-85`), but there is no
-      scheduled cleanup for users who never log in again. Add a sweep that
-      deletes rows where `revokedAt IS NOT NULL` or `expiresAt < now()`.
 
 ### SSE / Events / EventBus
 
