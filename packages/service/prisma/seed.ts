@@ -892,8 +892,8 @@ const builtInJobTemplates = [
     cronExpression: "0 * * * *",
   },
   {
-    name: "job-instance-cleanup",
-    type: "job-instance-cleanup",
+    name: "job-instance-sweep",
+    type: "job-instance-sweep",
     description: "Delete completed/failed job instances older than 30 days",
     cronExpression: "0 3 * * *",
   },
